@@ -7,7 +7,7 @@ load("//wpiunits:generate_wpiunits.bzl", "generate_wpiunits")
 py_binary(
     name = "generate_units",
     srcs = ["generate_units.py"],
-    data = glob(["src/generate/main/java/**"]),
+    data = ["src/generate/main/java/Measure-implementation.java.jinja"],
     target_compatible_with = select({
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],

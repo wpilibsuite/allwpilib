@@ -3,8 +3,8 @@ load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 
 wpilib_cc_library(
     name = "catch2",
-    srcs = glob(["src/main/native/cpp/**"]),
-    hdrs = glob(["src/main/native/include/**"]),
+    srcs = glob(["src/main/native/cpp/**/*.cpp"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]),
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],

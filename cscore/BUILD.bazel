@@ -7,7 +7,8 @@ load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project", "packa
 filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/main/native/include/**/*",
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
     ]),
     visibility = ["//visibility:public"],
 )
@@ -16,13 +17,13 @@ filegroup(
     name = "native-srcs",
     srcs = select({
         "@platforms//os:linux": glob([
-            "src/main/native/linux/**/*.cpp",
-            "src/main/native/linux/**/*.hpp",
+            "src/main/native/linux/*.cpp",
+            "src/main/native/linux/*.hpp",
         ]),
-        "@platforms//os:osx": glob(["src/main/native/osx/**/*.cpp"]),
+        "@platforms//os:osx": glob(["src/main/native/osx/*.cpp"]),
         "@platforms//os:windows": glob([
-            "src/main/native/windows/**/*.cpp",
-            "src/main/native/windows/**/*.hpp",
+            "src/main/native/windows/*.cpp",
+            "src/main/native/windows/*.hpp",
         ]),
     }),
 )
@@ -30,12 +31,13 @@ filegroup(
 wpilib_objc_library(
     name = "cscore-mac",
     srcs = glob([
-        "src/main/native/objcpp/**/*.mm",
+        "src/main/native/objcpp/*.mm",
         "src/main/native/cpp/*.hpp",
     ]),
     hdrs = glob([
-        "src/main/native/include/**/*",
-        "src/main/native/objcpp/**/*.hpp",
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
+        "src/main/native/objcpp/*.hpp",
     ]),
     include_arc = False,
     includes = [
@@ -60,11 +62,14 @@ wpilib_objc_library(
 
 wpilib_cc_library(
     name = "cscore",
-    srcs = [":native-srcs"] + glob(
-        ["src/main/native/cpp/**"],
-        exclude = ["src/main/native/cpp/jni/**"],
-    ),
-    hdrs = glob(["src/main/native/include/**/*"]),
+    srcs = [":native-srcs"] + glob([
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/cpp/*.hpp",
+    ]),
+    hdrs = glob([
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
+    ]),
     extra_src_pkg_files = [
         ":cscore-java-jni-hdrs-pkg",
     ],
@@ -141,7 +146,7 @@ wpilib_cc_static_library(
 
 wpilib_jni_cc_library(
     name = "cscorejni",
-    srcs = glob(["src/main/native/cpp/jni/**"]),
+    srcs = ["src/main/native/cpp/jni/CameraServerJNI.cpp"],
     java_dep = ":cscore-java",
     visibility = ["//visibility:public"],
     deps = [

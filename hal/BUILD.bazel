@@ -14,40 +14,51 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-MRCLIB_SRCS = glob(["src/main/native/cpp/mrclib/**"])
+MRCLIB_SRCS = glob(["src/main/native/cpp/mrclib/*.cpp"])
 
 filegroup(
     name = "platform-srcs",
     srcs = select({
-        "@wpilib_toolchains//constraints/is_systemcore:systemcore": glob(["src/main/native/systemcore/**"]) + MRCLIB_SRCS,
-        "//conditions:default": glob(["src/main/native/sim/**"]),
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": glob([
+            "src/main/native/systemcore/**/*.cpp",
+            "src/main/native/systemcore/**/*.h",
+            "src/main/native/systemcore/**/*.hpp",
+        ]) + MRCLIB_SRCS,
+        "//conditions:default": glob([
+            "src/main/native/sim/**/*.cpp",
+            "src/main/native/sim/**/*.hpp",
+        ]),
     }),
 )
 
 pkg_files(
     name = "hal-sim-pkg",
-    srcs = glob(["src/main/native/sim/**"]),
+    srcs = glob([
+        "src/main/native/sim/**/*.cpp",
+        "src/main/native/sim/**/*.hpp",
+    ]),
     strip_prefix = "src/main/native",
 )
 
 pkg_files(
     name = "hal-systemcore-pkg",
-    srcs = glob(["src/main/native/systemcore/**"]),
+    srcs = glob([
+        "src/main/native/systemcore/**/*.cpp",
+        "src/main/native/systemcore/**/*.hpp",
+    ]),
     strip_prefix = "src/main/native",
 )
 
 wpilib_cc_library(
     name = "wpiHal",
-    srcs = [":platform-srcs"] + glob(
-        [
-            "src/main/native/cpp/**",
-        ],
-        exclude = [
-            "src/main/native/cpp/jni/**",
-            "src/main/native/cpp/mrclib/**",
-        ],
-    ),
-    hdrs = glob(["src/main/native/include/**/*"]),
+    srcs = [":platform-srcs"] + glob([
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/cpp/handles/*.cpp",
+    ]),
+    hdrs = glob([
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
+    ]),
     extra_src_pkg_files = [
         ":hal-sim-pkg",
         ":hal-systemcore-pkg",
@@ -109,7 +120,10 @@ wpilib_cc_static_library(
 
 wpilib_jni_cc_library(
     name = "wpiHaljni",
-    srcs = glob(["src/main/native/cpp/jni/**"]),
+    srcs = glob([
+        "src/main/native/cpp/jni/**/*.cpp",
+        "src/main/native/cpp/jni/**/*.hpp",
+    ]),
     java_dep = ":hal-java",
     visibility = ["//visibility:public"],
     deps = [

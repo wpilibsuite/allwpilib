@@ -41,7 +41,7 @@ def pkg_files_headers(name, dep):
 def pkg_java_src_files(name):
     pkg_files(
         name = name + "-java-srcs",
-        srcs = native.glob(["src/main/java/**"]),
+        srcs = native.glob(["src/main/java/**/*.java"]),
         strip_prefix = "src/main/java",
     )
 
@@ -59,7 +59,7 @@ def pkg_java_src_files(name):
 
     pkg_files(
         name = name + "-proto-srcs",
-        srcs = native.glob(["src/main/proto/**"], allow_empty = True),
+        srcs = native.glob(["src/main/proto/**/*.proto"], allow_empty = True),
         strip_prefix = "src/main/proto",
     )
 

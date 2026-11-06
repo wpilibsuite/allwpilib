@@ -6,7 +6,7 @@ load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_library
 
 filegroup(
     name = "test-resources",
-    srcs = glob(["src/test/resources/**"]),
+    srcs = ["src/test/resources/META-INF/services/org.junit.jupiter.api.extension.Extension"],
     visibility = ["//commandsv3/src/test/java:__pkg__"],
 )
 
@@ -26,8 +26,8 @@ py_binary(
 filegroup(
     name = "templates",
     srcs = glob([
-        "src/generate/main/**",
-        "src/main/proto/**",
+        "src/generate/main/java/*.jinja",
+        "src/main/proto/*.proto",
     ]) + [
         "//wpilibj:hid_schema",
     ],

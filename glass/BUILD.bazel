@@ -17,7 +17,7 @@ third_party_cc_lib_helper(
 wpilib_cc_library(
     name = "glass",
     srcs = glob(["src/lib/native/cpp/**/*.cpp"]),
-    hdrs = glob(["src/lib/native/include/**"]),
+    hdrs = glob(["src/lib/native/include/**/*.hpp"]),
     hdrs_pkg_root = "src/lib/native/include",
     srcs_pkg_root = "src/lib/native/cpp",
     strip_include_prefix = "src/lib/native/include",
@@ -58,7 +58,7 @@ cc_library(
     srcs = glob(["src/lib/native/cpp/**/*.cpp"]) + [
         ":mrccomm-srcs",
     ],
-    hdrs = glob(["src/lib/native/include/**"]),
+    hdrs = glob(["src/lib/native/include/**/*.hpp"]),
     strip_include_prefix = "src/lib/native/include",
     tags = [
         "wpi-cpp-gui",
@@ -132,13 +132,16 @@ generate_resources(
     name = "generate-resources",
     namespace = "wpi::glass",
     prefix = "GLASS",
-    resource_files = glob(["src/app/native/resources/*"]),
+    resource_files = glob(["src/app/native/resources/*.png"]),
     visibility = ["//glass/src/test/native/imgui:__pkg__"],
 )
 
 filegroup(
     name = "app-native-srcs",
-    srcs = glob(["src/app/native/cpp/**"]),
+    srcs = glob([
+        "src/app/native/cpp/*.cpp",
+        "src/app/native/cpp/*.hpp",
+    ]),
     visibility = ["//glass/src/test/native/imgui:__pkg__"],
 )
 
@@ -147,7 +150,10 @@ cc_binary(
     srcs = [
         ":generate-resources",
         ":generate-version",
-    ] + glob(["src/app/native/cpp/**"]),
+    ] + glob([
+        "src/app/native/cpp/*.cpp",
+        "src/app/native/cpp/*.hpp",
+    ]),
     linkopts = select({
         "@platforms//os:windows": ["-SUBSYSTEM:WINDOWS"],
         "//conditions:default": [],

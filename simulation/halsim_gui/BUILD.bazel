@@ -14,14 +14,18 @@ cc_library(
 
 filegroup(
     name = "main-native-srcs",
-    srcs = glob(["src/main/native/cpp/*"]),
+    srcs = glob([
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/cpp/*.hpp",
+    ]),
     visibility = ["//simulation/halsim_gui/src/test/native/imgui:__pkg__"],
 )
 
 wpilib_cc_library(
     name = "halsim_gui",
     srcs = glob([
-        "src/main/native/cpp/*",
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/cpp/*.hpp",
         "src/main/native/include/**/*.hpp",
     ]),
     includes = ["src/main/native/include"],
@@ -42,7 +46,8 @@ wpilib_cc_library(
 wpilib_cc_library(
     name = "halsim_gui_static",
     srcs = glob([
-        "src/main/native/cpp/*",
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/cpp/*.hpp",
         "src/main/native/include/**/*.hpp",
     ]),
     copts = [
