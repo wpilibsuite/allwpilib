@@ -18,6 +18,7 @@ import org.openjdk.jmh.runner.options.TimeValue;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N5;
+import org.wpilib.math.numbers.N7;
 
 public class Main {
   /**
@@ -71,6 +72,13 @@ public class Main {
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
   public Matrix<N5, N5> dare() {
     return DAREBenchmark.dare();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.MICROSECONDS)
+  public Matrix<N7, N7> matrixExp() {
+    return MatrixExpBenchmark.matrixExp();
   }
 
   @Benchmark
