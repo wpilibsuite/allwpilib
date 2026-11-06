@@ -15,12 +15,10 @@ package org.wpilib.examples.hatchbotcmdv3;
 public final class Constants {
   public static final class DriveConstants {
     public static final int LEFT_MOTOR1_PORT = 0;
-    public static final int LEFT_MOTOR2_PORT = 1;
-    public static final int RIGHT_MOTOR1_PORT = 2;
-    public static final int RIGHT_MOTOR2_PORT = 3;
+    public static final int RIGHT_MOTOR1_PORT = 1;
 
-    public static final int[] LEFT_ENCODER_PORTS = new int[] {0, 1};
-    public static final int[] RIGHT_ENCODER_PORTS = new int[] {2, 3};
+    public static final int[] LEFT_ENCODER_PORTS = new int[] {2, 3};
+    public static final int[] RIGHT_ENCODER_PORTS = new int[] {4, 5};
     public static final boolean LEFT_ENCODER_REVERSED = false;
     public static final boolean RIGHT_ENCODER_REVERSED = true;
 
