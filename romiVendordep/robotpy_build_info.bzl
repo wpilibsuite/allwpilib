@@ -9,52 +9,53 @@ def define_native_wrapper(name, pyproject_toml = None):
         srcs = native.glob(["src/main/native/include/**"]) + [
             "//:LICENSE.md",
         ],
-        out = "native/telemetry/include",
+        out = "native/romi/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
-            "telemetry/src/main/native/include": "",
+            "romiVendordep/src/main/native/include": "",
         },
         verbose = False,
         visibility = ["//visibility:public"],
     )
 
-    libinit_files = ["native/telemetry/_init_robotpy_native_telemetry.py"]
+    libinit_files = ["native/romi/_init_robotpy_native_romi.py"]
 
     generate_native_files(
         name = name,
         pyproject_toml = pyproject_toml,
         pc_deps = [
-            "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+            "//wpilibc:native/wpilib/robotpy-native-wpilib.pc",
         ],
         libinit_files = libinit_files,
-        pc_files = ["native/telemetry/robotpy-native-telemetry.pc"],
+        pc_files = ["native/romi/robotpy-native-romi.pc"],
     )
 
     copy_native_file(
-        name = "telemetry",
-        library = "shared/telemetry",
-        base_path = "native/telemetry/",
+        name = "romiVendordep",
+        library = "shared/romiVendordep",
+        base_path = "native/romi/",
     )
 
     robotpy_library(
         name = name,
-        distribution = "robotpy-native-telemetry",
+        distribution = "robotpy-native-romi",
         srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
-            ":telemetry.copy_lib",
+            ":romiVendordep.copy_lib",
             "{}.copy_headers".format(name),
         ],
         deps = [
-            "//wpiutil:robotpy-native-wpiutil",
+            "//wpilibc:robotpy-native-wpilib",
         ],
-        summary = "WPILib Telemetry Library",
-        requires = ["robotpy-native-wpiutil==0.0.0"],
-        python_requires = "",
-        strip_path_prefixes = ["telemetry"],
+        strip_path_prefixes = ["romiVendordep"],
+        summary = "WPILib Romi support library",
+        project_urls = None,
+        author_email = None,
+        requires = ["robotpy-native-wpilib==0.0.0"],
+        python_requires = ">=3.12",
         entry_points = {
-            "pkg_config": [
-                "telemetry = native.telemetry",
-            ],
+            "pkg_config": ["romi = native.romi"],
         },
+        visibility = ["//visibility:public"],
     )

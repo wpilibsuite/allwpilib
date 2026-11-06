@@ -9,7 +9,7 @@ load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info")
 load("//wpiutil:generate.bzl", "generate_wpiutil")
-load("//wpiutil:robotpy_native_build_info.bzl", "define_native_wrapper")
+load(":robotpy_build_info.bzl", "define_native_wrapper")
 
 filegroup(
     name = "doxygen-files",

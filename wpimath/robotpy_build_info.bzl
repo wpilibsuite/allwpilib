@@ -62,13 +62,14 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//tunables:robotpy-native-tunables",
             "//wpiutil:robotpy-native-wpiutil",
         ],
+        strip_path_prefixes = ["wpimath"],
         summary = "WPILib Math Library",
+        project_urls = None,
+        author_email = None,
         requires = ["robotpy-native-telemetry==0.0.0", "robotpy-native-tunables==0.0.0", "robotpy-native-wpiutil==0.0.0"],
         python_requires = ">=3.12",
-        strip_path_prefixes = ["wpimath"],
         entry_points = {
-            "pkg_config": [
-                "wpimath = native.wpimath",
-            ],
+            "pkg_config": ["wpimath = native.wpimath"],
         },
+        visibility = ["//visibility:public"],
     )

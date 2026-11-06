@@ -6,19 +6,20 @@ load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "gene
 def define_native_wrapper(name, pyproject_toml = None):
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = native.glob(["src/main/native/include/**"]) + [
+        srcs = native.glob(["src/main/native/include/**"]) + ["//drivers:generated-native-include-files"] + [
             "//:LICENSE.md",
         ],
-        out = "native/romi/include",
+        out = "native/wpilib_drivers/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
-            "romiVendordep/src/main/native/include": "",
+            "drivers/src/generated/main/native/include": "",
+            "drivers/src/main/native/include": "",
         },
         verbose = False,
         visibility = ["//visibility:public"],
     )
 
-    libinit_files = ["native/romi/_init_robotpy_native_romi.py"]
+    libinit_files = ["native/wpilib_drivers/_init_robotpy_native_wpilib_drivers.py"]
 
     generate_native_files(
         name = name,
@@ -27,34 +28,35 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//wpilibc:native/wpilib/robotpy-native-wpilib.pc",
         ],
         libinit_files = libinit_files,
-        pc_files = ["native/romi/robotpy-native-romi.pc"],
+        pc_files = ["native/wpilib_drivers/robotpy-native-wpilib-drivers.pc"],
     )
 
     copy_native_file(
-        name = "romiVendordep",
-        library = "shared/romiVendordep",
-        base_path = "native/romi/",
+        name = "drivers",
+        library = "shared/drivers",
+        base_path = "native/wpilib_drivers/",
     )
 
     robotpy_library(
         name = name,
-        distribution = "robotpy-native-romi",
+        distribution = "robotpy-native-wpilib-drivers",
         srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
-            ":romiVendordep.copy_lib",
+            ":drivers.copy_lib",
             "{}.copy_headers".format(name),
         ],
         deps = [
             "//wpilibc:robotpy-native-wpilib",
         ],
-        summary = "WPILib Romi support library",
+        strip_path_prefixes = ["drivers"],
+        summary = "WPILib third-party drivers library",
+        project_urls = None,
+        author_email = None,
         requires = ["robotpy-native-wpilib==0.0.0"],
         python_requires = ">=3.12",
-        strip_path_prefixes = ["romiVendordep"],
         entry_points = {
-            "pkg_config": [
-                "romi = native.romi",
-            ],
+            "pkg_config": ["wpilib_drivers = native.wpilib_drivers"],
         },
+        visibility = ["//visibility:public"],
     )

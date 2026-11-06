@@ -67,13 +67,14 @@ def define_native_wrapper(name, pyproject_toml = None):
         ],
         deps = [
         ],
+        strip_path_prefixes = ["wpiutil"],
         summary = "WPILib Utility Library",
+        project_urls = None,
+        author_email = None,
         requires = ["msvc-runtime>=14.42.34433; platform_system == 'Windows'"],
         python_requires = ">=3.12",
-        strip_path_prefixes = ["wpiutil"],
         entry_points = {
-            "pkg_config": [
-                "wpiutil = native.wpiutil",
-            ],
+            "pkg_config": ["wpiutil = native.wpiutil"],
         },
+        visibility = ["//visibility:public"],
     )

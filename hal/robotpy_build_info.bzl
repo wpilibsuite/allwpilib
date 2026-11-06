@@ -61,14 +61,14 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//ntcore:robotpy-native-ntcore",
             "//wpiutil:robotpy-native-wpiutil",
         ],
+        strip_path_prefixes = ["hal"],
         summary = "WPILib HAL implementation",
+        project_urls = None,
+        author_email = None,
         requires = ["robotpy-native-wpiutil==0.0.0", "robotpy-native-ntcore==0.0.0"],
         python_requires = ">=3.12",
-        strip_path_prefixes = ["hal"],
         entry_points = {
-            "pkg_config": [
-                "mrclib = native.wpihal",
-                "wpihal = native.wpihal",
-            ],
+            "pkg_config": ["mrclib = native.wpihal", "wpihal = native.wpihal"],
         },
+        visibility = ["//visibility:public"],
     )
