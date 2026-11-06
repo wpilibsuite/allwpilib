@@ -20,6 +20,21 @@
 namespace wpi::math {
 
 /**
+ * Storage helper to guarantee m_odometryImpl is constructed prior to PoseEstimator.
+ */
+template <size_t NumModules>
+struct SwerveDrivePoseEstimatorStorage {
+  SwerveDriveOdometry<NumModules> m_odometryImpl;
+
+  SwerveDrivePoseEstimatorStorage(
+      SwerveDriveKinematics<NumModules>& kinematics,
+      const Rotation2d& gyroAngle,
+      const wpi::util::array<SwerveModulePosition, NumModules>& modulePositions,
+      const Pose2d& initialPose)
+      : m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {}
+};
+
+/**
  * This class wraps Swerve Drive Odometry to fuse latency-compensated
  * vision measurements with swerve drive encoder distance measurements. It is
  * intended to be a drop-in for SwerveDriveOdometry.
@@ -32,11 +47,15 @@ namespace wpi::math {
  */
 template <size_t NumModules>
 class SwerveDrivePoseEstimator
-    : public PoseEstimator<
+    : private SwerveDrivePoseEstimatorStorage<NumModules>,
+      public PoseEstimator<
           SwerveDriveKinematics<NumModules>,
           wpi::util::array<SwerveModulePosition, NumModules>,
           wpi::util::array<SwerveModuleVelocity, NumModules>,
           wpi::util::array<SwerveModuleAcceleration, NumModules>> {
+ private:
+  using Storage = SwerveDrivePoseEstimatorStorage<NumModules>;
+
  public:
   /**
    * Constructs a SwerveDrivePoseEstimator with default standard deviations
@@ -89,14 +108,11 @@ class SwerveDrivePoseEstimator
       const Pose2d& initialPose,
       const wpi::util::array<double, 3>& stateStdDevs,
       const wpi::util::array<double, 3>& visionMeasurementStdDevs)
-      : SwerveDrivePoseEstimator::PoseEstimator(m_odometryImpl, stateStdDevs,
-                                                visionMeasurementStdDevs),
-        m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {
+      : Storage{kinematics, gyroAngle, modulePositions, initialPose},
+        SwerveDrivePoseEstimator::PoseEstimator(
+            this->m_odometryImpl, stateStdDevs, visionMeasurementStdDevs) {
     this->ResetPose(initialPose);
   }
-
- private:
-  SwerveDriveOdometry<NumModules> m_odometryImpl;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)
