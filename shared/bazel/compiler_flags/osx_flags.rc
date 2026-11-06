@@ -19,3 +19,8 @@ common:macos --host_macos_minimum_os=15
 common:macos --macos_minimum_os=15
 
 common:macos --force_pic
+
+# Published optimized libraries need DWARF as well as debug builds.
+common:macos --copt=-g
+# Keep the linked debug map until the publication's dsymutil action reads it.
+common:macos --strip=never

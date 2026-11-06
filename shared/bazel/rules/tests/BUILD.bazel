@@ -1,0 +1,50 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_pkg//:mappings.bzl", "pkg_filegroup")
+load("@rules_python//python:defs.bzl", "py_test")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_shared_library")
+load("//shared/bazel/rules:publishing.bzl", "architectures_pkg_zip", "platform_prefix")
+
+package(default_testonly = True)
+
+cc_library(
+    name = "dependency",
+    srcs = ["dependency.cpp"],
+    hdrs = ["fixture.h"],
+)
+
+cc_library(
+    name = "fixture",
+    srcs = ["fixture.cpp"],
+    deps = [":dependency"],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/fixture",
+    deps = [":fixture"],
+)
+
+pkg_filegroup(
+    name = "shared_files",
+    srcs = [":shared/libfixture-shared-files"],
+    prefix = platform_prefix("shared"),
+)
+
+architectures_pkg_zip(
+    name = "fixture_zip",
+    srcs = [":shared_files"],
+    architectures = {"@allwpilib//shared/bazel:osx": "osxuniversal"},
+)
+
+py_test(
+    name = "macos_debug_symbols_test",
+    srcs = ["macos_debug_symbols_test.py"],
+    args = [
+        "$(location :fixture_zip-opt-osxuniversal)",
+        "$(location :fixture_zip-dbg-osxuniversal)",
+    ],
+    data = [
+        ":fixture_zip-dbg-osxuniversal",
+        ":fixture_zip-opt-osxuniversal",
+    ],
+    target_compatible_with = ["@platforms//os:osx"],
+)
