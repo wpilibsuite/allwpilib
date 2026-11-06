@@ -53,7 +53,7 @@ class Drivetrain {
       wpi::math::Rotation2d{},
       {frontLeft.GetPosition(), frontRight.GetPosition(),
        backLeft.GetPosition(), backRight.GetPosition()},
-      wpi::math::Pose2d{},
+      wpi::math::Pose2d{},  // Field center, facing the blue alliance wall.
       {0.1, 0.1, 0.1},
       {0.1, 0.1, 0.1}};
 };
