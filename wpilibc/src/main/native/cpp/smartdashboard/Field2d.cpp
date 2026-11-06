@@ -11,6 +11,7 @@
 
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/TunableTable.hpp"
 
 using namespace wpi;
 
