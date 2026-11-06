@@ -61,23 +61,37 @@ UNIT_CONFIGURATIONS = {
     },
     "Angle": {
         "base_unit": "Radians",
-        "multiply": {"Frequency": "AngularVelocity"},
-        "divide": {"Time": "AngularVelocity"},
+        "multiply": {"Frequency": "AngularVelocity", "Torque": "Energy"},
+        "divide": {"Time": "AngularVelocity", "AngularVelocity": "Time"},
     },
     "AngularAcceleration": {
         "base_unit": "RadiansPerSecondPerSecond",
-        "multiply": {"Time": "AngularVelocity"},
-        "divide": {"Frequency": "AngularVelocity"},
+        "multiply": {"Time": "AngularVelocity", "MomentOfInertia": "Torque"},
+        "divide": {"Frequency": "AngularVelocity", "AngularVelocity": "Frequency"},
     },
     "AngularMomentum": {
         "base_unit": "KilogramMetersSquaredPerSecond",
         "multiply": {},
-        "divide": {"AngularVelocity": "MomentOfInertia"},
+        "divide": {
+            "AngularVelocity": "MomentOfInertia",
+            "MomentOfInertia": "AngularVelocity",
+            "Torque": "Time",
+            "Time": "Torque",
+        },
     },
     "AngularVelocity": {
         "base_unit": "RadiansPerSecond",
-        "multiply": {"Time": "Angle", "Frequency": "AngularAcceleration"},
-        "divide": {"Time": "AngularAcceleration"},
+        "multiply": {
+            "Time": "Angle",
+            "Frequency": "AngularAcceleration",
+            "Torque": "Power",
+        },
+        "divide": {
+            "Time": "AngularAcceleration",
+            "AngularAcceleration": "Time",
+            "Frequency": "Angle",
+            "Angle": "Frequency",
+        },
         "extra": inspect.cleandoc("""
           public Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
         """),
@@ -114,6 +128,7 @@ UNIT_CONFIGURATIONS = {
         },
         "divide": {
             "Time": "Frequency",
+            "Frequency": "Time",
             # TODO:
             # "AngularVelocity": "Per<TimeUnit, AngleUnit>",
             # "AngularAcceleration": "Per<TimeUnit, AngularVelocityUnit>",
@@ -137,14 +152,23 @@ UNIT_CONFIGURATIONS = {
     "Energy": {
         "base_unit": "Joules",
         "multiply": {"Frequency": "Power"},
-        "divide": {"Time": "Power"},
+        "divide": {
+            "Time": "Power",
+            "Power": "Time",
+            "Distance": "Force",
+            "Force": "Distance",
+            "Angle": "Torque",
+            "Torque": "Angle",
+        },
     },
     "Force": {
         "base_unit": "Newtons",
         "multiply": {
             # Distance x Force = Torque
             # Force x Distance = Energy
-            "Distance": "Energy"
+            "Distance": "Energy",
+            "Time": "LinearMomentum",
+            "LinearVelocity": "Power",
         },
         "divide": {"Mass": "LinearAcceleration", "LinearAcceleration": "Mass"},
     },
@@ -166,17 +190,26 @@ UNIT_CONFIGURATIONS = {
     "LinearAcceleration": {
         "base_unit": "MetersPerSecondPerSecond",
         "multiply": {"Time": "LinearVelocity"},
-        "divide": {"Frequency": "LinearVelocity"},
+        "divide": {"Frequency": "LinearVelocity", "LinearVelocity": "Frequency"},
     },
     "LinearMomentum": {
         "base_unit": "KilogramMetersPerSecond",
         "multiply": {"Frequency": "Force"},
-        "divide": {"Mass": "LinearVelocity", "LinearVelocity": "Mass", "Time": "Force"},
+        "divide": {
+            "Mass": "LinearVelocity",
+            "LinearVelocity": "Mass",
+            "Time": "Force",
+            "Force": "Time",
+        },
     },
     "LinearVelocity": {
         "base_unit": "MetersPerSecond",
-        "multiply": {"Time": "Distance", "Frequency": "LinearAcceleration"},
-        "divide": {"Time": "LinearAcceleration"},
+        "multiply": {
+            "Time": "Distance",
+            "Frequency": "LinearAcceleration",
+            "Force": "Power",
+        },
+        "divide": {"Time": "LinearAcceleration", "LinearAcceleration": "Time"},
     },
     "Mass": {
         "base_unit": "Kilograms",
@@ -185,7 +218,10 @@ UNIT_CONFIGURATIONS = {
     },
     "MomentOfInertia": {
         "base_unit": "KilogramSquareMeters",
-        "multiply": {"AngularVelocity": "AngularMomentum"},
+        "multiply": {
+            "AngularVelocity": "AngularMomentum",
+            "AngularAcceleration": "Torque",
+        },
         "divide": {},
     },
     "Mult": {
@@ -212,10 +248,17 @@ UNIT_CONFIGURATIONS = {
     },
     "Power": {
         "base_unit": "Watts",
-        "multiply": {
-            "Time": "Energy",
+        "multiply": {"Time": "Energy"},
+        "divide": {
+            "Voltage": "Current",
+            "Current": "Voltage",
+            "Energy": "Frequency",
+            "Frequency": "Energy",
+            "Torque": "AngularVelocity",
+            "AngularVelocity": "Torque",
+            "Force": "LinearVelocity",
+            "LinearVelocity": "Force",
         },
-        "divide": {"Voltage": "Current", "Current": "Voltage", "Energy": "Frequency"},
     },
     "Resistance": {
         "base_unit": "Ohms",
@@ -233,6 +276,9 @@ UNIT_CONFIGURATIONS = {
             "AngularAcceleration": "AngularVelocity",
             "LinearVelocity": "Distance",
             "LinearAcceleration": "LinearVelocity",
+            "Power": "Energy",
+            "Force": "LinearMomentum",
+            "Torque": "AngularMomentum",
             # TODO:
             # "Acceleration<D>": "Velocity<D>"
             # "Velocity<D>": "Measure<D>"
@@ -249,8 +295,17 @@ UNIT_CONFIGURATIONS = {
     },
     "Torque": {
         "base_unit": "NewtonMeters",
-        "multiply": {},
-        "divide": {"Distance": "Force", "Force": "Distance"},
+        "multiply": {
+            "Angle": "Energy",
+            "AngularVelocity": "Power",
+            "Time": "AngularMomentum",
+        },
+        "divide": {
+            "Distance": "Force",
+            "Force": "Distance",
+            "MomentOfInertia": "AngularAcceleration",
+            "AngularAcceleration": "MomentOfInertia",
+        },
     },
     "Velocity": {
         "base_unit": "unit()",
