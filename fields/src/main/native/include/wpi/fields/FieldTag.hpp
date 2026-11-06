@@ -33,3 +33,6 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, FieldTag& tag);
 
 }  // namespace wpi::fields
+
+#include "wpi/fields/proto/FieldTagProto.hpp"
+#include "wpi/fields/struct/FieldTagStruct.hpp"

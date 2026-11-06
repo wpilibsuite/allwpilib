@@ -15,6 +15,7 @@
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
 namespace wpi::util {
 class json;
@@ -22,7 +23,7 @@ class json;
 
 namespace wpi::fields {
 
-enum class FieldId;
+enum class FieldId : uint32_t;
 
 class Field;
 
@@ -241,6 +242,7 @@ class WPILIB_DLLEXPORT Field final {
   friend Field GetField(FieldId field);
   friend void to_json(wpi::util::json& json, const Field& field);
   friend void from_json(const wpi::util::json& json, Field& field);
+  friend wpi::util::Protobuf<Field>;
 };
 
 WPILIB_DLLEXPORT
@@ -250,3 +252,5 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, Field& field);
 
 }  // namespace wpi::fields
+
+#include "wpi/fields/proto/FieldProto.hpp"

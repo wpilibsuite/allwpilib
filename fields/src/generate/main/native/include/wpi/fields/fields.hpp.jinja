@@ -17,7 +17,7 @@ namespace wpi::fields {
 inline constexpr const char* BASE_RESOURCE_DIR = {{ base_resource_dir|string }};
 
 /** Built-in FIRST field identifier. */
-enum class FieldId {
+enum class FieldId : uint32_t {
 {% for field in entries %}
   /** {{ field.name }}. */
   {{ field.enum }},
@@ -55,3 +55,6 @@ WPILIB_DLLEXPORT
 Field GetField(FieldId field);
 
 }  // namespace wpi::fields
+
+#include "wpi/fields/proto/FieldIdProto.hpp"
+#include "wpi/fields/struct/FieldIdStruct.hpp"

@@ -12,6 +12,7 @@ if (OperatingSystem.current().isWindows()) {
 dependencies {
     annotationProcessor libs.avaje.jsonb.generator
     implementation libs.avaje.jsonb
+    implementation libs.quickbuf.runtime
     implementation project(':wpimath')
     implementation project(':wpiutil')
 }
@@ -21,6 +22,20 @@ ext {
     baseId = nativeName
     groupId = 'org.wpilib.fields'
     devMain = "org.wpilib.fields.DevMain"
+
+    splitSetup = {
+        it.soruces {
+            nanopbCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/generated/main/native/cpp'
+                    include '**/protobuf/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/generated/main/native/cpp'
+                }
+            }
+        }
+    }
 }
 
 apply from: "${rootDir}/shared/resources.gradle"
@@ -28,8 +43,6 @@ apply from: "${rootDir}/shared/config.gradle"
 apply from: "${rootDir}/shared/java/javacommon.gradle"
 
 evaluationDependsOn(':wpimath')
-
-sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
 
 def generateTask = createGenerateResourcesTask(
         'main',
@@ -63,9 +76,14 @@ nativeUtils.exportsConfigs {
     }
 }
 
-sourceSets.main.resources {
-    srcDirs 'src/main/native/resources'
-    include '**/*.json'
+sourceSets.main {
+    java {
+        srcDir "${projectDir}/src/generated/main/java"
+    }
+    resources {
+        srcDirs 'src/main/native/resources', 'src/main/proto'
+        include '**/*.json', "**/*.proto"
+    }
 }
 
 def fieldImagesJavaBaseName = makeZipBaseName(project.groupId, "field-images-java")
@@ -105,13 +123,15 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/generated/main/native/cpp/fields',
+                                'src/generated/main/native/cpp/wpi/fields',
                                 'src/main/native/cpp',
                                 "$buildDir/generated/main/cpp"
                         include 'fields.cpp', 'FieldTag.cpp', 'FieldImage.cpp', 'Field.cpp', '*.json.cpp'
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include',
-                                'src/generated/main/native/include'
+                                'src/generated/main/native/include',
+                                'src/generated/main/native/cpp'
                     }
                 }
                 if (OperatingSystem.current().isWindows()) {
@@ -164,4 +184,19 @@ model {
     }
 }
 
+nativeUtils.exportsConfigs {
+    fields {
+        objectFilterClosure = { file ->
+            return file.name.endsWith('.pb.obj') || file.name.endsWith('.npb.obj')
+        }
+    }
+}
+
 apply from: 'publish.gradle'
+
+cppHeadersZip {
+    from("src/generated/main/native/cpp/wpi/fields/protobuf") {
+        into '/wpi/fields/protobuf'
+        include '**/*.h'
+    }
+}

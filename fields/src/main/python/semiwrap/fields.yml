@@ -1,5 +1,6 @@
 extra_includes:
 - pybind11/stl.h
+- wpystruct.h
 
 enums:
   FieldId:
@@ -7,3 +8,6 @@ functions:
   GetFields:
   GetFieldName:
   GetField:
+
+inline_code: |
+  SetupWPyStruct<wpi::fields::FieldId>(enum1.value);

@@ -8,6 +8,7 @@
 #include <string_view>
 
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
 namespace wpi::util {
 class json;
@@ -95,6 +96,7 @@ class WPILIB_DLLEXPORT FieldImage final {
 
   friend void to_json(wpi::util::json& json, const FieldImage& image);
   friend void from_json(const wpi::util::json& json, FieldImage& image);
+  friend wpi::util::Protobuf<FieldImage>;
 };
 
 WPILIB_DLLEXPORT
@@ -104,3 +106,5 @@ WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, FieldImage& image);
 
 }  // namespace wpi::fields
+
+#include "wpi/fields/proto/FieldImageProto.hpp"
