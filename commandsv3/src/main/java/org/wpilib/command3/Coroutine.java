@@ -809,7 +809,7 @@ public final class Coroutine {
     return m_scheduler;
   }
 
-  private boolean isMounted() {
+  boolean isMounted() {
     return m_backingContinuation.isMounted();
   }
 
