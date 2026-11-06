@@ -285,6 +285,9 @@ std::atomic<const WPI_AlertBackend*> backend{&defaultBackend};
 
 }  // namespace
 
+Alert::Alert(std::string_view text, Level level)
+    : Alert{"Alerts", text, text, level} {}
+
 Alert::Alert(std::string_view id, std::string_view text, Level level)
     : Alert{"Alerts", id, text, level} {}
 
