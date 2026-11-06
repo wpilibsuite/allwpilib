@@ -1,0 +1,89 @@
+= Linux Bluetooth LE packet transport
+
+`BluetoothLEPacketClient` is intended for realtime control: periodic values
+that are superseded by later values, plus occasional queued control commands.
+Its Linux implementation currently uses a nonblocking L2CAP packet socket,
+with direct ATT on fixed CID 4 as the GATT fallback. It implements MTU exchange,
+service/characteristic/CCCD discovery, notification subscription, and write
+commands for the configured control/status characteristics. It is a narrow
+packet transport, not a general GATT client.
+
+== Direct ATT ownership
+
+Direct ATT lets `SendPdu()` observe Bluetooth socket backpressure without an
+additional daemon queue. `BEST_EFFORT` drops a write that would block; `QUEUED`
+retains one pending write and prevents newer writes from overtaking it. Kernel
+and controller buffering still exist, so successful socket writes do not prove
+peer receipt or bounded packet age.
+
+A fixed ATT channel cannot be shared with another local owner on the same
+connection. Linux's
+https://github.com/torvalds/linux/blob/v6.8/net/bluetooth/l2cap_core.c#L7644[`l2cap_chan_connect()`]
+returns `EBUSY` when that destination CID is already present. This can happen
+when BlueZ owns the channel after connecting or pairing. `EBUSY` alone does not
+identify which process owns it.
+
+`StartGattBlueZDisconnectRetryOnLoop()` currently calls BlueZ `Device1.Disconnect`
+once before retrying the direct socket. This is a device-wide takeover:
+https://github.com/bluez/bluez/blob/5.72/doc/org.bluez.Device.rst#L49[BlueZ documents]
+that the method disconnects every connected profile and terminates the ACL
+connection. It can disrupt other applications using that peripheral. The retry
+is therefore an exclusive-use assumption, not ordinary GATT error recovery.
+Realtime control alone does not imply exclusive ownership.
+
+== BlueZ acquired descriptors
+
+`GattCharacteristic1.AcquireWrite` and `AcquireNotify` are a plausible alternative
+to handwritten ATT. BlueZ would own connection setup, discovery, MTU negotiation,
+and subscription; the client would poll acquired descriptors for packet traffic.
+No D-Bus call is needed for each data packet. The
+https://github.com/bluez/bluez/blob/5.72/doc/org.bluez.GattCharacteristic.rst#L131[BlueZ API]
+requires checking these optional methods and the characteristic properties.
+Write acquisition requires write-without-response; notification acquisition can
+conflict with an existing notification subscriber. Descriptor HUP requires
+cleanup, and reconnect requires reacquisition and a new MTU check.
+
+The acquired write descriptor is not the Bluetooth socket itself. In
+https://github.com/bluez/bluez/blob/5.72/src/gatt-client.c#L1053[BlueZ 5.72],
+`create_sock()` creates a nonblocking Unix `SOCK_SEQPACKET` pair. `sock_read()`
+reads a value into a 512-byte buffer, submits it to the shared GATT client, and
+does not inspect the submission result. A replacement must limit payloads to
+`min(maxPacketSize, MTU - 3, 512)` and cannot interpret a successful descriptor
+write as successful ATT submission.
+
+The shared GATT client's
+https://github.com/bluez/bluez/blob/5.72/src/shared/gatt-client.c#L2880[`bt_gatt_client_write_without_response()`]
+encodes the handle and calls `bt_att_send()`. That function
+https://github.com/bluez/bluez/blob/5.72/src/shared/att.c#L1501[appends commands to an internal write queue]
+without a queue-length limit in this path. The same enqueue behavior is present
+in https://github.com/bluez/bluez/blob/master/src/shared/att.c[upstream ATT source]
+examined during this investigation.
+
+Consequently, Unix socket writability is not evidence that the Bluetooth
+transport has capacity: BlueZ can drain the acquired socket into its own queue.
+This is a source-based inference about possible stale-control accumulation,
+not a measured latency comparison. Restricting the application's pending slot
+would not by itself bound that downstream queue.
+
+== Recommendation and remaining validation
+
+Keep the direct ATT implementation for now, with its exclusive-device behavior
+explicitly documented. Acquired descriptors remain a useful candidate when
+coexistence and broader GATT compatibility matter, but do not replace direct
+ATT solely on the assumption that acquired descriptors preserve its backpressure
+behavior. A shared-device design should also avoid automatic device-wide
+`Disconnect`; failing with an ownership error or an explicit takeover policy
+would be preferable to silently interrupting other profiles.
+
+Before selecting a different backend, compare both transports with sequence
+numbers and generation timestamps in control packets. Measure packet age at the
+peripheral, sustained overload, recovery after a radio stall, queue draining
+after the sender stops, notification loss, and reconnect after pairing. Include
+a second BlueZ client and test characteristic acquisition conflicts. Record
+kernel, BlueZ, adapter, firmware, MTU, connection interval, and producer rate.
+
+The socket regressions validate local lifecycle, cancellation, packet boundaries,
+and backpressure handling using Unix packet sockets. They do not emulate BlueZ's
+ATT queue, controller buffering, or radio timing. This investigation inspected
+source and APIs; no hardware latency measurements or acquired-descriptor backend
+were implemented.
