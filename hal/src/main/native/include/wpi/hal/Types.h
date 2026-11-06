@@ -16,6 +16,10 @@
 
 #define HAL_INVALID_HANDLE WPI_INVALID_HANDLE
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef WPI_Handle HAL_Handle;
 
 typedef HAL_Handle HAL_AnalogInputHandle;
@@ -65,6 +69,10 @@ typedef HAL_Handle HAL_CANStreamHandle;
 typedef int32_t HAL_Bool;
 
 typedef int32_t HAL_Status;
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif
 
 #ifdef __cplusplus
 #define HAL_ENUM_WITH_UNDERLYING_TYPE(name, type) enum name : type

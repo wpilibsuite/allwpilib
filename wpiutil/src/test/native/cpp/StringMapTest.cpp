@@ -501,7 +501,9 @@ namespace {
 // Simple class that counts how many moves and copy happens when growing a map
 struct CountCtorCopyAndMove {
   static unsigned Ctor;
+  [[maybe_unused]]
   static unsigned Move;
+  [[maybe_unused]]
   static unsigned Copy;
   int Data = 0;
   explicit CountCtorCopyAndMove(int Data) : Data(Data) { Ctor++; }

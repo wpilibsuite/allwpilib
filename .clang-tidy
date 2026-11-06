@@ -72,4 +72,4 @@ CheckOptions:
   - key: modernize-use-using.IgnoreExternC
     value: 'true'
 FormatStyle: file
-HeaderFilterRegex: '^((?!thirdparty/).)*$'
+ExcludeHeaderFilterRegex: '\.gradle/|thirdparty/|generated/|wpigui/.*/portable-file-dialogs\.h$|wpimath/.*/units/base\.hpp$|wpiutil/.*/FastQueue\.hpp$|wpiutil/.*/util/fs\.hpp$'
