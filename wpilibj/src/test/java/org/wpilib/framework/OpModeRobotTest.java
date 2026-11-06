@@ -14,7 +14,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
-import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.opmode.OpMode;
 import org.wpilib.simulation.DriverStationSim;
@@ -101,14 +101,14 @@ class OpModeRobotTest {
 
   @AfterEach
   void tearDown() {
-    DriverStationBackend.clearOpModes();
+    RobotState.clearOpModes();
     SimHooks.resumeTiming();
   }
 
   @AfterEach
   @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
   void resetUserProgramFlag() throws ReflectiveOperationException {
-    var field = DriverStationBackend.class.getDeclaredField("m_userProgramStarted");
+    var field = RobotState.class.getDeclaredField("m_userProgramStarted");
     field.setAccessible(true);
     field.set(null, false);
   }

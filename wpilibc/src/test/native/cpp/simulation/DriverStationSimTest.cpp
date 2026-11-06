@@ -39,7 +39,7 @@ TEST_CASE("DriverStationTest AutonomousMode", "[wpilibc][simulation]") {
   HAL_Initialize();
   DriverStationSim::ResetData();
   DriverStationSim::NotifyNewData();
-  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
+  wpi::RobotState::ObserveUserProgramStarting();
 
   CHECK_FALSE(RobotState::IsAutonomous());
   EnumCallback callback;
@@ -64,7 +64,7 @@ TEST_CASE("DriverStationTest Mode", "[wpilibc][simulation]") {
   HAL_Initialize();
   DriverStationSim::ResetData();
   DriverStationSim::NotifyNewData();
-  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
+  wpi::RobotState::ObserveUserProgramStarting();
 
   CHECK_FALSE(RobotState::IsUtility());
   EnumCallback callback;
