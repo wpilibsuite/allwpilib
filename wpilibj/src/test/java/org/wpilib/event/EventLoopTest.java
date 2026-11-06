@@ -66,9 +66,11 @@ class EventLoopTest {
     var order = new StringBuilder();
     var loop = new EventLoop();
 
-    loop.bindWeak(() -> order.append('a'));
+    Runnable appendA = () -> order.append('a');
+    loop.bindWeak(appendA);
     loop.bind(() -> order.append('b'));
-    loop.bindWeak(() -> order.append('c'));
+    Runnable appendC = () -> order.append('c');
+    loop.bindWeak(appendC);
     loop.bind(() -> order.append('d'));
 
     loop.poll();
