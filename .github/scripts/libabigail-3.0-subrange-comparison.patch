@@ -1,0 +1,8 @@
+diff --git a/src/abg-comparison.cc b/src/abg-comparison.cc
+--- a/src/abg-comparison.cc
++++ b/src/abg-comparison.cc
+@@ -4261,3 +4261,3 @@
+   vector<subrange_diff_sptr> subrange_diffs;
+-  if (first->get_subranges().size() == first->get_subranges().size())
++  if (first->get_subranges().size() == second->get_subranges().size())
+     {
