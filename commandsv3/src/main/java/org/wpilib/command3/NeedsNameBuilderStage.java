@@ -57,8 +57,8 @@ public interface NeedsNameBuilderStage {
   NeedsNameBuilderStage until(BooleanSupplier endCondition);
 
   /**
-   * Creates the command based on the options set during previous builder stages. The builders will
-   * no longer be usable after calling this method.
+   * Creates the command based on the options set during previous builder stages. The builder is not
+   * modified, and may be used again to create more commands.
    *
    * @param name The name of the command
    * @return The built command.
