@@ -226,6 +226,7 @@ PeriodicPriorityQueue = "wpi/internal/PeriodicPriorityQueue.hpp"
 
 # wpi/opmode
 OpMode = "wpi/opmode/OpMode.hpp"
+OpModeListener = "wpi/opmode/OpModeListener.hpp"
 PeriodicOpMode = "wpi/opmode/PeriodicOpMode.hpp"
 
 # wpi/smartdashboard
