@@ -112,6 +112,38 @@ public interface Command {
   int HIGHEST_PRIORITY = Integer.MAX_VALUE;
 
   /**
+   * Exit status of a command.
+   */
+  enum ExitStatus {
+    /** The command ran to completion successfully. */
+    SUCCESS,
+
+    /** The command's cancellation was requested from the {@link Scheduler}. */
+    CANCELLATION_REQUESTED,
+
+    /** A fork operation the command requested failed. */
+    FORK_FAILED,
+
+    /** The command was attempted to be run while the robot is disabled, but it can't be. */
+    CANNOT_RUN_IN_DISABLED,
+
+    /** An exception occurred in a child command. */
+    EXCEPTION_IN_CHILD_COMMAND,
+
+    /** The command's parent command has been cancelled. */
+    ORPHANED,
+
+    /** The {@link BindingScope} the command was bound to is no longer active.*/
+    BINDING_SCOPE_INACTIVE,
+
+    /** A default command with a more narrow {@link BindingScope} took precedence.  */
+    MORE_NARROW_SCOPE_AVAILBLE,
+
+    /** The command had requirements that conflicted with a higher priority command  */
+    INTERRUPTED,
+  }
+
+  /**
    * Runs the command. Commands that need to periodically run until a goal state is reached should
    * simply run a while loop like {@code while (!atGoal()) { ... } } and call {@link
    * Coroutine#yield()} at the end of the loop.
@@ -126,20 +158,14 @@ public interface Command {
 
   /**
    * An optional lifecycle hook that can be implemented to execute some code whenever this command
-   * is canceled before it naturally completes. Commands should be careful to do a single-shot
-   * cleanup (for example, setting a motor to zero volts) and not do any complex looping logic here.
-   */
-  default void onCancel() {
-    // NOP by default
-  }
-
-  /**
-   * An optional lifecycle hook that can be implemented to execute some code whenever this command
    * exits, regardless of exit condition (natural completion, cancellation, or interruption).
    * Commands should be careful to do a single-shot cleanup (for example, setting a motor to zero
    * volts) and not do any complex looping logic here.
+   *
+   * @param status the status the command exited with.
+   * @see ExitStatus
    */
-  default void onExit() {
+  default void onExit(ExitStatus status) {
     // NOP by default
   }
 
