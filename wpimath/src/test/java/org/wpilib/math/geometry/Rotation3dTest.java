@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.wpilib.math.util.UnitConversions.degreesToRadians;
+import static org.wpilib.units.Units.Radians;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.linalg.MatBuilder;
@@ -456,5 +457,86 @@ class Rotation3dTest {
     assertEquals(rot2.getX(), interpolated.getX(), EPSILON);
     assertEquals(rot2.getY(), interpolated.getY(), EPSILON);
     assertEquals(rot2.getZ(), interpolated.getZ(), EPSILON);
+  }
+
+  @Test
+  void testFromExtrinsicMatchesEulerConstructor() {
+    final double roll = 0.3;
+    final double pitch = -0.7;
+    final double yaw = 1.9;
+
+    var extrinsic = Rotation3d.fromExtrinsic(roll, pitch, yaw);
+    assertEquals(new Rotation3d(roll, pitch, yaw), extrinsic);
+    assertEquals(
+        extrinsic, Rotation3d.fromExtrinsic(Radians.of(roll), Radians.of(pitch), Radians.of(yaw)));
+
+    // getX/Y/Z report the extrinsic Euler angles, so they round-trip.
+    assertAll(
+        () -> assertEquals(roll, extrinsic.getX(), EPSILON),
+        () -> assertEquals(pitch, extrinsic.getY(), EPSILON),
+        () -> assertEquals(yaw, extrinsic.getZ(), EPSILON));
+
+    final var xAxis = VecBuilder.fill(1.0, 0.0, 0.0);
+    final var yAxis = VecBuilder.fill(0.0, 1.0, 0.0);
+    final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
+    assertEquals(new Rotation3d(xAxis, roll), Rotation3d.fromExtrinsic(roll, 0.0, 0.0));
+    assertEquals(new Rotation3d(yAxis, pitch), Rotation3d.fromExtrinsic(0.0, pitch, 0.0));
+    assertEquals(new Rotation3d(zAxis, yaw), Rotation3d.fromExtrinsic(0.0, 0.0, yaw));
+
+    assertEquals(Rotation3d.ZERO, Rotation3d.fromExtrinsic(0.0, 0.0, 0.0));
+    assertNotEquals(extrinsic, Rotation3d.fromIntrinsic(roll, pitch, yaw));
+  }
+
+  @Test
+  void testFromIntrinsicMatchesComposition() {
+    double roll = 0.3;
+    double pitch = -0.7;
+    double yaw = 1.9;
+
+    var r = new Rotation3d(roll, 0, 0);
+    var p = new Rotation3d(0, pitch, 0);
+    var y = new Rotation3d(0, 0, yaw);
+    var intrinsic = Rotation3d.fromIntrinsic(roll, pitch, yaw);
+
+    // Intrinsic roll, then pitch, then yaw is extrinsic yaw, then pitch, then roll.
+    assertEquals(y.rotateBy(p).rotateBy(r), intrinsic);
+    assertEquals(
+        intrinsic, Rotation3d.fromIntrinsic(Radians.of(roll), Radians.of(pitch), Radians.of(yaw)));
+
+    // A rotation about a single axis is the same either way.
+    assertEquals(
+        Rotation3d.fromExtrinsic(roll, 0.0, 0.0), Rotation3d.fromIntrinsic(roll, 0.0, 0.0));
+    assertEquals(
+        Rotation3d.fromExtrinsic(0.0, pitch, 0.0), Rotation3d.fromIntrinsic(0.0, pitch, 0.0));
+    assertEquals(
+        Rotation3d.fromExtrinsic(0.0, 0.0, yaw), Rotation3d.fromIntrinsic(0.0, 0.0, yaw));
+    assertEquals(Rotation3d.ZERO, Rotation3d.fromIntrinsic(0.0, 0.0, 0.0));
+
+    // intrinsic (90, 90, 0) degrees equals extrinsic (90, 0, 90) degrees. The getters report
+    // that extrinsic triple, not the intrinsic inputs.
+    var rightAngle = Rotation3d.fromIntrinsic(Math.PI / 2.0, Math.PI / 2.0, 0.0);
+    assertEquals(Rotation3d.fromExtrinsic(Math.PI / 2.0, 0.0, Math.PI / 2.0), rightAngle);
+    assertAll(
+        () -> assertEquals(Math.PI / 2.0, rightAngle.getX(), EPSILON),
+        () -> assertEquals(0.0, rightAngle.getY(), EPSILON),
+        () -> assertEquals(Math.PI / 2.0, rightAngle.getZ(), EPSILON));
+  }
+
+  @Test
+  void testFromIntrinsicRotatesAboutBodyAxes() {
+    // Pitch 90° about body Y (body X now points along world -Z, body Z along world +X), then
+    // yaw 90° about the new body Z (world +X). That swings body X from world -Z to world +Y.
+    // Extrinsically applying the same angles would leave body X along world -Z instead.
+    var rot = Rotation3d.fromIntrinsic(0.0, Math.PI / 2.0, Math.PI / 2.0);
+    var bodyX = new Translation3d(1.0, 0.0, 0.0).rotateBy(rot);
+    assertEquals(0.0, bodyX.getX(), 1e-9);
+    assertEquals(1.0, bodyX.getY(), 1e-9);
+    assertEquals(0.0, bodyX.getZ(), 1e-9);
+
+    var extrinsic = Rotation3d.fromExtrinsic(0.0, Math.PI / 2.0, Math.PI / 2.0);
+    var extrinsicBodyX = new Translation3d(1.0, 0.0, 0.0).rotateBy(extrinsic);
+    assertEquals(0.0, extrinsicBodyX.getX(), 1e-9);
+    assertEquals(0.0, extrinsicBodyX.getY(), 1e-9);
+    assertEquals(-1.0, extrinsicBodyX.getZ(), 1e-9);
   }
 }
