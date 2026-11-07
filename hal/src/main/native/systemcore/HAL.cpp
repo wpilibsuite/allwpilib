@@ -144,11 +144,6 @@ void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
   std::memcpy(write, serialNum, len);
 }
 
-void HAL_GetComments(struct WPI_String* comments) {
-  comments->len = 0;
-  comments->str = nullptr;
-}
-
 int32_t HAL_GetTeamNumber(void) {
   if (teamNumber != -1) {
     return teamNumber;

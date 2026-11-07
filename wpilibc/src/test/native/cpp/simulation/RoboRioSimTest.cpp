@@ -188,24 +188,4 @@ TEST_CASE("RoboRioSimTest SetSerialNumber", "[wpilibc][simulation]") {
   CHECK(SERIAL_NUMBER_TRUNCATED == RobotController::GetSerialNumber());
 }
 
-TEST_CASE("RoboRioSimTest SetComments", "[wpilibc][simulation]") {
-  const std::string COMMENTS =
-      "Hello! These are comments in the roboRIO web interface!";
-
-  RoboRioSim::ResetData();
-
-  RoboRioSim::SetComments(COMMENTS);
-  CHECK(COMMENTS == RoboRioSim::GetComments());
-  CHECK(COMMENTS == RobotController::GetComments());
-
-  const std::string COMMENTS_OVERFLOW =
-      "Hello! These are comments in the roboRIO web interface! This comment "
-      "exceeds 64 characters!";
-  const std::string COMMENTS_TRUNCATED = COMMENTS_OVERFLOW.substr(0, 64);
-
-  RoboRioSim::SetComments(COMMENTS_OVERFLOW);
-  CHECK(COMMENTS_TRUNCATED == RoboRioSim::GetComments());
-  CHECK(COMMENTS_TRUNCATED == RobotController::GetComments());
-}
-
 }  // namespace wpi::sim
