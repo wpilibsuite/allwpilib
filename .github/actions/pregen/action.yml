@@ -30,8 +30,8 @@ runs:
 
     - name: Regenerate HIDs
       run: |
-        ./wpilibc/generate_hids.py
-        ./wpilibj/generate_hids.py
+        ./wpilibc/generate_first_ds_hids.py
+        ./wpilibj/generate_first_ds_hids.py
         ./commandsv2/generate_hids.py
       shell: bash
 

@@ -14,7 +14,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from wpilibc.generate_first_ds_hids import generate_first_ds_hids
-from wpilibc.generate_hids import generate_hids
 
 
 def main():
@@ -47,9 +46,6 @@ def main():
     )
     args = parser.parse_args()
 
-    generate_hids(
-        args.output_directory, args.template_root, args.schema_root / "hids.json"
-    )
     test_output_directory = (
         None
         if args.test_output_directory.name == "__none__"
