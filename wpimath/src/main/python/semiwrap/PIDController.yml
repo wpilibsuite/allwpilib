@@ -1,7 +1,5 @@
 classes:
   wpi::math::PIDController:
-    ignored_bases:
-    - wpi::util::SendableHelper<PIDController>
     methods:
       PIDController:
         param_override:
@@ -35,4 +33,7 @@ classes:
           double:
           double, double:
       Reset:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
+      PublishTunable:
+      GetTunableType:

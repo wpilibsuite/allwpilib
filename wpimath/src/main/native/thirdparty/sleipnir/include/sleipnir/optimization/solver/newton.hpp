@@ -5,7 +5,6 @@
 #include <chrono>
 #include <cmath>
 #include <functional>
-#include <limits>
 #include <span>
 
 #include <Eigen/Core>
@@ -66,12 +65,10 @@ ExitStatus newton(
   solve_profilers.emplace_back("solver");
   solve_profilers.emplace_back("↳ setup");
   solve_profilers.emplace_back("↳ iteration");
-  solve_profilers.emplace_back("  ↳ feasibility check");
   solve_profilers.emplace_back("  ↳ callbacks");
   solve_profilers.emplace_back("  ↳ KKT matrix decomp");
   solve_profilers.emplace_back("  ↳ KKT system solve");
   solve_profilers.emplace_back("  ↳ line search");
-  solve_profilers.emplace_back("  ↳ next iter prep");
   solve_profilers.emplace_back("  ↳ f(x)");
   solve_profilers.emplace_back("  ↳ ∇f(x)");
   solve_profilers.emplace_back("  ↳ ∇²ₓₓL");
@@ -79,18 +76,16 @@ ExitStatus newton(
   auto& solver_prof = solve_profilers[0];
   auto& setup_prof = solve_profilers[1];
   auto& inner_iter_prof = solve_profilers[2];
-  auto& feasibility_check_prof = solve_profilers[3];
-  auto& iter_callbacks_prof = solve_profilers[4];
-  auto& kkt_matrix_decomp_prof = solve_profilers[5];
-  auto& kkt_system_solve_prof = solve_profilers[6];
-  auto& line_search_prof = solve_profilers[7];
-  auto& next_iter_prep_prof = solve_profilers[8];
+  auto& iter_callbacks_prof = solve_profilers[3];
+  auto& kkt_matrix_decomp_prof = solve_profilers[4];
+  auto& kkt_system_solve_prof = solve_profilers[5];
+  auto& line_search_prof = solve_profilers[6];
 
   // Set up profiled matrix callbacks
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-  auto& f_prof = solve_profilers[9];
-  auto& g_prof = solve_profilers[10];
-  auto& H_prof = solve_profilers[11];
+  auto& f_prof = solve_profilers[7];
+  auto& g_prof = solve_profilers[8];
+  auto& H_prof = solve_profilers[9];
 
   NewtonMatrixCallbacks<Scalar> matrices{
       matrix_callbacks.num_decision_variables,
@@ -105,7 +100,8 @@ ExitStatus newton(
       [&](const DenseVector& x) -> SparseMatrix {
         ScopedProfiler prof{H_prof};
         return matrix_callbacks.H(x);
-      }};
+      },
+      matrix_callbacks.scaling};
 #else
   const auto& matrices = matrix_callbacks;
 #endif
@@ -122,6 +118,10 @@ ExitStatus newton(
   slp_assert(H.rows() == matrices.num_decision_variables);
   slp_assert(H.cols() == matrices.num_decision_variables);
 
+  DenseVector trial_x;
+
+  Scalar trial_f;
+
   // Check whether initial guess has finite cost and derivatives
   if (!isfinite(f) || !all_finite(g) || !all_finite(H)) {
     return ExitStatus::NONFINITE_INITIAL_GUESS;
@@ -131,14 +131,17 @@ ExitStatus newton(
 
   Filter<Scalar> filter;
 
-  RegularizedLDLT<Scalar> solver{matrices.num_decision_variables, 0};
+  RegularizedLDLT<Scalar> solver{
+      // Use sparse solver if lower triangle fills < 25% of system
+      H.nonZeros() < 0.25 * H.size(), matrices.num_decision_variables, 0};
 
   // Variables for determining when a step is acceptable
   constexpr Scalar α_reduction_factor(0.5);
   constexpr Scalar α_min(1e-20);
 
   // Error
-  Scalar E_0 = std::numeric_limits<Scalar>::infinity();
+  Scalar E_0 = unscaled_kkt_error<Scalar, KKTErrorType::INF_NORM_SCALED>(
+      matrices.scaling, g);
 
   setup_prof.stop();
 
@@ -155,14 +158,12 @@ ExitStatus newton(
 
   while (E_0 > Scalar(options.tolerance)) {
     ScopedProfiler inner_iter_profiler{inner_iter_prof};
-    ScopedProfiler feasibility_check_profiler{feasibility_check_prof};
 
     // Check for diverging iterates
     if (x.template lpNorm<Eigen::Infinity>() > Scalar(1e10) || !x.allFinite()) {
       return ExitStatus::DIVERGING_ITERATES;
     }
 
-    feasibility_check_profiler.stop();
     ScopedProfiler iter_callbacks_profiler{iter_callbacks_prof};
 
     // Call iteration callbacks
@@ -190,13 +191,14 @@ ExitStatus newton(
 
     constexpr Scalar α_max(1);
     Scalar α = α_max;
+    const Scalar D_ϕ = g.transpose() * p_x;
 
     // Loop until a step is accepted. If a step becomes acceptable, the loop
     // will exit early.
     while (1) {
-      DenseVector trial_x = x + α * p_x;
+      trial_x = x + α * p_x;
 
-      Scalar trial_f = matrices.f(trial_x);
+      trial_f = matrices.f(trial_x);
 
       // If f(xₖ + αpₖˣ) isn't finite, reduce step size immediately
       if (!isfinite(trial_f)) {
@@ -210,7 +212,7 @@ ExitStatus newton(
       }
 
       // Check whether filter accepts trial iterate
-      if (filter.try_add(FilterEntry{f}, FilterEntry{trial_f}, p_x, g, α)) {
+      if (filter.try_add(FilterEntry{f}, FilterEntry{trial_f}, D_ϕ, α)) {
         // Accept step
         break;
       }
@@ -223,14 +225,14 @@ ExitStatus newton(
       if (α < α_min) {
         Scalar current_kkt_error = kkt_error<Scalar, KKTErrorType::ONE_NORM>(g);
 
-        DenseVector trial_x = x + α_max * p_x;
+        trial_x = x + α_max * p_x;
 
         Scalar next_kkt_error =
             kkt_error<Scalar, KKTErrorType::ONE_NORM>(matrices.g(trial_x));
 
         // If the step using αᵐᵃˣ reduced the KKT error, accept it anyway
         if (next_kkt_error <= Scalar(0.999) * current_kkt_error) {
-          α = α_max;
+          trial_f = matrices.f(trial_x);
 
           // Accept step
           break;
@@ -242,28 +244,29 @@ ExitStatus newton(
 
     line_search_profiler.stop();
 
-    // xₖ₊₁ = xₖ + αₖpₖˣ
-    x += α * p_x;
+    // Update iterates
+    x = trial_x;
+
+    f = trial_f;
 
     // Update autodiff for Hessian
-    f = matrices.f(x);
     g = matrices.g(x);
     H = matrices.H(x);
 
-    ScopedProfiler next_iter_prep_profiler{next_iter_prep_prof};
-
     // Update the error
-    E_0 = kkt_error<Scalar, KKTErrorType::INF_NORM_SCALED>(g);
+    E_0 = unscaled_kkt_error<Scalar, KKTErrorType::INF_NORM_SCALED>(
+        matrices.scaling, g);
 
-    next_iter_prep_profiler.stop();
     inner_iter_profiler.stop();
 
     if (options.diagnostics) {
-      print_iteration_diagnostics(iterations, IterationType::NORMAL,
-                                  inner_iter_profiler.current_duration(), E_0,
-                                  f, Scalar(0), Scalar(0), Scalar(0),
-                                  solver.hessian_regularization(), α, α_max,
-                                  α_reduction_factor, Scalar(1));
+      print_iteration_diagnostics(
+          iterations, IterationType::NORMAL,
+          inner_iter_profiler.current_duration(), E_0, f, Scalar(0), Scalar(0),
+          Scalar(0), solver.hessian_regularization(),
+          solver.constraint_jacobian_regularization(),
+          p_x.template lpNorm<Eigen::Infinity>(), Scalar(1), α, α_max,
+          α_reduction_factor, Scalar(1));
     }
 
     ++iterations;
@@ -279,7 +282,11 @@ ExitStatus newton(
     }
   }
 
-  return ExitStatus::SUCCESS;
+  if (!isfinite(E_0)) {
+    return ExitStatus::DIVERGING_ITERATES;
+  } else {
+    return ExitStatus::SUCCESS;
+  }
 }
 
 extern template SLEIPNIR_DLLEXPORT ExitStatus

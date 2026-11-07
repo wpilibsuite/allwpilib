@@ -1,0 +1,31 @@
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_pybind_build_info")
+load(":robotpy_pybind_build_info.bzl", "define_pybind_library", "fields_extension")
+
+PYBIND_PKGCFG_DEPS = [
+    "//fields:native/fields/robotpy-native-fields.pc",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//telemetry/src/main/python:python.generated_pkgcfg_files",
+    "//tunables:native/tunables/robotpy-native-tunables.pc",
+    "//tunables/src/main/python:python.generated_pkgcfg_files",
+    "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
+    "//wpimath/src/main/python:python.generated_pkgcfg_files",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil/src/main/python:python.generated_pkgcfg_files",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-fields-generator",
+    additional_srcs = ["//fields:robotpy-native-fields.copy_headers"],
+    package_root_file = "robotpy_fields/__init__.py",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    yaml_files = glob(["semiwrap/*.yml"]),
+)
+
+fields_extension(
+    srcs = ["robotpy_fields/src/main.cpp"],
+)
+
+define_pybind_library(
+    name = "python",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)

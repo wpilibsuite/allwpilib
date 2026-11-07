@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/hal/I2C.h"
 
@@ -21,7 +21,7 @@ void TestI2CInitializationCallback(const char* name, void* param,
   gTestI2CCallbackValue = *value;
 }
 
-TEST(I2CSimTest, I2CInitialization) {
+TEST_CASE("I2CSimTest I2CInitialization", "[hal][mockdata]") {
   const int INDEX_TO_TEST = 1;
 
   int32_t status = 0;
@@ -30,12 +30,12 @@ TEST(I2CSimTest, I2CInitialization) {
   int callbackParam = 0;
   int callbackId = HALSIM_RegisterI2CInitializedCallback(
       INDEX_TO_TEST, &TestI2CInitializationCallback, &callbackParam, false);
-  ASSERT_TRUE(0 != callbackId);
+  REQUIRE(0 != callbackId);
 
   port = HAL_I2C_PORT_1;
   gTestI2CCallbackName = "Unset";
   HAL_InitializeI2C(port, &status);
-  EXPECT_STREQ("Initialized", gTestI2CCallbackName.c_str());
+  CHECK("Initialized" == gTestI2CCallbackName);
 }
 
 }  // namespace wpi::hal

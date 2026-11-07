@@ -5,11 +5,9 @@ def outputsFolder = file("$buildDir/outputs")
 
 def baseArtifactId = nativeName
 def artifactGroupId = "org.wpilib.${nativeName}"
-def zipBaseName = "_GROUP_org_wpilib_${nativeName}_ID_${nativeName}-cpp_CLS"
+def zipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-cpp")
 ext.zipBaseName = zipBaseName
-def jniCvStaticBaseName = "_GROUP_org_wpilib_${nativeName}_ID_${nativeName}-jnicvstatic_CLS"
-
-def licenseFile = file("$rootDir/license.md")
+def jniCvStaticBaseName = makeZipBaseName(artifactGroupId, "${nativeName}-jnicvstatic")
 
 task cppSourcesZip(type: Zip) {
     destinationDirectory = outputsFolder
@@ -97,7 +95,7 @@ model {
                 value.each { binary ->
                     if (binary.buildable) {
                         if (binary instanceof SharedLibraryBinarySpec) {
-                            task.dependsOn binary.tasks.link
+                            includeSharedLibraryDebugSymbols(task, binary)
                             task.inputs.file(binary.sharedLibraryFile)
                             task.from(binary.sharedLibraryFile) {
                                 into nativeUtils.getPlatformPath(binary) + '/shared'

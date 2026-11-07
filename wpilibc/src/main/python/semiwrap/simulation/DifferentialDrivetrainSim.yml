@@ -41,6 +41,10 @@ classes:
             param_override:
               measurementStdDevs:
                 default: std::array<double, 7>{}
+      GetState:
+        overloads:
+          int [const]:
+          '[const]':
   wpi::sim::DifferentialDrivetrainSim::State:
     attributes:
       X:
@@ -75,22 +79,22 @@ classes:
 
 inline_code: |-
   cls_DifferentialDrivetrainSim
-    .def("getLeftPositionFeet", [](DifferentialDrivetrainSim * self) -> wpi::units::foot_t {
+    .def("get_left_position_feet", [](DifferentialDrivetrainSim * self) -> wpi::units::foot_t {
       return self->GetLeftPosition();
     })
-    .def("getLeftPositionInches", [](DifferentialDrivetrainSim * self) -> wpi::units::inch_t {
+    .def("get_left_position_inches", [](DifferentialDrivetrainSim * self) -> wpi::units::inch_t {
       return self->GetLeftPosition();
     })
-    .def("getLeftVelocityFps", [](DifferentialDrivetrainSim * self) -> wpi::units::feet_per_second_t {
+    .def("get_left_velocity_fps", [](DifferentialDrivetrainSim * self) -> wpi::units::feet_per_second_t {
       return self->GetLeftVelocity();
     })
-    .def("getRightPositionFeet", [](DifferentialDrivetrainSim * self) -> wpi::units::foot_t {
+    .def("get_right_position_feet", [](DifferentialDrivetrainSim * self) -> wpi::units::foot_t {
       return self->GetRightPosition();
     })
-    .def("getRightPositionInches", [](DifferentialDrivetrainSim * self) -> wpi::units::inch_t {
+    .def("get_right_position_inches", [](DifferentialDrivetrainSim * self) -> wpi::units::inch_t {
       return self->GetRightPosition();
     })
-    .def("getRightVelocityFps", [](DifferentialDrivetrainSim * self) -> wpi::units::feet_per_second_t {
+    .def("get_right_velocity_fps", [](DifferentialDrivetrainSim * self) -> wpi::units::feet_per_second_t {
       return self->GetRightVelocity();
     })
   ;

@@ -9,10 +9,10 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.util.UsageReporting;
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an estimate of the
@@ -89,26 +89,16 @@ public class SteadyStateKalmanFilter<States extends Num, Inputs extends Num, Out
     // S = CPCᵀ + R
     var S = C.times(P).times(C.transpose()).plus(discR);
 
-    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
-    // efficiently.
-    //
     // K = PCᵀS⁻¹
-    // KS = PCᵀ
-    // (KS)ᵀ = (PCᵀ)ᵀ
-    // SᵀKᵀ = CPᵀ
+    // K = PCᵀ / S
+    // K = (Sᵀ \ CPᵀ)ᵀ
+    // K = (S \ CP)ᵀ because S and P are symmetric
     //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // Kᵀ = Sᵀ.solve(CPᵀ)
-    // K = (Sᵀ.solve(CPᵀ))ᵀ
-    //
-    // Drop the transposes on symmetric matrices S and P.
-    //
-    // K = (S.solve(CP))ᵀ
+    // [1] wpimath/docs/LinalgIdentities.md
     m_K = new Matrix<>(S.getStorage().solve(C.times(P).getStorage()).transpose());
 
     reset();
-    MathSharedStore.getMathShared().reportUsage("SteadyStateKalmanFilter", "");
+    UsageReporting.reportUsage("SteadyStateKalmanFilter", "");
   }
 
   /** Resets the observer. */

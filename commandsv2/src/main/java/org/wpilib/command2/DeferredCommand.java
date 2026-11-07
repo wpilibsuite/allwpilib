@@ -8,7 +8,7 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Set;
 import java.util.function.Supplier;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Defers Command construction to runtime. Runs the command returned by a supplier when this command
@@ -72,9 +72,8 @@ public class DeferredCommand extends Command {
 
   @Override
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-    builder.addStringProperty(
-        "deferred", () -> m_command == m_nullCommand ? "null" : m_command.getName(), null);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
+    table.log("deferred", m_command == m_nullCommand ? "null" : m_command.getName());
   }
 }

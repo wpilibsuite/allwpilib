@@ -5,15 +5,16 @@
 #include "wpi/halsim/ws_server/HALSimHttpConnection.hpp"
 
 #include <cstdio>
+#include <format>
 #include <string>
 #include <string_view>
 
+#include <llhttp.h>
 #include <uv.h>
 
+#include "wpi/net/HttpUtil.hpp"
 #include "wpi/net/MimeTypes.hpp"
-#include "wpi/net/UrlParser.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
-#include "wpi/net/uv/Request.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -56,7 +57,7 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
 
     auto j = wpi::util::json::parse(msg);
     if (!j) {
-      m_websocket->Fail(400, fmt::format("JSON parse failed: {}", j.error()));
+      m_websocket->Fail(400, std::format("JSON parse failed: {}", j.error()));
       return;
     }
     m_server->OnNetValueChanged(*j);
@@ -149,22 +150,20 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
 }
 
 void HALSimHttpConnection::ProcessRequest() {
-  wpi::net::UrlParser url{m_request.GetUrl(),
-                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
-  if (!url.IsValid()) {
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
+  if (!url) {
     // failed to parse URL
     MySendError(400, "Invalid URL");
     return;
   }
 
   std::string_view path;
-  if (url.HasPath()) {
-    path = url.GetPath();
+  if (url->get_pathname_length() > 0) {
+    path = url->get_pathname();
   }
 
-  if (m_request.GetMethod() == wpi::net::HTTP_GET &&
-      wpi::util::starts_with(path, '/') && !wpi::util::contains(path, "..") &&
-      !wpi::util::contains(path, "//")) {
+  if (m_request.GetMethod() == HTTP_GET && wpi::util::starts_with(path, '/') &&
+      !wpi::util::contains(path, "..") && !wpi::util::contains(path, "//")) {
     // convert to fs native representation
     fs::path nativePath;
     if (auto userPath = wpi::util::remove_prefix(path, "/user/")) {
@@ -181,7 +180,7 @@ void HALSimHttpConnection::ProcessRequest() {
     }
 
     if (!fs::exists(nativePath) || fs::is_directory(nativePath)) {
-      MySendError(404, fmt::format("Resource '{}' not found", path));
+      MySendError(404, std::format("Resource '{}' not found", path));
     } else {
       auto contentType = wpi::net::MimeTypeFromPath(nativePath.string());
       SendFileResponse(200, "OK", contentType, nativePath.string());
@@ -197,7 +196,7 @@ void HALSimHttpConnection::MySendError(int code, std::string_view message) {
 }
 
 void HALSimHttpConnection::Log(int code) {
-  auto method = wpi::net::http_method_str(m_request.GetMethod());
+  auto method = llhttp_method_name(m_request.GetMethod());
   wpi::util::print(stderr, "{} {} HTTP/{}.{} {}\n", method, m_request.GetUrl(),
                    m_request.GetMajor(), m_request.GetMinor(), code);
 }

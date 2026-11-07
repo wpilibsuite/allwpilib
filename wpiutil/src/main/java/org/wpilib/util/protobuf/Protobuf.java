@@ -5,6 +5,8 @@
 package org.wpilib.util.protobuf;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import us.hebi.quickbuf.Descriptors.Descriptor;
@@ -181,6 +183,24 @@ public interface Protobuf<T, MessageType extends ProtoMessage<?>> {
   }
 
   /**
+   * Unpack a serialized protobuf array message to a list.
+   *
+   * @param <T> object type
+   * @param <MessageType> element type of the protobuf array
+   * @param msg protobuf array message
+   * @param proto protobuf implementation
+   * @return Deserialized list
+   */
+  static <T, MessageType extends ProtoMessage<MessageType>> List<T> unpackList(
+      RepeatedMessage<MessageType> msg, Protobuf<T, MessageType> proto) {
+    ArrayList<T> result = new ArrayList<>(msg.length());
+    for (var item : msg) {
+      result.add(proto.unpack(item));
+    }
+    return result;
+  }
+
+  /**
    * Pack a serialized protobuf array message.
    *
    * @param <T> object type
@@ -208,5 +228,23 @@ public interface Protobuf<T, MessageType extends ProtoMessage<?>> {
     msg.clear();
     msg.reserve(arr.length);
     msg.addAll(arr);
+  }
+
+  /**
+   * Pack a serialized protobuf array message to a list.
+   *
+   * @param <T> object type
+   * @param <MessageType> element type of the protobuf array
+   * @param msg protobuf array message
+   * @param list list of objects
+   * @param proto protobuf implementation
+   */
+  static <T, MessageType extends ProtoMessage<MessageType>> void packList(
+      RepeatedMessage<MessageType> msg, List<T> list, Protobuf<T, MessageType> proto) {
+    msg.clear();
+    msg.reserve(list.size());
+    for (var obj : list) {
+      proto.pack(msg.next(), obj);
+    }
   }
 }

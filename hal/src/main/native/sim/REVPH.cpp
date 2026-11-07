@@ -23,12 +23,12 @@ struct PCM {
 };
 }  // namespace
 
-static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
+static IndexedHandleResource<HAL_REVPHHandle, PCM, NUM_REVPH_MODULES,
                              HAL_HandleEnum::REV_PH>* pcmHandles;
 
 namespace wpi::hal::init {
 void InitializeREVPH() {
-  static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
+  static IndexedHandleResource<HAL_REVPHHandle, PCM, NUM_REVPH_MODULES,
                                HAL_HandleEnum::REV_PH>
       pH;
   pcmHandles = &pH;
@@ -43,7 +43,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
   if (!HAL_CheckREVPHModuleNumber(module)) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for REV PH", 1,
-                                       kNumREVPHModules, module);
+                                       NUM_REVPH_MODULES, module);
     return HAL_INVALID_HANDLE;
   }
 
@@ -78,11 +78,11 @@ void HAL_FreeREVPH(HAL_REVPHHandle handle) {
 }
 
 HAL_Bool HAL_CheckREVPHModuleNumber(int32_t module) {
-  return module >= 1 && module <= kNumREVPHModules;
+  return module >= 1 && module <= NUM_REVPH_MODULES;
 }
 
 HAL_Bool HAL_CheckREVPHSolenoidChannel(int32_t channel) {
-  return channel < kNumREVPHChannels && channel >= 0;
+  return channel < NUM_REVPH_CHANNELS && channel >= 0;
 }
 
 HAL_Bool HAL_GetREVPHCompressor(HAL_REVPHHandle handle, int32_t* status) {
@@ -199,7 +199,7 @@ int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {
   std::scoped_lock lock{pcm->lock};
   auto& data = SimREVPHData[pcm->module].solenoidOutput;
   int32_t ret = 0;
-  for (int i = 0; i < kNumREVPHChannels; i++) {
+  for (int i = 0; i < NUM_REVPH_CHANNELS; i++) {
     ret |= (data[i] << i);
   }
   return ret;
@@ -214,7 +214,7 @@ void HAL_SetREVPHSolenoids(HAL_REVPHHandle handle, int32_t mask, int32_t values,
 
   auto& data = SimREVPHData[pcm->module].solenoidOutput;
   std::scoped_lock lock{pcm->lock};
-  for (int i = 0; i < kNumREVPHChannels; i++) {
+  for (int i = 0; i < NUM_REVPH_CHANNELS; i++) {
     auto indexMask = (1 << i);
     if ((mask & indexMask) != 0) {
       data[i] = (values & indexMask) != 0;

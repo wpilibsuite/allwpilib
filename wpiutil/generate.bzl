@@ -7,6 +7,8 @@ def __generate_wpiutil_impl(ctx):
     args = ctx.actions.args()
     args.add("--output_directory", output_dir.path)
     args.add("--nanopb", ctx.executable._nanopb_generator)
+    first_file = ctx.attr.proto_files.files.to_list()[0]
+    args.add("--proto_directory", first_file.dirname)
 
     ctx.actions.run(
         inputs = ctx.attr.proto_files.files,

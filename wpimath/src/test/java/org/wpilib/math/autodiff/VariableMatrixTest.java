@@ -501,6 +501,94 @@ class VariableMatrixTest {
   }
 
   @Test
+  void testExp() {
+    assertEquals(0, Variable.totalNativeMemoryUsage());
+
+    try (var pool = new VariablePool()) {
+      // Scalar
+      var A1 = new VariableMatrix(new double[][] {{4.0}});
+      assertEquals(new SimpleMatrix(new double[][] {{Math.exp(4.0)}}), A1.exp().value(), 1e-13);
+      assertEquals(
+          new SimpleMatrix(new double[][] {{Math.exp(4.0)}}),
+          A1.block(0, 0, A1.rows(), A1.cols()).exp().value(),
+          1e-13);
+
+      var A2 = new VariableMatrix(new double[][] {{0.0, 1.0}, {0.0, -0.5}});
+      assertEquals(
+          SimpleMatrix.identity(2), A2.exp().value().mult(A2.unaryMinus().exp().value()), 1e-15);
+      assertEquals(
+          SimpleMatrix.identity(2),
+          A2.block(0, 0, A2.rows(), A2.cols())
+              .exp()
+              .value()
+              .mult(A2.block(0, 0, A2.rows(), A2.cols()).unaryMinus().exp().value()),
+          1e-15);
+
+      var A3 = new VariableMatrix(new double[][] {{0.0, 1.0}, {0.0, 10.0}});
+      assertEquals(
+          SimpleMatrix.identity(2), A3.exp().value().mult(A3.unaryMinus().exp().value()), 1e-15);
+      assertEquals(
+          SimpleMatrix.identity(2),
+          A3.block(0, 0, A3.rows(), A3.cols())
+              .exp()
+              .value()
+              .mult(A3.block(0, 0, A3.rows(), A3.cols()).unaryMinus().exp().value()),
+          1e-15);
+
+      var A4 = new VariableMatrix(new double[][] {{1.0, 10.0}, {0.0, 0.0}});
+      assertEquals(
+          SimpleMatrix.identity(2), A4.exp().value().mult(A4.unaryMinus().exp().value()), 1e-15);
+      assertEquals(
+          SimpleMatrix.identity(2),
+          A4.block(0, 0, A4.rows(), A4.cols())
+              .exp()
+              .value()
+              .mult(A4.block(0, 0, A4.rows(), A4.cols()).unaryMinus().exp().value()),
+          1e-15);
+
+      var A5 = new VariableMatrix(new double[][] {{2.0, 3.0}, {4.0, 5.0}});
+      assertEquals(
+          SimpleMatrix.identity(2), A5.exp().value().mult(A5.unaryMinus().exp().value()), 1e-12);
+      assertEquals(
+          SimpleMatrix.identity(2),
+          A5.block(0, 0, A5.rows(), A5.cols())
+              .exp()
+              .value()
+              .mult(A5.block(0, 0, A5.rows(), A5.cols()).unaryMinus().exp().value()),
+          1e-12);
+
+      // Pascal matrix
+      //
+      //    ([0  0  0  0  0  0  0])   [1  0   0   0   0  0  0]
+      //    ([1  0  0  0  0  0  0])   [1  1   0   0   0  0  0]
+      //    ([0  2  0  0  0  0  0])   [1  2   1   0   0  0  0]
+      // exp([0  0  3  0  0  0  0]) = [1  3   3   1   0  0  0]
+      //    ([0  0  0  4  0  0  0])   [1  4   6   4   1  0  0]
+      //    ([0  0  0  0  5  0  0])   [1  5  10  10   5  1  0]
+      //    ([0  0  0  0  0  6  0])   [1  6  15  20  15  6  1]
+      var pascal = VariableMatrix.zero(7, 7);
+      for (int col = 0; col < 6; ++col) {
+        pascal.set(col + 1, col, col + 1);
+      }
+      var expectedPascal = new SimpleMatrix(7, 7);
+      for (int row = 0; row < 7; ++row) {
+        expectedPascal.set(row, 0, 1.0);
+      }
+      for (int col = 1; col < 7; ++col) {
+        for (int row = col; row < 7; ++row) {
+          expectedPascal.set(
+              row, col, expectedPascal.get(row - 1, col - 1) + expectedPascal.get(row - 1, col));
+        }
+      }
+      assertEquals(expectedPascal, pascal.exp().value(), 1e-14);
+      assertEquals(
+          expectedPascal, pascal.block(0, 0, pascal.rows(), pascal.cols()).exp().value(), 1e-14);
+    }
+
+    assertEquals(0, Variable.totalNativeMemoryUsage());
+  }
+
+  @Test
   void testBlockFreeFunction() {
     assertEquals(0, Variable.totalNativeMemoryUsage());
 

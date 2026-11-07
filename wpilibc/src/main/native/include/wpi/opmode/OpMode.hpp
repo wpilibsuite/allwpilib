@@ -61,6 +61,17 @@ class OpMode {
   virtual void End() {}
 
   /**
+   * Called when the opmode is no longer selected on the DS or after an enabled
+   * run ends, even if the opmode was never started. The framework removes the
+   * opmode's periodic callbacks before calling this method and will not reuse
+   * the object afterward.
+   *
+   * This lifecycle cleanup does not depend on object destruction; other
+   * references may keep the object alive after this method returns.
+   */
+  virtual void Close() {}
+
+  /**
    * Returns a vector of custom periodic callbacks to be executed while the
    * opmode is enabled.
    *
@@ -68,6 +79,12 @@ class OpMode {
    * with custom execution intervals. The callbacks are executed by the robot
    * framework at their scheduled times, in addition to the primary Periodic()
    * callback.
+   *
+   * <p><b>Registration timing</b>: The callbacks returned by this method are
+   * registered with the framework immediately when the OpMode is constructed
+   * and begin executing as soon as they are registered. To restrict execution
+   * to only when the robot is enabled, callbacks should include an
+   * if (RobotState.isEnabled()) check at the beginning.
    *
    * @return A vector of custom callbacks to execute, or an empty vector if no
    *         custom callbacks are needed. The default implementation returns an

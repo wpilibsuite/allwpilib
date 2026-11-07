@@ -4,7 +4,8 @@
 
 #include "wpi/simulation/PWMSim.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/hal/HAL.h"
@@ -12,53 +13,53 @@
 
 namespace wpi::sim {
 
-TEST(PWMSimTest, Initialize) {
-  HAL_Initialize(500, 0);
+TEST_CASE("PWMSimTest Initialize", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   PWMSim sim{0};
   sim.ResetData();
-  EXPECT_FALSE(sim.GetInitialized());
+  CHECK_FALSE(sim.GetInitialized());
 
   BooleanCallback callback;
 
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
   PWM pwm{0};
-  EXPECT_TRUE(sim.GetInitialized());
+  CHECK(sim.GetInitialized());
 }
 
-TEST(PWMSimTest, SetPulseTime) {
-  HAL_Initialize(500, 0);
+TEST_CASE("PWMSimTest SetPulseTime", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   PWMSim sim{0};
   sim.ResetData();
-  EXPECT_FALSE(sim.GetInitialized());
+  CHECK_FALSE(sim.GetInitialized());
 
   IntCallback callback;
 
   auto cb = sim.RegisterPulseMicrosecondCallback(callback.GetCallback(), false);
   PWM pwm{0};
   sim.SetPulseMicrosecond(2290);
-  EXPECT_EQ(2290, sim.GetPulseMicrosecond());
-  EXPECT_EQ(2290, std::lround(pwm.GetPulseTime().value()));
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(2290, callback.GetLastValue());
+  CHECK(2290 == sim.GetPulseMicrosecond());
+  CHECK(2290 == std::lround(pwm.GetPulseTime().value()));
+  CHECK(callback.WasTriggered());
+  CHECK(2290 == callback.GetLastValue());
 }
 
-TEST(PWMSimTest, SetOutputPeriod) {
-  HAL_Initialize(500, 0);
+TEST_CASE("PWMSimTest SetOutputPeriod", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   PWMSim sim{0};
   sim.ResetData();
-  EXPECT_FALSE(sim.GetInitialized());
+  CHECK_FALSE(sim.GetInitialized());
 
   IntCallback callback;
 
   auto cb = sim.RegisterOutputPeriodCallback(callback.GetCallback(), false);
   PWM pwm{0};
   sim.SetOutputPeriod(3504);
-  EXPECT_EQ(3504, sim.GetOutputPeriod());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(3504, callback.GetLastValue());
+  CHECK(3504 == sim.GetOutputPeriod());
+  CHECK(callback.WasTriggered());
+  CHECK(3504 == callback.GetLastValue());
 }
 
 }  // namespace wpi::sim

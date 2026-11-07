@@ -26,19 +26,19 @@ inline_code: |
         wpi::units::meters_per_second_t, wpi::units::meters_per_second_t,
         wpi::units::meters_per_second_t, wpi::units::meters_per_second_t
       >(),
-      py::arg("frontLeft") = 0, py::arg("frontRight") = 0,
-      py::arg("rearLeft") = 0, py::arg("rearRight") = 0
+      py::arg("front_left") = 0, py::arg("front_right") = 0,
+      py::arg("rear_left") = 0, py::arg("rear_right") = 0
     )
-    .def_static("fromFeet", [](
+    .def_static("from_feet", [](
         wpi::units::feet_per_second_t frontLeft,
         wpi::units::feet_per_second_t frontRight,
         wpi::units::feet_per_second_t rearLeft,
         wpi::units::feet_per_second_t rearRight
     ){
       return MecanumDriveWheelVelocities{frontLeft, frontRight, rearLeft, rearRight};
-    }, py::arg("frontLeft"), py::arg("frontRight"),
-       py::arg("rearLeft"), py::arg("rearRight"))
-    .def_property("frontLeft_fps",
+    }, py::arg("front_left"), py::arg("front_right"),
+       py::arg("rear_left"), py::arg("rear_right"))
+    .def_property("front_left_fps",
       [](MecanumDriveWheelVelocities * self) -> wpi::units::feet_per_second_t {
         return self->frontLeft;
       },
@@ -46,7 +46,7 @@ inline_code: |
         self->frontLeft = fps;
       }
     )
-    .def_property("frontRight_fps", 
+    .def_property("front_right_fps",
       [](MecanumDriveWheelVelocities * self) -> wpi::units::feet_per_second_t {
         return self->frontRight;
       },
@@ -54,7 +54,7 @@ inline_code: |
         self->frontRight = fps;
       }
     )
-    .def_property("rearLeft_fps",
+    .def_property("rear_left_fps",
       [](MecanumDriveWheelVelocities * self) -> wpi::units::feet_per_second_t {
         return self->rearLeft;
       },
@@ -62,7 +62,7 @@ inline_code: |
         self->rearLeft = fps;
       }
     )
-    .def_property("rearRight_fps", 
+    .def_property("rear_right_fps",
       [](MecanumDriveWheelVelocities * self) -> wpi::units::feet_per_second_t {
         return self->rearRight;
       },
@@ -71,10 +71,10 @@ inline_code: |
       }
     )
     .def("__repr__", [](const MecanumDriveWheelVelocities &ms) -> std::string {
-      return "MecanumDriveWheelVelocities(frontLeft=" + std::to_string(ms.frontLeft()) + ", "
-                                     "frontRight=" + std::to_string(ms.frontRight()) + ", "
-                                     "rearLeft=" + std::to_string(ms.rearLeft()) + ", "
-                                     "rearRight=" + std::to_string(ms.rearRight()) + ")";
+      return "MecanumDriveWheelVelocities(front_left=" + std::to_string(ms.frontLeft()) + ", "
+                                     "front_right=" + std::to_string(ms.frontRight()) + ", "
+                                     "rear_left=" + std::to_string(ms.rearLeft()) + ", "
+                                     "rear_right=" + std::to_string(ms.rearRight()) + ")";
     })
   ;
 

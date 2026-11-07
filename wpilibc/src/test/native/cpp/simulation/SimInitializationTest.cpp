@@ -4,7 +4,8 @@
 
 #include <stdexcept>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/hal/HAL.h"
 #include "wpi/simulation/AddressableLEDSim.hpp"
@@ -21,10 +22,10 @@
 
 using namespace wpi::sim;
 
-TEST(SimInitializationTest, AllInitialize) {
-  HAL_Initialize(500, 0);
+TEST_CASE("SimInitializationTest AllInitialize", "[wpilibc][simulation]") {
+  HAL_Initialize();
   AnalogInputSim aisim{0};
-  EXPECT_THROW(DigitalPWMSim::CreateForChannel(0), std::out_of_range);
+  CHECK_THROWS_AS(DigitalPWMSim::CreateForChannel(0), std::out_of_range);
   DIOSim diosim{0};
   DriverStationSim dssim;
   (void)dssim;

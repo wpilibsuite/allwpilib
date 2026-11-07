@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <span>
 
 #include "wpi/glass/Model.hpp"

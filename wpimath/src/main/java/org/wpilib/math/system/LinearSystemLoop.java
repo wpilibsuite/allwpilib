@@ -12,9 +12,9 @@ import org.wpilib.math.controller.LinearQuadraticRegulator;
 import org.wpilib.math.estimator.KalmanFilter;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Combines a controller, feedforward, and observer for controlling a mechanism with full state
@@ -129,7 +129,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
 
     m_nextR = new Matrix<>(new SimpleMatrix(controller.getK().getNumCols(), 1));
     reset(m_nextR);
-    MathSharedStore.getMathShared().reportUsage("LinearSystemLoop", "");
+    UsageReporting.reportUsage("LinearSystemLoop", "");
   }
 
   /**
@@ -291,6 +291,24 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
    */
   public double getError(int index) {
     return getController().getR().minus(m_observer.getXhat()).get(index, 0);
+  }
+
+  /**
+   * Returns true if the error is within the tolerance set by setTolerance() for every state.
+   *
+   * @return True if the error is within tolerance of the reference.
+   */
+  public boolean atReference() {
+    return m_controller.atReference();
+  }
+
+  /**
+   * Sets the error which is considered tolerable for use with atReference().
+   *
+   * @param tolerance The tolerable error for each state.
+   */
+  public void setTolerance(Matrix<States, N1> tolerance) {
+    m_controller.setTolerance(tolerance);
   }
 
   /**

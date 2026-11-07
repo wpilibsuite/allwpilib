@@ -122,12 +122,11 @@ def architectures_pkg_zip(
 
 def platform_prefix(t):
     return select({
-        "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": "linux/x86-64/" + t,
-        "@rules_bzlmodrio_toolchains//conditions:osx": "osx/universal/" + t,
-        "@rules_bzlmodrio_toolchains//conditions:windows_arm64": "windows/arm64/" + t,
-        "@rules_bzlmodrio_toolchains//conditions:windows_x86_64": "windows/x86-64/" + t,
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": "linux/roborio/" + t,
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": "linux/systemcore/" + t,
+        "@wpilib_toolchains//conditions:linux_x86_64": "linux/x86-64/" + t,
+        "@wpilib_toolchains//conditions:osx": "osx/universal/" + t,
+        "@wpilib_toolchains//conditions:windows_arm64": "windows/arm64/" + t,
+        "@wpilib_toolchains//conditions:windows_x86_64": "windows/x86-64/" + t,
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": "linux/systemcore/" + t,
     })
 
 def _wpilib_maven_export_impl(
@@ -138,7 +137,8 @@ def _wpilib_maven_export_impl(
         osx_artifacts,
         windows_artifacts,
         lib_name = None,
-        visibility = None):
+        visibility = None,
+        **kwargs):
     """Implementation of wpilib_maven_export."""
     all_artifacts = {}
     all_artifacts.update(classifier_artifacts)
@@ -166,6 +166,9 @@ def _wpilib_maven_export_impl(
         classifier_artifacts = filtered_artifacts,
         lib_name = lib_name,
         visibility = visibility,
+        # Exclude files in the root (unnamed) package, which should only be module-info files
+        doc_excluded_packages = [""],
+        **kwargs
     )
 
 wpilib_maven_export = macro(
@@ -176,6 +179,7 @@ wpilib_maven_export = macro(
         "linux_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
         "maven_coordinates": attr.string(mandatory = True, configurable = False),
         "osx_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
+        "tags": attr.string_list(default = [], configurable = False),
         "windows_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
     },
     doc = "A symbolic macro that wraps maven_export for wpilib.",

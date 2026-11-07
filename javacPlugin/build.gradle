@@ -1,7 +1,7 @@
 ext {
     useJava = true
     useCpp = false
-    baseId = 'wpilibj-javac-plugin'
+    baseId = 'javac-plugin'
     groupId = 'org.wpilib'
 
     nativeName = ''

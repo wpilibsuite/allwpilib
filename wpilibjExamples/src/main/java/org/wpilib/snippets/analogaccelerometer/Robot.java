@@ -8,7 +8,7 @@ import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.accelerometer.AnalogAccelerometer;
 
 /**
- * AnalogAccelerometer snippets for frc-docs.
+ * AnalogAccelerometer snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 public class Robot extends TimedRobot {

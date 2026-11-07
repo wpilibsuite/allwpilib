@@ -9,8 +9,8 @@
 
 #define WPI_RAWFRAME_JNI
 #include "org_wpilib_vision_apriltag_jni_AprilTagJNI.h"
-#include "wpi/apriltag/AprilTag.hpp"
 #include "wpi/apriltag/AprilTagDetector.hpp"
+#include "wpi/apriltag/AprilTagImageGenerator.hpp"
 #include "wpi/apriltag/AprilTagPoseEstimator.hpp"
 #include "wpi/util/RawFrame.h"
 #include "wpi/util/jni_util.hpp"
@@ -610,7 +610,7 @@ Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_generate16h5AprilTagImage
     nullPointerEx.Throw(env, "frame is null");
     return;
   }
-  bool newData = AprilTag::Generate16h5AprilTagImage(frame, id);
+  bool newData = Generate16h5AprilTagImage(frame, id);
   wpi::util::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
 }
 
@@ -629,7 +629,7 @@ Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_generate36h11AprilTagImage
     return;
   }
   // function might reallocate
-  bool newData = AprilTag::Generate36h11AprilTagImage(frame, id);
+  bool newData = Generate36h11AprilTagImage(frame, id);
   wpi::util::SetFrameData(env, rawFrameCls, frameObj, *frame, newData);
 }
 

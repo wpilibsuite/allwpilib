@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <memory>
-
 namespace wpi::util {
 class json;
 }  // namespace wpi::util

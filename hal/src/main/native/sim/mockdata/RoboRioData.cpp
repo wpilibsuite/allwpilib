@@ -24,6 +24,7 @@ void RoboRioData::ResetData() {
   userActive3V3.Reset(true);
   userFaults3V3.Reset(0);
   brownoutVoltage.Reset(6.75);
+  brownoutRecoveryVoltage.Reset(7.25);
   cpuTemp.Reset(45.0);
   teamNumber.Reset(0);
   m_serialNumber = "";
@@ -107,6 +108,7 @@ DEFINE_CAPI(double, UserCurrent3V3, userCurrent3V3)
 DEFINE_CAPI(HAL_Bool, UserActive3V3, userActive3V3)
 DEFINE_CAPI(int32_t, UserFaults3V3, userFaults3V3)
 DEFINE_CAPI(double, BrownoutVoltage, brownoutVoltage)
+DEFINE_CAPI(double, BrownoutRecoveryVoltage, brownoutRecoveryVoltage)
 DEFINE_CAPI(double, CPUTemp, cpuTemp)
 DEFINE_CAPI(int32_t, TeamNumber, teamNumber)
 
@@ -154,6 +156,7 @@ void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
   REGISTER(userActive3V3);
   REGISTER(userFaults3V3);
   REGISTER(brownoutVoltage);
+  REGISTER(brownoutRecoveryVoltage);
   REGISTER(cpuTemp);
 }
 }  // extern "C"

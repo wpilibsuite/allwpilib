@@ -6,12 +6,10 @@
 
 #include <stdexcept>
 
-#include <fmt/format.h>
-
 #include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/protobuf/wpimath.npb.h"
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/wpimath.npb.h"
 
 template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)

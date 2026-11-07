@@ -48,7 +48,7 @@ public final class StructFetcher {
 
   /**
    * Returns a {@link Struct} for the given class. This does not do compile time checking that the
-   * class is a {@link StructSerializable}. Whenever possible it is reccomended to use {@link
+   * class is a {@link StructSerializable}. Whenever possible it is recommended to use {@link
    * #fetchStruct(Class)}.
    *
    * @param clazz The class object to extract the struct from.

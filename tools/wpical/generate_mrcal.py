@@ -19,12 +19,12 @@ def main(argv):
     args = parser.parse_args(argv)
 
     args.output_directory.mkdir(parents=True, exist_ok=True)
-    result = subprocess.run(
-        f"{dirname}/src/main/native/thirdparty/mrcal/src/minimath/minimath_generate.pl",
-        capture_output=True,
+    result = subprocess.check_output(
+        "./src/main/native/thirdparty/mrcal/src/minimath/minimath_generate.pl",
+        cwd=dirname,
     )
     (args.output_directory / "minimath_generated.h").write_text(
-        str(result.stdout, encoding="UTF8")
+        str(result, encoding="UTF8")
     )
 
 

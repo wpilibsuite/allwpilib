@@ -1,28 +1,28 @@
 import pytest
 from wpimath import MecanumDriveWheelAccelerations
-from wpimath.units import feetToMeters
+from wpimath.units import feet_to_meters
 
 # Epsilon matching the C++ test
-K_EPSILON = 1e-9
+EPSILON = 1e-9
 
 
 def test_default_constructor():
     wheel_accelerations = MecanumDriveWheelAccelerations()
 
-    assert wheel_accelerations.frontLeft == pytest.approx(0.0, abs=K_EPSILON)
-    assert wheel_accelerations.frontRight == pytest.approx(0.0, abs=K_EPSILON)
-    assert wheel_accelerations.rearLeft == pytest.approx(0.0, abs=K_EPSILON)
-    assert wheel_accelerations.rearRight == pytest.approx(0.0, abs=K_EPSILON)
+    assert wheel_accelerations.front_left == pytest.approx(0.0, abs=EPSILON)
+    assert wheel_accelerations.front_right == pytest.approx(0.0, abs=EPSILON)
+    assert wheel_accelerations.rear_left == pytest.approx(0.0, abs=EPSILON)
+    assert wheel_accelerations.rear_right == pytest.approx(0.0, abs=EPSILON)
 
 
 def test_parameterized_constructor():
     # Accelerations: FL=1.0, FR=2.0, RL=3.0, RR=4.0 m/s^2
     wheel_accelerations = MecanumDriveWheelAccelerations(1.0, 2.0, 3.0, 4.0)
 
-    assert wheel_accelerations.frontLeft == pytest.approx(1.0, abs=K_EPSILON)
-    assert wheel_accelerations.frontRight == pytest.approx(2.0, abs=K_EPSILON)
-    assert wheel_accelerations.rearLeft == pytest.approx(3.0, abs=K_EPSILON)
-    assert wheel_accelerations.rearRight == pytest.approx(4.0, abs=K_EPSILON)
+    assert wheel_accelerations.front_left == pytest.approx(1.0, abs=EPSILON)
+    assert wheel_accelerations.front_right == pytest.approx(2.0, abs=EPSILON)
+    assert wheel_accelerations.rear_left == pytest.approx(3.0, abs=EPSILON)
+    assert wheel_accelerations.rear_right == pytest.approx(4.0, abs=EPSILON)
 
 
 def test_plus():
@@ -31,10 +31,10 @@ def test_plus():
 
     wheel_accelerations = left + right
 
-    assert wheel_accelerations.frontLeft == pytest.approx(2.0, abs=K_EPSILON)
-    assert wheel_accelerations.frontRight == pytest.approx(2.0, abs=K_EPSILON)
-    assert wheel_accelerations.rearLeft == pytest.approx(1.0, abs=K_EPSILON)
-    assert wheel_accelerations.rearRight == pytest.approx(2.0, abs=K_EPSILON)
+    assert wheel_accelerations.front_left == pytest.approx(2.0, abs=EPSILON)
+    assert wheel_accelerations.front_right == pytest.approx(2.0, abs=EPSILON)
+    assert wheel_accelerations.rear_left == pytest.approx(1.0, abs=EPSILON)
+    assert wheel_accelerations.rear_right == pytest.approx(2.0, abs=EPSILON)
 
 
 def test_minus():
@@ -43,10 +43,10 @@ def test_minus():
 
     wheel_accelerations = left - right
 
-    assert wheel_accelerations.frontLeft == pytest.approx(-1.0, abs=K_EPSILON)
-    assert wheel_accelerations.frontRight == pytest.approx(-1.0, abs=K_EPSILON)
-    assert wheel_accelerations.rearLeft == pytest.approx(0.5, abs=K_EPSILON)
-    assert wheel_accelerations.rearRight == pytest.approx(-0.5, abs=K_EPSILON)
+    assert wheel_accelerations.front_left == pytest.approx(-1.0, abs=EPSILON)
+    assert wheel_accelerations.front_right == pytest.approx(-1.0, abs=EPSILON)
+    assert wheel_accelerations.rear_left == pytest.approx(0.5, abs=EPSILON)
+    assert wheel_accelerations.rear_right == pytest.approx(-0.5, abs=EPSILON)
 
 
 def test_unary_minus():
@@ -54,10 +54,10 @@ def test_unary_minus():
 
     wheel_accelerations = -accel
 
-    assert wheel_accelerations.frontLeft == pytest.approx(-1.0, abs=K_EPSILON)
-    assert wheel_accelerations.frontRight == pytest.approx(-0.5, abs=K_EPSILON)
-    assert wheel_accelerations.rearLeft == pytest.approx(-0.75, abs=K_EPSILON)
-    assert wheel_accelerations.rearRight == pytest.approx(-0.25, abs=K_EPSILON)
+    assert wheel_accelerations.front_left == pytest.approx(-1.0, abs=EPSILON)
+    assert wheel_accelerations.front_right == pytest.approx(-0.5, abs=EPSILON)
+    assert wheel_accelerations.rear_left == pytest.approx(-0.75, abs=EPSILON)
+    assert wheel_accelerations.rear_right == pytest.approx(-0.25, abs=EPSILON)
 
 
 def test_multiplication():
@@ -65,10 +65,10 @@ def test_multiplication():
 
     wheel_accelerations = accel * 2.0
 
-    assert wheel_accelerations.frontLeft == pytest.approx(2.0, abs=K_EPSILON)
-    assert wheel_accelerations.frontRight == pytest.approx(1.0, abs=K_EPSILON)
-    assert wheel_accelerations.rearLeft == pytest.approx(1.5, abs=K_EPSILON)
-    assert wheel_accelerations.rearRight == pytest.approx(0.5, abs=K_EPSILON)
+    assert wheel_accelerations.front_left == pytest.approx(2.0, abs=EPSILON)
+    assert wheel_accelerations.front_right == pytest.approx(1.0, abs=EPSILON)
+    assert wheel_accelerations.rear_left == pytest.approx(1.5, abs=EPSILON)
+    assert wheel_accelerations.rear_right == pytest.approx(0.5, abs=EPSILON)
 
 
 def test_division():
@@ -76,24 +76,24 @@ def test_division():
 
     wheel_accelerations = accel / 2.0
 
-    assert wheel_accelerations.frontLeft == pytest.approx(1.0, abs=K_EPSILON)
-    assert wheel_accelerations.frontRight == pytest.approx(0.5, abs=K_EPSILON)
-    assert wheel_accelerations.rearLeft == pytest.approx(0.75, abs=K_EPSILON)
-    assert wheel_accelerations.rearRight == pytest.approx(0.25, abs=K_EPSILON)
+    assert wheel_accelerations.front_left == pytest.approx(1.0, abs=EPSILON)
+    assert wheel_accelerations.front_right == pytest.approx(0.5, abs=EPSILON)
+    assert wheel_accelerations.rear_left == pytest.approx(0.75, abs=EPSILON)
+    assert wheel_accelerations.rear_right == pytest.approx(0.25, abs=EPSILON)
 
 
 def test_feet_constructor():
-    accel = MecanumDriveWheelAccelerations.fromFps(10, 11, 12, 13)
+    accel = MecanumDriveWheelAccelerations.from_fps(10, 11, 12, 13)
 
-    assert accel.frontLeft == pytest.approx(feetToMeters(10), abs=K_EPSILON)
-    assert accel.frontRight == pytest.approx(feetToMeters(11), abs=K_EPSILON)
-    assert accel.rearLeft == pytest.approx(feetToMeters(12), abs=K_EPSILON)
-    assert accel.rearRight == pytest.approx(feetToMeters(13), abs=K_EPSILON)
+    assert accel.front_left == pytest.approx(feet_to_meters(10), abs=EPSILON)
+    assert accel.front_right == pytest.approx(feet_to_meters(11), abs=EPSILON)
+    assert accel.rear_left == pytest.approx(feet_to_meters(12), abs=EPSILON)
+    assert accel.rear_right == pytest.approx(feet_to_meters(13), abs=EPSILON)
 
-    assert accel.front_left_fpss == pytest.approx(10, abs=K_EPSILON)
-    assert accel.front_right_fpss == pytest.approx(11, abs=K_EPSILON)
-    assert accel.rear_left_fpss == pytest.approx(12, abs=K_EPSILON)
-    assert accel.rear_right_fpss == pytest.approx(13, abs=K_EPSILON)
+    assert accel.front_left_fpss == pytest.approx(10, abs=EPSILON)
+    assert accel.front_right_fpss == pytest.approx(11, abs=EPSILON)
+    assert accel.rear_left_fpss == pytest.approx(12, abs=EPSILON)
+    assert accel.rear_right_fpss == pytest.approx(13, abs=EPSILON)
 
 
 def test_repr():
@@ -101,5 +101,5 @@ def test_repr():
 
     assert (
         str(accel)
-        == "MecanumDriveWheelAccelerations(frontLeft=1.000000, frontRight=2.000000, rearLeft=3.000000, rearRight=4.000000)"
+        == "MecanumDriveWheelAccelerations(front_left=1.000000, front_right=2.000000, rear_left=3.000000, rear_right=4.000000)"
     )

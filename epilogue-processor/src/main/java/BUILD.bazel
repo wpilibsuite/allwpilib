@@ -1,0 +1,37 @@
+load("@rules_java//java:defs.bzl", "java_plugin")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
+
+wpilib_java_library(
+    name = "processor-java",
+    srcs = glob(["**/*.java"]),
+    extra_source_pkgs = ["//epilogue-processor:resources"],
+    maven_artifact_name = "epilogue-processor-java",
+    maven_group_id = "org.wpilib.epilogue",
+    resource_strip_prefix = "epilogue-processor/src/main/resources/",
+    resources = ["//epilogue-processor:resources"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//commandsv2/src/main/java",
+        "//epilogue-runtime/src/main/java",
+        "//hal/src/main/java",
+        "//ntcore/src/main/java",
+        "//tunables/src/main/java",
+        "//wpilibj/src/main/java",
+        "//wpimath/src/main/java",
+    ],
+)
+
+java_plugin(
+    name = "plugin",
+    processor_class = "org.wpilib.epilogue.processor.AnnotationProcessor",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":processor-java",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":processor-java",
+    visibility = ["//visibility:public"],
+)

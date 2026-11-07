@@ -33,7 +33,7 @@ class OnBoardIO {
   enum ChannelMode { /** Input */ INPUT, /** Output */ OUTPUT };
   OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2);
 
-  static constexpr auto kMessageInterval = 1_s;
+  static constexpr auto MESSAGE_INTERVAL = 1_s;
   wpi::units::second_t m_nextMessageTime = 0_s;
 
   /**
@@ -65,6 +65,11 @@ class OnBoardIO {
    * Sets the yellow LED.
    */
   void SetYellowLed(bool value);
+
+  /**
+   * Allocates a PWM output.
+   */
+  static void AllocatePWM(int channel);
 
  private:
   wpi::DigitalInput m_buttonA{0};

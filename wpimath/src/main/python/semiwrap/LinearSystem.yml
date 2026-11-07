@@ -30,22 +30,22 @@ classes:
     template_inline_code: |
       cls_LinearSystem.def("slice", [](wpi::math::LinearSystem<States, Inputs, Outputs> &self, int idx0) {
           return self.Slice(idx0);
-        }, py::arg("outputIndex"),
-           py::doc("Returns the LinearSystem with the outputs listed in outputIndices.")
+        }, py::arg("output_index"),
+           py::doc("Returns the LinearSystem with the outputs listed in output_index.")
       );
 
       if constexpr (Outputs > 1) {
         cls_LinearSystem.def("slice", [](wpi::math::LinearSystem<States, Inputs, Outputs> &self, int idx0, int idx1) {
             return self.Slice(idx0, idx1);
-          }, py::arg("outputIndex0"), py::arg("outputIndex1"),
-            py::doc("Returns the LinearSystem with the outputs listed in outputIndices.")
+          }, py::arg("output_index0"), py::arg("output_index1"),
+            py::doc("Returns the LinearSystem with the outputs listed in output_index0 and output_index1.")
         );
       }
       if constexpr (Outputs > 2) {
         cls_LinearSystem.def("slice", [](wpi::math::LinearSystem<States, Inputs, Outputs> &self, int idx0, int idx1, int idx2) {
             return self.Slice(idx0, idx1, idx2);
-          }, py::arg("outputIndex0"), py::arg("outputIndex1"), py::arg("outputIndex2"),
-            py::doc("Returns the LinearSystem with the outputs listed in outputIndices.")
+          }, py::arg("output_index0"), py::arg("output_index1"), py::arg("output_index2"),
+            py::doc("Returns the LinearSystem with the outputs listed in output_index0, output_index1, and output_index2.")
         );
       }
 

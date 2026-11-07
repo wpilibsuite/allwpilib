@@ -117,31 +117,16 @@ Java_org_wpilib_hardware_hal_PowerJNI_resetUserCurrentFaults
 
 /*
  * Class:     org_wpilib_hardware_hal_PowerJNI
- * Method:    setBrownoutVoltage
- * Signature: (D)V
+ * Method:    setBrownoutVoltages
+ * Signature: (DD)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_PowerJNI_setBrownoutVoltage
-  (JNIEnv* env, jclass, jdouble brownoutVoltage)
+Java_org_wpilib_hardware_hal_PowerJNI_setBrownoutVoltages
+  (JNIEnv* env, jclass, jdouble brownoutVoltage, jdouble recoveryVoltage)
 {
   int32_t status = 0;
-  HAL_SetBrownoutVoltage(brownoutVoltage, &status);
+  HAL_SetBrownoutVoltages(brownoutVoltage, recoveryVoltage, &status);
   CheckStatus(env, status);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_PowerJNI
- * Method:    getBrownoutVoltage
- * Signature: ()D
- */
-JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_PowerJNI_getBrownoutVoltage
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  double val = HAL_GetBrownoutVoltage(&status);
-  CheckStatus(env, status);
-  return val;
 }
 
 /*

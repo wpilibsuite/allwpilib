@@ -12,7 +12,6 @@
 #include <mfidl.h>
 #include <mfreadwrite.h>
 
-#include <atomic>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -26,11 +25,8 @@
 #include "UsbCameraProperty.hpp"
 #include "WindowsMessagePump.hpp"
 #include "wpi/util/PixelFormat.hpp"
-#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/condition_variable.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/raw_istream.hpp"
-#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi::cs {
 
@@ -79,19 +75,19 @@ class UsbCameraImpl : public SourceImpl,
   // Messages passed to/from camera thread
   struct Message {
     enum Kind {
-      kNone = 0,
-      kCmdSetPath,
-      kCmdSetMode,
-      kCmdSetPixelFormat,
-      kCmdSetResolution,
-      kCmdSetFPS,
-      kCmdSetProperty,
-      kCmdSetPropertyStr,
-      kNumSinksChanged,         // no response
-      kNumSinksEnabledChanged,  // no response
+      NONE = 0,
+      CMD_SET_PATH,
+      CMD_SET_MODE,
+      CMD_SET_PIXEL_FORMAT,
+      CMD_SET_RESOLUTION,
+      CMD_SET_FPS,
+      CMD_SET_PROPERTY,
+      CMD_SET_PROPERTY_STR,
+      NUM_SINKS_CHANGED,          // no response
+      NUM_SINKS_ENABLED_CHANGED,  // no response
       // Responses
-      kOk,
-      kError
+      MSG_OK,
+      MSG_ERROR
     };
 
     explicit Message(Kind kind_)

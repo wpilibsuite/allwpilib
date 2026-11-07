@@ -3,7 +3,6 @@ import collections
 import json
 import pathlib
 import re
-from typing import Dict, List, Union
 
 import jinja2
 import tomli
@@ -30,7 +29,11 @@ from shared.bazel.rules.robotpy.hack_pkgcfgs import hack_pkgconfig
 
 
 class HeaderToDatConfig:
-    def __init__(self, header_to_dat_args: BuildTarget):
+    def __init__(
+        self,
+        header_to_dat_args: BuildTarget,
+        extension_name_transforms: list[tuple[str, str]],
+    ):
         includes = []
         defines = []
 
@@ -46,43 +49,52 @@ class HeaderToDatConfig:
         if header_to_dat_args.args[idx] == "--cpp":
             idx += 2
 
+        transforms = []
+        while True:
+            if header_to_dat_args.args[idx] in [
+                "--name-transform-attribute",
+                "--name-transform-default",
+                "--name-transform-enum-value",
+                "--name-transform-function",
+                "--name-transform-known-word",
+                "--name-transform-method",
+                "--name-transform-parameter",
+            ]:
+                transforms.append(
+                    (header_to_dat_args.args[idx], header_to_dat_args.args[idx + 1])
+                )
+                idx += 2
+            else:
+                break
+
+        # We assume that the transforms remain the same in a given extension
+        if extension_name_transforms:
+            assert extension_name_transforms == transforms
+        else:
+            extension_name_transforms.extend(transforms)
+
         args = header_to_dat_args.args[idx:]
         self.class_name = args[0]
-        self.yml_file = args[1].path
+        self.yml_file = pathlib.Path(args[1].path).as_posix()
         self.defines = defines
 
-        def find_root_dir(include_root):
-            """
-            Somewhat naive attempt to find the "root" directory of the repository,
-            as specified from the runfiles path
-            """
-            if "__main__/" in include_root:
-                return pathlib.Path(
-                    include_root[: include_root.find("__main__/") + len("__main__/")]
-                )
-            elif "_main/" in include_root:
-                return pathlib.Path(
-                    include_root[: include_root.find("_main/") + len("_main/")]
-                )
-            else:
-                return pathlib.Path(include_root)
-
         include_root = str(args[3]).replace("\\", "/")
-        root_dir = find_root_dir(include_root)
         if "native" in include_root:
-            base_include_root = pathlib.Path(*args[3].relative_to(root_dir).parts[3:])
-            base_include_file = args[2].relative_to(include_root)
+            # base_include_root = pathlib.Path(*args[3].relative_to(root_dir).parts[3:])
+            base_include_file = args[2].relative_to(include_root).as_posix()
             base_library = re.search("native/(.*?)/", include_root).groups(1)[0]
 
-            self.include_file = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)/{base_include_file}"
-            self.include_root = f"$(execpath :{fixup_native_lib_name('robotpy-native-' + base_library)}.copy_headers)"
+            native_library = fixup_native_lib_name("robotpy-native-" + base_library)
+            self.include_file = f"$(execpath //{fixup_root_package_name(base_library)}:{native_library}.copy_headers)/{base_include_file}"
+            self.include_root = f"$(execpath //{fixup_root_package_name(base_library)}:{native_library}.copy_headers)"
         else:
-            if root_dir.is_absolute():
-                self.include_file = args[2].relative_to(root_dir)
-                self.include_root = args[3].relative_to(root_dir)
-            else:
-                self.include_file = args[2]
-                self.include_root = args[3]
+            root_dir = pathlib.Path.cwd().absolute()
+            self.include_file = (
+                pathlib.Path(args[2]).absolute().relative_to(root_dir).as_posix()
+            )
+            self.include_root = (
+                pathlib.Path(args[3]).absolute().relative_to(root_dir).as_posix()
+            )
         # type casters         = 4
         # dat file             = 5
         # d file               = 6
@@ -96,7 +108,7 @@ class HeaderToDatConfig:
 
 
 class ResolveCastersConfig:
-    def __init__(self, item: BuildTarget):
+    def __init__(self, item: BuildTarget, stripped_include_prefix: str):
         self.pkl_file = item.args[0].name
         self.dep_file = item.args[1].name
         # semiwrap casters = 2
@@ -107,12 +119,13 @@ class ResolveCastersConfig:
             if isinstance(dep_path, BuildTargetOutput):
                 output_file = dep_path.target.args[2]
                 caster_deps.add(
-                    f":src/main/python/{dep_path.target.install_path}/{output_file.name}"
+                    f":{stripped_include_prefix}{dep_path.target.install_path}/{output_file.name}"
                 )
             else:
                 relevant_parts = dep_path.parts[3:]
+                package = relevant_parts[0]
                 caster_deps.add(
-                    f"//{relevant_parts[0]}:" + "/".join(relevant_parts[1:])
+                    f"//{package}/src/main/python:" + "/".join(relevant_parts[4:])
                 )
 
         self.caster_deps = sorted(caster_deps)
@@ -153,7 +166,7 @@ class GenModInitHpp:
 
 
 class PublishCastersConfig:
-    def __init__(self, projectcfg, item: BuildTarget):
+    def __init__(self, projectcfg, item: BuildTarget, stripped_include_prefix: str):
         self.project_file = item.args[0].path
         self.casters_name = item.args[1]
         self.json_output = item.args[2].name
@@ -166,22 +179,26 @@ class PublishCastersConfig:
         caster_cfg = projectcfg.export_type_casters[self.casters_name]
 
         for inc_dir in caster_cfg.includedir:
-            self.include_paths.append(f"src/main/python/{inc_dir}")
+            self.include_paths.append(f"{stripped_include_prefix}{inc_dir}")
 
 
 class BazelExtensionModule:
     def __init__(
         self,
         extension_module: ExtensionModule,
-        additional_extension_targets: Dict[str, BuildTarget],
+        additional_extension_targets: dict[str, BuildTarget],
+        stripped_include_prefix: str,
     ):
         self.name = extension_module.name
         self.package_name = extension_module.package_name
         self.install_path = extension_module.install_path
 
-        self.generation_data = self._extract_header_generation(extension_module.sources)
+        self.extension_name_transforms: list[tuple[str, str]] = []
+        self.generation_data = self._extract_header_generation(
+            extension_module.sources, self.extension_name_transforms
+        )
         self.resolve_casters = ResolveCastersConfig(
-            additional_extension_targets["resolve-casters"]
+            additional_extension_targets["resolve-casters"], stripped_include_prefix
         )
         self.gen_libinit = GenLibInitPyConfig(
             additional_extension_targets["gen-libinit-py"]
@@ -205,30 +222,30 @@ class BazelExtensionModule:
         dynamic_dependencies = set()
         for dep_name in all_dependencies:
             if "native" in dep_name:
-
                 transitive_deps = set()
                 self._get_transitive_native_dependencies(dep_name, transitive_deps)
                 for d in transitive_deps:
+                    if d == "robotpy-native-mrclib":
+                        continue
                     base_library = fixup_root_package_name(
-                        d.replace("robotpy-native-", "")
+                        d.replace("robotpy-native-", "").replace("-", "_")
                     )
                     native_wrapper_dependencies.add(
                         f"//{base_library}:{fixup_native_lib_name(d)}.copy_headers"
                     )
             elif "-casters" in dep_name:
                 base_library = dep_name.split("-")[0]
-                local_extension_dependencies.add(f"//{base_library}:{dep_name}")
-            else:
-                base_library = fixup_root_package_name(dep_name.split("_")[0])
                 local_extension_dependencies.add(
-                    f"//{base_library}:{fixup_shared_lib_name(base_library)}"
+                    f"//{base_library}/src/main/python:{dep_name}"
                 )
-                dynamic_dependencies.add(
-                    f"//{base_library}:shared/{fixup_shared_lib_name(base_library)}"
-                )
+            else:
+                base_library = fixup_root_package_name(dep_name.rsplit("_", 1)[0])
+                shared_lib_name = fixup_shared_lib_name(base_library.rsplit("/", 1)[-1])
+                local_extension_dependencies.add(f"//{base_library}:{shared_lib_name}")
+                dynamic_dependencies.add(f"//{base_library}:shared/{shared_lib_name}")
                 if dep_name != self.name:
                     local_extension_dependencies.add(
-                        f"//{base_library}:{dep_name}_pybind_library"
+                        f"//{base_library}/src/main/python:{dep_name}_pybind_library"
                     )
 
         self.native_wrapper_dependencies = sorted(native_wrapper_dependencies)
@@ -258,13 +275,15 @@ class BazelExtensionModule:
                 all_dependencies.add(child_dep.name)
                 self._collect_local_dependency_names(child_dep, all_dependencies)
             else:
-                raise
+                raise  # noqa: PLE0704
 
-    def _extract_header_generation(self, sources) -> Dict[str, HeaderToDatConfig]:
-        generation_data: Dict[str, HeaderToDatConfig] = {}
+    def _extract_header_generation(
+        self, sources, extension_name_transforms: list[tuple[str, str]]
+    ) -> dict[str, HeaderToDatConfig]:
+        generation_data: dict[str, HeaderToDatConfig] = {}
 
         def get_h2d_config(target_info: BuildTarget) -> HeaderToDatConfig:
-            config = HeaderToDatConfig(target_info)
+            config = HeaderToDatConfig(target_info, extension_name_transforms)
             if config.class_name not in generation_data:
                 generation_data[config.class_name] = config
             return generation_data[config.class_name]
@@ -287,18 +306,19 @@ class BazelExtensionModule:
                 # Handled elsewhere
                 continue
             else:
-                raise Exception("Unknown command", source.command)
+                raise RuntimeError("Unknown command", source.command)
 
         return generation_data
 
 
 def generate_pybind_build_file(
-    pkgcfgs: List[pathlib.Path],
+    pkgcfgs: list[pathlib.Path],
     project_file: pathlib.Path,
     package_root_file: str,
     stripped_include_prefix: str,
-    yml_prefix: Union[str, None],
+    yml_prefix: str | None,
     output_file: pathlib.Path,
+    package_name: str | None = None,
 ):
     project_dir = project_file.parent
     plan = makeplan(project_dir)
@@ -312,13 +332,15 @@ def generate_pybind_build_file(
     projectcfg = pyproject.project
 
     # Cache built up for an extension module. Gets reset when an ExtensionModule is encountered
-    additional_extension_targets: Dict[str, BuildTarget] = {}
+    additional_extension_targets: dict[str, BuildTarget] = {}
     publish_casters_targets = []
 
     for item in plan:
         if isinstance(item, ExtensionModule):
             extension_modules.append(
-                BazelExtensionModule(item, additional_extension_targets)
+                BazelExtensionModule(
+                    item, additional_extension_targets, stripped_include_prefix
+                )
             )
             additional_extension_targets = {}
         elif isinstance(item, BuildTarget):
@@ -329,7 +351,7 @@ def generate_pybind_build_file(
                 "gen-modinit-hpp",
             ]:
                 if item.command in additional_extension_targets:
-                    raise Exception(f"Repeated target {item.command}")
+                    raise RuntimeError(f"Repeated target {item.command}")
                 additional_extension_targets[item.command] = item
             elif item.command in [
                 "header2dat",
@@ -341,17 +363,17 @@ def generate_pybind_build_file(
             ]:
                 pass
             elif item.command == "publish-casters":
-                publish_casters_targets.append(PublishCastersConfig(projectcfg, item))
+                publish_casters_targets.append(
+                    PublishCastersConfig(projectcfg, item, stripped_include_prefix)
+                )
             else:
-                raise Exception(f"Unhandled build target {item.command}")
+                raise RuntimeError(f"Unhandled build target {item.command}")
         elif isinstance(item, Entrypoint):
             entry_points[item.group].append(f"{item.name} = {item.package}")
-        elif isinstance(item, LocalDependency):
-            pass
-        elif isinstance(item, CppMacroValue):
+        elif isinstance(item, (LocalDependency, CppMacroValue)):
             pass
         else:
-            raise Exception(f"Unknown item {type(item)}")
+            raise TypeError(f"Unknown item {type(item)}")
 
     with open(project_file, "rb") as fp:
         raw_config = tomli.load(fp)
@@ -376,11 +398,11 @@ def generate_pybind_build_file(
 
     def target_from_python_dep(python_dep):
         if "native" in python_dep:
-            base_library = python_dep.replace("robotpy-native-", "")
+            base_library = python_dep.replace("robotpy-native-", "").replace("-", "_")
             return f"//{fixup_root_package_name(base_library)}:{fixup_python_dep_name(python_dep)}"
         else:
             base_library = python_dep.replace("robotpy-", "")
-            return f"//{fixup_root_package_name(base_library)}:{fixup_python_dep_name(python_dep)}"
+            return f"//{fixup_root_package_name(base_library)}/src/main/python"
 
     EXTERNAL_PYPI_DEPS = [
         "robotpy-cli",
@@ -414,7 +436,7 @@ def generate_pybind_build_file(
         version_file = raw_config["tool"]["hatch"]["build"]["hooks"]["robotpy"][
             "version_file"
         ]
-    except:
+    except KeyError:
         version_file = None
 
     # The entry points defined above are implicit to how the project is broken down in the toml files.
@@ -425,12 +447,22 @@ def generate_pybind_build_file(
             for ep_key, ep_value in explicit_entry_points[entry_point_type].items():
                 entry_points[entry_point_type].append(f"{ep_key} = {ep_value}")
 
+    imports_dir = stripped_include_prefix if stripped_include_prefix else "."
+
+    # The package the generated file is loaded from is usually the project root, but a
+    # project can generate a build file for a module in a subpackage (e.g. test modules).
+    bazel_package = package_name or fixup_root_package_name(top_level_name)
     strip_path_prefixes = [
-        f"{fixup_root_package_name(top_level_name)}/{stripped_include_prefix}",
-        f"{fixup_root_package_name(top_level_name)}",
+        f"{bazel_package}/{stripped_include_prefix}",
     ]
 
-    with open(output_file, "w") as f:
+    has_semiwrap_files = False
+    for em in extension_modules:
+        if em.generation_data:
+            has_semiwrap_files = True
+            break
+
+    with open(output_file, "w", newline="\n") as f:
         f.write(
             template.render(
                 extension_modules=extension_modules,
@@ -438,7 +470,8 @@ def generate_pybind_build_file(
                 publish_casters_targets=publish_casters_targets,
                 python_deps=sorted(python_deps),
                 all_local_native_deps=all_local_native_deps,
-                stripped_include_prefix=stripped_include_prefix,
+                include_root_prefix=stripped_include_prefix,
+                imports_dir=imports_dir,
                 strip_path_prefixes=strip_path_prefixes,
                 yml_prefix=yml_prefix,
                 package_root_file=package_root_file,
@@ -446,6 +479,7 @@ def generate_pybind_build_file(
                 entry_points=entry_points,
                 version_file=version_file,
                 has_external_python_deps=has_external_python_deps,
+                has_semiwrap_files=has_semiwrap_files,
             )
             + "\n"
         )
@@ -455,11 +489,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--project_file", type=pathlib.Path, required=True)
     parser.add_argument("--output_file", type=pathlib.Path, required=True)
-    parser.add_argument(
-        "--stripped_include_prefix", type=str, default="src/main/python"
-    )
+    parser.add_argument("--stripped_include_prefix", type=str, default="")
     parser.add_argument("--yml_prefix", type=str)
     parser.add_argument("--package_root_file", type=str)
+    parser.add_argument("--package_name", type=str)
     parser.add_argument("--pkgcfgs", type=pathlib.Path, nargs="+")
 
     args = parser.parse_args()
@@ -471,6 +504,7 @@ def main():
         args.stripped_include_prefix,
         args.yml_prefix,
         args.output_file,
+        args.package_name,
     )
 
 

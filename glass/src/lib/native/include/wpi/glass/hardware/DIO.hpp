@@ -35,8 +35,6 @@ class DutyCycleModel : public Model {
 
 class DIOModel : public Model {
  public:
-  virtual const char* GetName() const = 0;
-
   virtual const char* GetSimDevice() const = 0;
 
   virtual DPWMModel* GetDPWM() = 0;

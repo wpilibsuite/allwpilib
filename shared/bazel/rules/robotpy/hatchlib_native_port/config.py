@@ -1,6 +1,5 @@
 import dataclasses
 import pathlib
-import typing as T
 
 
 @dataclasses.dataclass
@@ -14,46 +13,46 @@ class PcFileConfig:
     File to write pkgconf file to (relative to pyproject.toml)
     """
 
-    description: T.Optional[str] = None
+    description: str | None = None
     """Description of this package. If not specified, uses the first line of the package description."""
 
-    name: T.Optional[str] = None
+    name: str | None = None
     """Name of this package. If not specified, is basename of pcfile without extension"""
 
-    version: T.Optional[str] = None
+    version: str | None = None
     """If not specified, set to package version"""
 
-    includedir: T.Optional[str] = None
+    includedir: str | None = None
     """Where include files can be found (relative to pyproject.toml)"""
 
-    libdir: T.Optional[str] = None
+    libdir: str | None = None
     """Where the library is located. If not specified, it is next to pcfile"""
 
-    shared_libraries: T.Optional[T.List[str]] = None
+    shared_libraries: list[str] | None = None
     """Name of shared libraries located in libdir (without extension)"""
 
-    libs_private: T.Optional[str] = None
+    libs_private: str | None = None
     """The link flags for private libraries not exposed to applications"""
 
-    requires: T.Optional[T.List[str]] = None
+    requires: list[str] | None = None
     """
     Names of other packages this package requires. They must be installed
     at build time.
     """
 
-    requires_private: T.Optional[T.List[str]] = None
+    requires_private: list[str] | None = None
     """
     Names of private packages this package requires. They must be installed
     at build time.
     """
 
-    extra_cflags: T.Optional[str] = None
+    extra_cflags: str | None = None
     """A list of extra compiler flags to be added to Cflags after header search path"""
 
-    extra_link_flags: T.Optional[str] = None
+    extra_link_flags: str | None = None
     """A list of extra link flags to be added to Libs"""
 
-    variables: T.Optional[T.Dict[str, str]] = None
+    variables: dict[str, str] | None = None
     """
     Custom variables to add to the generated file. Prefix, libdir, includedir must not be specified."""
 
@@ -63,7 +62,7 @@ class PcFileConfig:
     the .pc file which will load the shared_libraries
     """
 
-    enable_if: T.Optional[str] = None
+    enable_if: str | None = None
     """
     This is a PEP 508 environment marker specification.
 

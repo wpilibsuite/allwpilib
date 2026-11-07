@@ -15,12 +15,9 @@ def get_repo_root():
     An empty string is returned if no repository root was found.
     """
     return Path(
-        subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            encoding="ascii",
-        ).stdout.rstrip()
+        subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"], encoding="utf-8"
+        ).rstrip()
     )
 
 
@@ -165,7 +162,7 @@ def git_am(patch: Path, use_threeway=False, ignore_whitespace=False):
     if ignore_whitespace:
         args.append("--ignore-whitespace")
 
-    subprocess.check_output(args + [patch])
+    subprocess.check_call(args + [patch])
 
 
 def has_git_rev(rev: str):
@@ -178,8 +175,12 @@ def has_git_rev(rev: str):
     Returns:
     True if the revision exists, otherwise False.
     """
-    cmd = ["git", "rev-parse", "--verify", "-q", rev]
-    return subprocess.run(cmd, stdout=subprocess.DEVNULL).returncode == 0
+    return (
+        subprocess.run(
+            ["git", "rev-parse", "--verify", "-q", rev], check=False
+        ).returncode
+        == 0
+    )
 
 
 class Lib:
@@ -189,7 +190,7 @@ class Lib:
         url: str,
         tag: str,
         copy_upstream_src: Callable[[Path], None],
-        patch_options={},
+        patch_options={},  # noqa: B006
         *,
         pre_patch_hook=None,
         pre_patch_commits=0,
@@ -241,15 +242,16 @@ class Lib:
         dest = dest.with_suffix("")
         return dest
 
-    def open_repo(self, *, err_msg_if_absent: str | None):
+    def open_repo(self, *, shallow: bool, err_msg_if_absent: str | None):
         """Changes the current working directory to the upstream repository. If
         err_msg_if_absent is not None and the upstream repository does not
         exist, the program exits with return code 1.
 
         Keyword-only argument:
+        shallow -- Whether to perform a shallow clone.
         err_msg_if_absent -- The error message to print to stderr if the
-        upstream repository does not exist. If None, the upstream repository
-        will be cloned without emitting any warnings.
+            upstream repository does not exist. If None, the upstream repository
+            will be cloned without emitting any warnings.
         """
         os.chdir(tempfile.gettempdir())
 
@@ -259,11 +261,30 @@ class Lib:
 
         if not dest.exists():
             if err_msg_if_absent is None:
-                subprocess.run(["git", "clone", "--filter=tree:0", self.url])
+                if shallow:
+                    subprocess.check_call(
+                        [
+                            "git",
+                            "clone",
+                            "--depth=1",
+                            "--revision",
+                            self.old_tag,
+                            self.url,
+                        ]
+                    )
+                else:
+                    subprocess.check_call(["git", "clone", self.url])
             else:
                 print(err_msg_if_absent, file=sys.stderr)
-                exit(1)
+                sys.exit(1)
         os.chdir(dest)
+
+        self.shallow = (
+            subprocess.check_output(
+                ["git", "rev-parse", "--is-shallow-repository"], encoding="utf-8"
+            ).rstrip()
+            == "true"
+        )
 
     def get_root_tags(self):
         """Returns a list of potential root tags.
@@ -271,11 +292,9 @@ class Lib:
         Returns:
         A list of the potential root tags.
         """
-        root_tag_output = subprocess.run(
-            ["git", "tag", "--list", "upstream_utils_root-*"],
-            capture_output=True,
-            text=True,
-        ).stdout
+        root_tag_output = subprocess.check_output(
+            ["git", "tag", "--list", "upstream_utils_root-*"], encoding="utf-8"
+        )
         return root_tag_output.splitlines()
 
     def get_root_tag(self):
@@ -292,13 +311,13 @@ class Lib:
                 "ERROR: Could not determine root tag: No tags match 'upstream_utils_root-*'",
                 file=sys.stderr,
             )
-            exit(1)
+            sys.exit(1)
         if len(root_tags) > 1:
             print(
                 f"ERROR: Could not determine root tag: Multiple candidates: {root_tags}",
                 file=sys.stderr,
             )
-            exit(1)
+            sys.exit(1)
         return root_tags[0]
 
     def set_root_tag(self, tag: str):
@@ -313,9 +332,12 @@ class Lib:
             print(f"WARNING: Deleting multiple root tags {root_tags}", file=sys.stderr)
 
         for root_tag in root_tags:
-            subprocess.run(["git", "tag", "-d", root_tag])
+            subprocess.check_call(["git", "tag", "-d", root_tag])
 
-        subprocess.run(["git", "tag", f"upstream_utils_root-{tag}", tag])
+        if self.shallow:
+            subprocess.check_call(["git", "tag", f"upstream_utils_root-{tag}", "HEAD"])
+        else:
+            subprocess.check_call(["git", "tag", f"upstream_utils_root-{tag}", tag])
 
     def get_patch_directory(self):
         """Returns the path to the directory containing the patch files.
@@ -383,11 +405,12 @@ class Lib:
         print(f"Pre patch commits: {self.pre_patch_commits}")
         print(f"WPILib root: {self.wpilib_root}")
 
-    def clone(self):
+    def clone(self, shallow: bool):
         """Clones the upstream repository and sets it up."""
-        self.open_repo(err_msg_if_absent=None)
+        self.open_repo(shallow=shallow, err_msg_if_absent=None)
 
-        subprocess.run(["git", "switch", "--detach", self.old_tag])
+        if not self.shallow:
+            subprocess.check_call(["git", "switch", "--detach", self.old_tag])
 
         self.set_root_tag(self.old_tag)
 
@@ -396,10 +419,12 @@ class Lib:
         the script and patches.
         """
         self.open_repo(
-            err_msg_if_absent='There\'s nothing to reset. Run the "clone" command first.'
+            shallow=False,
+            err_msg_if_absent='There\'s nothing to reset. Run the "clone" command first.',
         )
 
-        subprocess.run(["git", "switch", "--detach", self.old_tag])
+        if not self.shallow:
+            subprocess.check_call(["git", "switch", "--detach", self.old_tag])
 
         self.apply_patches()
 
@@ -412,18 +437,19 @@ class Lib:
         new_tag -- The tag to rebase onto.
         """
         self.open_repo(
-            err_msg_if_absent='There\'s nothing to rebase. Run the "clone" command first.'
+            shallow=False,
+            err_msg_if_absent='There\'s nothing to rebase. Run the "clone" command first.',
         )
 
-        subprocess.run(["git", "fetch", "origin", new_tag])
+        subprocess.check_call(["git", "fetch", "origin", new_tag])
 
-        subprocess.run(["git", "switch", "--detach", self.old_tag])
+        subprocess.check_call(["git", "switch", "--detach", self.old_tag])
 
         self.apply_patches()
 
         self.set_root_tag(new_tag)
 
-        subprocess.run(["git", "rebase", "--onto", new_tag, self.old_tag])
+        subprocess.check_call(["git", "rebase", "--onto", new_tag, self.old_tag])
 
         # Detect merge conflict by detecting if we stopped in the middle of a rebase
         if has_git_rev("REBASE_HEAD"):
@@ -437,7 +463,8 @@ class Lib:
         the patch directory.
         """
         self.open_repo(
-            err_msg_if_absent='There\'s nothing to run format-patch on. Run the "clone" and "rebase" commands first.'
+            shallow=False,
+            err_msg_if_absent='There\'s nothing to run format-patch on. Run the "clone" and "rebase" commands first.',
         )
 
         root_tag = self.get_root_tag()
@@ -445,14 +472,13 @@ class Lib:
 
         start_commit = root_tag
         if self.pre_patch_commits > 0:
-            commits_since_tag_output = subprocess.run(
-                ["git", "log", "--format=format:%h", f"{start_commit}..HEAD"],
-                capture_output=True,
-            ).stdout
+            commits_since_tag_output = subprocess.check_output(
+                ["git", "log", "--format=format:%h", f"{start_commit}..HEAD"]
+            )
             commits_since_tag = commits_since_tag_output.count(b"\n") + 1
             start_commit = f"HEAD~{commits_since_tag - self.pre_patch_commits}"
 
-        subprocess.run(
+        subprocess.check_call(
             [
                 "git",
                 "format-patch",
@@ -481,10 +507,12 @@ class Lib:
         directory.
         """
         self.open_repo(
-            err_msg_if_absent='There\'s no repository to copy from. Run the "clone" command first.'
+            shallow=False,
+            err_msg_if_absent='There\'s no repository to copy from. Run the "clone" command first.',
         )
 
-        subprocess.run(["git", "switch", "--detach", self.old_tag])
+        if not self.shallow:
+            subprocess.check_call(["git", "switch", "--detach", self.old_tag])
 
         self.apply_patches()
 
@@ -501,8 +529,13 @@ class Lib:
             "info", help="Displays information about the upstream library"
         )
 
-        subparsers.add_parser(
+        parser_clone = subparsers.add_parser(
             "clone", help="Clones the upstream repository in a local tempdir"
+        )
+        parser_clone.add_argument(
+            "--shallow",
+            action="store_true",
+            help="Creates a shallow clone of the upstream_utils script's commit",
         )
 
         subparsers.add_parser(
@@ -531,7 +564,7 @@ class Lib:
         if args.subcommand == "info":
             self.info()
         elif args.subcommand == "clone":
-            self.clone()
+            self.clone(args.shallow)
         elif args.subcommand == "reset":
             self.reset()
         elif args.subcommand == "rebase":

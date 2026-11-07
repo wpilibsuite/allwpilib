@@ -1,0 +1,37 @@
+{
+  "channel_storage_duration": 5000000000,
+  "channels": [
+    {
+      "name": "/aos",
+      "type": "aos.timing.Report",
+      "frequency": 50,
+      "num_senders": 20,
+      "max_size": 2048
+    },
+    {
+      "name": "/aos",
+      "type": "aos.logging.DynamicLogCommand",
+      "frequency": 10,
+      "num_senders": 1
+    },
+    {
+      "name": "/aos",
+      "type": "aos.logging.LogMessageFbs",
+      "frequency": 250,
+      "num_senders": 20,
+      "max_size": 512
+    },
+    {
+      "name": "/aos",
+      "type": "aos.starter.Status",
+      "frequency": 50,
+      "num_senders": 20
+    },
+    {
+      "name": "/aos",
+      "type": "aos.starter.StarterRpc",
+      "frequency": 10,
+      "num_senders": 2
+    }
+  ]
+}

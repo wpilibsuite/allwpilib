@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/Notifier.hpp"
 #include "wpi/hal/Threads.h"
 #include "wpi/system/Errors.hpp"
@@ -57,7 +57,7 @@ Notifier::Notifier(int priority, std::function<void()> callback) {
               "  See https://wpilib.org/stacktrace for more information.\n");
           throw;
         } catch (const std::exception& e) {
-          HAL_SendError(1, err::Error, 0, e.what(), "", "", 1);
+          wpi::hal::SendError(1, err::Error, e.what(), "", "", 1);
           throw;
         }
       }
@@ -105,14 +105,14 @@ void Notifier::SetCallback(std::function<void()> callback) {
 
 void Notifier::StartSingle(wpi::units::second_t delay) {
   int32_t status = 0;
-  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(delay * 1e6), 0, false,
+  HAL_SetNotifierAlarm(m_notifier, static_cast<int64_t>(delay * 1e9), 0, false,
                        false, &status);
 }
 
 void Notifier::StartPeriodic(wpi::units::second_t period) {
   int32_t status = 0;
-  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(period * 1e6),
-                       static_cast<uint64_t>(period * 1e6), false, false,
+  HAL_SetNotifierAlarm(m_notifier, static_cast<int64_t>(period * 1e9),
+                       static_cast<int64_t>(period * 1e9), false, false,
                        &status);
 }
 

@@ -4,18 +4,22 @@ def __generate_wpimath_impl(ctx):
     """
     output_dir = ctx.actions.declare_directory("_gendir")
 
+    protoc = ctx.toolchains["@protobuf//bazel/private:proto_toolchain_type"].proto.proto_compiler
+
     args = ctx.actions.args()
     args.add("--output_directory", output_dir.path)
-    args.add("--protoc", ctx.executable._protoc)
+    args.add("--template_root", "wpimath/src/generate")
+    args.add("--proto_directory", "wpimath/src/main/proto")
+    args.add("--protoc", protoc.executable)
     args.add("--quickbuf_plugin", ctx.executable._quickbuf)
-    args.add("--nanopb_generator", ctx.executable._nanopb_generator)
+    args.add("--nanopb", ctx.executable._nanopb)
 
     ctx.actions.run(
         inputs = ctx.attr._templates.files.to_list() + ctx.attr.proto_files.files.to_list(),
         outputs = [output_dir],
         executable = ctx.executable._tool,
         arguments = [args],
-        tools = [ctx.executable._protoc, ctx.executable._nanopb_generator, ctx.executable._quickbuf],
+        tools = [protoc, ctx.executable._nanopb, ctx.executable._quickbuf],
     )
 
     return [DefaultInfo(files = depset([output_dir]))]
@@ -27,13 +31,8 @@ generate_wpimath = rule(
             allow_files = True,
             default = Label("//wpimath:proto_files"),
         ),
-        "_nanopb_generator": attr.label(
+        "_nanopb": attr.label(
             default = Label("//wpiutil:nanopb_generator"),
-            cfg = "exec",
-            executable = True,
-        ),
-        "_protoc": attr.label(
-            default = Label("@com_google_protobuf//:protoc"),
             cfg = "exec",
             executable = True,
         ),
@@ -51,4 +50,5 @@ generate_wpimath = rule(
             executable = True,
         ),
     },
+    toolchains = ["@protobuf//bazel/private:proto_toolchain_type"],
 )

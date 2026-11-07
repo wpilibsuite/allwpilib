@@ -14,6 +14,7 @@
 #include "wpi/util/ErrorHandling.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/Errc.hpp"
+#include "wpi/util/Errno.hpp"
 #include "wpi/util/WindowsError.hpp"
 #include "wpi/util/print.hpp"
 #include <cassert>
@@ -49,6 +50,21 @@ static void *BadAllocErrorHandlerUserData = nullptr;
 // builds. We can remove these ifdefs if that script goes away.
 static std::mutex ErrorHandlerMutex;
 static std::mutex BadAllocErrorHandlerMutex;
+
+static bool write_retry(int fd, const char *buf, size_t count) {
+  while (count > 0) {
+#ifdef _WIN32
+    int written = sys::RetryAfterSignal(-1, ::_write, fd, buf, count);
+#else
+    ssize_t written = sys::RetryAfterSignal(-1, ::write, fd, buf, count);
+#endif
+    if (written <= 0)
+      return false;
+    buf += written;
+    count -= written;
+  }
+  return true;
+}
 
 void wpi::util::install_fatal_error_handler(fatal_error_handler_t handler,
                                        void *user_data) {
@@ -92,6 +108,25 @@ void wpi::util::report_fatal_error(std::string_view Reason, bool GenCrashDiag) {
   exit(1);
 }
 
+void wpi::util::reportFatalInternalError(const char *reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/true);
+}
+void wpi::util::reportFatalInternalError(const std::string& reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/true);
+}
+void wpi::util::reportFatalInternalError(std::string_view reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/true);
+}
+void wpi::util::reportFatalUsageError(const char *reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/false);
+}
+void wpi::util::reportFatalUsageError(const std::string& reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/false);
+}
+void wpi::util::reportFatalUsageError(std::string_view reason) {
+  report_fatal_error(reason, /*GenCrashDiag=*/false);
+}
+
 void wpi::util::install_bad_alloc_error_handler(fatal_error_handler_t handler,
                                            void *user_data) {
   std::scoped_lock Lock(BadAllocErrorHandlerMutex);
@@ -127,15 +162,9 @@ void wpi::util::report_bad_alloc_error(const char *Reason, bool GenCrashDiag) {
   // an OOM to stderr and abort.
   const char *OOMMessage = "LLVM ERROR: out of memory\n";
   const char *Newline = "\n";
-#ifdef _WIN32
-  (void)!::_write(2, OOMMessage, strlen(OOMMessage));
-  (void)!::_write(2, Reason, strlen(Reason));
-  (void)!::_write(2, Newline, strlen(Newline));
-#else
-  (void)!::write(2, OOMMessage, strlen(OOMMessage));
-  (void)!::write(2, Reason, strlen(Reason));
-  (void)!::write(2, Newline, strlen(Newline));
-#endif
+  write_retry(2, OOMMessage, strlen(OOMMessage));
+  write_retry(2, Reason, strlen(Reason));
+  write_retry(2, Newline, strlen(Newline));
   abort();
 }
 
@@ -175,8 +204,14 @@ void wpi::util::wpi_unreachable_internal(const char *msg, const char *file,
 
 #ifdef _WIN32
 
+// mingw-w64 tends to define it as 0x0502 in its headers.
+#undef _WIN32_WINNT
+
+// Require at least Windows 7 API.
+#define _WIN32_WINNT 0x0601
+#define WIN32_LEAN_AND_MEAN
 #define WIN32_NO_STATUS
-#include "Windows/WindowsSupport.hpp"
+#include <windows.h>
 #undef WIN32_NO_STATUS
 #include <ntstatus.h>
 #include <winerror.h>

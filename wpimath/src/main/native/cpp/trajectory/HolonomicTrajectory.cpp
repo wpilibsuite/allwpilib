@@ -1,0 +1,90 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/math/trajectory/HolonomicTrajectory.hpp"
+
+#include <cstddef>
+#include <utility>
+#include <vector>
+
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
+#include "wpi/util/json.hpp"
+
+using namespace wpi::math;
+
+HolonomicSample HolonomicTrajectory::Interpolate(const HolonomicSample& start,
+                                                 const HolonomicSample& end,
+                                                 double t) const {
+  return KinematicInterpolate(start, end, t);
+}
+
+HolonomicTrajectory HolonomicTrajectory::TransformBy(
+    const Transform2d& transform) const {
+  const Pose2d& firstPose = Start().pose;
+  Pose2d transformedFirstPose = firstPose.TransformBy(transform);
+
+  // The whole trajectory is rigidly rotated by the transform's rotation, so the
+  // field-relative velocities and accelerations rotate by the same amount.
+  const Rotation2d& rotation = transform.Rotation();
+
+  std::vector<HolonomicSample> transformedSamples;
+  transformedSamples.reserve(Samples().size());
+
+  // Transform first sample
+  transformedSamples.push_back(
+      HolonomicSample(Start().time, transformedFirstPose,
+                      Start().velocity.ToFieldRelative(rotation),
+                      Start().acceleration.ToFieldRelative(rotation)));
+
+  // Transform remaining samples
+  for (size_t i = 1; i < Samples().size(); ++i) {
+    const auto& sample = Samples()[i];
+    transformedSamples.push_back(HolonomicSample(
+        sample.time, transformedFirstPose + (sample.pose - firstPose),
+        sample.velocity.ToFieldRelative(rotation),
+        sample.acceleration.ToFieldRelative(rotation)));
+  }
+
+  return HolonomicTrajectory(std::move(transformedSamples));
+}
+
+HolonomicTrajectory HolonomicTrajectory::RelativeTo(const Pose2d& pose) const {
+  std::vector<HolonomicSample> samples;
+  samples.reserve(m_samples.size());
+  for (const auto& s : m_samples) {
+    samples.emplace_back(s.RelativeTo(pose));
+  }
+  return HolonomicTrajectory{std::move(samples)};
+}
+
+HolonomicTrajectory HolonomicTrajectory::Concatenate(
+    const HolonomicTrajectory& other) const {
+  std::vector<HolonomicSample> samples;
+  samples.reserve(m_samples.size() + other.Samples().size());
+
+  // Copy existing
+  samples.insert(samples.end(), m_samples.begin(), m_samples.end());
+
+  // Append other with time offset
+  for (auto s : other.Samples()) {
+    s.time += Duration();
+    samples.emplace_back(std::move(s));
+  }
+
+  return HolonomicTrajectory{std::move(samples)};
+}
+
+void wpi::math::to_json(wpi::util::json& json,
+                        const HolonomicTrajectory& trajectory) {
+  json = wpi::util::json::object("samples", trajectory.Samples());
+}
+
+HolonomicTrajectory wpi::util::json_serializer<HolonomicTrajectory>::from(
+    const json& json) {
+  std::vector<HolonomicSample> samples;
+  from_json(json.at("samples"), samples);
+  return HolonomicTrajectory{std::move(samples)};
+}

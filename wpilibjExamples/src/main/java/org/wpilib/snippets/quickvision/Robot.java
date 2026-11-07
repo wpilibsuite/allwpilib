@@ -14,6 +14,7 @@ import org.wpilib.vision.stream.CameraServer;
  */
 public class Robot extends TimedRobot {
   public Robot() {
+    CameraServer.initialize();
     CameraServer.startAutomaticCapture();
   }
 }

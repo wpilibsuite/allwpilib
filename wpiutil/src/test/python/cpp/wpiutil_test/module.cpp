@@ -13,6 +13,8 @@
 
 #include <limits>
 #include <functional>
+#include <string>
+#include <vector>
 
 #include <pybind11/functional.h>
 
@@ -150,7 +152,6 @@ constexpr auto const_string() {
     return wpi::util::ct_string<char, std::char_traits<char>, 3>{{'#', '1', '2'}};
 }
 
-void sendable_test(py::module &m);
 void struct_test(py::module &m);
 
 /* WPI_String tests */
@@ -177,10 +178,11 @@ StructWithWPI_String cast_struct_with_wpi_string() {
     return output;
 }
 
-PYBIND11_MODULE(module, m) {
+void span_safety_test(py::module_& m);
 
-    sendable_test(m);
+PYBIND11_MODULE(module, m) {
     struct_test(m);
+    span_safety_test(m);
 
     // array
     m.def("load_array_int", &load_array_int);
@@ -209,7 +211,7 @@ PYBIND11_MODULE(module, m) {
     m.def("load_stringmap_int", &load_stringmap_int);
     m.def("cast_stringmap", &cast_stringmap);
     // JSON
-    m.def("cast_json_arg", &cast_json_arg); 
+    m.def("cast_json_arg", &cast_json_arg);
     m.def("cast_json_val", &cast_json_val);
     m.attr("max_uint64") = std::numeric_limits<uint64_t>::max();
     m.attr("max_int64") = std::numeric_limits<int64_t>::max();
@@ -220,7 +222,7 @@ PYBIND11_MODULE(module, m) {
     // WPI_String
     m.def("load_wpi_string", &load_wpi_string);
     m.def("cast_wpi_string", &cast_wpi_string);
-    
+
     py::class_<StructWithWPI_String> structWithWpiStringCls(m, "StructWithWPI_String");
     structWithWpiStringCls.def_readwrite("x", &StructWithWPI_String::x);
     structWithWpiStringCls.def_readonly("str", &StructWithWPI_String::str);

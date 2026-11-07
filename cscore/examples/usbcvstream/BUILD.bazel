@@ -1,0 +1,14 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+cc_binary(
+    name = "usbcvstream",
+    srcs = glob(["*.cpp"]),
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        "//cscore",
+        "//wpiutil",
+        "@bzlmodrio-opencv//libraries/cpp/opencv",
+    ],
+)

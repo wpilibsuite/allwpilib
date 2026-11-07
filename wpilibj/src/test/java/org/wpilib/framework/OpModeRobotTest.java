@@ -23,7 +23,7 @@ import org.wpilib.util.Color;
 
 @ResourceLock("timing")
 class OpModeRobotTest {
-  static final double kPeriod = 0.02;
+  static final double PERIOD = 0.02;
 
   @SuppressWarnings("PMD.PublicFieldNamingConvention")
   public static class MockOpMode implements OpMode {
@@ -117,24 +117,24 @@ class OpModeRobotTest {
   void addOpMode() {
     class MyMockRobot extends MockRobot {
       MyMockRobot() {
-        addOpModeFactory(
-            () -> new MockOpMode(),
+        addOpMode(
             RobotMode.AUTONOMOUS,
             "NoArgOpMode-Auto",
             "Group",
             "Description",
             Color.WHITE,
-            Color.BLACK);
-        addOpModeFactory(
-            () -> new OneArgOpMode(this),
+            Color.BLACK,
+            MockOpMode::new);
+        addOpMode(
             RobotMode.UTILITY,
             "OneArgOpMode-Test",
             "Group",
             "Description",
             Color.WHITE,
-            Color.BLACK);
-        addOpModeFactory(() -> new MockOpMode(), RobotMode.TELEOPERATED, "NoArgOpMode");
-        addOpModeFactory(() -> new OneArgOpMode(this), RobotMode.TELEOPERATED, "OneArgOpMode");
+            Color.BLACK,
+            () -> new OneArgOpMode(this));
+        addOpMode(RobotMode.TELEOPERATED, "NoArgOpMode", MockOpMode::new);
+        addOpMode(RobotMode.TELEOPERATED, "OneArgOpMode", () -> new OneArgOpMode(this));
         publishOpModes();
       }
     }
@@ -191,8 +191,8 @@ class OpModeRobotTest {
   void clearOpModes() {
     class MyMockRobot extends MockRobot {
       MyMockRobot() {
-        addOpModeFactory(() -> new MockOpMode(), RobotMode.TELEOPERATED, "NoArgOpMode");
-        addOpModeFactory(() -> new OneArgOpMode(this), RobotMode.TELEOPERATED, "OneArgOpMode");
+        addOpMode(RobotMode.TELEOPERATED, "NoArgOpMode", MockOpMode::new);
+        addOpMode(RobotMode.TELEOPERATED, "OneArgOpMode", () -> new OneArgOpMode(this));
         publishOpModes();
       }
     }
@@ -210,8 +210,8 @@ class OpModeRobotTest {
   void removeOpMode() {
     class MyMockRobot extends MockRobot {
       MyMockRobot() {
-        addOpModeFactory(() -> new MockOpMode(), RobotMode.TELEOPERATED, "NoArgOpMode");
-        addOpModeFactory(() -> new OneArgOpMode(this), RobotMode.TELEOPERATED, "OneArgOpMode");
+        addOpMode(RobotMode.TELEOPERATED, "NoArgOpMode", MockOpMode::new);
+        addOpMode(RobotMode.TELEOPERATED, "OneArgOpMode", () -> new OneArgOpMode(this));
         publishOpModes();
       }
     }
@@ -231,8 +231,8 @@ class OpModeRobotTest {
   void nonePeriodic() throws InterruptedException {
     class MyMockRobot extends MockRobot {
       MyMockRobot() {
-        addOpModeFactory(() -> new MockOpMode(), RobotMode.TELEOPERATED, "NoArgOpMode");
-        addOpModeFactory(() -> new OneArgOpMode(this), RobotMode.TELEOPERATED, "OneArgOpMode");
+        addOpMode(RobotMode.TELEOPERATED, "NoArgOpMode", MockOpMode::new);
+        addOpMode(RobotMode.TELEOPERATED, "OneArgOpMode", () -> new OneArgOpMode(this));
         publishOpModes();
       }
     }
@@ -256,7 +256,7 @@ class OpModeRobotTest {
   void robotPeriodic() throws InterruptedException {
     class MyMockRobot extends MockRobot {
       MyMockRobot() {
-        addOpModeFactory(() -> new MockOpMode(), RobotMode.TELEOPERATED, "TestOpMode");
+        addOpMode(RobotMode.TELEOPERATED, "TestOpMode", MockOpMode::new);
         publishOpModes();
       }
     }
@@ -271,11 +271,11 @@ class OpModeRobotTest {
     assertEquals(0, robot.m_robotPeriodicCount.get());
 
     // Step timing to allow callbacks to execute
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
     assertEquals(1, robot.m_robotPeriodicCount.get());
 
     // Additional time steps should continue calling robotPeriodic
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
     assertEquals(2, robot.m_robotPeriodicCount.get());
 
     robot.endCompetition();

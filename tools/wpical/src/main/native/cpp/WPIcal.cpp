@@ -2,31 +2,36 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <chrono>
 #include <filesystem>
+#include <format>
+#include <future>
 #include <map>
 #include <memory>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include <GLFW/glfw3.h>
-#include <fmt/format.h>
-#include <fmt/ranges.h>
+#include <SDL3/SDL.h>
 #include <imgui.h>
 
 #include "cameracalibration.hpp"
 #include "fieldcalibration.hpp"
 #include "fmap.hpp"
-#include "wpi/apriltag/AprilTag.hpp"
-#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+#include "wpi/fields/Field.hpp"
+#include "wpi/fields/FieldTag.hpp"
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/MainMenuBar.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
+#ifdef RUNNING_IMGUI_TESTS
+#include "wpi/gui/test/GuiTestEngineRunner.hpp"
+#endif
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
-#include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/raw_ostream.hpp"
@@ -50,7 +55,7 @@ std::string_view GetResource_wpical_128_png();
 std::string_view GetResource_wpical_256_png();
 std::string_view GetResource_wpical_512_png();
 }  // namespace wpical
-static wpi::apriltag::AprilTagFieldLayout gIdealFieldLayout;
+static wpi::fields::Field gIdealFieldLayout;
 static std::string gInvalidLayoutPath;
 static wpi::glass::MainMenuBar gMainMenu;
 static wpical::CameraModel gCameraModel;
@@ -134,7 +139,7 @@ void SelectDirectoryButton(const char* text,
  * Sets up an error modal for the field layout being unable to be loaded.
  */
 void FieldLoadingError() {
-  if (ImGui::BeginPopupModal("AprilTag Field Layout Loading Error", NULL,
+  if (ImGui::BeginPopupModal("AprilTag Field Layout Loading Error", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text("Failed to load AprilTag field layout located at");
     ImGui::TextWrapped("%s", gInvalidLayoutPath.c_str());
@@ -152,7 +157,7 @@ void FieldLoadingError() {
  * when combining calibrations.
  */
 void MissingTagInField() {
-  if (ImGui::BeginPopupModal("Tag ID Not In Field", NULL,
+  if (ImGui::BeginPopupModal("Tag ID Not In Field", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text("This tag is not available in the field.");
     ImGui::TextWrapped(
@@ -203,7 +208,7 @@ void CameraCalibrationSelectorButton(const char* text,
 
 void FieldSelectorButton(const char* text,
                          std::unique_ptr<pfd::open_file>& selector,
-                         wpi::apriltag::AprilTagFieldLayout& layout) {
+                         wpi::fields::Field& layout) {
   if (ImGui::Button(text)) {
     selector = std::make_unique<pfd::open_file>(
         "Select File", "", std::vector<std::string>{"JSON", "*.json"},
@@ -225,7 +230,7 @@ void FieldSelectorButton(const char* text,
         goto err;
       }
       try {
-        layout = j->get<wpi::apriltag::AprilTagFieldLayout>();
+        layout = j->get<wpi::fields::Field>();
       } catch (...) {
         gInvalidLayoutPath = idealLayoutPath;
         goto err;
@@ -248,7 +253,16 @@ void IdealFieldSelectorButton(const char* text) {
   FieldSelectorButton(text, idealFieldLayoutSelector, gIdealFieldLayout);
 }
 
-void SaveCalibratedField(const wpi::apriltag::AprilTagFieldLayout& field,
+static wpi::fields::Field MakeFieldWithTags(
+    const wpi::fields::Field& idealField,
+    std::vector<wpi::fields::FieldTag> tags) {
+  return {idealField.GetName(),    idealField.GetSeason(),
+          idealField.GetGame(),    std::nullopt,
+          idealField.GetLength(),  idealField.GetWidth(),
+          idealField.GetProgram(), std::move(tags)};
+}
+
+void SaveCalibratedField(const wpi::fields::Field& field,
                          std::string outputName,
                          std::unique_ptr<pfd::select_folder>& saveDirSelector) {
   static std::string saveDir;
@@ -258,13 +272,13 @@ void SaveCalibratedField(const wpi::apriltag::AprilTagFieldLayout& field,
     wpi::util::raw_fd_ostream out(saveDir + "/" + outputName + ".json", ec,
                                   fs::OF_Text);
     if (!ec) {
-      wpi::util::json{field}.marshal(out, true, 4);
+      wpi::util::json{field}.marshal(out, true);
     }
 
     wpi::util::raw_fd_ostream fmap(saveDir + "/" + outputName + ".fmap", ec,
                                    fs::OF_Text);
     if (!ec) {
-      wpi::util::json{fmap::Fieldmap(field)}.marshal(fmap, true, 4);
+      wpi::util::json{fmap::Fieldmap(field)}.marshal(fmap, true);
     }
 
     saveDir.clear();
@@ -275,7 +289,24 @@ void CalibrateCamera() {
   static std::unique_ptr<pfd::open_file> cameraVideoSelector;
   static std::string cameraVideoPath;
   static std::unique_ptr<wpical::CameraCalibrator> videoProcessor;
+  static std::vector<std::future<void>> videoProcessorCleanupTasks;
   static bool calibrating = false;
+
+  std::erase_if(videoProcessorCleanupTasks, [](auto& task) {
+    return task.wait_for(std::chrono::seconds{0}) == std::future_status::ready;
+  });
+  const bool videoProcessorCleanupPending = !videoProcessorCleanupTasks.empty();
+
+  auto cleanupVideoProcessor = [&] {
+    if (!videoProcessor) {
+      return;
+    }
+    videoProcessor->Stop();
+    videoProcessorCleanupTasks.emplace_back(std::async(
+        std::launch::async, [processor = std::move(videoProcessor)]() mutable {
+          processor.reset();
+        }));
+  };
 
   static double squareWidth = 0.709;
   static double markerWidth = 0.551;
@@ -283,10 +314,10 @@ void CalibrateCamera() {
   static int boardHeight = 8;
   static int numWorkers = 8;
 
-  if (ImGui::BeginPopupModal("Camera Calibration", NULL,
+  if (ImGui::BeginPopupModal("Camera Calibration", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     // Camera Calibration Error calibration popup window
-    if (ImGui::BeginPopupModal("Camera Calibration Error", NULL,
+    if (ImGui::BeginPopupModal("Camera Calibration Error", nullptr,
                                ImGuiWindowFlags_AlwaysAutoResize)) {
       ImGui::TextWrapped(
           "Camera calibration failed. Please make sure you have uploaded the "
@@ -325,10 +356,11 @@ void CalibrateCamera() {
         wpi::util::raw_fd_ostream output_file(outputPath.string(), ec,
                                               fs::OF_Text);
         if (!ec) {
-          wpi::util::json{gCameraModel}.marshal(output_file, true, 4);
+          wpi::util::json{gCameraModel}.marshal(output_file, true);
         }
         ImGui::CloseCurrentPopup();
         calibrating = false;
+        cleanupVideoProcessor();
       } else if (!videoProcessor->IsFinished()) {
         double processed = videoProcessor->TotalFramesProcessed();
         double total = videoProcessor->TotalFrames();
@@ -339,26 +371,33 @@ void CalibrateCamera() {
         } else {
           ImGui::ProgressBar(
               processed / total, ImVec2(0.0f, 0.0f),
-              fmt::format("{}/{} frames", processed, total).c_str());
+              std::format("{}/{} frames", processed, total).c_str());
         }
       } else {
         ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
         ImGui::OpenPopup("Camera Calibration Error");
         calibrating = false;
+        cleanupVideoProcessor();
       }
-    } else if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
-      videoProcessor = std::make_unique<wpical::CameraCalibrator>(
-          numWorkers, squareWidth, markerWidth, boardWidth, boardHeight,
-          cameraVideoPath);
-      calibrating = true;
+    } else {
+      ImGui::BeginDisabled(videoProcessorCleanupPending);
+      if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
+        videoProcessor = std::make_unique<wpical::CameraCalibrator>(
+            numWorkers, squareWidth, markerWidth, boardWidth, boardHeight,
+            cameraVideoPath);
+        calibrating = true;
+      }
+      ImGui::EndDisabled();
     }
     ImGui::SameLine();
     if (ImGui::Button("Close")) {
-      if (videoProcessor) {
-        videoProcessor->Stop();
-      }
+      cleanupVideoProcessor();
       calibrating = false;
       ImGui::CloseCurrentPopup();
+    }
+    if (videoProcessorCleanupPending) {
+      ImGui::TextUnformatted(
+          "Waiting for the previous calibration to finish...");
     }
     ImGui::EndPopup();
   }
@@ -366,15 +405,14 @@ void CalibrateCamera() {
 
 void CombineCalibrations() {
   static std::unique_ptr<pfd::open_file> calibratedFieldLayoutMultiselector;
-  static std::map<std::string, wpi::apriltag::AprilTagFieldLayout>
-      calibratedFieldLayouts;
+  static std::map<std::string, wpi::fields::Field> calibratedFieldLayouts;
   static std::unique_ptr<pfd::select_folder> saveDirSelector;
-  static std::vector<wpi::apriltag::AprilTag> tags;
+  static std::vector<wpi::fields::FieldTag> tags;
   // Maps tag IDs to paths to JSON files containing field layouts
   static std::map<int, std::string> combinerMap;
   static int currentCombinerTagId = 0;
 
-  if (ImGui::BeginPopupModal("Combine Calibrations", NULL,
+  if (ImGui::BeginPopupModal("Combine Calibrations", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     IdealFieldSelectorButton("Select Ideal Map");
 
@@ -387,7 +425,7 @@ void CombineCalibrations() {
         calibratedFieldLayoutMultiselector->ready(0)) {
       auto selectedFiles = calibratedFieldLayoutMultiselector->result();
       if (!selectedFiles.empty()) {
-        std::map<std::string, wpi::apriltag::AprilTagFieldLayout> fieldLayouts;
+        std::map<std::string, wpi::fields::Field> fieldLayouts;
         for (auto& path : selectedFiles) {
           auto fileBuffer = wpi::util::MemoryBuffer::GetFile(path);
           if (!fileBuffer) {
@@ -401,8 +439,7 @@ void CombineCalibrations() {
             goto err;
           }
           try {
-            fieldLayouts.emplace(path,
-                                 j->get<wpi::apriltag::AprilTagFieldLayout>());
+            fieldLayouts.emplace(path, j->get<wpi::fields::Field>());
           } catch (...) {
             gInvalidLayoutPath = path;
             goto err;
@@ -425,9 +462,9 @@ void CombineCalibrations() {
         for (auto& tags : layout.GetTags()) {
           tagIds.push_back(tags.ID);
         }
-        auto text = fmt::format("{} tags: {}",
+        auto text = std::format("{} tags: {}",
                                 std::filesystem::path(file).filename().string(),
-                                fmt::join(tagIds, ", "));
+                                wpi::util::join(tagIds, ", "));
         ImGui::Selectable(text.c_str(), false,
                           ImGuiSelectableFlags_DontClosePopups);
         if (ImGui::BeginDragDropSource()) {
@@ -442,7 +479,7 @@ void CombineCalibrations() {
       // be pulled from the dragged JSON field layout
       for (auto& [tagId, filePath] : combinerMap) {
         if (!filePath.empty()) {
-          auto text = fmt::format("Tag ID {}: {}", tagId, filePath);
+          auto text = std::format("Tag ID {}: {}", tagId, filePath);
           ImGui::TextUnformatted(text.c_str());
         } else {
           ImGui::Text("Tag ID %i: <none, using ideal field layout (DROP HERE)>",
@@ -492,11 +529,11 @@ void CombineCalibrations() {
           auto tagPose = calibratedFieldLayouts[layoutPath].GetTagPose(tagId);
           if (tagPose) {
             // TODO: remove variable when clang 16 is available on Mac
-            wpi::apriltag::AprilTag tag{tagId, tagPose.value()};
+            wpi::fields::FieldTag tag{tagId, tagPose.value()};
             tags.emplace_back(tag);
           }
         } else {
-          wpi::apriltag::AprilTag tag{
+          wpi::fields::FieldTag tag{
               tagId, gIdealFieldLayout.GetTagPose(tagId).value()};
           tags.emplace_back(tag);
         }
@@ -504,8 +541,7 @@ void CombineCalibrations() {
       saveDirSelector =
           std::make_unique<pfd::select_folder>("Select Download Directory", "");
     }
-    SaveCalibratedField({tags, gIdealFieldLayout.GetFieldLength(),
-                         gIdealFieldLayout.GetFieldWidth()},
+    SaveCalibratedField(MakeFieldWithTags(gIdealFieldLayout, tags),
                         "combined_calibration", saveDirSelector);
     ImGui::EndPopup();
   }
@@ -515,8 +551,8 @@ void VisualizeCalibration() {
   static int focusedTag = 1;
   static int referenceTag = 1;
   static std::unique_ptr<pfd::open_file> calibratedFieldLayoutSelector;
-  static wpi::apriltag::AprilTagFieldLayout currentCalibrationLayout;
-  if (ImGui::BeginPopupModal("Visualize Calibration", NULL,
+  static wpi::fields::Field currentCalibrationLayout;
+  if (ImGui::BeginPopupModal("Visualize Calibration", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     FieldSelectorButton("Select Calibrated Field Layout",
                         calibratedFieldLayoutSelector,
@@ -606,11 +642,12 @@ static void DisplayMainMenu() {
     ImGui::OpenPopup("About");
     about = false;
   }
-  if (ImGui::BeginPopupModal("About", NULL,
+  if (ImGui::BeginPopupModal("About", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text("WPIcal");
     ImGui::Separator();
     ImGui::Text("v%s", GetWPILibVersion());
+    gui::EmitRendererInfo();
     ImGui::Separator();
     ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
@@ -628,7 +665,7 @@ static void DisplayGui() {
   // fill entire OS window with this window
   ImGui::SetNextWindowPos(ImVec2(0, 0));
   int width, height;
-  glfwGetWindowSize(gui::GetSystemWindow(), &width, &height);
+  SDL_GetWindowSize(gui::GetSystemWindow(), &width, &height);
   ImGui::SetNextWindowSize(
       ImVec2(static_cast<float>(width), static_cast<float>(height)));
 
@@ -639,7 +676,7 @@ static void DisplayGui() {
 
   DisplayMainMenu();
 
-  static wpi::apriltag::AprilTagFieldLayout calibratedFieldLayout;
+  static wpi::fields::Field calibratedFieldLayout;
   static std::unique_ptr<pfd::select_folder> saveDirSelector;
   static std::unique_ptr<pfd::select_folder> fieldVideoDirSelector;
   static std::string fieldVideoDir;
@@ -690,7 +727,7 @@ static void DisplayGui() {
     }
   }
   if (calibrateButtonPressed && fieldCalibrator->IsFinished()) {
-    if (auto layout = fieldCalibrator->GetAprilTagFieldLayout()) {
+    if (auto layout = fieldCalibrator->GetField()) {
       calibratedFieldLayout = *layout;
       saveDirSelector =
           std::make_unique<pfd::select_folder>("Select Download Directory", "");
@@ -719,7 +756,7 @@ static void DisplayGui() {
   }
 
   // error popup window
-  if (ImGui::BeginPopupModal("Field Calibration Error", NULL,
+  if (ImGui::BeginPopupModal("Field Calibration Error", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text("Field Calibration Failed - please try again, ensuring that:");
     ImGui::TextWrapped(
@@ -740,7 +777,7 @@ static void DisplayGui() {
     ImGui::EndPopup();
   }
 
-  if (ImGui::BeginPopupModal("Camera Calibration Loading Error", NULL,
+  if (ImGui::BeginPopupModal("Camera Calibration Loading Error", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::Text("Could not load camera calibration JSON. Make sure that:");
     ImGui::TextWrapped("- Your camera calibration is valid JSON");
@@ -765,21 +802,12 @@ static void DisplayGui() {
 }
 
 #ifndef RUNNING_WPICAL_TESTS
-#ifdef _WIN32
-int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
-                      int nCmdShow) {
-  int argc = __argc;
-  char** argv = __argv;
-#else
-int main(int argc, char** argv) {
-#endif
-  std::string_view saveDir;
-  if (argc == 2) {
-    saveDir = argv[1];
-  }
-
+void Application(std::string_view saveDir) {
   wpi::gui::CreateContext();
   wpi::glass::CreateContext();
+#ifdef RUNNING_IMGUI_TESTS
+  wpi::gui::test::InstallTestEngineHooks();
+#endif
 
   wpi::gui::AddIcon(wpical::GetResource_wpical_16_png());
   wpi::gui::AddIcon(wpical::GetResource_wpical_32_png());
@@ -795,12 +823,30 @@ int main(int argc, char** argv) {
 
   wpi::gui::AddLateExecute(DisplayGui);
 
-  wpi::gui::Initialize("WPIcal", 900, 600);
+  wpi::gui::Initialize("WPIcal", 900, 600,
+                       wpi::gui::RendererPreference::PREFER_2D);
   wpi::gui::Main();
 
   wpi::glass::DestroyContext();
   wpi::gui::DestroyContext();
+}
+#endif
 
+#if !defined(RUNNING_WPICAL_TESTS) && !defined(RUNNING_IMGUI_TESTS)
+#ifdef _WIN32
+int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
+                      int nCmdShow) {
+  int argc = __argc;
+  char** argv = __argv;
+#else
+int main(int argc, char** argv) {
+#endif
+  std::string_view saveDir;
+  if (argc == 2) {
+    saveDir = argv[1];
+  }
+
+  Application(saveDir);
   return 0;
 }
 #endif

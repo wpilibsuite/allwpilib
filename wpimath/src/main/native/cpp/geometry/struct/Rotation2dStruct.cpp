@@ -5,18 +5,18 @@
 #include "wpi/math/geometry/struct/Rotation2dStruct.hpp"
 
 namespace {
-constexpr size_t kValueOff = 0;
+constexpr size_t VALUE_OFF = 0;
 }  // namespace
 
 using StructType = wpi::util::Struct<wpi::math::Rotation2d>;
 
 wpi::math::Rotation2d StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::Rotation2d{
-      wpi::units::radian_t{wpi::util::UnpackStruct<double, kValueOff>(data)},
+      wpi::units::radian_t{wpi::util::UnpackStruct<double, VALUE_OFF>(data)},
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const wpi::math::Rotation2d& value) {
-  wpi::util::PackStruct<kValueOff>(data, value.Radians().value());
+  wpi::util::PackStruct<VALUE_OFF>(data, value.Radians().value());
 }

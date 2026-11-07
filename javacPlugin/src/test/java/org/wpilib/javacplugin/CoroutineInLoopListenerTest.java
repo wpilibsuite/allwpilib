@@ -7,14 +7,14 @@ package org.wpilib.javacplugin;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.javacplugin.CompileTestUtils.kJavaVersionOptions;
+import static org.wpilib.javacplugin.CompileTestUtils.JAVA_VERSION_OPTIONS;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.jupiter.api.Test;
 
 class CoroutineInLoopListenerTest {
-  private static final String kCoroutineSource =
+  private static final String COROUTINE_SOURCE =
       """
       package org.wpilib.command3;
 
@@ -22,6 +22,11 @@ class CoroutineInLoopListenerTest {
         void yield();
       }
       """;
+
+  public static final String STANDARD_MSG =
+      "[WPILib] Missing call to `coroutine.yield()` inside loop. "
+          + "If this is intentional, the error may be silenced with "
+          + "@SuppressWarnings(\"WPILib.CoroutineYieldInLoop\")";
 
   @Test
   void noYieldInLoopWithoutCoroutines() {
@@ -39,7 +44,7 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -65,9 +70,9 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -93,9 +98,9 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -121,15 +126,15 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error.getMessage(null));
+    assertEquals(STANDARD_MSG, error.getMessage(null));
   }
 
   @Test
@@ -154,9 +159,9 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     // TODO: Should we make it an error to yield (or invoke any methods on) a captured coroutine?
@@ -187,20 +192,22 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Missing call to "
+        "[WPILib] Missing call to "
             + "`firstCoroutine.yield()`, "
             + "`c1.yield()`, "
             + "`next.yield()`, or "
-            + "`thisMightBeTheLastOne.yield()` inside loop",
+            + "`thisMightBeTheLastOne.yield()` inside loop. "
+            + "If this is intentional, the error may be silenced with "
+            + "@SuppressWarnings(\"WPILib.CoroutineYieldInLoop\")",
         error.getMessage(null));
   }
 
@@ -226,15 +233,19 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Missing call to `innerCoroutine.yield()` inside loop", error.getMessage(null));
+    assertEquals(
+        "[WPILib] Missing call to `innerCoroutine.yield()` inside loop."
+            + " If this is intentional, the error may be silenced with "
+            + "@SuppressWarnings(\"WPILib.CoroutineYieldInLoop\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -259,9 +270,9 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -270,7 +281,11 @@ class CoroutineInLoopListenerTest {
     // and another error for calling a method on a captured coroutine (from a different analyzer)
     assertEquals(2, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Missing call to `innerCoroutine.yield()` inside loop", error.getMessage(null));
+    assertEquals(
+        "[WPILib] Missing call to `innerCoroutine.yield()` inside loop."
+            + " If this is intentional, the error may be silenced with "
+            + "@SuppressWarnings(\"WPILib.CoroutineYieldInLoop\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -296,20 +311,20 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(2, compilation.errors().size());
 
     var error1 = compilation.errors().get(0);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error1.getMessage(null));
+    assertEquals(STANDARD_MSG, error1.getMessage(null));
     assertEquals(8, error1.getLineNumber());
 
     var error2 = compilation.errors().get(1);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error2.getMessage(null));
+    assertEquals(STANDARD_MSG, error2.getMessage(null));
     assertEquals(9, error2.getLineNumber());
   }
 
@@ -336,15 +351,15 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error.getMessage(null));
+    assertEquals(STANDARD_MSG, error.getMessage(null));
     assertEquals(10, error.getLineNumber());
   }
 
@@ -371,15 +386,15 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error.getMessage(null));
+    assertEquals(STANDARD_MSG, error.getMessage(null));
     assertEquals(8, error.getLineNumber());
   }
 
@@ -417,40 +432,40 @@ class CoroutineInLoopListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(7, compilation.errors().size());
 
     var error1 = compilation.errors().get(0);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error1.getMessage(null));
+    assertEquals(STANDARD_MSG, error1.getMessage(null));
     assertEquals(8, error1.getLineNumber());
 
     var error2 = compilation.errors().get(1);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error2.getMessage(null));
+    assertEquals(STANDARD_MSG, error2.getMessage(null));
     assertEquals(9, error2.getLineNumber());
 
     var error3 = compilation.errors().get(2);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error3.getMessage(null));
+    assertEquals(STANDARD_MSG, error3.getMessage(null));
     assertEquals(10, error3.getLineNumber());
 
     var error4 = compilation.errors().get(3);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error4.getMessage(null));
+    assertEquals(STANDARD_MSG, error4.getMessage(null));
     assertEquals(11, error4.getLineNumber());
 
     var error5 = compilation.errors().get(4);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error5.getMessage(null));
+    assertEquals(STANDARD_MSG, error5.getMessage(null));
     assertEquals(12, error5.getLineNumber());
 
     var error6 = compilation.errors().get(5);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error6.getMessage(null));
+    assertEquals(STANDARD_MSG, error6.getMessage(null));
     assertEquals(13, error6.getLineNumber());
 
     var error7 = compilation.errors().get(6);
-    assertEquals("Missing call to `coroutine.yield()` inside loop", error7.getMessage(null));
+    assertEquals(STANDARD_MSG, error7.getMessage(null));
     assertEquals(16, error7.getLineNumber());
   }
 }

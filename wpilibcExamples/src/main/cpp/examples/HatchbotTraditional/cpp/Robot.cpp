@@ -6,7 +6,6 @@
 
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/DataLogManager.hpp"
 
 Robot::Robot() {
@@ -28,6 +27,7 @@ Robot::Robot() {
  */
 void Robot::RobotPeriodic() {
   wpi::cmd::CommandScheduler::GetInstance().Run();
+  container.UpdateTelemetry();
 }
 
 /**
@@ -53,9 +53,9 @@ void Robot::AutonomousInit() {
 
 void Robot::AutonomousPeriodic() {}
 
-void Robot::TeleopInit() {
+void Robot::AutonomousExit() {
   // This makes sure that the autonomous stops running when
-  // teleop starts running. If you want the autonomous to
+  // autonomous mode ends. If you want the autonomous to
   // continue until interrupted by another command, remove
   // this line or comment it out.
   if (autonomousCommand != nullptr) {
@@ -63,6 +63,8 @@ void Robot::TeleopInit() {
     autonomousCommand = nullptr;
   }
 }
+
+void Robot::TeleopInit() {}
 
 /**
  * This function is called periodically during operator control.

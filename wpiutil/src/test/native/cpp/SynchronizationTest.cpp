@@ -6,19 +6,23 @@
 
 #include <thread>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
-TEST(EventTest, AutoReset) {
+TEST_CASE("EventTest AutoReset", "[wpiutil]") {
   auto event = wpi::util::MakeEvent(false, false);
   std::thread thr([&] { wpi::util::SetEvent(event); });
   wpi::util::WaitForObject(event);
   thr.join();
   bool timedOut;
   wpi::util::WaitForObject(event, 0, &timedOut);
-  ASSERT_EQ(timedOut, true);
+  REQUIRE(timedOut == true);
 }
 
-TEST(EventTest, ManualReset) {
+TEST_CASE("EventTest ManualReset", "[wpiutil]") {
   auto event = wpi::util::MakeEvent(true, false);
   int done = 0;
   std::thread thr([&] {
@@ -27,31 +31,31 @@ TEST(EventTest, ManualReset) {
   });
   wpi::util::WaitForObject(event);
   thr.join();
-  ASSERT_EQ(done, 1);
+  REQUIRE(done == 1);
   bool timedOut;
   wpi::util::WaitForObject(event, 0, &timedOut);
-  ASSERT_EQ(timedOut, false);
+  REQUIRE(timedOut == false);
 }
 
-TEST(EventTest, InitialSet) {
+TEST_CASE("EventTest InitialSet", "[wpiutil]") {
   auto event = wpi::util::MakeEvent(false, true);
   bool timedOut;
   wpi::util::WaitForObject(event, 0, &timedOut);
-  ASSERT_EQ(timedOut, false);
+  REQUIRE(timedOut == false);
 }
 
-TEST(EventTest, WaitMultiple) {
+TEST_CASE("EventTest WaitMultiple", "[wpiutil]") {
   auto event1 = wpi::util::MakeEvent(false, false);
   auto event2 = wpi::util::MakeEvent(false, false);
   std::thread thr([&] { wpi::util::SetEvent(event2); });
   WPI_Handle signaled[2];
   auto result1 = wpi::util::WaitForObjects({event1, event2}, signaled);
   thr.join();
-  ASSERT_EQ(result1.size(), 1u);
-  ASSERT_EQ(result1[0], event2);
+  REQUIRE(result1.size() == 1u);
+  REQUIRE(result1[0] == event2);
   bool timedOut;
   auto result2 =
       wpi::util::WaitForObjects({event1, event2}, signaled, 0, &timedOut);
-  ASSERT_EQ(timedOut, true);
-  ASSERT_EQ(result2.size(), 0u);
+  REQUIRE(timedOut == true);
+  REQUIRE(result2.size() == 0u);
 }

@@ -4,9 +4,12 @@
 
 package org.wpilib.examples.statespaceelevator;
 
+import static org.wpilib.math.util.UnitConversions.feetToMeters;
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
+
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.LinearQuadraticRegulator;
 import org.wpilib.math.estimator.KalmanFilter;
@@ -19,34 +22,32 @@ import org.wpilib.math.system.LinearSystemLoop;
 import org.wpilib.math.system.Models;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Units;
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller to control an
  * elevator.
  */
 public class Robot extends TimedRobot {
-  private static final int kMotorPort = 0;
-  private static final int kEncoderAChannel = 0;
-  private static final int kEncoderBChannel = 1;
-  private static final int kJoystickPort = 0;
-  private static final double kHighGoalPosition = Units.feetToMeters(3);
-  private static final double kLowGoalPosition = Units.feetToMeters(0);
+  private static final int MOTOR_PORT = 0;
+  private static final int ENCODER_A_CHANNEL = 0;
+  private static final int ENCODER_B_CHANNEL = 1;
+  private static final int JOYSTICK_PORT = 0;
+  private static final double HIGH_GOAL_POSITION = feetToMeters(3);
+  private static final double LOW_GOAL_POSITION = feetToMeters(0);
 
-  private static final double kCarriageMass = 4.5; // kilograms
+  private static final double CARRIAGE_MASS = 4.5; // kilograms
 
   // A 1.5in diameter drum has a radius of 0.75in, or 0.019in.
-  private static final double kDrumRadius = 1.5 / 2.0 * 25.4 / 1000.0;
+  private static final double DRUM_RADIUS = 1.5 / 2.0 * 25.4 / 1000.0;
 
   // Reduction between motors and encoder, as output over input. If the elevator spins slower than
   // the motors, this number should be greater than one.
-  private static final double kElevatorGearing = 6.0;
+  private static final double ELEVATOR_GEARING = 6.0;
 
   private final TrapezoidProfile profile =
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
-              Units.feetToMeters(3.0),
-              Units.feetToMeters(6.0))); // Max elevator velocity and acceleration.
+              feetToMeters(3.0), feetToMeters(6.0))); // Max elevator velocity and acceleration.
   private TrapezoidProfile.State lastProfiledReference = new TrapezoidProfile.State();
 
   /* The plant holds a state-space model of our elevator. This system has the following properties:
@@ -59,7 +60,7 @@ public class Robot extends TimedRobot {
    */
   private final LinearSystem<N2, N1, N2> elevatorPlant =
       Models.elevatorFromPhysicalConstants(
-          DCMotor.getNEO(2), kCarriageMass, kDrumRadius, kElevatorGearing);
+          DCMotor.getNEO(2), CARRIAGE_MASS, DRUM_RADIUS, ELEVATOR_GEARING);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")
@@ -68,7 +69,7 @@ public class Robot extends TimedRobot {
           Nat.N2(),
           Nat.N1(),
           (LinearSystem<N2, N1, N1>) elevatorPlant.slice(0),
-          VecBuilder.fill(Units.inchesToMeters(2), Units.inchesToMeters(40)), // How accurate we
+          VecBuilder.fill(inchesToMeters(2), inchesToMeters(40)), // How accurate we
           // think our model is, in meters and meters/second.
           VecBuilder.fill(0.001), // How accurate we think our encoder position
           // data is. In this case we very highly trust our encoder position reading.
@@ -79,7 +80,7 @@ public class Robot extends TimedRobot {
   private final LinearQuadraticRegulator<N2, N1, N1> controller =
       new LinearQuadraticRegulator<>(
           (LinearSystem<N2, N1, N1>) elevatorPlant.slice(0),
-          VecBuilder.fill(Units.inchesToMeters(1.0), Units.inchesToMeters(10.0)), // qelms. Position
+          VecBuilder.fill(inchesToMeters(1.0), inchesToMeters(10.0)), // qelms. Position
           // and velocity error tolerances, in meters and meters per second. Decrease this to more
           // heavily penalize state excursion, or make the controller behave more aggressively. In
           // this example we weight position much more highly than velocity, but this can be
@@ -98,16 +99,16 @@ public class Robot extends TimedRobot {
           (LinearSystem<N2, N1, N1>) elevatorPlant.slice(0), controller, observer, 12.0, 0.020);
 
   // An encoder set up to measure elevator height in meters.
-  private final Encoder encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+  private final Encoder encoder = new Encoder(ENCODER_A_CHANNEL, ENCODER_B_CHANNEL);
 
-  private final PWMSparkMax motor = new PWMSparkMax(kMotorPort);
+  private final PWMSparkMax motor = new PWMSparkMax(MOTOR_PORT);
 
   // A joystick to read the trigger from.
-  private final Joystick joystick = new Joystick(kJoystickPort);
+  private final Joystick joystick = new Joystick(JOYSTICK_PORT);
 
   public Robot() {
     // Circumference = pi * d, so distance per click = pi * d / counts
-    encoder.setDistancePerPulse(Math.PI * 2 * kDrumRadius / 4096.0);
+    encoder.setDistancePerPulse(Math.PI * 2 * DRUM_RADIUS / 4096.0);
   }
 
   @Override
@@ -126,10 +127,10 @@ public class Robot extends TimedRobot {
     TrapezoidProfile.State goal;
     if (joystick.getTrigger()) {
       // the trigger is pressed, so we go to the high goal.
-      goal = new TrapezoidProfile.State(kHighGoalPosition, 0.0);
+      goal = new TrapezoidProfile.State(HIGH_GOAL_POSITION, 0.0);
     } else {
       // Otherwise, we go to the low goal
-      goal = new TrapezoidProfile.State(kLowGoalPosition, 0.0);
+      goal = new TrapezoidProfile.State(LOW_GOAL_POSITION, 0.0);
     }
     // Step our TrapezoidalProfile forward 20ms and set it as our next reference
     lastProfiledReference = profile.calculate(0.020, lastProfiledReference, goal);

@@ -4,14 +4,15 @@
 
 package org.wpilib.examples.elevatorexponentialsimulation.subsystems;
 
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
+
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.examples.elevatorexponentialsimulation.Constants;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.ElevatorFeedforward;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.trajectory.ExponentialProfile;
-import org.wpilib.math.util.Units;
 import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.ElevatorSim;
 import org.wpilib.simulation.EncoderSim;
@@ -20,8 +21,8 @@ import org.wpilib.simulation.RoboRioSim;
 import org.wpilib.smartdashboard.Mechanism2d;
 import org.wpilib.smartdashboard.MechanismLigament2d;
 import org.wpilib.smartdashboard.MechanismRoot2d;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
+import org.wpilib.telemetry.Telemetry;
 
 public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
@@ -30,33 +31,33 @@ public class Elevator implements AutoCloseable {
   private final ExponentialProfile profile =
       new ExponentialProfile(
           ExponentialProfile.Constraints.fromCharacteristics(
-              Constants.kElevatorMaxV, Constants.kElevatorkV, Constants.kElevatorkA));
+              Constants.ELEVATOR_MAX_V, Constants.ELEVATOR_KV, Constants.ELEVATOR_KA));
 
   private ExponentialProfile.State setpoint = new ExponentialProfile.State(0, 0);
 
   // Standard classes for controlling our elevator
   private final PIDController pidController =
-      new PIDController(Constants.kElevatorKp, Constants.kElevatorKi, Constants.kElevatorKd);
+      new PIDController(Constants.ELEVATOR_KP, Constants.ELEVATOR_KI, Constants.ELEVATOR_KD);
 
   ElevatorFeedforward feedforward =
       new ElevatorFeedforward(
-          Constants.kElevatorkS,
-          Constants.kElevatorkG,
-          Constants.kElevatorkV,
-          Constants.kElevatorkA);
+          Constants.ELEVATOR_KS,
+          Constants.ELEVATOR_KG,
+          Constants.ELEVATOR_KV,
+          Constants.ELEVATOR_KA);
   private final Encoder encoder =
-      new Encoder(Constants.kEncoderAChannel, Constants.kEncoderBChannel);
-  private final PWMSparkMax motor = new PWMSparkMax(Constants.kMotorPort);
+      new Encoder(Constants.ENCODER_A_CHANNEL, Constants.ENCODER_B_CHANNEL);
+  private final PWMSparkMax motor = new PWMSparkMax(Constants.MOTOR_PORT);
 
   // Simulation classes help us simulate what's going on, including gravity.
   private final ElevatorSim elevatorSim =
       new ElevatorSim(
           elevatorGearbox,
-          Constants.kElevatorGearing,
-          Constants.kCarriageMass,
-          Constants.kElevatorDrumRadius,
-          Constants.kMinElevatorHeight,
-          Constants.kMaxElevatorHeight,
+          Constants.ELEVATOR_GEARING,
+          Constants.CARRIAGE_MASS,
+          Constants.ELEVATOR_DRUM_RADIUS,
+          Constants.MIN_ELEVATOR_HEIGHT,
+          Constants.MAX_ELEVATOR_HEIGHT,
           true,
           0,
           0.005,
@@ -65,20 +66,15 @@ public class Elevator implements AutoCloseable {
   private final PWMMotorControllerSim motorSim = new PWMMotorControllerSim(motor);
 
   // Create a Mechanism2d visualization of the elevator
-  private final Mechanism2d mech2d =
-      new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(51));
+  private final Mechanism2d mech2d = new Mechanism2d(inchesToMeters(10), inchesToMeters(51));
   private final MechanismRoot2d mech2dRoot =
-      mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
+      mech2d.getRoot("Elevator Root", inchesToMeters(5), inchesToMeters(0.5));
   private final MechanismLigament2d elevatorMech2d =
       mech2dRoot.append(new MechanismLigament2d("Elevator", elevatorSim.getPosition(), 90));
 
   /** Subsystem constructor. */
   public Elevator() {
-    encoder.setDistancePerPulse(Constants.kElevatorEncoderDistPerPulse);
-
-    // Publish Mechanism2d to SmartDashboard
-    // To view the Elevator visualization, select Network Tables -> SmartDashboard -> Elevator Sim
-    SmartDashboard.putData("Elevator Sim", mech2d);
+    encoder.setDistancePerPulse(Constants.ELEVATOR_ENCODER_DIST_PER_PULSE);
   }
 
   /** Advance the simulation. */
@@ -130,12 +126,15 @@ public class Elevator implements AutoCloseable {
   public void updateTelemetry() {
     // Update elevator visualization with position
     elevatorMech2d.setLength(encoder.getDistance());
+
+    // Publish Mechanism2d to telemetry
+    // To view the Elevator visualization, select Network Tables -> Telemetry -> Elevator Sim
+    Telemetry.log("Elevator Sim", mech2d);
   }
 
   @Override
   public void close() {
     encoder.close();
     motor.close();
-    mech2d.close();
   }
 }

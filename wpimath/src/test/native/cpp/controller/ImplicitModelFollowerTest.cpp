@@ -4,13 +4,19 @@
 
 #include "wpi/math/controller/ImplicitModelFollower.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/Models.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace wpi::math {
 
-TEST(ImplicitModelFollowerTest, SameModel) {
+TEST_CASE("ImplicitModelFollowerTest SameModel", "[wpimath]") {
   constexpr wpi::units::second_t dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
@@ -29,8 +35,8 @@ TEST(ImplicitModelFollowerTest, SameModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_DOUBLE_EQ(x(0), xImf(0));
-    EXPECT_DOUBLE_EQ(x(1), xImf(1));
+    CHECK_DOUBLE_EQ(x(0), xImf(0));
+    CHECK_DOUBLE_EQ(x(1), xImf(1));
   }
 
   // Backward
@@ -39,8 +45,8 @@ TEST(ImplicitModelFollowerTest, SameModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_DOUBLE_EQ(x(0), xImf(0));
-    EXPECT_DOUBLE_EQ(x(1), xImf(1));
+    CHECK_DOUBLE_EQ(x(0), xImf(0));
+    CHECK_DOUBLE_EQ(x(1), xImf(1));
   }
 
   // Rotate CCW
@@ -49,12 +55,12 @@ TEST(ImplicitModelFollowerTest, SameModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_DOUBLE_EQ(x(0), xImf(0));
-    EXPECT_DOUBLE_EQ(x(1), xImf(1));
+    CHECK_DOUBLE_EQ(x(0), xImf(0));
+    CHECK_DOUBLE_EQ(x(1), xImf(1));
   }
 }
 
-TEST(ImplicitModelFollowerTest, SlowerRefModel) {
+TEST_CASE("ImplicitModelFollowerTest SlowerRefModel", "[wpimath]") {
   constexpr wpi::units::second_t dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
@@ -78,8 +84,8 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_GE(x(0), xImf(0));
-    EXPECT_GE(x(1), xImf(1));
+    CHECK(x(0) >= xImf(0));
+    CHECK(x(1) >= xImf(1));
   }
 
   // Backward
@@ -90,8 +96,8 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_LE(x(0), xImf(0));
-    EXPECT_LE(x(1), xImf(1));
+    CHECK(x(0) <= xImf(0));
+    CHECK(x(1) <= xImf(1));
   }
 
   // Rotate CCW
@@ -102,8 +108,8 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_NEAR(x(0), xImf(0), 1e-5);
-    EXPECT_NEAR(x(1), xImf(1), 1e-5);
+    CHECK_NEAR(x(0), xImf(0), 1e-5);
+    CHECK_NEAR(x(1), xImf(1), 1e-5);
   }
 }
 

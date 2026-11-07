@@ -9,7 +9,6 @@
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
 #include "mockdata/DutyCycleDataInternal.hpp"
-#include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
@@ -24,12 +23,12 @@ struct DutyCycle {
 struct Empty {};
 }  // namespace
 
-static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
+static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, NUM_DUTY_CYCLES,
                              HAL_HandleEnum::DUTY_CYCLE>* dutyCycleHandles;
 
 namespace wpi::hal::init {
 void InitializeDutyCycle() {
-  static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, kNumDutyCycles,
+  static IndexedHandleResource<HAL_DutyCycleHandle, DutyCycle, NUM_DUTY_CYCLES,
                                HAL_HandleEnum::DUTY_CYCLE>
       dcH;
   dutyCycleHandles = &dcH;
@@ -66,7 +65,7 @@ void HAL_FreeDutyCycle(HAL_DutyCycleHandle dutyCycleHandle) {
   SimDutyCycleData[dutyCycle->index].initialized = false;
 }
 
-void HAL_SetDutyCycleSimDevice(HAL_EncoderHandle handle,
+void HAL_SetDutyCycleSimDevice(HAL_DutyCycleHandle handle,
                                HAL_SimDeviceHandle device) {
   auto dutyCycle = dutyCycleHandles->Get(handle);
   if (dutyCycle == nullptr) {

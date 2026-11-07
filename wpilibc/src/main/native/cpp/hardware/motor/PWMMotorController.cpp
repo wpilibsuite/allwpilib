@@ -4,13 +4,11 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
-
 #include "wpi/system/RobotController.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -66,7 +64,7 @@ void PWMMotorController::StopMotor() {
 }
 
 std::string PWMMotorController::GetDescription() const {
-  return fmt::format("PWM {}", GetChannel());
+  return std::format("PWM {}", GetChannel());
 }
 
 int PWMMotorController::GetChannel() const {
@@ -81,10 +79,7 @@ void PWMMotorController::AddFollower(PWMMotorController& follower) {
   m_nonowningFollowers.emplace_back(&follower);
 }
 
-PWMMotorController::PWMMotorController(std::string_view name, int channel)
-    : m_pwm(channel, false) {
-  wpi::util::SendableRegistry::Add(this, name, channel);
-
+PWMMotorController::PWMMotorController(int channel) : m_pwm{channel} {
   m_simDevice = wpi::hal::SimDevice{"PWMMotorController", channel};
   if (m_simDevice) {
     m_simThrottle = m_simDevice.CreateDouble(
@@ -93,12 +88,12 @@ PWMMotorController::PWMMotorController(std::string_view name, int channel)
   }
 }
 
-void PWMMotorController::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Motor Controller");
-  builder.SetActuator(true);
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return GetThrottle(); },
-      [=, this](double value) { SetThrottle(value); });
+void PWMMotorController::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("Value", GetThrottle());
+}
+
+std::string_view PWMMotorController::GetTelemetryType() const {
+  return "Motor Controller";
 }
 
 wpi::units::microsecond_t PWMMotorController::GetMinPositivePwm() const {

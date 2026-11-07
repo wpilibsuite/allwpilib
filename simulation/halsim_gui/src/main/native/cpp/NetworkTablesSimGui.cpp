@@ -41,7 +41,7 @@ void NetworkTablesSimGui::Initialize() {
   }));
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
-  gNetworkTablesInfoWindow->SetDefaultVisibility(wpi::glass::Window::kHide);
+  gNetworkTablesInfoWindow->SetDefaultVisibility(wpi::glass::Window::HIDE);
   gNetworkTablesInfoWindow->DisableRenamePopup();
   wpi::gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
 

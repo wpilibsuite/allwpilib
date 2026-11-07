@@ -7,7 +7,7 @@ package org.wpilib.javacplugin;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.javacplugin.CompileTestUtils.kJavaVersionOptions;
+import static org.wpilib.javacplugin.CompileTestUtils.JAVA_VERSION_OPTIONS;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -34,7 +34,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -60,7 +60,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -68,8 +68,8 @@ class MaxLengthDetectorTest {
     assertEquals(1, errors.size());
     var error = errors.get(0);
     assertEquals(
-        "String literal exceeds maximum length: \"abcdefghijklmnopqrstuvwxyz1234567890\""
-            + " (36 characters) is longer than 1 character",
+        "[WPILib] String literal exceeds maximum length: \"abcdefghijklmnopqrstuvwxyz1234567890\""
+            + " (36 characters) is longer than 1 character.",
         error.getMessage(null));
   }
 
@@ -93,7 +93,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -101,7 +101,8 @@ class MaxLengthDetectorTest {
     assertEquals(1, errors.size());
     var error = errors.get(0);
     assertEquals(
-        "String literal exceeds maximum length: \"12\" (2 characters) is longer than 1 character",
+        "[WPILib] String literal exceeds maximum length: \"12\" (2 characters) is longer than 1"
+            + " character.",
         error.getMessage(null));
   }
 
@@ -125,7 +126,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     // Can't detect this
@@ -148,14 +149,14 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals("@MaxLength value must be >= 1 (was 0)", error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was 0).", error.getMessage(null));
   }
 
   @Test
@@ -174,14 +175,14 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals("@MaxLength value must be >= 1 (was -123)", error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was -123).", error.getMessage(null));
   }
 
   @Test
@@ -202,14 +203,14 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals("@MaxLength value must be >= 1 (was 0)", error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was 0).", error.getMessage(null));
   }
 
   @Test
@@ -230,13 +231,13 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals("@MaxLength value must be >= 1 (was -3)", error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was -3).", error.getMessage(null));
   }
 }

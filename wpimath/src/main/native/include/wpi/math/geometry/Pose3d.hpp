@@ -11,10 +11,13 @@
 #include <utility>
 
 #include <Eigen/Core>
+#include <gcem.hpp>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::util {
@@ -27,6 +30,12 @@ class Transform3d;
 
 /**
  * Represents a 3D pose containing translational and rotational elements.
+ *
+ * When used as a field-relative pose, the origin is at the center of the field,
+ * +X points toward the blue alliance wall, and +Y points to the left when
+ * facing +X. +Z points up, and positive yaw is counterclockwise viewed from
+ * above. A zero rotation faces +X. Poses may also be expressed in other
+ * reference frames; pose operations do not depend on field dimensions.
  */
 class WPILIB_DLLEXPORT Pose3d final {
  public:

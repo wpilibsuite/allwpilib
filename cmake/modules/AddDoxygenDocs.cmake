@@ -3,6 +3,7 @@ macro(add_doxygen_docs)
         apriltag
         cameraserver
         cscore
+        drivers
         fields
         hal
         ntcore
@@ -22,63 +23,42 @@ macro(add_doxygen_docs)
 
         if(DOCS_WARNINGS_AS_ERRORS)
             set(DOXYGEN_WARN_AS_ERROR "FAIL_ON_WARNINGS_PRINT")
-            list(FILTER dirs EXCLUDE REGEX fmt|memory|units)
+            list(FILTER dirs EXCLUDE REGEX memory|units)
             list(
                 APPEND DOXYGEN_EXCLUDE_PATTERNS
                 # apriltag
                 "apriltag_pose.h"
                 # llvm
-                "wpi/AlignOf.h"
-                "wpi/Casting.h"
-                "wpi/Chrono.h"
-                "wpi/Compiler.h"
-                "wpi/ConvertUTF.h"
-                "wpi/DenseMap.h"
-                "wpi/DenseMapInfo.h"
-                "wpi/Endian.h"
-                "wpi/EpochTracker.h"
-                "wpi/Errc.h"
-                "wpi/Errno.h"
-                "wpi/ErrorHandling.h"
-                "wpi/bit.h"
-                "wpi/fs.h"
-                "wpi/FunctionExtras.h"
-                "wpi/function_ref.h"
-                "wpi/iterator.h"
-                "wpi/iterator_range.h"
-                "wpi/ManagedStatic.h"
-                "wpi/MathExtras.h"
-                "wpi/MemAlloc.h"
-                "wpi/PointerIntPair.h"
-                "wpi/PointerLikeTypeTraits.h"
-                "wpi/PointerUnion.h"
-                "wpi/raw_os_ostream.h"
-                "wpi/raw_ostream.h"
-                "wpi/SmallPtrSet.h"
-                "wpi/SmallSet.h"
-                "wpi/SmallString.h"
-                "wpi/SmallVector.h"
-                "wpi/StringExtras.h"
-                "wpi/StringMap.h"
-                "wpi/SwapByteOrder.h"
-                "wpi/type_traits.h"
-                "wpi/VersionTuple.h"
-                "wpi/WindowsError.h"
+                "wpi/util/Compiler.hpp"
+                "wpi/util/ErrorHandling.hpp"
+                "wpi/util/SmallVector.hpp"
+                "wpi/util/StringExtras.hpp"
+                "wpi/util/raw_ostream.hpp"
                 # libuv
                 "uv.h"
                 "uv/**"
-                # json
-                "wpi/adl_serializer.h"
-                "wpi/byte_container_with_subtype.h"
-                "wpi/json.h"
-                "wpi/json_fwd.h"
-                "wpi/ordered_map.h"
                 # mpack
-                "wpi/mpack.h"
+                "wpi/util/mpack.h"
             )
         endif()
+        set(DOXYGEN_EXPAND_AS_DEFINED
+            UNIT_ADD
+            UNIT_ADD_UNIT_TAGS
+            UNIT_ADD_UNIT_DEFINITION
+            UNIT_ADD_CUSTOM_TYPE_UNIT_DEFINITION
+            UNIT_ADD_NAME
+            UNIT_ADD_IO
+            UNIT_ADD_TELEMETRY
+            UNIT_ADD_LITERALS
+            UNIT_ADD_WITH_CUSTOM_TYPE
+            UNIT_ADD_DECIBEL
+            UNIT_ADD_WITH_METRIC_PREFIXES
+            UNIT_ADD_WITH_METRIC_AND_BINARY_PREFIXES
+        )
         list(APPEND docs_dirs ${dirs})
-        list(APPEND docs_dirs ${dir}/src/generated/main/native/include)
+        if(EXISTS ${dir}/src/generated/main/native/include)
+            list(APPEND docs_dirs ${dir}/src/generated/main/native/include)
+        endif()
     endforeach()
 
     set(DOXYGEN_CASE_SENSE_NAMES false)
@@ -93,6 +73,7 @@ macro(add_doxygen_docs)
     set(DOXYGEN_GENERATE_TREEVIEW true)
     set(DOXYGEN_HTML_COLORSTYLE "LIGHT")
     set(DOXYGEN_HTML_EXTRA_STYLESHEET docs/theme.css)
+    set(DOXYGEN_INCLUDE_PATH ${docs_dirs})
     set(DOXYGEN_JAVADOC_AUTOBRIEF true)
     set(DOXYGEN_ALIASES
         "effects=\\par <i>Effects:</i>^^"
@@ -120,20 +101,7 @@ macro(add_doxygen_docs)
     set(DOXYGEN_ENABLE_PREPROCESSING true)
     set(DOXYGEN_MACRO_EXPANSION true)
     set(DOXYGEN_EXPAND_ONLY_PREDEF true)
-    set(DOXYGEN_PREDEFINED
-        "__cplusplus"
-        "HAL_ENUM(name)=enum name : int32_t"
-        "DOXYGEN"
-        "WPI_NOEXCEPT:=noexcept"
-        "WPI_SFINAE(x):="
-        "WPI_REQUIRES(x):="
-        "WPI_REQUIRES_RET(...):="
-        "WPI_ENABLE_IF(...):="
-        "WPI_CONSTEXPR:=constexpr"
-        "WPI_CONSTEXPR_FNC:=constexpr"
-        "WPI_IMPL_DEFINED(...):=implementation_defined"
-        "WPI_EBO(...):="
-    )
+    set(DOXYGEN_PREDEFINED "__cplusplus" "HAL_ENUM(name)=enum name : int32_t")
     execute_process(COMMAND git describe OUTPUT_VARIABLE version)
     string(SUBSTRING ${version} 1 -1 version)
     set(DOXYGEN_PROJECT_NUMBER ${version})

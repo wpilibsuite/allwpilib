@@ -14,12 +14,12 @@ public final class TravelingSalesmanBenchmark {
   }
 
   private static final Pose2d[] poses = {
-    new Pose2d(-1, 1, Rotation2d.kCW_90deg),
-    new Pose2d(-1, 2, Rotation2d.kCCW_90deg),
-    new Pose2d(0, 0, Rotation2d.kZero),
-    new Pose2d(0, 3, Rotation2d.kCW_90deg),
-    new Pose2d(1, 1, Rotation2d.kCCW_90deg),
-    new Pose2d(1, 2, Rotation2d.kCCW_90deg),
+    new Pose2d(-1, 1, Rotation2d.CW_90DEG),
+    new Pose2d(-1, 2, Rotation2d.CCW_90DEG),
+    new Pose2d(0, 0, Rotation2d.ZERO),
+    new Pose2d(0, 3, Rotation2d.CW_90DEG),
+    new Pose2d(1, 1, Rotation2d.CCW_90DEG),
+    new Pose2d(1, 2, Rotation2d.CCW_90DEG),
   };
   private static final int iterations = 100;
 

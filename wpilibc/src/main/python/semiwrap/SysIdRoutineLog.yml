@@ -21,15 +21,15 @@ classes:
         overloads:
           wpi::units::meter_t:
           wpi::units::turn_t:
-            rename: angularPosition
+            rename: angular_position
       velocity:
         overloads:
           wpi::units::meters_per_second_t:
           wpi::units::turns_per_second_t:
-            rename: angularVelocity
+            rename: angular_velocity
       acceleration:
         overloads:
           wpi::units::meters_per_second_squared_t:
           wpi::units::turns_per_second_squared_t:
-            rename: angularAcceleration
+            rename: angular_acceleration
       current:

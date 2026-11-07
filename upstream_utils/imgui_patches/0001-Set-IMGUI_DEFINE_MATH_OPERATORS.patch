@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jade Turner <spacey-sooty@proton.me>
 Date: Fri, 11 Apr 2025 11:20:41 +0800
-Subject: [PATCH] Set IMGUI_DEFINE_MATH_OPERATORS
+Subject: [PATCH 1/2] Set IMGUI_DEFINE_MATH_OPERATORS
 
 Signed-off-by: Jade Turner <spacey-sooty@proton.me>
 ---

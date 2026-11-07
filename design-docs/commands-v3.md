@@ -141,7 +141,7 @@ void bindDriveButtons() {
   controller.a().onTrue(...)
 }
 
-Trigger atScoringPosition = new Trigger(() -> getPosition().isNear(kScoringPosition));
+Trigger atScoringPosition = new Trigger(() -> getPosition().isNear(SCORING_POSITION));
 
 Command autonomous() {
   return Command.noRequirements(coroutine -> {
@@ -187,7 +187,8 @@ and manually scheduled commands.
 A command scheduled in a certain scope, a trigger binding created in a certain scope, or a default command set in
 a certain scope will only exist _within that scope_. Changing the default command for a mechanism within a custom opmode
 will only be applied while that opmode is active; when the opmode exits, the default command specified in the robot
-constructor (or mechanism constructor) will be reapplied.
+constructor (or mechanism constructor) will be reapplied. Triggers created in a scope will be unbound from the event
+loop and be allowed to be garbage collected if no existing references exist.
 
 ```java
 class Robot extends OpModeRobot {
@@ -309,6 +310,39 @@ will schedule a given command and call `yield()` in a loop until that command ha
 execution (note: this does *not* naively call `command.run(coroutine)`, which would hide the inner
 command from the scheduler and potentially sidestep requirement mutexing)
 
+The `Coroutine` class provides helpers for a few common operations. These helpers will park the coroutine
+so the scheduler doesn't need to bother mounting and unmounting a coroutine that it knows will do nothing.
+This saves a few microseconds per command, and will not emit telemetry events related to command mounting
+an yielding.
+
+- `park()` permanently places the coroutine into a parked state, never to be resumed by the scheduler
+- `waitUntil(BooleanSupplier)` temporarily parks the coroutine until the given condition is met
+- `await(Command)` temporarily parks the coroutine until the given command has completed execution
+- `awaitAll(Collection<Command>)` temporarily parks the coroutine until all given commands have completed execution
+- `awaitAny(Collection<Command>)` temporarily parks the coroutine until any of the given commands have completed execution
+- `wait(Time)` temporarily parks the coroutine until the given duration has elapsed
+
+This is implemented by tracking an internal state object, which can be one of the following:
+
+- `Live` - when the coroutine is live and not parked. The coroutine is always mountable.
+- `Frozen` - when the coroutine is permanently parked. The coroutine is never mountable.
+- `ParkedOnCondition(BooleanSupplier)` - when the coroutine is temporarily parked waiting on some condition. The coroutine is mountable when the condition is met, when checked by the scheduler.
+- `ParkedUntil(Time)` - when the coroutine is parked until a future timestamp is reached.
+- `Canceled` - when `requestCancellation()` is called. The coroutine is never mountable and the scheduler will cancel its associated command and its descendants.
+- `ForkFailed` - when a fork or await call failed to schedule a command. The coroutine is never mountable and the scheduler will interrupt its associated command and its entire composition.
+
+When the scheduler attempts to run a command, it first checks the state of the coroutine assigned to that command.
+If the state is not mountable, the scheduler will not attempt to run the command. Otherwise, it mounts the
+coroutine and allows it to run until it reaches a yield point or exits. A resumed coroutine always sets its state
+back to `Live`.
+
+Awaiting is implemented by tracking the run IDs of all the forked commands and comparing those original
+run IDs with the current IDs associated with those commands. If an ID changes, the command is considered
+to have completed execution and the coroutine may resume. This approach correctly handles one-shot commands,
+whose run IDs are guaranteed to have changed (likely to zero, for not running) when checked, as well as
+commands that complete and are rescheduled before being checked (the check will look at the original ID,
+and the new run has a different ID).
+
 ### Command Function Bodies
 
 Command logic lives in a single function `run` that accepts a `Coroutine` object argument. All
@@ -420,12 +454,13 @@ and `Command` (a scope for a specific running command).
 ### Scheduler `run()` Cycle
 
 1. Cancel commands bound to inactive scopes
-2. Run periodic sideload functions
-3. Poll the event loop for triggers (which may queue or cancel commands)
-4. Schedule default commands for the next iteration to pick up and start running
-5. Promote scheduled commands to running
+2. Cancel triggers bound to inactive scopes
+3. Run periodic sideload functions
+4. Poll the event loop for triggers (which may queue or cancel commands)
+5. Schedule default commands for the next iteration to pick up and start running
+6. Promote scheduled commands to running
     1. Cancels any running commands that conflict with scheduled ones
-6. Iterate over running commands
+7. Iterate over running commands
     1. Mount
     2. Run until yield point is reached or an error is raised
     3. Unmount
@@ -448,11 +483,21 @@ and `Command` (a scope for a specific running command).
 ### Telemetry
 
 Scheduler state is serialized using protobuf. The scheduler will send a list of the currently queued
-commands and a list of the current running commands. Commands are serialized as (id: uint32,
-parent_id: uint32, name: string, priority: int32, requirements: string array,
-last_time_ms: double, total_time_ms: double). Consumers can use the `id` and `parent_id` attributes
-to reconstruct the tree structure, if desired. `id` and `parent_id` marginally increase the size of
-serialized data, but make the schema and deserialization quite simple.
+commands and a list of the current running commands. Commands are serialized with the following attributes:
+
+| Attribute            | Type                    | Description                                                                                                                                                                                                 |
+|----------------------|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id`                 | uint32                  | Uniquely identifies an invocation of a command                                                                                                                                                              |
+| `parent_id`          | uint32 (optional)       | Identifies the parent command, if any (root commands have no parents)                                                                                                                                       |
+| `name`               | string                  | The name of the command                                                                                                                                                                                     |
+| `priority`           | int32                   | The priority level of the command                                                                                                                                                                           |
+| `requirements`       | ProtobufMechanism array | The requirements of the command                                                                                                                                                                             |
+| `last_time_ms`       | double (optional)       | The duration the command took to execute in its most recent tick. Blank if the command is only queued, not running.                                                                                         |
+| `total_time_ms`      | double (optional)       | The total duration the command has take to execute, summed across all ticks. This is different from the duration that the command has been scheduled for. Blank if the command is only queued, not running. |
+| `is_default_command` | bool (optional)         | Whether the command is the default command for a mechanism. Only present for commands that have been set as the default command for a mechanism.                                                            |
+
+Consumers can use the `id` and `parent_id` attributes to reconstruct the tree structure, if desired. `id` and `parent_id`
+marginally increase the size of serialized data, but make the schema and deserialization quite simple.
 
 Command IDs are unique across all commands, including those that are not currently running. Every time
 a command is scheduled, the scheduler will assign that run a unique ID. Note that this is stored as a

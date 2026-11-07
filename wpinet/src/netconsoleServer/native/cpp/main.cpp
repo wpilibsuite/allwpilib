@@ -13,8 +13,6 @@
 #include <memory>
 #include <string>
 
-#include <fmt/format.h>
-
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Pipe.hpp"
@@ -31,7 +29,7 @@
 
 namespace uv = wpi::net::uv;
 
-static uint64_t startTime = wpi::util::Now();
+static int64_t startTime = wpi::util::Now();
 
 static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
                           wpi::util::SmallVectorImpl<uv::Buffer>& bufs,
@@ -51,7 +49,7 @@ static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
   if (tcp) {
     // Header is 2 byte len, 1 byte type, 4 byte timestamp, 2 byte sequence num
     uint32_t ts =
-        std::bit_cast<uint32_t, float>((wpi::util::Now() - startTime) * 1.0e-6);
+        std::bit_cast<uint32_t, float>((wpi::util::Now() - startTime) * 1.0e-9);
     uint16_t len = rem.size() + toCopy.size() + 1 + 4 + 2;
     const uint8_t header[] = {static_cast<uint8_t>((len >> 8) & 0xff),
                               static_cast<uint8_t>(len & 0xff),

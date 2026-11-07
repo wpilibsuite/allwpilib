@@ -57,8 +57,8 @@ public class ConstructorMatch<T> {
   /**
    * Creates a new instance of the constructor's class using the given arguments. The arguments must
    * match the parameter types of the constructor, and must not be assignable to each other. The
-   * order of the arguments does not matter, as they will be matched to the parameter types.
-   * Duplicate arguments are ignored, as the first match will match.
+   * order of the arguments does matter, as they will be matched to the constructor parameter types
+   * in order.
    *
    * @param args the arguments to pass to the constructor
    * @return a new instance of the constructor's class
@@ -90,8 +90,8 @@ public class ConstructorMatch<T> {
    * types must not be assignable to each other. If multiple constructors match, the one with the
    * most specific parameter types is chosen. If there is still a tie, the one with the most
    * specific first parameter type is chosen, then the second parameter type, and so on. The order
-   * of the parameter types does not matter, as they will be matched to the constructor's parameter
-   * types. Duplicate parameter types are ignored, as the first match will match.
+   * of the parameter types does matter, as they will be matched to the constructor parameter types
+   * in order.
    *
    * @param <T> the type of the class to find the constructor for
    * @param clazz the class to find the constructor for

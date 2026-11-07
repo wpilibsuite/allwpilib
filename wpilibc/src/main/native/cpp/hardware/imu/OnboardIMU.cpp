@@ -148,7 +148,7 @@ wpi::units::meters_per_second_squared_t OnboardIMU::GetAccelY() {
   int32_t status = 0;
   HAL_GetIMUAcceleration(&val, &status);
   WPILIB_CheckErrorStatus(status, "Onboard IMU");
-  return wpi::units::meters_per_second_squared_t{val.x};
+  return wpi::units::meters_per_second_squared_t{val.y};
 }
 
 wpi::units::meters_per_second_squared_t OnboardIMU::GetAccelZ() {
@@ -156,5 +156,5 @@ wpi::units::meters_per_second_squared_t OnboardIMU::GetAccelZ() {
   int32_t status = 0;
   HAL_GetIMUAcceleration(&val, &status);
   WPILIB_CheckErrorStatus(status, "Onboard IMU");
-  return wpi::units::meters_per_second_squared_t{val.x};
+  return wpi::units::meters_per_second_squared_t{val.z};
 }

@@ -28,7 +28,7 @@ Python's struct module uses a character-based approach to describe data layout o
 [[schema]]
 == Schema
 
-The schema is a text-based format with similar syntax to the list of variable declarations in a C structure. The C syntax is flexible, easy to parse, and matches the intent of specifying a fixed size structure.
+The schema is a UTF-8 text-based format with similar syntax to the list of variable declarations in a C structure. The C syntax is flexible, easy to parse, and matches the intent of specifying a fixed size structure. Identifier names and user-defined type names may contain UTF-8 characters.
 
 Each member of the struct is defined by a single declaration. Each declaration is either a standard declaration or a bit-field declaration. Declarations are separated by semicolons. The last declaration may optionally have a trailing semicolon. Empty declarations (e.g. two semicolons back-to-back or separated by only whitespace) are allowed but are ignored. Unlike C structures, every declaration must be separated by a semicolon; commas cannot be used to declare multiple members with the same type. Declarations may also start and end with whitespace.
 

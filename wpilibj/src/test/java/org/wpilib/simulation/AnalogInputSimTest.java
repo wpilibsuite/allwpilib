@@ -16,7 +16,7 @@ import org.wpilib.simulation.testutils.DoubleCallback;
 class AnalogInputSimTest {
   @Test
   void setInitializeTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     AnalogInputSim sim = new AnalogInputSim(5);
     BooleanCallback callback = new BooleanCallback();
@@ -30,7 +30,7 @@ class AnalogInputSimTest {
 
   @Test
   void testSetVoltage() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     AnalogInputSim sim = new AnalogInputSim(5);
     DoubleCallback callback = new DoubleCallback();

@@ -7,7 +7,7 @@ package org.wpilib.command2;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.function.Supplier;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Schedules a given command when this command is initialized and ends when it ends, but does not
@@ -74,9 +74,8 @@ public class ProxyCommand extends Command {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-    builder.addStringProperty(
-        "proxied", () -> m_command == null ? "null" : m_command.getName(), null);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
+    table.log("proxied", m_command == null ? "null" : m_command.getName());
   }
 }

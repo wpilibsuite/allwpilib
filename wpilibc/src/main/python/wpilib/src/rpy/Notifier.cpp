@@ -6,16 +6,14 @@
 
 #include <utility>
 
-#include <fmt/format.h>
+#include <gilsafe_object.h>
+#include <pybind11/functional.h>
 
 #include "wpi/hal/Notifier.hpp"
 #include "wpi/hal/Threads.h"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Timer.hpp"
 #include "wpi/util/Synchronization.h"
-
-#include <pybind11/functional.h>
-#include <gilsafe_object.h>
 
 using namespace wpi;
 using namespace pybind11::literals;
@@ -102,14 +100,14 @@ PyNotifier::~PyNotifier() {
   }
 }
 
-PyNotifier::PyNotifier(PyNotifier &&rhs)
+PyNotifier::PyNotifier(PyNotifier&& rhs)
     : m_thread(std::move(rhs.m_thread)),
       m_notifier(rhs.m_notifier.load()),
       m_handler(std::move(rhs.m_handler)) {
   rhs.m_notifier = HAL_INVALID_HANDLE;
 }
 
-PyNotifier &PyNotifier::operator=(PyNotifier &&rhs) {
+PyNotifier& PyNotifier::operator=(PyNotifier&& rhs) {
   m_thread = std::move(rhs.m_thread);
   m_notifier = rhs.m_notifier.load();
   rhs.m_notifier = HAL_INVALID_HANDLE;
@@ -130,16 +128,16 @@ void PyNotifier::SetCallback(std::function<void()> handler) {
 
 void PyNotifier::StartSingle(wpi::units::second_t delay) {
   int32_t status = 0;
-  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(delay * 1e6), 0, false,
+  HAL_SetNotifierAlarm(m_notifier,
+                       wpi::units::nanosecond_t{delay}.to<int64_t>(), 0, false,
                        false, &status);
   WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 }
 
 void PyNotifier::StartPeriodic(wpi::units::second_t period) {
   int32_t status = 0;
-  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(period * 1e6),
-                       static_cast<uint64_t>(period * 1e6), false, false,
-                       &status);
+  auto periodNs = wpi::units::nanosecond_t{period}.to<int64_t>();
+  HAL_SetNotifierAlarm(m_notifier, periodNs, periodNs, false, false, &status);
   WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 }
 

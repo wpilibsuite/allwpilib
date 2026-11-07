@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.controller.ElevatorFeedforward;
-import org.wpilib.math.proto.ProtobufElevatorFeedforward;
+import org.wpilib.math.controller.proto.detail.ProtobufElevatorFeedforward;
 
 class ElevatorFeedforwardProtoTest {
   private static final ElevatorFeedforward DATA = new ElevatorFeedforward(1.91, 1.1, 1.1, 0.229);

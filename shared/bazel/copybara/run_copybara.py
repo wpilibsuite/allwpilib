@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 import dataclasses
 import json
@@ -5,18 +7,18 @@ import os
 import pathlib
 import re
 import subprocess
-from typing import Optional
+import tomllib
 
 
 @dataclasses.dataclass
 class CopybaraConfig:
     # Needed to run the additional updates for updating the rdev file
-    mostrobotpy_local_repo_path: Optional[str] = None
+    mostrobotpy_local_repo_path: str | None = None
 
     # Settings for migrating to a fork that you own
-    mostrobotpy_fork_repo: Optional[str] = None
-    allwpilib_fork_repo: Optional[str] = None
-    robotpy_commandsv2_fork_repo: Optional[str] = None
+    mostrobotpy_fork_repo: str | None = None
+    allwpilib_fork_repo: str | None = None
+    robotpy_commandsv2_fork_repo: str | None = None
 
     # Settings for truth repositories
     mostrobotpy_truth_repo: str = "https://github.com/robotpy/mostrobotpy.git"
@@ -26,7 +28,13 @@ class CopybaraConfig:
     allwpilib_truth_branch: str = "2027"
 
 
-def run_copybara(copybara_file: pathlib.Path, migration: str, destination_url: str):
+def run_copybara(
+    copybara_file: pathlib.Path,
+    migration: str,
+    destination_url: str,
+    force: bool,
+    verbose: bool,
+):
     args = [
         "bazel",
         "run",
@@ -35,11 +43,15 @@ def run_copybara(copybara_file: pathlib.Path, migration: str, destination_url: s
         "migrate",
         str(copybara_file),
         migration,
-        "--force",
         "--git-destination-url",
         destination_url,
         "--git-destination-non-fast-forward",
     ]
+
+    if force:
+        args.append("--force")
+    if verbose:
+        args.append("--verbose")
 
     subprocess.check_call(args)
 
@@ -57,7 +69,7 @@ def checkout_branch(auto_delete_branch: bool, branch_name: str):
         if not auto_delete_branch:
             ans = input(f"Delete local branch {branch_name}?")
             if ans.lower() != "y":
-                raise Exception(
+                raise RuntimeError(
                     f"You must delete your local copy of {branch_name} before the script can finish"
                 )
 
@@ -67,7 +79,9 @@ def checkout_branch(auto_delete_branch: bool, branch_name: str):
     subprocess.check_call(["git", "checkout", branch_name])
 
 
-def update_mostrobotpy_rdev(wpilib_bin_version: str, is_development_build: bool):
+def update_mostrobotpy_rdev(
+    wpilib_bin_version: str, mrclib_version, is_development_build: bool
+):
     with open("rdev.toml") as f:
         contents = f.read()
 
@@ -83,7 +97,15 @@ def update_mostrobotpy_rdev(wpilib_bin_version: str, is_development_build: bool)
         contents,
     )
     contents = re.sub(
+        'mrclib_bin_version = ".*"',
+        f'mrclib_bin_version = "{mrclib_version}"',
+        contents,
+    )
+    contents = re.sub(
         'wpilib_bin_url = ".*"', f'wpilib_bin_url = "{artifactory_path}"', contents
+    )
+    contents = re.sub(
+        'mrclib_bin_url = ".*"', f'mrclib_bin_url = "{artifactory_path}"', contents
     )
 
     with open("rdev.toml", "w") as f:
@@ -97,27 +119,35 @@ def allwpilib_to_mostrobotpy(
     mostrobotpy_local_repository: str,
     mostrobotpy_fork_repo: str,
     wpilib_bin_version: str,
+    mrclib_version: str,
     is_development_build: bool,
     auto_delete_branch: bool,
+    force: bool,
+    verbose: bool,
 ):
-    run_copybara(copybara_file, "allwpilib_to_mostrobotpy", mostrobotpy_fork_repo)
+
+    run_copybara(
+        copybara_file, "allwpilib_to_mostrobotpy", mostrobotpy_fork_repo, force, verbose
+    )
 
     os.chdir(mostrobotpy_local_repository)
     checkout_branch(auto_delete_branch, "copybara_allwpilib_to_mostrobotpy")
-    update_mostrobotpy_rdev(wpilib_bin_version, is_development_build)
+    update_mostrobotpy_rdev(wpilib_bin_version, mrclib_version, is_development_build)
+
+    # Run black
+    subprocess.check_call(["black", "."])
+    subprocess.check_call(["git", "add", "-A"])
+    subprocess.call(["git", "commit", "-m", "Run black"])
+
     subprocess.check_call(["git", "push", "-f"])
 
 
-def mostrobotpy_to_allwpilib(copybara_file: pathlib.Path, allwpilib_fork):
-    run_copybara(copybara_file, "mostrobotpy_to_allwpilib", allwpilib_fork)
-
-
-def commandsv2_to_allwpilib(copybara_file: pathlib.Path, allwpilib_fork):
-    run_copybara(copybara_file, "commandsv2_to_allwpilib", allwpilib_fork)
-
-
-def allwpilib_to_commandsv2(copybara_file: pathlib.Path, allwpilib_fork):
-    run_copybara(copybara_file, "allwpilib_to_commandsv2", allwpilib_fork)
+def mostrobotpy_to_allwpilib(
+    copybara_file: pathlib.Path, allwpilib_fork, force: bool, verbose: bool
+):
+    run_copybara(
+        copybara_file, "mostrobotpy_to_allwpilib", allwpilib_fork, force, verbose
+    )
 
 
 def load_user_config() -> CopybaraConfig:
@@ -143,6 +173,9 @@ def main():
     subparsers = parser.add_subparsers(
         dest="migration", required=True, help="Available commands"
     )
+
+    parser.add_argument("--force", action="store_true")
+    parser.add_argument("--verbose", action="store_true")
 
     def add_allwpilib_fork_arg(subparser):
         subparser.add_argument(
@@ -191,24 +224,6 @@ def main():
     )
     add_allwpilib_fork_arg(mostrobotpy_to_allwpilib_parser)
 
-    # allwpilib -> commands-v2
-    allwpilib_to_commandsv2_parser = subparsers.add_parser(
-        "allwpilib_to_commandsv2",
-        help="Pushes changes from the allwpilib mirror to the robotpy commands-v2 repo",
-    )
-    allwpilib_to_commandsv2_parser.add_argument(
-        "--robotpy_commandsv2_fork_repo",
-        default=user_config.robotpy_commandsv2_fork_repo,
-        help="URL to your github fork of mostrobotpy that you have write permissions for",
-    )
-
-    # commands-v2 -> allwpilib
-    commandsv2_to_allwpilib_parser = subparsers.add_parser(
-        "commandsv2_to_allwpilib",
-        help="Pulls changes from the robotpy commands-v2 source of truth into this mirror",
-    )
-    add_allwpilib_fork_arg(commandsv2_to_allwpilib_parser)
-
     script_dir = pathlib.Path(__file__).parent
     copybara_file = script_dir / "../../../copy.bara.sky"
 
@@ -216,41 +231,40 @@ def main():
 
     if args.migration == "allwpilib_to_mostrobotpy":
         if args.mostrobotpy_local_repo_path is None:
-            raise Exception(
+            raise RuntimeError(
                 "You mist specify mostrobotpy_local_repo_path, either on the command line or in your user config"
             )
         if args.mostrobotpy_fork_repo is None:
-            raise Exception(
+            raise RuntimeError(
                 "You mist specify mostrobotpy_fork_repo, either on the command line or in your user config"
             )
+
+        versions_file = script_dir / "../../../gradle/libs.versions.toml"
+        with versions_file.open("rb") as f:
+            versions = tomllib.load(f)["versions"]
+        mrclib_version = versions["mrclib"]
+
         allwpilib_to_mostrobotpy(
             copybara_file,
             args.mostrobotpy_local_repo_path,
             args.mostrobotpy_fork_repo,
             args.wpilib_bin_version,
+            mrclib_version,
             args.development_build,
             args.auto_delete_branch,
+            args.force,
+            args.verbose,
         )
     elif args.migration == "mostrobotpy_to_allwpilib":
         if args.allwpilib_fork_repo is None:
-            raise Exception(
+            raise RuntimeError(
                 "You mist specify allwpilib_fork_repo, either on the command line or in your user config"
             )
-        mostrobotpy_to_allwpilib(copybara_file, args.allwpilib_fork_repo)
-    elif args.migration == "allwpilib_to_commandsv2":
-        if args.robotpy_commandsv2_fork_repo is None:
-            raise Exception(
-                "You mist specify robotpy_commandsv2_fork_repo, either on the command line or in your user config"
-            )
-        allwpilib_to_commandsv2(copybara_file, args.robotpy_commandsv2_fork_repo)
-    elif args.migration == "commandsv2_to_allwpilib":
-        if args.allwpilib_fork_repo is None:
-            raise Exception(
-                "You mist specify allwpilib_fork_repo, either on the command line or in your user config"
-            )
-        commandsv2_to_allwpilib(copybara_file, args.allwpilib_fork_repo)
+        mostrobotpy_to_allwpilib(
+            copybara_file, args.allwpilib_fork_repo, args.force, args.verbose
+        )
     else:
-        raise Exception(f"Unexpected migration {args.migration}")
+        raise RuntimeError(f"Unexpected migration {args.migration}")
 
 
 if __name__ == "__main__":

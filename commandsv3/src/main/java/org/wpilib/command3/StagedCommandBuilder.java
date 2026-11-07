@@ -58,6 +58,7 @@ public final class StagedCommandBuilder {
   private final Set<Mechanism> m_requirements = new HashSet<>();
   private Consumer<Coroutine> m_impl;
   private Runnable m_onCancel = () -> {};
+  private Runnable m_onExit = () -> {};
   private String m_name;
   private int m_priority = Command.DEFAULT_PRIORITY;
   private BooleanSupplier m_endCondition;
@@ -131,6 +132,14 @@ public final class StagedCommandBuilder {
         }
 
         @Override
+        public NeedsNameBuilderStage whenExited(Runnable onExit) {
+          throwIfAlreadyBuilt();
+
+          m_onExit = onExit;
+          return this;
+        }
+
+        @Override
         public NeedsNameBuilderStage withPriority(int priority) {
           throwIfAlreadyBuilt();
 
@@ -170,11 +179,12 @@ public final class StagedCommandBuilder {
       };
 
   private static final class BuilderBackedCommand implements Command {
-    private static final Runnable kNoOp = () -> {};
+    private static final Runnable NO_OP = () -> {};
 
     private final Set<Mechanism> m_requirements;
     private final Consumer<Coroutine> m_impl;
     private final Runnable m_onCancel;
+    private final Runnable m_onExit;
     private final String m_name;
     private final int m_priority;
 
@@ -182,7 +192,8 @@ public final class StagedCommandBuilder {
       // Copy builder fields into the command so the builder object can be garbage collected
       m_requirements = new HashSet<>(builder.m_requirements);
       m_impl = builder.m_impl;
-      m_onCancel = Objects.requireNonNullElse(builder.m_onCancel, kNoOp);
+      m_onCancel = Objects.requireNonNullElse(builder.m_onCancel, NO_OP);
+      m_onExit = Objects.requireNonNullElse(builder.m_onExit, NO_OP);
       m_name = builder.m_name;
       m_priority = builder.m_priority;
     }
@@ -195,6 +206,11 @@ public final class StagedCommandBuilder {
     @Override
     public void onCancel() {
       m_onCancel.run();
+    }
+
+    @Override
+    public void onExit() {
+      m_onExit.run();
     }
 
     @Override

@@ -5,18 +5,17 @@
 package org.wpilib.hardware.discrete;
 
 import org.wpilib.hardware.hal.AnalogInputJNI;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Analog channel class.
  *
  * <p>Each analog channel is read from hardware as a 12-bit number representing 0V to 3.3V.
  */
-public class AnalogInput implements Sendable, AutoCloseable {
+public class AnalogInput implements TelemetryLoggable, AutoCloseable {
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
 
@@ -25,20 +24,17 @@ public class AnalogInput implements Sendable, AutoCloseable {
    *
    * @param channel The SmartIO channel for the analog input.
    */
-  @SuppressWarnings("this-escape")
   public AnalogInput(final int channel) {
     AnalogInputJNI.checkAnalogInputChannel(channel);
     m_channel = channel;
 
     m_port = AnalogInputJNI.initializeAnalogInputPort(channel);
 
-    HAL.reportUsage("IO", channel, "AnalogInput");
-    SendableRegistry.add(this, "AnalogInput", channel);
+    UsageReporting.reportUsage("IO", channel, "AnalogInput");
   }
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     AnalogInputJNI.freeAnalogInputPort(m_port);
     m_port = 0;
     m_channel = 0;
@@ -83,8 +79,12 @@ public class AnalogInput implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Analog Input");
-    builder.addDoubleProperty("Value", this::getVoltage, null);
+  public void logTo(TelemetryTable table) {
+    table.log("Value", getVoltage());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Analog Input";
   }
 }

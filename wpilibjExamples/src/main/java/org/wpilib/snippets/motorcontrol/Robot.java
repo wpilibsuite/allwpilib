@@ -4,11 +4,11 @@
 
 package org.wpilib.snippets.motorcontrol;
 
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /**
  * This sample program shows how to control a motor using a joystick. In the operator control part
@@ -19,12 +19,16 @@ import org.wpilib.smartdashboard.SmartDashboard;
  *
  * <p>In addition, the encoder value of an encoder connected to ports 0 and 1 is consistently sent
  * to the Dashboard.
+ *
+ * <p>Finally, short code snippets show how to invert the motor direction and how to use the motor
+ * safety for frc-docs.
+ * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
  */
 public class Robot extends TimedRobot {
-  private static final int kMotorPort = 0;
-  private static final int kJoystickPort = 0;
-  private static final int kEncoderPortA = 0;
-  private static final int kEncoderPortB = 1;
+  private static final int MOTOR_PORT = 0;
+  private static final int JOYSTICK_PORT = 0;
+  private static final int ENCODER_PORT_A = 0;
+  private static final int ENCODER_PORT_B = 1;
 
   private final PWMSparkMax motor;
   private final Joystick joystick;
@@ -32,12 +36,21 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    motor = new PWMSparkMax(kMotorPort);
-    joystick = new Joystick(kJoystickPort);
-    encoder = new Encoder(kEncoderPortA, kEncoderPortB);
+    motor = new PWMSparkMax(MOTOR_PORT);
+    joystick = new Joystick(JOYSTICK_PORT);
+    encoder = new Encoder(ENCODER_PORT_A, ENCODER_PORT_B);
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
     encoder.setDistancePerPulse((Math.PI * 6) / 360.0);
+
+    // show motor inversion
+    motor.setInverted(true);
+
+    // show motor safety features
+    motor.setSafetyEnabled(true);
+    motor.setSafetyEnabled(false);
+    motor.setExpiration(0.1);
+    motor.feed();
   }
 
   /*
@@ -46,7 +59,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    SmartDashboard.putNumber("Encoder", encoder.getDistance());
+    Telemetry.log("Encoder", encoder.getDistance());
   }
 
   /** The teleop periodic function is called every control packet in teleop. */

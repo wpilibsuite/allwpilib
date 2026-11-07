@@ -12,7 +12,9 @@ using namespace std::chrono_literals;
 
 class NotifierCommandTest : public CommandTestBase {};
 
-TEST_F(NotifierCommandTest, NotifierCommandSchedule) {
+TEST_CASE_METHOD(NotifierCommandTest,
+                 "NotifierCommandTest NotifierCommandSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   wpi::sim::PauseTiming();
@@ -28,5 +30,5 @@ TEST_F(NotifierCommandTest, NotifierCommandSchedule) {
 
   wpi::sim::ResumeTiming();
 
-  EXPECT_EQ(counter, 2);
+  CHECK(counter == 2);
 }

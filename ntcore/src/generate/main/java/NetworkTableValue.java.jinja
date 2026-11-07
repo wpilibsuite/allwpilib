@@ -51,7 +51,7 @@ public final class NetworkTableValue {
   /**
    * Get the creation time of the value in local time.
    *
-   * @return The time, in the units returned by NetworkTablesJNI.now().
+   * @return The time, in nanoseconds.
    */
   public long getTime() {
     return m_time;
@@ -60,7 +60,7 @@ public final class NetworkTableValue {
   /**
    * Get the creation time of the value in server time.
    *
-   * @return The server time.
+   * @return The server time, in nanoseconds.
    */
   public long getServerTime() {
     return m_serverTime;
@@ -123,7 +123,7 @@ public final class NetworkTableValue {
    * Creates a {{ t.java.ValueType }} value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue make{{ t.TypeName }}({{ t.java.ValueType }} value, long time) {
@@ -144,7 +144,7 @@ public final class NetworkTableValue {
    * Creates a {{ t.java.ValueType }} value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue make{{ t.TypeName }}({{ t.java.WrapValueType }} value, long time) {

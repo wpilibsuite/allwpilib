@@ -4,7 +4,7 @@
 
 #include "wpi/hal/ErrorHandling.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"
@@ -35,7 +35,7 @@ HAL_Status MakeErrorIndexOutOfRange(HAL_Status status, std::string_view message,
                                     int32_t requested) {
   return MakeError(
       status,
-      fmt::format("{}\n Status: {}\n  Minimum: {} Maximum: {} Requested: {}",
+      std::format("{}\n Status: {}\n  Minimum: {} Maximum: {} Requested: {}",
                   message, status, minimum, maximum, requested));
 }
 
@@ -44,7 +44,7 @@ HAL_Status MakeErrorPreviouslyAllocated(HAL_Status status,
                                         int32_t channel,
                                         std::string_view previousAllocation) {
   return MakeError(status,
-                   fmt::format("{} {} previously allocated.\n"
+                   std::format("{} {} previously allocated.\n"
                                "Location of the previous allocation:\n{}\n"
                                "Location of the current allocation:",
                                message, channel, previousAllocation));

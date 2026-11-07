@@ -6,14 +6,15 @@
 #include <cmath>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
 #include "wpi/sysid/analysis/FeedforwardAnalysis.hpp"
 #include "wpi/sysid/analysis/FilteringUtils.hpp"
 #include "wpi/sysid/analysis/Storage.hpp"
 
-TEST(FilterTest, MedianFilter) {
+TEST_CASE("FilterTest MedianFilter", "[sysid]") {
   std::vector<sysid::PreparedData> testData{
       sysid::PreparedData{0_s, 0, 0, 0},    sysid::PreparedData{0_s, 0, 0, 1},
       sysid::PreparedData{0_s, 0, 0, 10},   sysid::PreparedData{0_s, 0, 0, 5},
@@ -28,10 +29,10 @@ TEST(FilterTest, MedianFilter) {
       sysid::PreparedData{0_s, 0, 0, 6}, sysid::PreparedData{0_s, 0, 0, 5}};
 
   sysid::ApplyMedianFilter(&testData, 3);
-  EXPECT_EQ(expectedData, testData);
+  CHECK(expectedData == testData);
 }
 
-TEST(FilterTest, NoiseFloor) {
+TEST_CASE("FilterTest NoiseFloor", "[sysid]") {
   std::vector<sysid::PreparedData> testData = {
       {0_s, 1, 2, 3, 5_ms, 0, 0},    {1_s, 1, 2, 3, 5_ms, 1, 0},
       {2_s, 1, 2, 3, 5_ms, 2, 0},    {3_s, 1, 2, 3, 5_ms, 5, 0},
@@ -40,7 +41,7 @@ TEST(FilterTest, NoiseFloor) {
       {8_s, 1, 2, 3, 5_ms, 0.01, 0}, {9_s, 1, 2, 3, 5_ms, 0, 0}};
   double noiseFloor =
       GetNoiseFloor(testData, 2, [](auto&& pt) { return pt.acceleration; });
-  EXPECT_NEAR(0.953, noiseFloor, 0.001);
+  CHECK(0.953 == Catch::Approx(noiseFloor).margin(0.001));
 }
 
 void FillStepVoltageData(std::vector<sysid::PreparedData>& data) {
@@ -59,7 +60,7 @@ void FillStepVoltageData(std::vector<sysid::PreparedData>& data) {
   }
 }
 
-TEST(FilterTest, StepTrim) {
+TEST_CASE("FilterTest StepTrim", "[sysid]") {
   {
     std::vector<sysid::PreparedData> forwardTestData = {
         {0_s, 1, 0, 0, 1_s, 0},  {0_s, 1, 0, 0, 1_s, 0.25},
@@ -80,8 +81,8 @@ TEST(FilterTest, StepTrim) {
                                    maxTime);
     minTime = tempMinTime;
 
-    EXPECT_EQ(3, settings.stepTestDuration.value());
-    EXPECT_EQ(2, minTime.value());
+    CHECK(3 == settings.stepTestDuration.value());
+    CHECK(2 == minTime.value());
   }
 
   {
@@ -104,8 +105,8 @@ TEST(FilterTest, StepTrim) {
                                    maxTime);
     minTime = tempMinTime;
 
-    EXPECT_EQ(3, settings.stepTestDuration.value());
-    EXPECT_EQ(2, minTime.value());
+    CHECK(3 == settings.stepTestDuration.value());
+    CHECK(2 == minTime.value());
   }
 
   {
@@ -130,8 +131,8 @@ TEST(FilterTest, StepTrim) {
 
     // Expect trimming to reject the erroneous peak negative accel,
     // correctly picking up the max positive accel instead.
-    EXPECT_EQ(4, settings.stepTestDuration.value());
-    EXPECT_EQ(2, minTime.value());
+    CHECK(4 == settings.stepTestDuration.value());
+    CHECK(2 == minTime.value());
   }
 }
 
@@ -153,16 +154,16 @@ void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h,
     // half the window size in the past.
     // The order of accuracy is O(h^(N - d)) where N is number of stencil
     // points and d is order of derivative
-    EXPECT_NEAR(dfdx((i - static_cast<int>((Samples - 1) / 2)) * h.value()),
-                filter.Calculate(f(i * h.value())),
-                std::pow(h.value(), Samples - Derivative));
+    CHECK(dfdx((i - static_cast<int>((Samples - 1) / 2)) * h.value()) ==
+          Catch::Approx(filter.Calculate(f(i * h.value())))
+              .margin(std::pow(h.value(), Samples - Derivative)));
   }
 }
 
 /**
  * Test central finite difference.
  */
-TEST(LinearFilterOutputTest, CentralFiniteDifference) {
+TEST_CASE("LinearFilterOutputTest CentralFiniteDifference", "[sysid]") {
   constexpr auto h = 5_ms;
 
   AssertCentralResults<1, 3>(

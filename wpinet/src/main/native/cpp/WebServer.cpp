@@ -8,16 +8,14 @@
 #include <unistd.h>
 #endif
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
-
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/HttpServerConnection.hpp"
 #include "wpi/net/HttpUtil.hpp"
-#include "wpi/net/UrlParser.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/GetAddrInfo.hpp"
 #include "wpi/net/uv/Stream.hpp"
@@ -27,6 +25,7 @@
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/Signal.h"
 #include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
@@ -226,20 +225,19 @@ void MyHttpConnection::SendFileResponse(int code, std::string_view codeText,
 }
 
 void MyHttpConnection::ProcessRequest() {
-  // fmt::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
-  wpi::net::UrlParser url{m_request.GetUrl(),
-                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
-  if (!url.IsValid()) {
+  // wpi::util::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
+  if (!url) {
     // failed to parse URL
     SendError(400);
     return;
   }
 
   std::string_view path;
-  if (url.HasPath()) {
-    path = url.GetPath();
+  if (url->get_pathname_length() > 0) {
+    path = url->get_pathname();
   }
-  // fmt::print(stderr, "path: \"{}\"\n", path);
+  // wpi::util::print(stderr, "path: \"{}\"\n", path);
 
   wpi::util::SmallString<128> pathBuf;
   bool error;
@@ -250,29 +248,28 @@ void MyHttpConnection::ProcessRequest() {
   }
 
   std::string_view query;
-  if (url.HasQuery()) {
-    query = url.GetQuery();
+  if (url->has_search()) {
+    query = url->get_search();
   }
-  // fmt::print(stderr, "query: \"{}\"\n", query);
-  HttpQueryMap qmap{query};
+  // wpi::util::print(stderr, "query: \"{}\"\n", query);
+  ada::url_search_params qmap{query};
 
-  const bool isGET = m_request.GetMethod() == wpi::net::HTTP_GET;
+  const bool isGET = m_request.GetMethod() == HTTP_GET;
   if (isGET && wpi::util::starts_with(path, '/') &&
       !wpi::util::contains(path, "..")) {
-    fs::path fullpath = fmt::format("{}{}", m_path, path);
+    fs::path fullpath = std::format("{}{}", m_path, path);
     std::error_code ec;
     bool isdir = fs::is_directory(fullpath, ec);
     if (isdir) {
       if (!wpi::util::ends_with(path, '/')) {
         // redirect to trailing / location
         SendResponse(301, "Moved Permanently", "text/plain", "",
-                     fmt::format("Location: {}/\r\n\r\n", path));
+                     std::format("Location: {}/\r\n\r\n", path));
         return;
       }
       // generate directory listing
-      wpi::util::SmallString<64> formatBuf;
       fs::path indexpath = fs::path{fullpath} / "index.html";
-      if (qmap.Get("format", formatBuf).value_or("") == "json") {
+      if (qmap.get("format").value_or("") == "json") {
         wpi::util::json dirs = wpi::util::json::array();
         wpi::util::json files = wpi::util::json::array();
         for (auto&& entry : fs::directory_iterator{fullpath}) {
@@ -302,20 +299,20 @@ void MyHttpConnection::ProcessRequest() {
           wpi::util::SmallString<128> nameUriBuf, nameHtmlBuf;
           if (subdir) {
             dirs.emplace(
-                name, fmt::format(
+                name, std::format(
                           "<tr><td><a href=\"{}/\">{}/</a></td><td></td></tr>",
                           EscapeURI(name, nameUriBuf),
                           EscapeHTML(name, nameHtmlBuf)));
           } else {
             files.emplace(
-                name, fmt::format(
+                name, std::format(
                           "<tr><td><a href=\"{}\">{}</a></td><td>{}</td></tr>",
                           EscapeURI(name, nameUriBuf),
                           EscapeHTML(name, nameHtmlBuf), entry.file_size(ec)));
           }
         }
 
-        std::string html = fmt::format(
+        std::string html = std::format(
             "<html><head><title>{}</title></head><body>"
             "<table><tr><th>Name</th><th>Size</th></tr>\n",
             path);

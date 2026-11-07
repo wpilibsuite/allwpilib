@@ -21,6 +21,9 @@ import org.wpilib.util.struct.StructSerializable;
 /**
  * Represents a transformation for a Pose3d in the pose's frame. Translation is applied before
  * rotation. (The translation is applied in the pose's original frame, not the transformed frame.)
+ *
+ * <p>Transforms are applied intrinsically, i.e. relative to the pose's own frame rather than the
+ * global frame. This is in contrast to the rotation classes, which apply rotations extrinsically.
  */
 public final class Transform3d implements ProtobufSerializable, StructSerializable {
   /**
@@ -28,7 +31,7 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    *
    * <p>This exists to avoid allocations for common transformations.
    */
-  public static final Transform3d kZero = new Transform3d();
+  public static final Transform3d ZERO = new Transform3d();
 
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
@@ -106,8 +109,8 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
 
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform3d() {
-    m_translation = Translation3d.kZero;
-    m_rotation = Rotation3d.kZero;
+    m_translation = Translation3d.ZERO;
+    m_rotation = Rotation3d.ZERO;
   }
 
   /**
@@ -150,7 +153,7 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @return The composition of the two transformations.
    */
   public Transform3d plus(Transform3d other) {
-    return new Transform3d(Pose3d.kZero, Pose3d.kZero.transformBy(this).transformBy(other));
+    return new Transform3d(Pose3d.ZERO, Pose3d.ZERO.transformBy(this).transformBy(other));
   }
 
   /**

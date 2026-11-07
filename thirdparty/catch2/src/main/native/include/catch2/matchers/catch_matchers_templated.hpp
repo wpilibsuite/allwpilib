@@ -22,12 +22,12 @@
 namespace Catch {
 namespace Matchers {
     class MatcherGenericBase : public MatcherUntypedBase {
+        std::string describe() const override;
     public:
-        MatcherGenericBase() = default;
-        ~MatcherGenericBase() override; // = default;
+        constexpr MatcherGenericBase() = default;
 
-        MatcherGenericBase(MatcherGenericBase const&) = default;
-        MatcherGenericBase(MatcherGenericBase&&) = default;
+        constexpr MatcherGenericBase(MatcherGenericBase const&) = default;
+        constexpr MatcherGenericBase(MatcherGenericBase&&) = default;
 
         MatcherGenericBase& operator=(MatcherGenericBase const&) = delete;
         MatcherGenericBase& operator=(MatcherGenericBase&&) = delete;
@@ -36,7 +36,9 @@ namespace Matchers {
 
     namespace Detail {
         template<std::size_t N, std::size_t M>
-        std::array<void const*, N + M> array_cat(std::array<void const*, N> && lhs, std::array<void const*, M> && rhs) {
+        constexpr std::array<void const*, N + M>
+        array_cat( std::array<void const*, N>&& lhs,
+                   std::array<void const*, M>&& rhs ) {
             std::array<void const*, N + M> arr{};
             std::copy_n(lhs.begin(), N, arr.begin());
             std::copy_n(rhs.begin(), M, arr.begin() + N);
@@ -44,7 +46,8 @@ namespace Matchers {
         }
 
         template<std::size_t N>
-        std::array<void const*, N+1> array_cat(std::array<void const*, N> && lhs, void const* rhs) {
+        constexpr std::array<void const*, N + 1>
+        array_cat( std::array<void const*, N>&& lhs, void const* rhs ) {
             std::array<void const*, N+1> arr{};
             std::copy_n(lhs.begin(), N, arr.begin());
             arr[N] = rhs;
@@ -52,7 +55,8 @@ namespace Matchers {
         }
 
         template<std::size_t N>
-        std::array<void const*, N+1> array_cat(void const* lhs, std::array<void const*, N> && rhs) {
+        constexpr std::array<void const*, N + 1>
+        array_cat( void const* lhs, std::array<void const*, N>&& rhs ) {
             std::array<void const*, N + 1> arr{ {lhs} };
             std::copy_n(rhs.begin(), N, arr.begin() + 1);
             return arr;
@@ -75,23 +79,31 @@ namespace Matchers {
 
 
         template<std::size_t N, typename Arg>
-        bool match_all_of(Arg&&, std::array<void const*, N> const&, std::index_sequence<>) {
+        constexpr bool match_all_of( Arg&&,
+                                    std::array<void const*, N> const&,
+                                    std::index_sequence<> ) {
             return true;
         }
 
         template<typename T, typename... MatcherTs, std::size_t N, typename Arg, std::size_t Idx, std::size_t... Indices>
-        bool match_all_of(Arg&& arg, std::array<void const*, N> const& matchers, std::index_sequence<Idx, Indices...>) {
+        constexpr bool match_all_of( Arg&& arg,
+                                    std::array<void const*, N> const& matchers,
+                                    std::index_sequence<Idx, Indices...> ) {
             return static_cast<T const*>(matchers[Idx])->match(arg) && match_all_of<MatcherTs...>(arg, matchers, std::index_sequence<Indices...>{});
         }
 
 
         template<std::size_t N, typename Arg>
-        bool match_any_of(Arg&&, std::array<void const*, N> const&, std::index_sequence<>) {
+        constexpr bool match_any_of( Arg&&,
+                                     std::array<void const*, N> const&,
+                                     std::index_sequence<> ) {
             return false;
         }
 
         template<typename T, typename... MatcherTs, std::size_t N, typename Arg, std::size_t Idx, std::size_t... Indices>
-        bool match_any_of(Arg&& arg, std::array<void const*, N> const& matchers, std::index_sequence<Idx, Indices...>) {
+        constexpr bool match_any_of( Arg&& arg,
+                                     std::array<void const*, N> const& matchers,
+                                     std::index_sequence<Idx, Indices...> ) {
             return static_cast<T const*>(matchers[Idx])->match(arg) || match_any_of<MatcherTs...>(arg, matchers, std::index_sequence<Indices...>{});
         }
 
@@ -112,15 +124,18 @@ namespace Matchers {
         public:
             MatchAllOfGeneric(MatchAllOfGeneric const&) = delete;
             MatchAllOfGeneric& operator=(MatchAllOfGeneric const&) = delete;
-            MatchAllOfGeneric(MatchAllOfGeneric&&) = default;
-            MatchAllOfGeneric& operator=(MatchAllOfGeneric&&) = default;
+            constexpr MatchAllOfGeneric( MatchAllOfGeneric&& ) = default;
+            constexpr MatchAllOfGeneric& operator=(MatchAllOfGeneric&&) = default;
 
-            MatchAllOfGeneric(MatcherTs const&... matchers CATCH_ATTR_LIFETIMEBOUND)
+            constexpr MatchAllOfGeneric(
+                MatcherTs const&... matchers CATCH_ATTR_LIFETIMEBOUND )
                 : m_matchers{ {std::addressof(matchers)...} } {}
-            explicit MatchAllOfGeneric(std::array<void const*, sizeof...(MatcherTs)> matchers) : m_matchers{matchers} {}
+            constexpr explicit MatchAllOfGeneric(
+                std::array<void const*, sizeof...( MatcherTs )> matchers ):
+                m_matchers{ matchers } {}
 
             template<typename Arg>
-            bool match(Arg&& arg) const {
+            constexpr bool match( Arg&& arg ) const {
                 return match_all_of<MatcherTs...>(arg, m_matchers, std::index_sequence_for<MatcherTs...>{});
             }
 
@@ -136,7 +151,7 @@ namespace Matchers {
 
             //! Avoids type nesting for `GenericAllOf && GenericAllOf` case
             template<typename... MatchersRHS>
-            friend
+            constexpr friend
             MatchAllOfGeneric<MatcherTs..., MatchersRHS...> operator && (
                 MatchAllOfGeneric<MatcherTs...>&& lhs CATCH_ATTR_LIFETIMEBOUND,
                 MatchAllOfGeneric<MatchersRHS...>&& rhs CATCH_ATTR_LIFETIMEBOUND ) {
@@ -145,7 +160,8 @@ namespace Matchers {
 
             //! Avoids type nesting for `GenericAllOf && some matcher` case
             template<typename MatcherRHS>
-            friend std::enable_if_t<is_matcher_v<MatcherRHS>,
+            constexpr friend std::enable_if_t<
+                is_matcher_v<MatcherRHS>,
             MatchAllOfGeneric<MatcherTs..., MatcherRHS>> operator && (
                 MatchAllOfGeneric<MatcherTs...>&& lhs CATCH_ATTR_LIFETIMEBOUND,
                 MatcherRHS const& rhs CATCH_ATTR_LIFETIMEBOUND ) {
@@ -154,7 +170,8 @@ namespace Matchers {
 
             //! Avoids type nesting for `some matcher && GenericAllOf` case
             template<typename MatcherLHS>
-            friend std::enable_if_t<is_matcher_v<MatcherLHS>,
+            constexpr friend std::enable_if_t<
+                is_matcher_v<MatcherLHS>,
             MatchAllOfGeneric<MatcherLHS, MatcherTs...>> operator && (
                 MatcherLHS const& lhs CATCH_ATTR_LIFETIMEBOUND,
                 MatchAllOfGeneric<MatcherTs...>&& rhs CATCH_ATTR_LIFETIMEBOUND ) {
@@ -168,15 +185,18 @@ namespace Matchers {
         public:
             MatchAnyOfGeneric(MatchAnyOfGeneric const&) = delete;
             MatchAnyOfGeneric& operator=(MatchAnyOfGeneric const&) = delete;
-            MatchAnyOfGeneric(MatchAnyOfGeneric&&) = default;
-            MatchAnyOfGeneric& operator=(MatchAnyOfGeneric&&) = default;
+            constexpr MatchAnyOfGeneric( MatchAnyOfGeneric&& ) = default;
+            constexpr MatchAnyOfGeneric& operator=(MatchAnyOfGeneric&&) = default;
 
-            MatchAnyOfGeneric(MatcherTs const&... matchers CATCH_ATTR_LIFETIMEBOUND)
+            constexpr MatchAnyOfGeneric(
+                MatcherTs const&... matchers CATCH_ATTR_LIFETIMEBOUND )
                 : m_matchers{ {std::addressof(matchers)...} } {}
-            explicit MatchAnyOfGeneric(std::array<void const*, sizeof...(MatcherTs)> matchers) : m_matchers{matchers} {}
+            constexpr explicit MatchAnyOfGeneric(
+                std::array<void const*, sizeof...( MatcherTs )> matchers ):
+                m_matchers{ matchers } {}
 
             template<typename Arg>
-            bool match(Arg&& arg) const {
+            constexpr bool match( Arg&& arg ) const {
                 return match_any_of<MatcherTs...>(arg, m_matchers, std::index_sequence_for<MatcherTs...>{});
             }
 
@@ -192,7 +212,8 @@ namespace Matchers {
 
             //! Avoids type nesting for `GenericAnyOf || GenericAnyOf` case
             template<typename... MatchersRHS>
-            friend MatchAnyOfGeneric<MatcherTs..., MatchersRHS...> operator || (
+            constexpr friend MatchAnyOfGeneric<MatcherTs..., MatchersRHS...>
+            operator||(
                 MatchAnyOfGeneric<MatcherTs...>&& lhs CATCH_ATTR_LIFETIMEBOUND,
                 MatchAnyOfGeneric<MatchersRHS...>&& rhs CATCH_ATTR_LIFETIMEBOUND ) {
                 return MatchAnyOfGeneric<MatcherTs..., MatchersRHS...>{array_cat(CATCH_MOVE(lhs.m_matchers), CATCH_MOVE(rhs.m_matchers))};
@@ -200,7 +221,8 @@ namespace Matchers {
 
             //! Avoids type nesting for `GenericAnyOf || some matcher` case
             template<typename MatcherRHS>
-            friend std::enable_if_t<is_matcher_v<MatcherRHS>,
+            constexpr friend std::enable_if_t<
+                is_matcher_v<MatcherRHS>,
             MatchAnyOfGeneric<MatcherTs..., MatcherRHS>> operator || (
                     MatchAnyOfGeneric<MatcherTs...>&& lhs CATCH_ATTR_LIFETIMEBOUND,
                     MatcherRHS const& rhs CATCH_ATTR_LIFETIMEBOUND ) {
@@ -209,7 +231,8 @@ namespace Matchers {
 
             //! Avoids type nesting for `some matcher || GenericAnyOf` case
             template<typename MatcherLHS>
-            friend std::enable_if_t<is_matcher_v<MatcherLHS>,
+            constexpr friend std::enable_if_t<
+                is_matcher_v<MatcherLHS>,
             MatchAnyOfGeneric<MatcherLHS, MatcherTs...>> operator || (
                 MatcherLHS const& lhs CATCH_ATTR_LIFETIMEBOUND,
                 MatchAnyOfGeneric<MatcherTs...>&& rhs CATCH_ATTR_LIFETIMEBOUND) {
@@ -225,14 +248,15 @@ namespace Matchers {
         public:
             MatchNotOfGeneric(MatchNotOfGeneric const&) = delete;
             MatchNotOfGeneric& operator=(MatchNotOfGeneric const&) = delete;
-            MatchNotOfGeneric(MatchNotOfGeneric&&) = default;
-            MatchNotOfGeneric& operator=(MatchNotOfGeneric&&) = default;
+            constexpr MatchNotOfGeneric( MatchNotOfGeneric&& ) = default;
+            constexpr MatchNotOfGeneric& operator=(MatchNotOfGeneric&&) = default;
 
-            explicit MatchNotOfGeneric(MatcherT const& matcher CATCH_ATTR_LIFETIMEBOUND)
+            constexpr explicit MatchNotOfGeneric(
+                MatcherT const& matcher CATCH_ATTR_LIFETIMEBOUND )
                 : m_matcher{matcher} {}
 
             template<typename Arg>
-            bool match(Arg&& arg) const {
+            constexpr bool match( Arg&& arg ) const {
                 return !m_matcher.match(arg);
             }
 
@@ -241,7 +265,7 @@ namespace Matchers {
             }
 
             //! Negating negation can just unwrap and return underlying matcher
-            friend MatcherT const&
+            constexpr friend MatcherT const&
             operator!( MatchNotOfGeneric<MatcherT> const& matcher
                            CATCH_ATTR_LIFETIMEBOUND ) {
                 return matcher.m_matcher;
@@ -252,14 +276,18 @@ namespace Matchers {
 
     // compose only generic matchers
     template<typename MatcherLHS, typename MatcherRHS>
-    std::enable_if_t<Detail::are_generic_matchers_v<MatcherLHS, MatcherRHS>, Detail::MatchAllOfGeneric<MatcherLHS, MatcherRHS>>
+    constexpr std::enable_if_t<
+        Detail::are_generic_matchers_v<MatcherLHS, MatcherRHS>,
+        Detail::MatchAllOfGeneric<MatcherLHS, MatcherRHS>>
     operator&&( MatcherLHS const& lhs CATCH_ATTR_LIFETIMEBOUND,
                 MatcherRHS const& rhs CATCH_ATTR_LIFETIMEBOUND ) {
         return { lhs, rhs };
     }
 
     template<typename MatcherLHS, typename MatcherRHS>
-    std::enable_if_t<Detail::are_generic_matchers_v<MatcherLHS, MatcherRHS>, Detail::MatchAnyOfGeneric<MatcherLHS, MatcherRHS>>
+    constexpr std::enable_if_t<
+        Detail::are_generic_matchers_v<MatcherLHS, MatcherRHS>,
+        Detail::MatchAnyOfGeneric<MatcherLHS, MatcherRHS>>
     operator||( MatcherLHS const& lhs CATCH_ATTR_LIFETIMEBOUND,
                 MatcherRHS const& rhs CATCH_ATTR_LIFETIMEBOUND ) {
         return { lhs, rhs };
@@ -267,7 +295,8 @@ namespace Matchers {
 
     //! Wrap provided generic matcher in generic negator
     template<typename MatcherT>
-    std::enable_if_t<Detail::is_generic_matcher_v<MatcherT>, Detail::MatchNotOfGeneric<MatcherT>>
+    constexpr std::enable_if_t<Detail::is_generic_matcher_v<MatcherT>,
+                               Detail::MatchNotOfGeneric<MatcherT>>
     operator!( MatcherT const& matcher CATCH_ATTR_LIFETIMEBOUND ) {
         return Detail::MatchNotOfGeneric<MatcherT>{matcher};
     }

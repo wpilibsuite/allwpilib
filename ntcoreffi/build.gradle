@@ -68,7 +68,7 @@ model {
                     binary.buildable = false
                     return
                 }
-                binary.tasks.withType(AbstractNativeSourceCompileTask) {
+                binary.tasks.withType(AbstractNativeSourceCompileTask).configureEach {
                     it.dependsOn generateSymbols
                 }
                 project(':ntcore').addNtcoreDependency(binary, 'static')
@@ -82,7 +82,7 @@ model {
 def nativeName = 'ntcoreffi'
 def baseArtifactId = nativeName
 def artifactGroupId = "org.wpilib.${nativeName}"
-def zipBaseName = "_GROUP_org_wpilib_${nativeName}_ID_${nativeName}-cpp_CLS"
+def zipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-cpp")
 def outputsFolder = file("$project.buildDir/outputs")
 
 evaluationDependsOn(':ntcore')

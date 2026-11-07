@@ -40,9 +40,9 @@ public class ConfiguredLoggerHandler extends ElementHandler {
             .orElseThrow()
             .getValue();
 
-    return "Epilogue."
+    return "EpilogueLoggers."
         + loggerType.toString().replace('.', '_')
-        + ".tryUpdate(backend.getNested(\""
+        + ".tryUpdate(table.getTable(\""
         + loggedName(element)
         + "\"), "
         + elementAccess(element, loggedClass)

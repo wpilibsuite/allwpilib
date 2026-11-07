@@ -13,9 +13,8 @@
 #ifndef WPIUTIL_WPI_ENDIAN_H
 #define WPIUTIL_WPI_ENDIAN_H
 
-#include "wpi/util/bit.hpp"
 #include "wpi/util/Compiler.hpp"
-#include "wpi/util/SwapByteOrder.hpp"
+#include <bit>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -41,23 +40,25 @@ struct PickAlignment {
 namespace endian {
 
 template <typename value_type>
-[[nodiscard]] inline value_type byte_swap(value_type value, endianness endian) {
-  if (endian != wpi::util::endianness::native)
-    sys::swapByteOrder(value);
+[[nodiscard]] inline value_type byte_swap(value_type value, std::endian endian) {
+  if (endian != std::endian::native)
+    return std::byteswap(value);
   return value;
 }
 
 /// Swap the bytes of value to match the given endianness.
-template <typename value_type, endianness endian>
-[[nodiscard]] inline value_type byte_swap(value_type value) {
-  if constexpr (endian != wpi::util::endianness::native)
-    sys::swapByteOrder(value);
+template <typename value_type, std::endian endian>
+[[nodiscard]]
+LLVM_DEPRECATED("Pass endian as a function argument instead",
+                "byte_swap") inline value_type byte_swap(value_type value) {
+  if constexpr (endian != std::endian::native)
+    return std::byteswap(value);
   return value;
 }
 
 /// Read a value of a particular endianness from memory.
 template <typename value_type, std::size_t alignment = unaligned>
-[[nodiscard]] inline value_type read(const void *memory, endianness endian) {
+[[nodiscard]] inline value_type read(const void *memory, std::endian endian) {
   value_type ret;
 
   memcpy(static_cast<void *>(&ret),
@@ -67,8 +68,10 @@ template <typename value_type, std::size_t alignment = unaligned>
   return byte_swap<value_type>(ret, endian);
 }
 
-template <typename value_type, endianness endian, std::size_t alignment>
-[[nodiscard]] inline value_type read(const void *memory) {
+template <typename value_type, std::endian endian, std::size_t alignment>
+[[nodiscard]] LLVM_DEPRECATED("Pass endian as a function argument instead",
+                              "read") inline value_type
+    read(const void *memory) {
   return read<value_type, alignment>(memory, endian);
 }
 
@@ -77,13 +80,13 @@ template <typename value_type, endianness endian, std::size_t alignment>
 template <typename value_type, std::size_t alignment = unaligned,
           typename CharT>
 [[nodiscard]] inline value_type readNext(const CharT *&memory,
-                                         endianness endian) {
+                                         std::endian endian) {
   value_type ret = read<value_type, alignment>(memory, endian);
   memory += sizeof(value_type);
   return ret;
 }
 
-template <typename value_type, endianness endian,
+template <typename value_type, std::endian endian,
           std::size_t alignment = unaligned, typename CharT>
 [[nodiscard]] inline value_type readNext(const CharT *&memory) {
   return readNext<value_type, alignment, CharT>(memory, endian);
@@ -91,16 +94,15 @@ template <typename value_type, endianness endian,
 
 /// Write a value to memory with a particular endianness.
 template <typename value_type, std::size_t alignment = unaligned>
-inline void write(void *memory, value_type value, endianness endian) {
+inline void write(void *memory, value_type value, std::endian endian) {
   value = byte_swap<value_type>(value, endian);
   memcpy(LLVM_ASSUME_ALIGNED(
              memory, (detail::PickAlignment<value_type, alignment>::value)),
          &value, sizeof(value_type));
 }
 
-template<typename value_type,
-         endianness endian,
-         std::size_t alignment>
+template <typename value_type, std::endian endian, std::size_t alignment>
+LLVM_DEPRECATED("Pass endian as a function argument instead", "write")
 inline void write(void *memory, value_type value) {
   write<value_type, alignment>(memory, value, endian);
 }
@@ -109,12 +111,12 @@ inline void write(void *memory, value_type value) {
 /// value.
 template <typename value_type, std::size_t alignment = unaligned,
           typename CharT>
-inline void writeNext(CharT *&memory, value_type value, endianness endian) {
+inline void writeNext(CharT *&memory, value_type value, std::endian endian) {
   write(memory, value, endian);
   memory += sizeof(value_type);
 }
 
-template <typename value_type, endianness endian,
+template <typename value_type, std::endian endian,
           std::size_t alignment = unaligned, typename CharT>
 inline void writeNext(CharT *&memory, value_type value) {
   writeNext<value_type, alignment, CharT>(memory, value, endian);
@@ -125,12 +127,12 @@ using make_unsigned_t = std::make_unsigned_t<value_type>;
 
 /// Read a value of a particular endianness from memory, for a location
 /// that starts at the given bit offset within the first byte.
-template <typename value_type, endianness endian, std::size_t alignment>
+template <typename value_type, std::endian endian, std::size_t alignment>
 [[nodiscard]] inline value_type readAtBitAlignment(const void *memory,
                                                    uint64_t startBit) {
   assert(startBit < 8);
   if (startBit == 0)
-    return read<value_type, endian, alignment>(memory);
+    return read<value_type, alignment>(memory, endian);
   else {
     // Read two values and compose the result from them.
     value_type val[2];
@@ -138,8 +140,8 @@ template <typename value_type, endianness endian, std::size_t alignment>
            LLVM_ASSUME_ALIGNED(
                memory, (detail::PickAlignment<value_type, alignment>::value)),
            sizeof(value_type) * 2);
-    val[0] = byte_swap<value_type, endian>(val[0]);
-    val[1] = byte_swap<value_type, endian>(val[1]);
+    val[0] = byte_swap<value_type>(val[0], endian);
+    val[1] = byte_swap<value_type>(val[1], endian);
 
     // Shift bits from the lower value into place.
     make_unsigned_t<value_type> lowerVal = val[0] >> startBit;
@@ -160,12 +162,12 @@ template <typename value_type, endianness endian, std::size_t alignment>
 
 /// Write a value to memory with a particular endianness, for a location
 /// that starts at the given bit offset within the first byte.
-template <typename value_type, endianness endian, std::size_t alignment>
+template <typename value_type, std::endian endian, std::size_t alignment>
 inline void writeAtBitAlignment(void *memory, value_type value,
                                 uint64_t startBit) {
   assert(startBit < 8);
   if (startBit == 0)
-    write<value_type, endian, alignment>(memory, value);
+    write<value_type, alignment>(memory, value, endian);
   else {
     // Read two values and shift the result into them.
     value_type val[2];
@@ -173,8 +175,8 @@ inline void writeAtBitAlignment(void *memory, value_type value,
            LLVM_ASSUME_ALIGNED(
                memory, (detail::PickAlignment<value_type, alignment>::value)),
            sizeof(value_type) * 2);
-    val[0] = byte_swap<value_type, endian>(val[0]);
-    val[1] = byte_swap<value_type, endian>(val[1]);
+    val[0] = byte_swap<value_type>(val[0], endian);
+    val[1] = byte_swap<value_type>(val[1], endian);
 
     // Mask off any existing bits in the upper part of the lower value that
     // we want to replace.
@@ -202,8 +204,8 @@ inline void writeAtBitAlignment(void *memory, value_type value,
     val[1] |= upperVal;
 
     // Finally, rewrite values.
-    val[0] = byte_swap<value_type, endian>(val[0]);
-    val[1] = byte_swap<value_type, endian>(val[1]);
+    val[0] = byte_swap<value_type>(val[0], endian);
+    val[1] = byte_swap<value_type>(val[1], endian);
     memcpy(LLVM_ASSUME_ALIGNED(
                memory, (detail::PickAlignment<value_type, alignment>::value)),
            &val[0], sizeof(value_type) * 2);
@@ -214,25 +216,26 @@ inline void writeAtBitAlignment(void *memory, value_type value,
 
 namespace detail {
 
-template <typename ValueType, endianness Endian, std::size_t Alignment,
+template <typename ValueType, std::endian Endian, std::size_t Alignment,
           std::size_t ALIGN = PickAlignment<ValueType, Alignment>::value>
 struct packed_endian_specific_integral {
   using value_type = ValueType;
-  static constexpr endianness endian = Endian;
+  static constexpr std::endian endian = Endian;
   static constexpr std::size_t alignment = Alignment;
 
   packed_endian_specific_integral() = default;
 
   explicit packed_endian_specific_integral(value_type val) { *this = val; }
 
-  operator value_type() const {
-    return endian::read<value_type, endian, alignment>(
-      (const void*)Value.buffer);
+  value_type value() const {
+    return endian::read<value_type, alignment>((const void *)Value.buffer,
+                                               endian);
   }
+  operator value_type() const { return value(); }
 
   void operator=(value_type newValue) {
-    endian::write<value_type, endian, alignment>(
-      (void*)Value.buffer, newValue);
+    endian::write<value_type, alignment>((void *)Value.buffer, newValue,
+                                         endian);
   }
 
   packed_endian_specific_integral &operator+=(value_type newValue) {
@@ -265,11 +268,11 @@ public:
     explicit ref(void *Ptr) : Ptr(Ptr) {}
 
     operator value_type() const {
-      return endian::read<value_type, endian, alignment>(Ptr);
+      return endian::read<value_type, alignment>(Ptr, endian);
     }
 
     void operator=(value_type NewValue) {
-      endian::write<value_type, endian, alignment>(Ptr, NewValue);
+      endian::write<value_type, alignment>(Ptr, NewValue, endian);
     }
 
   private:
@@ -279,208 +282,211 @@ public:
 
 } // end namespace detail
 
+using ulittle8_t =
+    detail::packed_endian_specific_integral<uint8_t, std::endian::little,
+                                            unaligned>;
 using ulittle16_t =
-    detail::packed_endian_specific_integral<uint16_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<uint16_t, std::endian::little,
                                             unaligned>;
 using ulittle32_t =
-    detail::packed_endian_specific_integral<uint32_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<uint32_t, std::endian::little,
                                             unaligned>;
 using ulittle64_t =
-    detail::packed_endian_specific_integral<uint64_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<uint64_t, std::endian::little,
                                             unaligned>;
 
 using little16_t =
-    detail::packed_endian_specific_integral<int16_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<int16_t, std::endian::little,
                                             unaligned>;
 using little32_t =
-    detail::packed_endian_specific_integral<int32_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<int32_t, std::endian::little,
                                             unaligned>;
 using little64_t =
-    detail::packed_endian_specific_integral<int64_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<int64_t, std::endian::little,
                                             unaligned>;
 
 using aligned_ulittle16_t =
-    detail::packed_endian_specific_integral<uint16_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<uint16_t, std::endian::little,
                                             aligned>;
 using aligned_ulittle32_t =
-    detail::packed_endian_specific_integral<uint32_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<uint32_t, std::endian::little,
                                             aligned>;
 using aligned_ulittle64_t =
-    detail::packed_endian_specific_integral<uint64_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<uint64_t, std::endian::little,
                                             aligned>;
 
 using aligned_little16_t =
-    detail::packed_endian_specific_integral<int16_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<int16_t, std::endian::little,
                                             aligned>;
 using aligned_little32_t =
-    detail::packed_endian_specific_integral<int32_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<int32_t, std::endian::little,
                                             aligned>;
 using aligned_little64_t =
-    detail::packed_endian_specific_integral<int64_t, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<int64_t, std::endian::little,
                                             aligned>;
 
 using ubig16_t =
-    detail::packed_endian_specific_integral<uint16_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<uint16_t, std::endian::big,
                                             unaligned>;
 using ubig32_t =
-    detail::packed_endian_specific_integral<uint32_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<uint32_t, std::endian::big,
                                             unaligned>;
 using ubig64_t =
-    detail::packed_endian_specific_integral<uint64_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<uint64_t, std::endian::big,
                                             unaligned>;
 
 using big16_t =
-    detail::packed_endian_specific_integral<int16_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<int16_t, std::endian::big,
                                             unaligned>;
 using big32_t =
-    detail::packed_endian_specific_integral<int32_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<int32_t, std::endian::big,
                                             unaligned>;
 using big64_t =
-    detail::packed_endian_specific_integral<int64_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<int64_t, std::endian::big,
                                             unaligned>;
 
 using aligned_ubig16_t =
-    detail::packed_endian_specific_integral<uint16_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<uint16_t, std::endian::big,
                                             aligned>;
 using aligned_ubig32_t =
-    detail::packed_endian_specific_integral<uint32_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<uint32_t, std::endian::big,
                                             aligned>;
 using aligned_ubig64_t =
-    detail::packed_endian_specific_integral<uint64_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<uint64_t, std::endian::big,
                                             aligned>;
 
 using aligned_big16_t =
-    detail::packed_endian_specific_integral<int16_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<int16_t, std::endian::big,
                                             aligned>;
 using aligned_big32_t =
-    detail::packed_endian_specific_integral<int32_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<int32_t, std::endian::big,
                                             aligned>;
 using aligned_big64_t =
-    detail::packed_endian_specific_integral<int64_t, wpi::util::endianness::big,
+    detail::packed_endian_specific_integral<int64_t, std::endian::big,
                                             aligned>;
 
 using unaligned_uint16_t =
-    detail::packed_endian_specific_integral<uint16_t, wpi::util::endianness::native,
+    detail::packed_endian_specific_integral<uint16_t, std::endian::native,
                                             unaligned>;
 using unaligned_uint32_t =
-    detail::packed_endian_specific_integral<uint32_t, wpi::util::endianness::native,
+    detail::packed_endian_specific_integral<uint32_t, std::endian::native,
                                             unaligned>;
 using unaligned_uint64_t =
-    detail::packed_endian_specific_integral<uint64_t, wpi::util::endianness::native,
+    detail::packed_endian_specific_integral<uint64_t, std::endian::native,
                                             unaligned>;
 
 using unaligned_int16_t =
-    detail::packed_endian_specific_integral<int16_t, wpi::util::endianness::native,
+    detail::packed_endian_specific_integral<int16_t, std::endian::native,
                                             unaligned>;
 using unaligned_int32_t =
-    detail::packed_endian_specific_integral<int32_t, wpi::util::endianness::native,
+    detail::packed_endian_specific_integral<int32_t, std::endian::native,
                                             unaligned>;
 using unaligned_int64_t =
-    detail::packed_endian_specific_integral<int64_t, wpi::util::endianness::native,
+    detail::packed_endian_specific_integral<int64_t, std::endian::native,
                                             unaligned>;
 
 template <typename T>
 using little_t =
-    detail::packed_endian_specific_integral<T, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<T, std::endian::little,
                                             unaligned>;
 template <typename T>
-using big_t = detail::packed_endian_specific_integral<T, wpi::util::endianness::big,
+using big_t = detail::packed_endian_specific_integral<T, std::endian::big,
                                                       unaligned>;
 
 template <typename T>
 using aligned_little_t =
-    detail::packed_endian_specific_integral<T, wpi::util::endianness::little,
+    detail::packed_endian_specific_integral<T, std::endian::little,
                                             aligned>;
 template <typename T>
 using aligned_big_t =
-    detail::packed_endian_specific_integral<T, wpi::util::endianness::big, aligned>;
+    detail::packed_endian_specific_integral<T, std::endian::big, aligned>;
 
 namespace endian {
 
-template <typename T, endianness E> [[nodiscard]] inline T read(const void *P) {
+template <typename T, std::endian E> [[nodiscard]] inline T read(const void *P) {
   return *(const detail::packed_endian_specific_integral<T, E, unaligned> *)P;
 }
 
-[[nodiscard]] inline uint16_t read16(const void *P, endianness E) {
+[[nodiscard]] inline uint16_t read16(const void *P, std::endian E) {
   return read<uint16_t>(P, E);
 }
-[[nodiscard]] inline uint32_t read32(const void *P, endianness E) {
+[[nodiscard]] inline uint32_t read32(const void *P, std::endian E) {
   return read<uint32_t>(P, E);
 }
-[[nodiscard]] inline uint64_t read64(const void *P, endianness E) {
+[[nodiscard]] inline uint64_t read64(const void *P, std::endian E) {
   return read<uint64_t>(P, E);
 }
 
-template <endianness E> [[nodiscard]] inline uint16_t read16(const void *P) {
+template <std::endian E> [[nodiscard]] inline uint16_t read16(const void *P) {
   return read<uint16_t, E>(P);
 }
-template <endianness E> [[nodiscard]] inline uint32_t read32(const void *P) {
+template <std::endian E> [[nodiscard]] inline uint32_t read32(const void *P) {
   return read<uint32_t, E>(P);
 }
-template <endianness E> [[nodiscard]] inline uint64_t read64(const void *P) {
+template <std::endian E> [[nodiscard]] inline uint64_t read64(const void *P) {
   return read<uint64_t, E>(P);
 }
 
 [[nodiscard]] inline uint16_t read16le(const void *P) {
-  return read16<wpi::util::endianness::little>(P);
+  return read16<std::endian::little>(P);
 }
 [[nodiscard]] inline uint32_t read32le(const void *P) {
-  return read32<wpi::util::endianness::little>(P);
+  return read32<std::endian::little>(P);
 }
 [[nodiscard]] inline uint64_t read64le(const void *P) {
-  return read64<wpi::util::endianness::little>(P);
+  return read64<std::endian::little>(P);
 }
 [[nodiscard]] inline uint16_t read16be(const void *P) {
-  return read16<wpi::util::endianness::big>(P);
+  return read16<std::endian::big>(P);
 }
 [[nodiscard]] inline uint32_t read32be(const void *P) {
-  return read32<wpi::util::endianness::big>(P);
+  return read32<std::endian::big>(P);
 }
 [[nodiscard]] inline uint64_t read64be(const void *P) {
-  return read64<wpi::util::endianness::big>(P);
+  return read64<std::endian::big>(P);
 }
 
-template <typename T, endianness E> inline void write(void *P, T V) {
+template <typename T, std::endian E> inline void write(void *P, T V) {
   *(detail::packed_endian_specific_integral<T, E, unaligned> *)P = V;
 }
 
-inline void write16(void *P, uint16_t V, endianness E) {
+inline void write16(void *P, uint16_t V, std::endian E) {
   write<uint16_t>(P, V, E);
 }
-inline void write32(void *P, uint32_t V, endianness E) {
+inline void write32(void *P, uint32_t V, std::endian E) {
   write<uint32_t>(P, V, E);
 }
-inline void write64(void *P, uint64_t V, endianness E) {
+inline void write64(void *P, uint64_t V, std::endian E) {
   write<uint64_t>(P, V, E);
 }
 
-template <endianness E> inline void write16(void *P, uint16_t V) {
+template <std::endian E> inline void write16(void *P, uint16_t V) {
   write<uint16_t, E>(P, V);
 }
-template <endianness E> inline void write32(void *P, uint32_t V) {
+template <std::endian E> inline void write32(void *P, uint32_t V) {
   write<uint32_t, E>(P, V);
 }
-template <endianness E> inline void write64(void *P, uint64_t V) {
+template <std::endian E> inline void write64(void *P, uint64_t V) {
   write<uint64_t, E>(P, V);
 }
 
 inline void write16le(void *P, uint16_t V) {
-  write16<wpi::util::endianness::little>(P, V);
+  write16<std::endian::little>(P, V);
 }
 inline void write32le(void *P, uint32_t V) {
-  write32<wpi::util::endianness::little>(P, V);
+  write32<std::endian::little>(P, V);
 }
 inline void write64le(void *P, uint64_t V) {
-  write64<wpi::util::endianness::little>(P, V);
+  write64<std::endian::little>(P, V);
 }
 inline void write16be(void *P, uint16_t V) {
-  write16<wpi::util::endianness::big>(P, V);
+  write16<std::endian::big>(P, V);
 }
 inline void write32be(void *P, uint32_t V) {
-  write32<wpi::util::endianness::big>(P, V);
+  write32<std::endian::big>(P, V);
 }
 inline void write64be(void *P, uint64_t V) {
-  write64<wpi::util::endianness::big>(P, V);
+  write64<std::endian::big>(P, V);
 }
 
 } // end namespace endian

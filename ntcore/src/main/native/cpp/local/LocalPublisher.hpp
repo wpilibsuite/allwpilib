@@ -14,7 +14,7 @@
 namespace wpi::nt::local {
 
 struct LocalPublisher {
-  static constexpr auto kType = Handle::PUBLISHER;
+  static constexpr auto TYPE = Handle::PUBLISHER;
 
   LocalPublisher(NT_Publisher handle, LocalTopic* topic, PubSubConfig config)
       : handle{handle}, topic{topic}, config{std::move(config)} {}

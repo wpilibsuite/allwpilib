@@ -11,8 +11,8 @@ import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.Watchdog;
+import org.wpilib.tunable.TunableRegistry;
 
 /**
  * IterativeRobotBase implements a specific type of robot program framework, extending the RobotBase
@@ -318,8 +318,8 @@ public abstract class IterativeRobotBase extends RobotBase {
     robotPeriodic();
     m_watchdog.addEpoch("robotPeriodic()");
 
-    SmartDashboard.updateValues();
-    m_watchdog.addEpoch("SmartDashboard.updateValues()");
+    TunableRegistry.update();
+    m_watchdog.addEpoch("TunableRegistry.update()");
 
     if (isSimulation()) {
       HAL.simPeriodicBefore();

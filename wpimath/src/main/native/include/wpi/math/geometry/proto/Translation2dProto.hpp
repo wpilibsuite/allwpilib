@@ -6,9 +6,9 @@
 
 #include "pb.h"
 #include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/protobuf/geometry2d.npb.h"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Translation2d> final {

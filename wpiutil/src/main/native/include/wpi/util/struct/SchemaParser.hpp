@@ -89,7 +89,7 @@ class Lexer {
 
   void Get() {
     if (m_pos < m_in.size()) {
-      [[likely]] m_current = m_in[m_pos];
+      [[likely]] m_current = static_cast<unsigned char>(m_in[m_pos]);
     } else {
       m_current = -1;
     }
@@ -100,7 +100,7 @@ class Lexer {
     if (m_pos > 0) {
       [[likely]] m_pos--;
       if (m_pos < m_in.size()) {
-        [[likely]] m_current = m_in[m_pos];
+        [[likely]] m_current = static_cast<unsigned char>(m_in[m_pos]);
       } else {
         m_current = -1;
       }

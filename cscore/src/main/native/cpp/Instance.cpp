@@ -8,8 +8,6 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
-
 #include "wpi/util/fs.hpp"
 #include "wpi/util/print.hpp"
 

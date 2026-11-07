@@ -4,20 +4,11 @@
 
 #pragma once
 
-#include <ostream>
-#include <span>
 #include <string>
-#include <string_view>
 
-#include <gtest/gtest.h>
-
-#include "wpi/util/TestPrinters.hpp"
+#include <catch2/catch_tostring.hpp>
 
 namespace wpi::nt {
-
-namespace net3 {
-class Message3;
-}  // namespace net3
 
 namespace net {
 struct ClientMessage;
@@ -29,12 +20,38 @@ class Handle;
 class PubSubOptionsImpl;
 class Value;
 
-void PrintTo(const Event& event, std::ostream* os);
-void PrintTo(const Handle& handle, std::ostream* os);
-void PrintTo(const net3::Message3& msg, std::ostream* os);
-void PrintTo(const net::ClientMessage& msg, std::ostream* os);
-void PrintTo(const net::ServerMessage& msg, std::ostream* os);
-void PrintTo(const Value& value, std::ostream* os);
-void PrintTo(const PubSubOptionsImpl& options, std::ostream* os);
-
 }  // namespace wpi::nt
+
+namespace Catch {
+
+template <>
+struct StringMaker<wpi::nt::Event> {
+  static std::string convert(const wpi::nt::Event& event);
+};
+
+template <>
+struct StringMaker<wpi::nt::Handle> {
+  static std::string convert(const wpi::nt::Handle& handle);
+};
+
+template <>
+struct StringMaker<wpi::nt::net::ClientMessage> {
+  static std::string convert(const wpi::nt::net::ClientMessage& msg);
+};
+
+template <>
+struct StringMaker<wpi::nt::net::ServerMessage> {
+  static std::string convert(const wpi::nt::net::ServerMessage& msg);
+};
+
+template <>
+struct StringMaker<wpi::nt::Value> {
+  static std::string convert(const wpi::nt::Value& value);
+};
+
+template <>
+struct StringMaker<wpi::nt::PubSubOptionsImpl> {
+  static std::string convert(const wpi::nt::PubSubOptionsImpl& options);
+};
+
+}  // namespace Catch

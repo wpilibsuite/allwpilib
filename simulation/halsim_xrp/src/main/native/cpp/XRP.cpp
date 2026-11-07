@@ -8,8 +8,6 @@
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
-
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/json.hpp"
 
@@ -144,9 +142,9 @@ void XRP::HandleMotorSimValueChanged(const wpi::util::json& data) {
     deviceId = 3;
   }
 
-  auto dutyCycle = motorData->lookup("<duty_cycle");
-  if (deviceId != -1 && dutyCycle && dutyCycle->is_number()) {
-    m_motor_outputs[deviceId] = dutyCycle->get_number();
+  auto throttle = motorData->lookup("<throttle");
+  if (deviceId != -1 && throttle && throttle->is_number()) {
+    m_motor_outputs[deviceId] = throttle->get_number();
   }
 }
 

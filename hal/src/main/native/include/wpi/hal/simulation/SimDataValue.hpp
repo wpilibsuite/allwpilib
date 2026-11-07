@@ -57,12 +57,26 @@ class SimDataValueBase : protected SimCallbackRegistryBase {
     std::scoped_lock lock(this->m_mutex);
     if (m_value != value) {
       m_value = value;
-      if (m_callbacks) {
-        HAL_Value halValue = MakeValue(value);
-        for (auto&& cb : *m_callbacks) {
-          reinterpret_cast<HAL_NotifyCallback>(cb.callback)(name, cb.param,
-                                                            &halValue);
-        }
+      DoNotify(name);
+    }
+  }
+
+  bool DoSetNoNotify(T value) {
+    std::scoped_lock lock(this->m_mutex);
+    if (m_value == value) {
+      return false;
+    }
+    m_value = value;
+    return true;
+  }
+
+  void DoNotify(const char* name) {
+    std::scoped_lock lock(this->m_mutex);
+    if (m_callbacks) {
+      HAL_Value halValue = MakeValue(m_value);
+      for (auto&& cb : *m_callbacks) {
+        reinterpret_cast<HAL_NotifyCallback>(cb.callback)(name, cb.param,
+                                                          &halValue);
       }
     }
   }
@@ -111,6 +125,19 @@ class SimDataValue final : public impl::SimDataValueBase<T, MakeValue> {
   LLVM_ATTRIBUTE_ALWAYS_INLINE void Set(T value) {
     this->DoSet(value, GetName());
   }
+
+  /**
+   * Set the value without invoking registered callbacks.
+   *
+   * @param value the new value
+   * @return true if the value changed
+   */
+  LLVM_ATTRIBUTE_ALWAYS_INLINE bool SetNoNotify(T value) {
+    return this->DoSetNoNotify(value);
+  }
+
+  /** Invoke registered callbacks with the current value. */
+  LLVM_ATTRIBUTE_ALWAYS_INLINE void Notify() { this->DoNotify(GetName()); }
 
   LLVM_ATTRIBUTE_ALWAYS_INLINE SimDataValue& operator=(T value) {
     Set(value);

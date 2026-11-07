@@ -15,7 +15,7 @@ import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N5;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.trajectory.Trajectory;
+import org.wpilib.math.trajectory.DifferentialSample;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.StateSpaceUtil;
@@ -31,9 +31,6 @@ import org.wpilib.math.util.StateSpaceUtil;
  * controller has a pose reference and chassis velocity command outputs, and the low-level
  * controller has wheel velocity references and voltage outputs. Flat hierarchies are easier to tune
  * in one shot.
- *
- * <p>See section 8.7 in Controls Engineering in FRC for a derivation of the control law we used
- * shown in theorem 8.7.4.
  */
 public class LTVDifferentialDriveController {
   private final double m_trackwidth;
@@ -131,22 +128,10 @@ public class LTVDifferentialDriveController {
       Pose2d poseRef,
       double leftVelocityRef,
       double rightVelocityRef) {
-    // This implements the linear time-varying differential drive controller in
-    // theorem 8.7.4 of https://controls-in-frc.link/
-    //
-    //     [x ]
-    //     [y ]       [Vₗ]
-    // x = [θ ]   u = [Vᵣ]
-    //     [vₗ]
-    //     [vᵣ]
+    // See theorem 8.7.4 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
 
     double velocity = (leftVelocity + rightVelocity) / 2.0;
-
-    // The DARE is ill-conditioned if the velocity is close to zero, so don't
-    // let the system stop.
-    if (Math.abs(velocity) < 1e-4) {
-      velocity = 1e-4;
-    }
 
     var r =
         VecBuilder.fill(
@@ -167,9 +152,10 @@ public class LTVDifferentialDriveController {
     m_error.set(2, 0, MathUtil.angleModulus(m_error.get(2, 0)));
 
     // spotless:off
+    final double τ = 20.0;
     var A = MatBuilder.fill(Nat.N5(), Nat.N5(),
         0.0, 0.0, 0.0, 0.5, 0.5,
-        0.0, 0.0, velocity, 0.0, 0.0,
+        0.0, -1 / τ, velocity, 0.0, 0.0,
         0.0, 0.0, 0.0, -1.0 / m_trackwidth, 1.0 / m_trackwidth,
         0.0, 0.0, 0.0, m_A.get(0, 0), m_A.get(0, 1),
         0.0, 0.0, 0.0, m_A.get(1, 0), m_A.get(1, 1));
@@ -226,24 +212,13 @@ public class LTVDifferentialDriveController {
       Pose2d currentPose,
       double leftVelocity,
       double rightVelocity,
-      Trajectory.State desiredState) {
-    // v = (v_r + v_l) / 2     (1)
-    // w = (v_r - v_l) / (2r)  (2)
-    // k = w / v               (3)
-    //
-    // v_l = v - wr
-    // v_l = v - (vk)r
-    // v_l = v(1 - kr)
-    //
-    // v_r = v + wr
-    // v_r = v + (vk)r
-    // v_r = v(1 + kr)
+      DifferentialSample desiredState) {
     return calculate(
         currentPose,
         leftVelocity,
         rightVelocity,
         desiredState.pose,
-        desiredState.velocity * (1 - (desiredState.curvature * m_trackwidth / 2.0)),
-        desiredState.velocity * (1 + (desiredState.curvature * m_trackwidth / 2.0)));
+        desiredState.leftVelocity,
+        desiredState.rightVelocity);
   }
 }

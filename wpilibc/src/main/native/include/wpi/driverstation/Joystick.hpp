@@ -7,6 +7,7 @@
 #include <array>
 
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/units/angle.hpp"
 
 namespace wpi {
@@ -19,43 +20,43 @@ namespace wpi {
  * single class instance for each joystick and the mapping of ports to hardware
  * buttons depends on the code in the Driver Station.
  */
-class Joystick : public GenericHID {
+class Joystick : public HIDDevice {
  public:
   /// Default X axis channel.
-  static constexpr int kDefaultXChannel = 0;
+  static constexpr int DEFAULT_X_CHANNEL = 0;
   /// Default Y axis channel.
-  static constexpr int kDefaultYChannel = 1;
+  static constexpr int DEFAULT_Y_CHANNEL = 1;
   /// Default Z axis channel.
-  static constexpr int kDefaultZChannel = 2;
+  static constexpr int DEFAULT_Z_CHANNEL = 2;
   /// Default twist axis channel.
-  static constexpr int kDefaultTwistChannel = 2;
+  static constexpr int DEFAULT_TWIST_CHANNEL = 2;
   /// Default throttle axis channel.
-  static constexpr int kDefaultThrottleChannel = 3;
+  static constexpr int DEFAULT_THROTTLE_CHANNEL = 3;
 
   /**
    * Represents an analog axis on a joystick.
    */
   enum AxisType {
     /// X axis.
-    kXAxis,
+    X_AXIS,
     /// Y axis.
-    kYAxis,
+    Y_AXIS,
     /// Z axis.
-    kZAxis,
+    Z_AXIS,
     /// Twist axis.
-    kTwistAxis,
+    TWIST_AXIS,
     /// Throttle axis.
-    kThrottleAxis
+    THROTTLE_AXIS
   };
 
   /**
    * Represents a digital button on a joystick.
    */
   enum ButtonType {
-    /// kTrigger.
-    kTriggerButton,
-    /// kTop.
-    kTopButton
+    /// TRIGGER.
+    TRIGGER_BUTTON,
+    /// TOP.
+    TOP_BUTTON
   };
 
   /**
@@ -68,10 +69,31 @@ class Joystick : public GenericHID {
    */
   explicit Joystick(int port);
 
+  /**
+   * Construct an instance of a joystick with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this joystick.
+   */
+  explicit Joystick(GenericHID& hid);
+
   ~Joystick() override = default;
 
   Joystick(Joystick&&) = default;
   Joystick& operator=(Joystick&&) = default;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  GenericHID& GetHID() override;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  const GenericHID& GetHID() const override;
 
   /**
    * Set the channel associated with the X axis.
@@ -142,6 +164,55 @@ class Joystick : public GenericHID {
    * @return The channel for the axis.
    */
   int GetThrottleChannel() const;
+
+  /**
+   * Get the button value (starting at button 1).
+   *
+   * The buttons are returned in a single 16 bit value with one bit representing
+   * the state of each button. The appropriate button is returned as a boolean
+   * value.
+   *
+   * @param button The button number to be read (starting at 1)
+   * @return The state of the button
+   */
+  bool GetRawButton(int button) const;
+
+  /**
+   * Whether the button was pressed since the last check. Button indexes begin
+   * at 1.
+   *
+   * @param button The button index, beginning at 1.
+   * @return Whether the button was pressed since the last check.
+   */
+  bool GetRawButtonPressed(int button);
+
+  /**
+   * Whether the button was released since the last check. Button indexes begin
+   * at 1.
+   *
+   * @param button The button index, beginning at 1.
+   * @return Whether the button was released since the last check.
+   */
+  bool GetRawButtonReleased(int button);
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read, starting at 0.
+   * @return The value of the axis.
+   */
+  double GetRawAxis(int axis) const;
+
+  /**
+   * Get the angle in degrees of a POV on the HID.
+   *
+   * The POV angles start at 0 in the up direction, and increase clockwise (e.g.
+   * right is 90, upper-left is 315).
+   *
+   * @param pov The index of the POV to read, starting at 0.
+   * @return the angle of the POV
+   */
+  POVDirection GetPOV(int pov = 0) const;
 
   /**
    * Get the X value of the current joystick.
@@ -262,10 +333,11 @@ class Joystick : public GenericHID {
   wpi::units::radian_t GetDirection() const;
 
  private:
-  enum Axis { kX, kY, kZ, kTwist, kThrottle, kNumAxes };
-  enum Button { kTrigger = 1, kTop = 2 };
+  enum Axis { X, Y, Z, TWIST, THROTTLE, NUM_AXES };
+  enum Button { TRIGGER = 1, TOP = 2 };
 
-  std::array<int, Axis::kNumAxes> m_axes;
+  std::array<int, Axis::NUM_AXES> m_axes;
+  GenericHID* m_hid;
 };
 
 }  // namespace wpi

@@ -1,55 +1,43 @@
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@rules_jvm_external//:defs.bzl", "maven_export")
-load("@rules_python//python:defs.bzl", "py_binary")
-load("//wpilibcExamples:build_cpp_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests")
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
-py_binary(
-    name = "generate_bazel_files",
-    srcs = ["generate_bazel_files.py"],
-    target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-)
-
-cmd = "$(locations :generate_bazel_files) $(OUTS)"
-
-genrule(
-    name = "generate_bazel_files_rule",
+pkg_zip(
+    name = "commands-zip",
     srcs = [
-        "src/main/cpp/commands/commands.json",
-        "src/main/cpp/examples/examples.json",
-        "src/main/cpp/snippets/snippets.json",
-        "src/main/cpp/templates/templates.json",
+        "//:license_pkg_files",
+        "//wpilibcExamples/src/main/cpp/commands",
     ],
-    outs = ["gen/example_projects.bzl"],
-    cmd = cmd,
-    tools = [":generate_bazel_files"],
+    tags = ["manual"],
 )
 
-write_source_file(
-    name = "write_example_project_list",
-    diff_args = ["-u"],
-    in_file = ":generate_bazel_files_rule",
-    out_file = "example_projects.bzl",
-    suggested_update_target = "//:write_all",
-    tags = ["pregeneration"],
-    visibility = ["//visibility:public"],
+pkg_zip(
+    name = "snippets-zip",
+    srcs = [
+        "//:license_pkg_files",
+        "//wpilibcExamples/src/main/cpp/snippets",
+        "//wpilibcExamples/src/test/cpp/snippets",
+    ],
+    tags = ["manual"],
 )
 
-halsim_deps = [
-]
+pkg_zip(
+    name = "templates-zip",
+    srcs = [
+        "//:license_pkg_files",
+        "//wpilibcExamples/src/main/cpp/templates",
+    ],
+    tags = ["manual"],
+)
 
-build_commands()
-
-build_examples(halsim_deps = halsim_deps)
-
-build_snippets()
-
-build_templates()
-
-build_tests()
+pkg_zip(
+    name = "examples-zip",
+    srcs = [
+        "//:license_pkg_files",
+        "//wpilibcExamples/src/main/cpp/examples",
+        "//wpilibcExamples/src/test/cpp/examples",
+    ],
+    tags = ["manual"],
+)
 
 maven_export(
     name = "examples_publish",
@@ -69,5 +57,12 @@ maven_export(
     name = "templates_publish",
     maven_coordinates = "org.wpilib.wpilibc:templates:$(WPILIB_VERSION)",
     target = ":templates-zip",
+    visibility = ["//visibility:public"],
+)
+
+maven_export(
+    name = "snippets_publish",
+    maven_coordinates = "org.wpilib.wpilibc:snippets:$(WPILIB_VERSION)",
+    target = ":snippets-zip",
     visibility = ["//visibility:public"],
 )

@@ -4,6 +4,8 @@
 
 #include "wpi/math/estimator/KalmanFilter.hpp"
 
+#include "wpi/util/SymbolExports.hpp"
+
 namespace wpi::math {
 
 template class EXPORT_TEMPLATE_DEFINE(WPILIB_DLLEXPORT) KalmanFilter<1, 1, 1>;

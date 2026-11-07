@@ -1,0 +1,24 @@
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
+classes:
+  wpi::fields::FieldImage:
+    force_no_trampoline: true
+    methods:
+      FieldImage:
+        overloads:
+          "":
+          std::string_view, int, int, int, int:
+      GetPath:
+      GetTop:
+      GetLeft:
+      GetBottom:
+      GetRight:
+      operator==:
+    inline_code: |
+      .def("__repr__", [](const FieldImage &self) {
+        return py::str("FieldImage(path={!r}, top={}, left={}, bottom={}, right={})")
+          .format(py::str(self.GetPath()), self.GetTop(), self.GetLeft(), self.GetBottom(), self.GetRight());
+      })

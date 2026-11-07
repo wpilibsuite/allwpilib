@@ -10,6 +10,13 @@ checkstyle {
     config = resources.text.fromFile(new File(configDirectory.get().getAsFile(), "checkstyle.xml"))
 }
 
+tasks.withType(Checkstyle) {
+    // Checkstyle falls over if module-info files are included in the check scope
+    // The suppressions file does not appear to work for this, so we need to configure the task
+    // itself
+    exclude("**/module-info.java")
+}
+
 apply plugin: 'pmd'
 
 pmd {
@@ -18,6 +25,14 @@ pmd {
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
     ruleSets = []
+}
+
+tasks.withType(Pmd).configureEach {
+    exclude { details ->
+        def path = details.file.toPath()
+        path.startsWith(project.file("src/generated").toPath()) ||
+            path.startsWith(project.file("build/generated").toPath())
+    }
 }
 
 apply plugin: 'com.diffplug.spotless'
@@ -82,12 +97,12 @@ spotbugs {
     excludeFilter = file("${project.rootDir}/styleguide/spotbugs-exclude.xml")
 }
 
-task javaFormat {
+tasks.register('javaFormat') {
     dependsOn(tasks.withType(Checkstyle))
     dependsOn(tasks.withType(Pmd))
     dependsOn 'spotlessApply'
 }
 
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach {
     it.mustRunAfter 'spotlessApply'
 }

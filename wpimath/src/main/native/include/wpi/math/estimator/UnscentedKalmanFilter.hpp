@@ -8,6 +8,7 @@
 #include <utility>
 
 #include <Eigen/Cholesky>
+#include <Eigen/Core>
 
 #include "wpi/math/estimator/SigmaPoints.hpp"
 #include "wpi/math/estimator/UnscentedTransform.hpp"
@@ -18,6 +19,7 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -115,7 +117,7 @@ class UnscentedKalmanFilter {
     m_dt = dt;
 
     Reset();
-    wpi::math::MathSharedStore::ReportUsage("UnscentedKalmanFilter", "");
+    wpi::util::ReportUsage("UnscentedKalmanFilter", "");
   }
 
   /**
@@ -175,7 +177,7 @@ class UnscentedKalmanFilter {
     m_dt = dt;
 
     Reset();
-    wpi::math::MathSharedStore::ReportUsage("UnscentedKalmanFilter", "");
+    wpi::util::ReportUsage("UnscentedKalmanFilter", "");
   }
 
   /**
@@ -437,19 +439,18 @@ class UnscentedKalmanFilter {
               .transpose();
     }
 
-    // Compute the Kalman gain. We use Eigen's QR decomposition to solve. This
-    // is equivalent to MATLAB's \ operator, so we need to rearrange to use
-    // that.
+    // Compute the Kalman gain (see wpimath/docs/LinalgIdentities.md)
     //
     //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
-    //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
+    //   K = (S_{y} \ P_{xy}ᵀ)ᵀ / S_{y}
     //   K = (S_{y}ᵀ \ (S_{y} \ P_{xy}ᵀ))ᵀ
     //
     // equation (27)
     Matrixd<States, Rows> K =
         Sy.transpose()
-            .fullPivHouseholderQr()
-            .solve(Sy.fullPivHouseholderQr().solve(Pxy.transpose()))
+            .template triangularView<Eigen::Upper>()
+            .solve(Sy.template triangularView<Eigen::Lower>().solve(
+                Pxy.transpose()))
             .transpose();
 
     // Compute the posterior state mean

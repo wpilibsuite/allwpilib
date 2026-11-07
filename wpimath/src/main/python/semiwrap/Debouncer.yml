@@ -6,7 +6,7 @@ classes:
       Debouncer:
         param_override:
           type:
-            default: wpi::math::Debouncer::DebounceType::kRising
+            default: wpi::math::Debouncer::DebounceType::RISING
       Calculate:
       SetDebounceTime:
       GetDebounceTime:

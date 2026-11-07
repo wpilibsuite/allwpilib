@@ -32,15 +32,15 @@ public final class HALUtil extends JNIWrapper {
   public static final int RUNTIME_SIMULATION = 1;
 
   /**
-   * Returns the roboRIO serial number.
+   * Returns the Systemcore serial number.
    *
-   * @return The roboRIO serial number.
+   * @return The Systemcore serial number.
    * @see "HAL_GetSerialNumber"
    */
   public static native String getSerialNumber();
 
   /**
-   * Returns the comments from the roboRIO web interface.
+   * Returns the comments from the Systemcore web interface.
    *
    * @return The comments string.
    * @see "HAL_GetComments"
@@ -56,9 +56,9 @@ public final class HALUtil extends JNIWrapper {
   public static native int getTeamNumber();
 
   /**
-   * Reads the microsecond-resolution monotonic timer.
+   * Reads the nanosecond-resolution monotonic timer.
    *
-   * @return The current monotonic time in microseconds.
+   * @return The current monotonic time in nanoseconds.
    */
   public static native long getMonotonicTime();
 

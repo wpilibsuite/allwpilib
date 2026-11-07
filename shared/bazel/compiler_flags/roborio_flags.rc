@@ -1,5 +1,0 @@
-###############################
-# Roborio
-###############################
-build:roborio --platforms=@rules_bzlmodrio_toolchains//platforms/roborio
-build:roborio --platform_suffix=roborio

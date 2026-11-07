@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#include <bit>
 #include <cassert>
 #include <span>
 #include <string>
@@ -14,7 +15,6 @@
 #include <vector>
 
 #include "wpi/util/StringMap.hpp"
-#include "wpi/util/bit.hpp"
 
 namespace wpi::util {
 
@@ -422,16 +422,12 @@ class DynamicStruct {
                       size_t arrIndex = 0) const {
     assert(field->IsInt());
     uint64_t raw = GetFieldImpl(field, arrIndex);
-    switch (field->m_size) {
-      case 1:
-        return static_cast<int8_t>(raw);
-      case 2:
-        return static_cast<int16_t>(raw);
-      case 4:
-        return static_cast<int32_t>(raw);
-      default:
-        return raw;
+    // Signed integer widths are 1 through 64, including non-bitfield integers.
+    // Extend the declared sign bit, not the storage unit's sign bit.
+    if ((raw & (uint64_t{1} << (field->m_bitWidth - 1))) != 0) {
+      raw |= ~field->m_bitMask;
     }
+    return std::bit_cast<int64_t>(raw);
   }
 
   /**
@@ -457,7 +453,7 @@ class DynamicStruct {
   float GetFloatField(const StructFieldDescriptor* field,
                       size_t arrIndex = 0) const {
     assert(field->m_type == StructFieldType::FLOAT);
-    return bit_cast<float>(
+    return std::bit_cast<float>(
         static_cast<uint32_t>(GetFieldImpl(field, arrIndex)));
   }
 
@@ -471,7 +467,7 @@ class DynamicStruct {
   double GetDoubleField(const StructFieldDescriptor* field,
                         size_t arrIndex = 0) const {
     assert(field->m_type == StructFieldType::DOUBLE);
-    return bit_cast<double>(GetFieldImpl(field, arrIndex));
+    return std::bit_cast<double>(GetFieldImpl(field, arrIndex));
   }
 
   /**
@@ -495,9 +491,10 @@ class DynamicStruct {
     assert(field->m_parent == m_desc);
     assert(m_desc->IsValid());
     assert(arrIndex < field->m_arraySize);
-    return DynamicStruct{field->m_struct,
-                         m_data.subspan(field->m_offset +
-                                        arrIndex * field->m_struct->GetSize())};
+    auto size = field->m_struct->GetSize();
+    return DynamicStruct{
+        field->m_struct,
+        m_data.subspan(field->m_offset + arrIndex * size, size)};
   }
 
  protected:
@@ -591,7 +588,7 @@ class MutableDynamicStruct : public DynamicStruct {
   void SetFloatField(const StructFieldDescriptor* field, float value,
                      size_t arrIndex = 0) {
     assert(field->m_type == StructFieldType::FLOAT);
-    SetFieldImpl(field, bit_cast<uint32_t>(value), arrIndex);
+    SetFieldImpl(field, std::bit_cast<uint32_t>(value), arrIndex);
   }
 
   /**
@@ -604,7 +601,7 @@ class MutableDynamicStruct : public DynamicStruct {
   void SetDoubleField(const StructFieldDescriptor* field, double value,
                       size_t arrIndex = 0) {
     assert(field->m_type == StructFieldType::DOUBLE);
-    SetFieldImpl(field, bit_cast<uint64_t>(value), arrIndex);
+    SetFieldImpl(field, std::bit_cast<uint64_t>(value), arrIndex);
   }
 
   /**
@@ -640,9 +637,10 @@ class MutableDynamicStruct : public DynamicStruct {
     assert(field->m_parent == m_desc);
     assert(m_desc->IsValid());
     assert(arrIndex < field->m_arraySize);
+    auto size = field->m_struct->GetSize();
     return MutableDynamicStruct{
-        field->m_struct, m_data.subspan(field->m_offset +
-                                        arrIndex * field->m_struct->GetSize())};
+        field->m_struct,
+        m_data.subspan(field->m_offset + arrIndex * size, size)};
   }
 
   using DynamicStruct::GetStructField;

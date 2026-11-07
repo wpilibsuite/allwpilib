@@ -8,11 +8,12 @@ from .commandgenerichid import CommandGenericHID
 from .trigger import Trigger
 
 
-class CommandNiDsPS4Controller(CommandGenericHID):
+class CommandNiDsPS4Controller:
     """
     A version of NI DS PS4Controller with Trigger factories for command-based.
     """
 
+    _command_hid: CommandGenericHID
     _hid: NiDsPS4Controller
 
     def __init__(self, port: int):
@@ -21,259 +22,270 @@ class CommandNiDsPS4Controller(CommandGenericHID):
 
         :param port: The port index on the Driver Station that the device is plugged into.
         """
-        super().__init__(port)
-        self._hid = NiDsPS4Controller(port)
+        self._command_hid = CommandGenericHID.get_command_generic_hid(port)
+        self._hid = NiDsPS4Controller(self._command_hid.get_hid())
 
-    def getHID(self) -> NiDsPS4Controller:
+    def __getattr__(self, name: str):
+        return getattr(self._command_hid, name)
+
+    def get_hid(self) -> CommandGenericHID:
         """
-        Get the underlying GenericHID object.
+        Get the underlying CommandGenericHID object.
 
-        :returns: the wrapped GenericHID object
+        :returns: the wrapped CommandGenericHID object
+        """
+        return self._command_hid
+
+    def get_ni_ds_ps4_controller(self) -> NiDsPS4Controller:
+        """
+        Get the underlying NiDsPS4Controller object.
+
+        :returns: the wrapped NiDsPS4Controller object
         """
         return self._hid
 
-    def L2(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def l2(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the L2 button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the L2 button's digital signal attached to the given
                   loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getL2Button())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_l2_button())
 
-    def R2(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def r2(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the R2 button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the R2 button's digital signal attached to the given
                   loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getR2Button())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_r2_button())
 
-    def L1(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def l1(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the L1 button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the L1 button's digital signal attached to the given
                   loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getL1Button())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_l1_button())
 
-    def R1(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def r1(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the R1 button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the R1 button's digital signal attached to the given
             loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getR1Button())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_r1_button())
 
-    def L3(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def l3(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the L3 button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the L3 button's digital signal attached to the given
                   loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getL3Button())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_l3_button())
 
-    def R3(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def r3(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the R3 button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the R3 button's digital signal attached to the given
                   loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getR3Button())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_r3_button())
 
     def square(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the square button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the square button's digital signal attached to the given
                   loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getSquareButton())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_square_button())
 
     def cross(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the cross button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the cross button's digital signal attached to the given
                   loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getCrossButton())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_cross_button())
 
     def triangle(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the triangle button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the triangle button's digital signal attached to the
                   given loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getTriangleButton())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_triangle_button())
 
     def circle(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the circle button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the circle button's digital signal attached to the given
             loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getCircleButton())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_circle_button())
 
     def share(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the share button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the share button's digital signal attached to the given
                   loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getShareButton())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_share_button())
 
-    def PS(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def ps(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the PS button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the PS button's digital signal attached to the given
                   loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getPSButton())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_ps_button())
 
     def options(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the options button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the options button's digital signal attached to the
                   given loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getOptionsButton())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_options_button())
 
     def touchpad(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the touchpad's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the touchpad's digital signal attached to the given
                   loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getTouchpad())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._hid.get_touchpad())
 
-    def getLeftX(self) -> float:
+    def get_left_x(self) -> float:
         """
         Get the X axis value of left side of the controller. Right is positive.
 
         :returns: the axis value.
         """
-        return self._hid.getLeftX()
+        return self._hid.get_left_x()
 
-    def getRightX(self) -> float:
+    def get_right_x(self) -> float:
         """
         Get the X axis value of right side of the controller. Right is positive.
 
         :returns: the axis value.
         """
-        return self._hid.getRightX()
+        return self._hid.get_right_x()
 
-    def getLeftY(self) -> float:
+    def get_left_y(self) -> float:
         """
         Get the Y axis value of left side of the controller. Back is positive.
 
         :returns: the axis value.
         """
-        return self._hid.getLeftY()
+        return self._hid.get_left_y()
 
-    def getRightY(self) -> float:
+    def get_right_y(self) -> float:
         """
         Get the Y axis value of right side of the controller. Back is positive.
 
         :returns: the axis value.
         """
-        return self._hid.getRightY()
+        return self._hid.get_right_y()
 
-    def getL2Axis(self) -> float:
+    def get_l2_axis(self) -> float:
         """
         Get the L2 axis value of the controller. Note that this axis is bound to the range of [0, 1] as
         opposed to the usual [-1, 1].
 
         :returns: the axis value.
         """
-        return self._hid.getL2Axis()
+        return self._hid.get_l2_axis()
 
-    def getR2Axis(self) -> float:
+    def get_r2_axis(self) -> float:
         """
         Get the R2 axis value of the controller. Note that this axis is bound to the range of [0, 1] as
         opposed to the usual [-1, 1].
 
         :returns: the axis value.
         """
-        return self._hid.getR2Axis()
+        return self._hid.get_r2_axis()

@@ -10,9 +10,12 @@ ext {
 apply from: "${rootDir}/shared/java/javacommon.gradle"
 
 dependencies {
-    api(project(':datalog'))
-    api(project(':ntcore'))
-    api(project(':wpiutil'))
+    api(project(':wpilibj'))
     api(project(':wpiunits'))
-    testImplementation(project(':wpimath')) // for convenient protobuf types
+    api(project(':telemetry'))
+
+    implementation(project(':ntcore'))
+    implementation(project(':tunables'))
+    implementation(project(':wpimath'))
+    implementation(project(':hal'))
 }

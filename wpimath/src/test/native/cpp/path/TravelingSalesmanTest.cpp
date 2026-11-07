@@ -5,13 +5,16 @@
 #include "wpi/math/path/TravelingSalesman.hpp"
 
 #include <cassert>
+#include <cstddef>
 #include <span>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/util/array.hpp"
 #include "wpi/util/circular_buffer.hpp"
 
@@ -51,7 +54,8 @@ bool IsMatchingCycle(std::span<const wpi::math::Pose2d> expected,
   return matchesExpectedForward || matchesExpectedReverse;
 }
 
-TEST(TravelingSalesmanTest, FiveLengthStaticPathWithDistanceCost) {
+TEST_CASE("TravelingSalesmanTest FiveLengthStaticPathWithDistanceCost",
+          "[wpimath]") {
   // ...................
   // ........2..........
   // ..0..........4.....
@@ -64,15 +68,16 @@ TEST(TravelingSalesmanTest, FiveLengthStaticPathWithDistanceCost) {
       wpi::math::Pose2d{14_m, 3_m, 0_rad}};
 
   wpi::math::TravelingSalesman traveler;
-  wpi::util::array<wpi::math::Pose2d, 5> solution = traveler.Solve(poses, 500);
+  wpi::util::array<wpi::math::Pose2d, 5> solution = traveler.Solve(poses, 2000);
 
   wpi::util::array<wpi::math::Pose2d, 5> expected{poses[0], poses[2], poses[4],
                                                   poses[1], poses[3]};
 
-  EXPECT_TRUE(IsMatchingCycle(expected, solution));
+  CHECK(IsMatchingCycle(expected, solution));
 }
 
-TEST(TravelingSalesmanTest, FiveLengthDynamicPathWithDistanceCost) {
+TEST_CASE("TravelingSalesmanTest FiveLengthDynamicPathWithDistanceCost",
+          "[wpimath]") {
   // ...................
   // ........2..........
   // ..0..........4.....
@@ -86,16 +91,17 @@ TEST(TravelingSalesmanTest, FiveLengthDynamicPathWithDistanceCost) {
 
   wpi::math::TravelingSalesman traveler;
   std::vector<wpi::math::Pose2d> solution =
-      traveler.Solve(std::span<const wpi::math::Pose2d>{poses}, 500);
+      traveler.Solve(std::span<const wpi::math::Pose2d>{poses}, 2000);
 
-  ASSERT_EQ(5u, solution.size());
+  REQUIRE(5u == solution.size());
   wpi::util::array<wpi::math::Pose2d, 5> expected{poses[0], poses[2], poses[4],
                                                   poses[1], poses[3]};
 
-  EXPECT_TRUE(IsMatchingCycle(expected, solution));
+  CHECK(IsMatchingCycle(expected, solution));
 }
 
-TEST(TravelingSalesmanTest, TenLengthStaticPathWithDistanceCost) {
+TEST_CASE("TravelingSalesmanTest TenLengthStaticPathWithDistanceCost",
+          "[wpimath]") {
   // ....6.3..1.2.......
   // ..4................
   // .............9.....
@@ -110,16 +116,18 @@ TEST(TravelingSalesmanTest, TenLengthStaticPathWithDistanceCost) {
       wpi::math::Pose2d{13_m, 5_m, 0_rad}, wpi::math::Pose2d{14_m, 3_m, 0_rad}};
 
   wpi::math::TravelingSalesman traveler;
-  wpi::util::array<wpi::math::Pose2d, 10> solution = traveler.Solve(poses, 500);
+  wpi::util::array<wpi::math::Pose2d, 10> solution =
+      traveler.Solve(poses, 2000);
 
   wpi::util::array<wpi::math::Pose2d, 10> expected{
       poses[0], poses[4], poses[6], poses[3], poses[1],
       poses[2], poses[9], poses[8], poses[5], poses[7]};
 
-  EXPECT_TRUE(IsMatchingCycle(expected, solution));
+  CHECK(IsMatchingCycle(expected, solution));
 }
 
-TEST(TravelingSalesmanTest, TenLengthDynamicPathWithDistanceCost) {
+TEST_CASE("TravelingSalesmanTest TenLengthDynamicPathWithDistanceCost",
+          "[wpimath]") {
   // ....6.3..1.2.......
   // ..4................
   // .............9.....
@@ -135,12 +143,12 @@ TEST(TravelingSalesmanTest, TenLengthDynamicPathWithDistanceCost) {
 
   wpi::math::TravelingSalesman traveler;
   std::vector<wpi::math::Pose2d> solution =
-      traveler.Solve(std::span<const wpi::math::Pose2d>{poses}, 500);
+      traveler.Solve(std::span<const wpi::math::Pose2d>{poses}, 2000);
 
-  ASSERT_EQ(10u, solution.size());
+  REQUIRE(10u == solution.size());
   wpi::util::array<wpi::math::Pose2d, 10> expected{
       poses[0], poses[4], poses[6], poses[3], poses[1],
       poses[2], poses[9], poses[8], poses[5], poses[7]};
 
-  EXPECT_TRUE(IsMatchingCycle(expected, solution));
+  CHECK(IsMatchingCycle(expected, solution));
 }

@@ -6,7 +6,11 @@
 
 #include <Eigen/Core>
 
+#include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 using namespace wpi::math;
 

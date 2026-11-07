@@ -10,17 +10,16 @@
 
 #include <Eigen/Core>
 
-#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+#include "wpi/fields/Field.hpp"
 
 using namespace fmap;
 
 Fieldmap::Fieldmap(std::string type, std::vector<Fiducial> fiducials)
     : type(std::move(type)), fiducials(std::move(fiducials)) {}
 
-Fieldmap::Fieldmap(const wpi::apriltag::AprilTagFieldLayout& layout)
-    : type("frc") {
+Fieldmap::Fieldmap(const wpi::fields::Field& field) : type("frc") {
   // https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-map-specification
-  for (auto tag : layout.GetTags()) {
+  for (auto tag : field.GetTags()) {
     // TODO: remove variable when clang 16 is available on Mac
     Fiducial fiducial{"apriltag3_36h11_classic", tag.ID, 165.1,
                       tag.pose.ToMatrix(), 1};

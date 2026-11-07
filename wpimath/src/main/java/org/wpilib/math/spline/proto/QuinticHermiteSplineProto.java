@@ -4,8 +4,8 @@
 
 package org.wpilib.math.spline.proto;
 
-import org.wpilib.math.proto.ProtobufQuinticHermiteSpline;
 import org.wpilib.math.spline.QuinticHermiteSpline;
+import org.wpilib.math.spline.proto.detail.ProtobufQuinticHermiteSpline;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

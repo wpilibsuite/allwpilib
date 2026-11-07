@@ -10,12 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.util.AllocationException;
 
 class SolenoidTestCTRE {
   @Test
   void testValidInitialization() {
-    try (Solenoid solenoid = new Solenoid(0, 3, PneumaticsModuleType.CTRE_PCM, 2)) {
+    try (Solenoid solenoid = new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.CTRE_PCM, 2)) {
       assertEquals(2, solenoid.getChannel());
 
       solenoid.set(true);
@@ -28,17 +29,20 @@ class SolenoidTestCTRE {
 
   @Test
   void testDoubleInitialization() {
-    try (Solenoid solenoid = new Solenoid(0, 3, PneumaticsModuleType.CTRE_PCM, 2)) {
+    try (Solenoid solenoid = new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.CTRE_PCM, 2)) {
       assertThrows(
-          AllocationException.class, () -> new Solenoid(0, 3, PneumaticsModuleType.CTRE_PCM, 2));
+          AllocationException.class,
+          () -> new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.CTRE_PCM, 2));
     }
   }
 
   @Test
   void testDoubleInitializationFromDoubleSolenoid() {
-    try (DoubleSolenoid solenoid = new DoubleSolenoid(0, 3, PneumaticsModuleType.CTRE_PCM, 2, 3)) {
+    try (DoubleSolenoid solenoid =
+        new DoubleSolenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.CTRE_PCM, 2, 3)) {
       assertThrows(
-          AllocationException.class, () -> new Solenoid(0, 3, PneumaticsModuleType.CTRE_PCM, 2));
+          AllocationException.class,
+          () -> new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.CTRE_PCM, 2));
     }
   }
 
@@ -46,12 +50,12 @@ class SolenoidTestCTRE {
   void testInvalidChannel() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> new Solenoid(0, 3, PneumaticsModuleType.CTRE_PCM, 100));
+        () -> new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.CTRE_PCM, 100));
   }
 
   @Test
   void testToggle() {
-    try (Solenoid solenoid = new Solenoid(0, 3, PneumaticsModuleType.CTRE_PCM, 2)) {
+    try (Solenoid solenoid = new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.CTRE_PCM, 2)) {
       solenoid.set(true);
       assertTrue(solenoid.get());
 

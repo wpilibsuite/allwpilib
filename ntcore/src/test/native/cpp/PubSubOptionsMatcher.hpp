@@ -4,32 +4,19 @@
 
 #pragma once
 
-#include <ostream>
-#include <utility>
-
 #include "PubSubOptions.hpp"
-#include "gmock/gmock.h"
+#include "TestPrinters.hpp"
 
 namespace wpi::nt {
 
-class PubSubOptionsMatcher
-    : public ::testing::MatcherInterface<const PubSubOptionsImpl&> {
- public:
-  explicit PubSubOptionsMatcher(PubSubOptionsImpl good)
-      : good{std::move(good)} {}
-
-  bool MatchAndExplain(const PubSubOptionsImpl& val,
-                       ::testing::MatchResultListener* listener) const override;
-  void DescribeTo(::std::ostream* os) const override;
-  void DescribeNegationTo(::std::ostream* os) const override;
-
- private:
-  PubSubOptionsImpl good;
-};
-
-inline ::testing::Matcher<const PubSubOptionsImpl&> PubSubOptionsEq(
-    PubSubOptionsImpl good) {
-  return ::testing::MakeMatcher(new PubSubOptionsMatcher(std::move(good)));
+inline bool operator==(const PubSubOptionsImpl& lhs,
+                       const PubSubOptionsImpl& rhs) {
+  return lhs.periodicMs == rhs.periodicMs &&
+         lhs.pollStorage == rhs.pollStorage && lhs.sendAll == rhs.sendAll &&
+         lhs.keepDuplicates == rhs.keepDuplicates &&
+         lhs.topicsOnly == rhs.topicsOnly &&
+         lhs.prefixMatch == rhs.prefixMatch &&
+         lhs.disableSignal == rhs.disableSignal;
 }
 
 }  // namespace wpi::nt

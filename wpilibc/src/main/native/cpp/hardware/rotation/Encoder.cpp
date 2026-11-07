@@ -4,11 +4,12 @@
 
 #include "wpi/hardware/rotation/Encoder.hpp"
 
+#include <format>
+
 #include "wpi/hal/Encoder.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -28,19 +29,6 @@ void Encoder::Reset() {
   int32_t status = 0;
   HAL_ResetEncoder(m_encoder, &status);
   WPILIB_CheckErrorStatus(status, "Reset");
-}
-
-wpi::units::second_t Encoder::GetPeriod() const {
-  int32_t status = 0;
-  double value = HAL_GetEncoderPeriod(m_encoder, &status);
-  WPILIB_CheckErrorStatus(status, "GetPeriod");
-  return wpi::units::second_t{value};
-}
-
-void Encoder::SetMaxPeriod(wpi::units::second_t maxPeriod) {
-  int32_t status = 0;
-  HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod.value(), &status);
-  WPILIB_CheckErrorStatus(status, "SetMaxPeriod");
 }
 
 bool Encoder::GetStopped() const {
@@ -85,10 +73,11 @@ double Encoder::GetRate() const {
   return value;
 }
 
-void Encoder::SetMinRate(double minRate) {
+void Encoder::SetRateWindow(wpi::units::millisecond_t window) {
   int32_t status = 0;
-  HAL_SetEncoderMinRate(m_encoder, minRate, &status);
-  WPILIB_CheckErrorStatus(status, "SetMinRate");
+  HAL_SetEncoderRateWindow(m_encoder, static_cast<int32_t>(window.value()),
+                           &status);
+  WPILIB_CheckErrorStatus(status, "SetRateWindow");
 }
 
 void Encoder::SetDistancePerPulse(double distancePerPulse) {
@@ -110,25 +99,6 @@ void Encoder::SetReverseDirection(bool reverseDirection) {
   WPILIB_CheckErrorStatus(status, "SetReverseDirection");
 }
 
-void Encoder::SetSamplesToAverage(int samplesToAverage) {
-  if (samplesToAverage < 1 || samplesToAverage > 127) {
-    throw WPILIB_MakeError(
-        err::ParameterOutOfRange,
-        "Average counter values must be between 1 and 127, got {}",
-        samplesToAverage);
-  }
-  int32_t status = 0;
-  HAL_SetEncoderSamplesToAverage(m_encoder, samplesToAverage, &status);
-  WPILIB_CheckErrorStatus(status, "SetSamplesToAverage");
-}
-
-int Encoder::GetSamplesToAverage() const {
-  int32_t status = 0;
-  int result = HAL_GetEncoderSamplesToAverage(m_encoder, &status);
-  WPILIB_CheckErrorStatus(status, "GetSamplesToAverage");
-  return result;
-}
-
 void Encoder::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetEncoderSimDevice(m_encoder, device);
 }
@@ -140,23 +110,18 @@ int Encoder::GetFPGAIndex() const {
   return val;
 }
 
-void Encoder::InitSendable(wpi::util::SendableBuilder& builder) {
-  int32_t status = 0;
-  HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
-  WPILIB_CheckErrorStatus(status, "GetEncodingType");
-  if (type == HAL_EncoderEncodingType::HAL_ENCODER_4X_ENCODING) {
-    builder.SetSmartDashboardType("Quadrature Encoder");
-  } else {
-    builder.SetSmartDashboardType("Encoder");
-  }
+void Encoder::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("Velocity", GetRate());
+  table.Log("Distance", GetDistance());
+  table.Log("Distance per Tick", GetDistancePerPulse());
+}
 
-  builder.AddDoubleProperty(
-      "Velocity", [=, this] { return GetRate(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Distance", [=, this] { return GetDistance(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Distance per Tick", [=, this] { return GetDistancePerPulse(); },
-      nullptr);
+std::string_view Encoder::GetTelemetryType() const {
+  if (m_type == EncodingType::X4) {
+    return "Quadrature Encoder";
+  } else {
+    return "Encoder";
+  }
 }
 
 void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
@@ -165,6 +130,7 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
   m_encoder = HAL_InitializeEncoder(
       aChannel, bChannel, reverseDirection,
       static_cast<HAL_EncoderEncodingType>(encodingType), &status);
+  m_type = encodingType;
   WPILIB_CheckErrorStatus(status, "InitEncoder");
 
   const char* type = "Encoder";
@@ -179,8 +145,7 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
       type = "Encoder:4x";
       break;
   }
-  HAL_ReportUsage(fmt::format("IO[{},{}]", aChannel, bChannel), type);
-  // wpi::util::SendableRegistry::Add(this, "Encoder", m_aSource->GetChannel());
+  wpi::util::ReportUsage(std::format("IO[{},{}]", aChannel, bChannel), type);
 }
 
 double Encoder::DecodingScaleFactor() const {

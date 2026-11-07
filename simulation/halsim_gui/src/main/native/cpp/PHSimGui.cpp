@@ -4,7 +4,6 @@
 
 #include "PHSimGui.hpp"
 
-#include <cstdio>
 #include <memory>
 #include <vector>
 

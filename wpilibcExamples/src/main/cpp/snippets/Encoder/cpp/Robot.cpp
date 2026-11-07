@@ -7,7 +7,7 @@
 #include "wpi/util/deprecated.hpp"
 
 /**
- * Encoder snippets for frc-docs.
+ * Encoder snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
 WPI_IGNORE_DEPRECATED
@@ -17,16 +17,8 @@ class Robot : public wpi::TimedRobot {
     // Configures the encoder to return a distance of 4 for every 256 pulses
     // Also changes the units of getRate
     encoder.SetDistancePerPulse(4.0 / 256.0);
-    // Configures the encoder to consider itself stopped after .1 seconds
-    encoder.SetMaxPeriod(0.1_s);
-    // Configures the encoder to consider itself stopped when its rate is below
-    // 10
-    encoder.SetMinRate(10);
     // Reverses the direction of the encoder
     encoder.SetReverseDirection(true);
-    // Configures an encoder to average its period measurement over 5 samples
-    // Can be between 1 and 127 samples
-    encoder.SetSamplesToAverage(5);
   }
 
   void TeleopPeriodic() override {
@@ -43,7 +35,6 @@ class Robot : public wpi::TimedRobot {
     encoder.GetDirection();
 
     // Gets the current period of the encoder
-    encoder.GetPeriod();
 
     // Resets the encoder to read a distance of zero
     encoder.Reset();

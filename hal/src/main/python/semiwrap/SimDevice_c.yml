@@ -10,4 +10,4 @@ strip_prefixes:
 
 enums:
   HAL_SimValueDirection:
-
+    value_prefix: HAL_SIM_VALUE

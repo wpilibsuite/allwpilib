@@ -21,6 +21,9 @@ classes:
       RegisterBrownoutVoltageCallback:
       GetBrownoutVoltage:
       SetBrownoutVoltage:
+      RegisterBrownoutRecoveryVoltageCallback:
+      GetBrownoutRecoveryVoltage:
+      SetBrownoutRecoveryVoltage:
       RegisterCPUTempCallback:
       GetCPUTemp:
       SetCPUTemp:

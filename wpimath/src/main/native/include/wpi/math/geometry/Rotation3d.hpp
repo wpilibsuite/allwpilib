@@ -5,7 +5,7 @@
 #pragma once
 
 #include <numbers>
-#include <type_traits>
+#include <stdexcept>
 
 #include <Eigen/Core>
 #include <gcem.hpp>
@@ -14,7 +14,9 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -88,6 +90,21 @@ class WPILIB_DLLEXPORT Rotation3d final {
    *
    * Extrinsic rotations occur in that order around the axes in the fixed global
    * frame rather than the body frame.
+   *
+   * Intrinsic rotations applied in the order yaw, then pitch, then roll are
+   * equivalent to these extrinsic rotations, so they can be passed to this
+   * constructor unchanged as (roll, pitch, yaw).
+   *
+   * Intrinsic rotations applied in the order roll, then pitch, then yaw cannot
+   * be passed directly. Instead, construct the rotation by composing
+   * single-axis rotations:
+   *
+   * @code{.cpp}
+   * wpi::math::Rotation3d r{roll, 0_rad, 0_rad};
+   * wpi::math::Rotation3d p{0_rad, pitch, 0_rad};
+   * wpi::math::Rotation3d y{0_rad, 0_rad, yaw};
+   * auto rotation = y.RotateBy(p).RotateBy(r);
+   * @endcode
    *
    * Angles are measured counterclockwise with the rotation axis pointing "out
    * of the page". If you point your right thumb along the positive axis
@@ -205,7 +222,7 @@ class WPILIB_DLLEXPORT Rotation3d final {
       return Quaternion{w, x, y, z};
     };
 
-    if (std::is_constant_evaluated()) {
+    if consteval {
       m_q = impl(ct_matrix3d{rotationMatrix});
     } else {
       m_q = impl(rotationMatrix);
@@ -383,6 +400,27 @@ class WPILIB_DLLEXPORT Rotation3d final {
   }
 
   /**
+   * Projects the rotation forward by integrating the given body rates over
+   * time.
+   *
+   * @param rollRate The body roll rate.
+   * @param pitchRate The body pitch rate.
+   * @param yawRate The body yaw rate.
+   * @param dt The time over which to integrate.
+   * @return The rotation in the world frame projected forward.
+   */
+  constexpr Rotation3d Integrate(units::radians_per_second_t rollRate,
+                                 units::radians_per_second_t pitchRate,
+                                 units::radians_per_second_t yawRate,
+                                 units::second_t dt) const {
+    // qₖ₊₁ = qₖ exp(1/2 W dt) where W = 0 + ω_x î + ω_y ĵ + ω_z k̂
+    //
+    // https://math.stackexchange.com/a/2099673
+    Quaternion W{0.0, rollRate.value(), pitchRate.value(), yawRate.value()};
+    return Rotation3d{m_q * (W * (0.5 * dt.value())).Exp()};
+  }
+
+  /**
    * Returns the quaternion representation of the Rotation3d.
    */
   constexpr const Quaternion& GetQuaternion() const { return m_q; }
@@ -396,7 +434,7 @@ class WPILIB_DLLEXPORT Rotation3d final {
     double y = m_q.Y();
     double z = m_q.Z();
 
-    // wpimath/algorithms.md
+    // See wpimath/docs/Quaternion.md
     double cxcy = 1.0 - 2.0 * (x * x + y * y);
     double sxcy = 2.0 * (w * x + y * z);
     double cy_sq = cxcy * cxcy + sxcy * sxcy;
@@ -435,7 +473,7 @@ class WPILIB_DLLEXPORT Rotation3d final {
     double y = m_q.Y();
     double z = m_q.Z();
 
-    // wpimath/algorithms.md
+    // wpimath/docs/Quaternion.md
     double cycz = 1.0 - 2.0 * (y * y + z * z);
     double cysz = 2.0 * (w * z + x * y);
     double cy_sq = cycz * cycz + cysz * cysz;

@@ -13,17 +13,17 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.command2.sysid.SysIdRoutine;
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.examples.sysidroutine.Constants.DriveConstants;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.system.RobotController;
 
 public class Drive extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final PWMSparkMax leftMotor = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
+  private final PWMSparkMax leftMotor = new PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT);
 
   // The motors on the right side of the drive.
-  private final PWMSparkMax rightMotor = new PWMSparkMax(DriveConstants.kRightMotor1Port);
+  private final PWMSparkMax rightMotor = new PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT);
 
   // The robot's drive
   private final DifferentialDrive drive =
@@ -32,16 +32,16 @@ public class Drive extends SubsystemBase {
   // The left-side drive encoder
   private final Encoder leftEncoder =
       new Encoder(
-          DriveConstants.kLeftEncoderPorts[0],
-          DriveConstants.kLeftEncoderPorts[1],
-          DriveConstants.kLeftEncoderReversed);
+          DriveConstants.LEFT_ENCODER_PORTS[0],
+          DriveConstants.LEFT_ENCODER_PORTS[1],
+          DriveConstants.LEFT_ENCODER_REVERSED);
 
   // The right-side drive encoder
   private final Encoder rightEncoder =
       new Encoder(
-          DriveConstants.kRightEncoderPorts[0],
-          DriveConstants.kRightEncoderPorts[1],
-          DriveConstants.kRightEncoderReversed);
+          DriveConstants.RIGHT_ENCODER_PORTS[0],
+          DriveConstants.RIGHT_ENCODER_PORTS[1],
+          DriveConstants.RIGHT_ENCODER_REVERSED);
 
   // Create a new SysId routine for characterizing the drive.
   private final SysIdRoutine sysIdRoutine =
@@ -79,8 +79,8 @@ public class Drive extends SubsystemBase {
   /** Creates a new Drive subsystem. */
   public Drive() {
     // Add the second motors on each side of the drivetrain
-    leftMotor.addFollower(new PWMSparkMax(DriveConstants.kLeftMotor2Port));
-    rightMotor.addFollower(new PWMSparkMax(DriveConstants.kRightMotor2Port));
+    leftMotor.addFollower(new PWMSparkMax(DriveConstants.LEFT_MOTOR2_PORT));
+    rightMotor.addFollower(new PWMSparkMax(DriveConstants.RIGHT_MOTOR2_PORT));
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
@@ -88,8 +88,8 @@ public class Drive extends SubsystemBase {
     rightMotor.setInverted(true);
 
     // Sets the distance per pulse for the encoders
-    leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
-    rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    leftEncoder.setDistancePerPulse(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
+    rightEncoder.setDistancePerPulse(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
   }
 
   /**

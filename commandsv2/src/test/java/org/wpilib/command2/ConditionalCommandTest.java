@@ -73,27 +73,27 @@ class ConditionalCommandTest extends CommandTestBase {
     return Stream.of(
         arguments(
             "AllCancelSelf",
-            InterruptionBehavior.kCancelSelf,
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            InterruptionBehavior.CANCEL_SELF,
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_SELF),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_SELF),
             (BooleanSupplier) () -> true),
         arguments(
             "AllCancelIncoming",
-            InterruptionBehavior.kCancelIncoming,
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            InterruptionBehavior.CANCEL_INCOMING,
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_INCOMING),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_INCOMING),
             (BooleanSupplier) () -> true),
         arguments(
             "OneCancelSelfOneIncoming",
-            InterruptionBehavior.kCancelSelf,
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
+            InterruptionBehavior.CANCEL_SELF,
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_SELF),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_INCOMING),
             (BooleanSupplier) () -> true),
         arguments(
             "OneCancelIncomingOneSelf",
-            InterruptionBehavior.kCancelSelf,
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelIncoming),
-            Commands.idle().withInterruptBehavior(InterruptionBehavior.kCancelSelf),
+            InterruptionBehavior.CANCEL_SELF,
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_INCOMING),
+            Commands.idle().withInterruptBehavior(InterruptionBehavior.CANCEL_SELF),
             (BooleanSupplier) () -> true));
   }
 

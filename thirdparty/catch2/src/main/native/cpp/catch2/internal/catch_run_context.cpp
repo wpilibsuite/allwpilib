@@ -11,6 +11,7 @@
 #include <catch2/generators/catch_generators_throw.hpp>
 #include <catch2/interfaces/catch_interfaces_config.hpp>
 #include <catch2/interfaces/catch_interfaces_generatortracker.hpp>
+#include <catch2/interfaces/catch_interfaces_registry_hub.hpp>
 #include <catch2/interfaces/catch_interfaces_reporter.hpp>
 #include <catch2/internal/catch_compiler_capabilities.hpp>
 #include <catch2/internal/catch_context.hpp>
@@ -195,6 +196,8 @@ namespace Catch {
                 auto getGenerator() const -> GeneratorBasePtr const& override {
                     return m_generator;
                 }
+
+                bool isFilteredImpl() const override { return m_isFiltered; }
             };
         } // namespace
     }
@@ -307,6 +310,25 @@ namespace Catch {
             return value;
         }
         CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION
+
+
+        void pushScopedMessage( MessageInfo&& message ) {
+            Detail::g_messageHolder().addScopedMessage(  CATCH_MOVE( message ) );
+        }
+
+        void popScopedMessage( unsigned int messageId ) {
+            Detail::g_messageHolder().removeMessage( messageId );
+        }
+
+        void emplaceUnscopedMessage( MessageBuilder&& builder ) {
+            Detail::g_messageHolder().addUnscopedMessage( CATCH_MOVE( builder ) );
+        }
+
+        void addUnscopedMessage( MessageInfo&& message ) {
+            Detail::g_messageHolder().addUnscopedMessage( CATCH_MOVE( message ) );
+        }
+
+        bool lastAssertionPassed() { return Detail::g_lastAssertionPassed; }
 
     } // namespace Detail
 
@@ -441,14 +463,13 @@ namespace Catch {
             Detail::g_lastAssertionPassed = true;
         } else if (!result.succeeded()) {
             Detail::g_lastAssertionPassed = false;
-            if (result.isOk()) {
-            }
-            else if( m_activeTestCase->getTestCaseInfo().okToFail() ) // Read from a shared state established before the threads could start, this is fine
+            if (result.isOk()) {}
+            else if( m_activeTestCase->getTestCaseInfo().okToFail() ) { // Read from a shared state established before the threads could start, this is fine
                 m_atomicAssertionCount.failedButOk++;
-            else
+            } else {
                 m_atomicAssertionCount.failed++;
-        }
-        else {
+            }
+        } else {
             Detail::g_lastAssertionPassed = true;
         }
 
@@ -521,17 +542,6 @@ namespace Catch {
         SourceLineInfo lineInfo,
         Generators::GeneratorBasePtr&& generator ) {
 
-        // TBD: Do we want to avoid the warning if the generator is filtered?
-        if ( m_config->warnAboutInfiniteGenerators() &&
-             !generator->isFinite() ) {
-            // We want the semantics of `FAIL()`, but we inline it
-            // to avoid issues with conditionally prefixed macros
-            INTERNAL_CATCH_MSG( "FAIL",
-                                Catch::ResultWas::ExplicitFailure,
-                                Catch::ResultDisposition::Normal,
-                                "GENERATE() would run infinitely" );
-        }
-
         auto nameAndLoc = TestCaseTracking::NameAndLocation( static_cast<std::string>( generatorName ), lineInfo );
         auto& currentTracker = m_trackerContext.currentTracker();
         assert(
@@ -544,11 +554,24 @@ namespace Catch {
                 m_trackerContext,
                 &currentTracker,
                 CATCH_MOVE( generator ) );
-        auto ret = newTracker.get();
+
+        // The warning shouldn't fire if the generator is infinite, **but** filtered down.
+        if ( m_config->warnAboutInfiniteGenerators() &&
+             !newTracker->m_generator->isFinite() &&
+             !newTracker->isFiltered() ) {
+            // We want the semantics of `FAIL()`, but we inline it
+            // to avoid issues with conditionally prefixed macros
+            INTERNAL_CATCH_MSG( "FAIL",
+                                Catch::ResultWas::ExplicitFailure,
+                                Catch::ResultDisposition::Normal,
+                                "GENERATE() would run infinitely" );
+        }
+
+        auto returnPtr = newTracker.get();
         currentTracker.addChild( CATCH_MOVE( newTracker ) );
 
-        ret->open();
-        return ret;
+        returnPtr->open();
+        return returnPtr;
     }
 
     bool RunContext::testForMissingAssertions(Counts& assertions) {
@@ -630,7 +653,7 @@ namespace Catch {
         //      and since IResultCapture::getLastResult is deprecated,
         //      we will leave it as is, until it is finally removed.
         Detail::LockGuard _( m_assertionMutex );
-        return &(*m_lastResult);
+        return &*m_lastResult;
     }
 
     void RunContext::exceptionEarlyReported() {
@@ -702,10 +725,6 @@ namespace Catch {
         m_totals.testCases.failed++;
         updateTotalsFromAtomics();
         m_reporter->testRunEnded(TestRunStats(m_runInfo, m_totals, false));
-    }
-
-    bool RunContext::lastAssertionPassed() {
-        return Detail::g_lastAssertionPassed;
     }
 
     void RunContext::assertionPassedFastPath(SourceLineInfo lineInfo) {
@@ -886,7 +905,7 @@ namespace Catch {
     }
 
     void RunContext::populateReaction( AssertionReaction& reaction,
-                                       bool has_normal_disposition ) {
+                                       bool has_normal_disposition ) const {
         reaction.shouldDebugBreak = m_shouldDebugBreak;
         reaction.shouldThrow = aborting() || has_normal_disposition;
     }
@@ -935,22 +954,6 @@ namespace Catch {
             populateReaction(
                 reaction, info.resultDisposition & ResultDisposition::Normal );
         }
-    }
-
-    void IResultCapture::pushScopedMessage( MessageInfo&& message ) {
-        Detail::g_messageHolder().addScopedMessage(  CATCH_MOVE( message ) );
-    }
-
-    void IResultCapture::popScopedMessage( unsigned int messageId ) {
-        Detail::g_messageHolder().removeMessage( messageId );
-    }
-
-    void IResultCapture::emplaceUnscopedMessage( MessageBuilder&& builder ) {
-        Detail::g_messageHolder().addUnscopedMessage( CATCH_MOVE( builder ) );
-    }
-
-    void IResultCapture::addUnscopedMessage( MessageInfo&& message ) {
-        Detail::g_messageHolder().addUnscopedMessage( CATCH_MOVE( message ) );
     }
 
     void seedRng(IConfig const& config) {

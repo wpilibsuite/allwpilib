@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"
@@ -24,13 +24,13 @@ void TestPwmInitializationCallback(const char* name, void* param,
   gTestPwmCallbackValue = *value;
 }
 
-TEST(PWMSimTest, PwmInitialization) {
+TEST_CASE("PWMSimTest PwmInitialization", "[hal][mockdata]") {
   const int INDEX_TO_TEST = 7;
 
   int callbackParam = 0;
   int callbackId = HALSIM_RegisterPWMInitializedCallback(
       INDEX_TO_TEST, &TestPwmInitializationCallback, &callbackParam, false);
-  ASSERT_TRUE(0 != callbackId);
+  REQUIRE(0 != callbackId);
 
   int32_t status = 0;
   int32_t channel = 0;
@@ -40,31 +40,31 @@ TEST(PWMSimTest, PwmInitialization) {
   channel = 8000;
   gTestPwmCallbackName = "Unset";
   pwmHandle = HAL_InitializePWMPort(channel, nullptr, &status);
-  EXPECT_EQ(HAL_INVALID_HANDLE, pwmHandle);
-  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  CHECK(HAL_INVALID_HANDLE == pwmHandle);
+  CHECK(HAL_USE_LAST_ERROR == status);
   HAL_GetLastError(&status);
-  EXPECT_EQ(HAL_RESOURCE_OUT_OF_RANGE, status);
-  EXPECT_STREQ("Unset", gTestPwmCallbackName.c_str());
+  CHECK(HAL_RESOURCE_OUT_OF_RANGE == status);
+  CHECK("Unset" == gTestPwmCallbackName);
 
   // Successful setup
   status = 0;
   channel = INDEX_TO_TEST;
   gTestPwmCallbackName = "Unset";
   pwmHandle = HAL_InitializePWMPort(channel, nullptr, &status);
-  EXPECT_TRUE(HAL_INVALID_HANDLE != pwmHandle);
-  EXPECT_EQ(0, status);
-  EXPECT_STREQ("Initialized", gTestPwmCallbackName.c_str());
+  CHECK(HAL_INVALID_HANDLE != pwmHandle);
+  CHECK(0 == status);
+  CHECK("Initialized" == gTestPwmCallbackName);
 
   // Double initialize... should fail
   status = 0;
   channel = INDEX_TO_TEST;
   gTestPwmCallbackName = "Unset";
   pwmHandle = HAL_InitializePWMPort(channel, nullptr, &status);
-  EXPECT_EQ(HAL_INVALID_HANDLE, pwmHandle);
-  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  CHECK(HAL_INVALID_HANDLE == pwmHandle);
+  CHECK(HAL_USE_LAST_ERROR == status);
   HAL_GetLastError(&status);
-  EXPECT_EQ(HAL_RESOURCE_IS_ALLOCATED, status);
-  EXPECT_STREQ("Unset", gTestPwmCallbackName.c_str());
+  CHECK(HAL_RESOURCE_IS_ALLOCATED == status);
+  CHECK("Unset" == gTestPwmCallbackName);
 
   // Reset, should allow you to re-register
   wpi::hal::HandleBase::ResetGlobalHandles();
@@ -76,9 +76,9 @@ TEST(PWMSimTest, PwmInitialization) {
   channel = INDEX_TO_TEST;
   gTestPwmCallbackName = "Unset";
   pwmHandle = HAL_InitializePWMPort(channel, nullptr, &status);
-  EXPECT_TRUE(HAL_INVALID_HANDLE != pwmHandle);
-  EXPECT_EQ(0, status);
-  EXPECT_STREQ("Initialized", gTestPwmCallbackName.c_str());
+  CHECK(HAL_INVALID_HANDLE != pwmHandle);
+  CHECK(0 == status);
+  CHECK("Initialized" == gTestPwmCallbackName);
   HALSIM_CancelPWMInitializedCallback(INDEX_TO_TEST, callbackId);
 }
 }  // namespace wpi::hal

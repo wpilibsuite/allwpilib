@@ -68,7 +68,7 @@
 #include <catch2/internal/catch_decomposer.hpp>
 #include <catch2/internal/catch_deprecation_macro.hpp>
 #include <catch2/internal/catch_enforce.hpp>
-#include <catch2/internal/catch_enum_values_registry.hpp>
+#include <catch2/internal/catch_enum_info.hpp>
 #include <catch2/internal/catch_errno_guard.hpp>
 #include <catch2/internal/catch_exception_translator_registry.hpp>
 #include <catch2/internal/catch_fatal_condition_handler.hpp>

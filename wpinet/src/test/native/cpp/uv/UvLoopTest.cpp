@@ -27,13 +27,13 @@
 #include "wpi/net/uv/Loop.hpp"
 // clang-format on
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/net/uv/Timer.hpp"
 
 namespace wpi::net::uv {
 
-TEST(UvLoopTest, Walk) {
+TEST_CASE("UvLoopTest Walk", "[uv][loop]") {
   int seen_timer_handle = 0;
 
   auto loop = Loop::Create();
@@ -54,9 +54,9 @@ TEST(UvLoopTest, Walk) {
   timer->Start(Timer::Time{1});
 
   // Start event loop, expect to see the timer handle
-  ASSERT_EQ(seen_timer_handle, 0);
+  REQUIRE(seen_timer_handle == 0);
   loop->Run();
-  ASSERT_EQ(seen_timer_handle, 1);
+  REQUIRE(seen_timer_handle == 1);
 
   // Loop is finished, should not see our timer handle
   seen_timer_handle = 0;
@@ -65,7 +65,7 @@ TEST(UvLoopTest, Walk) {
       seen_timer_handle++;
     }
   });
-  ASSERT_EQ(seen_timer_handle, 0);
+  REQUIRE(seen_timer_handle == 0);
 }
 
 }  // namespace wpi::net::uv

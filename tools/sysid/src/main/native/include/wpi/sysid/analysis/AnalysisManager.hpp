@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <array>
 #include <exception>
+#include <format>
 #include <limits>
 #include <numeric>
 #include <string>
@@ -42,12 +43,12 @@ class AnalysisManager {
     /**
      * The feedback controller preset used to calculate gains.
      */
-    FeedbackControllerPreset preset = presets::kDefault;
+    FeedbackControllerPreset preset = presets::DEFAULT;
 
     /**
      * The feedback controller loop type (position or velocity).
      */
-    FeedbackControllerLoopType type = FeedbackControllerLoopType::kVelocity;
+    FeedbackControllerLoopType type = FeedbackControllerLoopType::VELOCITY;
 
     /**
      * LQR parameters used for feedback gain calculation.
@@ -139,7 +140,7 @@ class AnalysisManager {
      * @param path The path of the file attempted to open
      */
     explicit FileReadingError(std::string_view path) {
-      msg = fmt::format("Unable to read: {}", path);
+      msg = std::format("Unable to read: {}", path);
     }
 
     const char* what() const noexcept override { return msg.c_str(); }
@@ -154,7 +155,7 @@ class AnalysisManager {
   /**
    * The keys (which contain sysid data) that are in the JSON to analyze.
    */
-  static constexpr const char* kJsonDataKeys[] = {
+  static constexpr const char* JSON_DATA_KEYS[] = {
       "quasistatic-forward", "quasistatic-reverse", "dynamic-forward",
       "dynamic-reverse"};
 

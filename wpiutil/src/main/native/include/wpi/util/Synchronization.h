@@ -4,15 +4,7 @@
 
 #pragma once
 
-/**
- * Generic handle for all WPI handle-based interfaces.
- *
- * Handle data layout:
- * - Bits 0-23:  Type-specific
- * - Bits 24-30: Type
- * - Bit 31:     Error
- */
-typedef unsigned int WPI_Handle;  // NOLINT
+#include "wpi/util/Handle.h"
 
 /** An event handle. */
 typedef WPI_Handle WPI_EventHandle;  // NOLINT

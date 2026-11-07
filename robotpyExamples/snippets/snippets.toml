@@ -1,0 +1,21 @@
+[tests]
+base = [
+  "AddressableLED",
+  "AprilTagsVision",
+  "CANPDP",
+  "DigitalCommunication",
+  "DutyCycleInput",
+  "EventLoop",
+  "FlywheelBangBangController",
+  "GameData2026",
+  "HttpCamera",
+  "I2CCommunication",
+  "IntermediateVision",
+  "MotorControl",
+  "QuickVision",
+  "SelectCommand",
+  "Solenoid",
+]
+
+ignored = [
+]

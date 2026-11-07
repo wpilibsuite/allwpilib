@@ -85,7 +85,7 @@ public abstract class ImageSource extends VideoSource {
         CameraServerJNI.createSourceProperty(
             m_handle,
             name,
-            VideoProperty.Kind.kInteger.getValue(),
+            VideoProperty.Kind.INTEGER.getValue(),
             minimum,
             maximum,
             step,
@@ -106,7 +106,7 @@ public abstract class ImageSource extends VideoSource {
         CameraServerJNI.createSourceProperty(
             m_handle,
             name,
-            VideoProperty.Kind.kBoolean.getValue(),
+            VideoProperty.Kind.BOOLEAN.getValue(),
             0,
             1,
             1,
@@ -125,7 +125,7 @@ public abstract class ImageSource extends VideoSource {
     VideoProperty prop =
         new VideoProperty(
             CameraServerJNI.createSourceProperty(
-                m_handle, name, VideoProperty.Kind.kString.getValue(), 0, 0, 0, 0, 0));
+                m_handle, name, VideoProperty.Kind.STRING.getValue(), 0, 0, 0, 0, 0));
     prop.setString(value);
     return prop;
   }

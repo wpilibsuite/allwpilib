@@ -32,7 +32,7 @@ class REVPHData {
       false};
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetSolenoidOutputName,
                GetSolenoidOutputDefault>
-      solenoidOutput[kNumREVPHChannels];
+      solenoidOutput[NUM_REVPH_CHANNELS];
   SimDataValue<HAL_Bool, HAL_MakeBoolean, GetCompressorOnName> compressorOn{
       false};
   SimDataValue<HAL_REVPHCompressorConfigType, MakeCompressorConfigTypeValue,

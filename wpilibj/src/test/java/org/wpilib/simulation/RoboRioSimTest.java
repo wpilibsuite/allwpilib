@@ -6,9 +6,11 @@ package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.hal.util.UncleanStatusException;
 import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.IntCallback;
@@ -21,13 +23,13 @@ class RoboRioSimTest {
 
     DoubleCallback voltageCallback = new DoubleCallback();
     try (CallbackStore voltageCb = RoboRioSim.registerVInVoltageCallback(voltageCallback, false)) {
-      final double kTestVoltage = 1.91;
+      final double TEST_VOLTAGE = 1.91;
 
-      RoboRioSim.setVInVoltage(kTestVoltage);
+      RoboRioSim.setVInVoltage(TEST_VOLTAGE);
       assertTrue(voltageCallback.wasTriggered());
-      assertEquals(kTestVoltage, voltageCallback.getSetValue());
-      assertEquals(kTestVoltage, RoboRioSim.getVInVoltage());
-      assertEquals(kTestVoltage, RobotController.getInputVoltage());
+      assertEquals(TEST_VOLTAGE, voltageCallback.getSetValue());
+      assertEquals(TEST_VOLTAGE, RoboRioSim.getVInVoltage());
+      assertEquals(TEST_VOLTAGE, RobotController.getInputVoltage());
     }
   }
 
@@ -35,16 +37,56 @@ class RoboRioSimTest {
   void testSetBrownout() {
     RoboRioSim.resetData();
 
-    DoubleCallback voltageCallback = new DoubleCallback();
-    try (CallbackStore voltageCb =
-        RoboRioSim.registerBrownoutVoltageCallback(voltageCallback, false)) {
-      final double kTestVoltage = 1.91;
+    DoubleCallback brownoutVoltageCallback = new DoubleCallback();
+    DoubleCallback recoveryVoltageCallback = new DoubleCallback();
+    double[] recoveryVoltageDuringBrownoutCallback = {0.0};
+    double[] brownoutVoltageDuringRecoveryCallback = {0.0};
+    try (CallbackStore brownoutVoltageCb =
+            RoboRioSim.registerBrownoutVoltageCallback(brownoutVoltageCallback, false);
+        CallbackStore recoveryVoltageCb =
+            RoboRioSim.registerBrownoutRecoveryVoltageCallback(recoveryVoltageCallback, false);
+        CallbackStore brownoutConsistencyCb =
+            RoboRioSim.registerBrownoutVoltageCallback(
+                (name, value) ->
+                    recoveryVoltageDuringBrownoutCallback[0] =
+                        RoboRioSim.getBrownoutRecoveryVoltage(),
+                false);
+        CallbackStore recoveryConsistencyCb =
+            RoboRioSim.registerBrownoutRecoveryVoltageCallback(
+                (name, value) ->
+                    brownoutVoltageDuringRecoveryCallback[0] = RoboRioSim.getBrownoutVoltage(),
+                false)) {
+      final double REQUESTED_BROWNOUT_VOLTAGE = 7.5004;
+      final double REQUESTED_RECOVERY_VOLTAGE = 8.0003;
+      final double EXPECTED_BROWNOUT_VOLTAGE = 7.5;
+      final double EXPECTED_RECOVERY_VOLTAGE = 8.0;
 
-      RoboRioSim.setBrownoutVoltage(kTestVoltage);
-      assertTrue(voltageCallback.wasTriggered());
-      assertEquals(kTestVoltage, voltageCallback.getSetValue());
-      assertEquals(kTestVoltage, RoboRioSim.getBrownoutVoltage());
-      assertEquals(kTestVoltage, RobotController.getBrownoutVoltage());
+      RobotController.setBrownoutVoltages(REQUESTED_BROWNOUT_VOLTAGE, REQUESTED_RECOVERY_VOLTAGE);
+      assertTrue(brownoutVoltageCallback.wasTriggered());
+      assertTrue(recoveryVoltageCallback.wasTriggered());
+      assertEquals(EXPECTED_BROWNOUT_VOLTAGE, brownoutVoltageCallback.getSetValue());
+      assertEquals(EXPECTED_RECOVERY_VOLTAGE, recoveryVoltageCallback.getSetValue());
+      assertEquals(EXPECTED_RECOVERY_VOLTAGE, recoveryVoltageDuringBrownoutCallback[0]);
+      assertEquals(EXPECTED_BROWNOUT_VOLTAGE, brownoutVoltageDuringRecoveryCallback[0]);
+      assertEquals(EXPECTED_BROWNOUT_VOLTAGE, RoboRioSim.getBrownoutVoltage());
+      assertEquals(EXPECTED_RECOVERY_VOLTAGE, RoboRioSim.getBrownoutRecoveryVoltage());
+    }
+  }
+
+  @Test
+  void testRejectsInvalidBrownoutThresholds() {
+    final double DEFAULT_BROWNOUT_VOLTAGE = 6.75;
+    final double DEFAULT_RECOVERY_VOLTAGE = 7.25;
+    double[][] invalidPairs = {{4.99, 7.0}, {6.5, 8.51}, {6.5, 6.99}};
+
+    for (double[] pair : invalidPairs) {
+      RoboRioSim.resetData();
+
+      assertThrows(
+          UncleanStatusException.class,
+          () -> RobotController.setBrownoutVoltages(pair[0], pair[1]));
+      assertEquals(DEFAULT_BROWNOUT_VOLTAGE, RoboRioSim.getBrownoutVoltage());
+      assertEquals(DEFAULT_RECOVERY_VOLTAGE, RoboRioSim.getBrownoutRecoveryVoltage());
     }
   }
 
@@ -62,21 +104,21 @@ class RoboRioSimTest {
             RoboRioSim.registerUserCurrent3V3Callback(currentCallback, false);
         CallbackStore activeCb = RoboRioSim.registerUserActive3V3Callback(activeCallback, false);
         CallbackStore faultsCb = RoboRioSim.registerUserFaults3V3Callback(faultCallback, false)) {
-      final double kTestVoltage = 22.9;
-      final double kTestCurrent = 174;
-      final int kTestFaults = 229;
+      final double TEST_VOLTAGE = 22.9;
+      final double TEST_CURRENT = 174;
+      final int TEST_FAULTS = 229;
 
-      RoboRioSim.setUserVoltage3V3(kTestVoltage);
+      RoboRioSim.setUserVoltage3V3(TEST_VOLTAGE);
       assertTrue(voltageCallback.wasTriggered());
-      assertEquals(kTestVoltage, voltageCallback.getSetValue());
-      assertEquals(kTestVoltage, RoboRioSim.getUserVoltage3V3());
-      assertEquals(kTestVoltage, RobotController.getVoltage3V3());
+      assertEquals(TEST_VOLTAGE, voltageCallback.getSetValue());
+      assertEquals(TEST_VOLTAGE, RoboRioSim.getUserVoltage3V3());
+      assertEquals(TEST_VOLTAGE, RobotController.getVoltage3V3());
 
-      RoboRioSim.setUserCurrent3V3(kTestCurrent);
+      RoboRioSim.setUserCurrent3V3(TEST_CURRENT);
       assertTrue(currentCallback.wasTriggered());
-      assertEquals(kTestCurrent, currentCallback.getSetValue());
-      assertEquals(kTestCurrent, RoboRioSim.getUserCurrent3V3());
-      assertEquals(kTestCurrent, RobotController.getCurrent3V3());
+      assertEquals(TEST_CURRENT, currentCallback.getSetValue());
+      assertEquals(TEST_CURRENT, RoboRioSim.getUserCurrent3V3());
+      assertEquals(TEST_CURRENT, RobotController.getCurrent3V3());
 
       RoboRioSim.setUserActive3V3(false);
       assertTrue(activeCallback.wasTriggered());
@@ -84,11 +126,11 @@ class RoboRioSimTest {
       assertFalse(RoboRioSim.getUserActive3V3());
       assertFalse(RobotController.getEnabled3V3());
 
-      RoboRioSim.setUserFaults3V3(kTestFaults);
+      RoboRioSim.setUserFaults3V3(TEST_FAULTS);
       assertTrue(faultCallback.wasTriggered());
-      assertEquals(kTestFaults, faultCallback.getSetValue());
-      assertEquals(kTestFaults, RoboRioSim.getUserFaults3V3());
-      assertEquals(kTestFaults, RobotController.getFaultCount3V3());
+      assertEquals(TEST_FAULTS, faultCallback.getSetValue());
+      assertEquals(TEST_FAULTS, RoboRioSim.getUserFaults3V3());
+      assertEquals(TEST_FAULTS, RobotController.getFaultCount3V3());
     }
   }
 
@@ -99,13 +141,13 @@ class RoboRioSimTest {
     DoubleCallback callback = new DoubleCallback();
 
     try (CallbackStore cb = RoboRioSim.registerCPUTempCallback(callback, false)) {
-      final double kCPUTemp = 100.0;
+      final double CPU_TEMP = 100.0;
 
-      RoboRioSim.setCPUTemp(kCPUTemp);
+      RoboRioSim.setCPUTemp(CPU_TEMP);
       assertTrue(callback.wasTriggered());
-      assertEquals(kCPUTemp, callback.getSetValue());
-      assertEquals(kCPUTemp, RoboRioSim.getCPUTemp());
-      assertEquals(kCPUTemp, RobotController.getCPUTemp());
+      assertEquals(CPU_TEMP, callback.getSetValue());
+      assertEquals(CPU_TEMP, RoboRioSim.getCPUTemp());
+      assertEquals(CPU_TEMP, RobotController.getCPUTemp());
     }
   }
 
@@ -116,13 +158,13 @@ class RoboRioSimTest {
     IntCallback callback = new IntCallback();
 
     try (CallbackStore cb = RoboRioSim.registerTeamNumberCallback(callback, false)) {
-      final int kTeamNumber = 9999;
+      final int TEAM_NUMBER = 9999;
 
-      RoboRioSim.setTeamNumber(kTeamNumber);
+      RoboRioSim.setTeamNumber(TEAM_NUMBER);
       assertTrue(callback.wasTriggered());
-      assertEquals(kTeamNumber, callback.getSetValue());
-      assertEquals(kTeamNumber, RoboRioSim.getTeamNumber());
-      assertEquals(kTeamNumber, RobotController.getTeamNumber());
+      assertEquals(TEAM_NUMBER, callback.getSetValue());
+      assertEquals(TEAM_NUMBER, RoboRioSim.getTeamNumber());
+      assertEquals(TEAM_NUMBER, RobotController.getTeamNumber());
     }
   }
 
@@ -130,36 +172,36 @@ class RoboRioSimTest {
   void testSerialNumber() {
     RoboRioSim.resetData();
 
-    final String kSerialNumber = "Hello";
+    final String SERIAL_NUMBER = "Hello";
 
-    RoboRioSim.setSerialNumber(kSerialNumber);
-    assertEquals(kSerialNumber, RoboRioSim.getSerialNumber());
-    assertEquals(kSerialNumber, RobotController.getSerialNumber());
+    RoboRioSim.setSerialNumber(SERIAL_NUMBER);
+    assertEquals(SERIAL_NUMBER, RoboRioSim.getSerialNumber());
+    assertEquals(SERIAL_NUMBER, RobotController.getSerialNumber());
 
     // Make sure it truncates at 8 characters properly
-    final String kSerialNumberOverflow = "SerialNumber";
-    final String kSerialNumberTruncated = kSerialNumberOverflow.substring(0, 8);
-    RoboRioSim.setSerialNumber(kSerialNumberOverflow);
-    assertEquals(kSerialNumberTruncated, RoboRioSim.getSerialNumber());
-    assertEquals(kSerialNumberTruncated, RobotController.getSerialNumber());
+    final String SERIAL_NUMBER_OVERFLOW = "SerialNumber";
+    final String SERIAL_NUMBER_TRUNCATED = SERIAL_NUMBER_OVERFLOW.substring(0, 8);
+    RoboRioSim.setSerialNumber(SERIAL_NUMBER_OVERFLOW);
+    assertEquals(SERIAL_NUMBER_TRUNCATED, RoboRioSim.getSerialNumber());
+    assertEquals(SERIAL_NUMBER_TRUNCATED, RobotController.getSerialNumber());
   }
 
   @Test
   void testComments() {
     RoboRioSim.resetData();
 
-    final String kComments = "Hello! These are comments in the roboRIO web interface!";
+    final String COMMENTS = "Hello! These are comments in the roboRIO web interface!";
 
-    RoboRioSim.setComments(kComments);
-    assertEquals(kComments, RoboRioSim.getComments());
-    assertEquals(kComments, RobotController.getComments());
+    RoboRioSim.setComments(COMMENTS);
+    assertEquals(COMMENTS, RoboRioSim.getComments());
+    assertEquals(COMMENTS, RobotController.getComments());
 
-    final String kCommentsOverflow =
+    final String COMMENTS_OVERFLOW =
         "Hello! These are comments in the roboRIO web interface!"
             + " This comment exceeds 64 characters!";
-    final String kCommentsTruncated = kCommentsOverflow.substring(0, 64);
-    RoboRioSim.setComments(kCommentsOverflow);
-    assertEquals(kCommentsTruncated, RoboRioSim.getComments());
-    assertEquals(kCommentsTruncated, RobotController.getComments());
+    final String COMMENTS_TRUNCATED = COMMENTS_OVERFLOW.substring(0, 64);
+    RoboRioSim.setComments(COMMENTS_OVERFLOW);
+    assertEquals(COMMENTS_TRUNCATED, RoboRioSim.getComments());
+    assertEquals(COMMENTS_TRUNCATED, RobotController.getComments());
   }
 }

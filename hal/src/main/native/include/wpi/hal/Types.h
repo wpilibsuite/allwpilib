@@ -6,17 +6,17 @@
 
 #include <stdint.h>
 
+#include "wpi/util/Handle.h"
+
 /**
  * @defgroup hal_types Type Definitions
  * @ingroup hal_capi
  * @{
  */
 
-#define HAL_INVALID_HANDLE 0
+#define HAL_INVALID_HANDLE WPI_INVALID_HANDLE
 
-typedef int32_t HAL_Handle;
-
-typedef HAL_Handle HAL_AlertHandle;
+typedef WPI_Handle HAL_Handle;
 
 typedef HAL_Handle HAL_AnalogInputHandle;
 
@@ -68,7 +68,7 @@ typedef int32_t HAL_Status;
 
 #ifdef __cplusplus
 #define HAL_ENUM_WITH_UNDERLYING_TYPE(name, type) enum name : type
-#elif defined(__clang__)
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
 #define HAL_ENUM_WITH_UNDERLYING_TYPE(name, type) \
   enum name : type;                               \
   typedef enum name name;                         \

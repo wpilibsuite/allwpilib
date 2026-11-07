@@ -4,8 +4,12 @@
 
 #include "wpi/math/util/StateSpaceUtil.hpp"
 
+#include <cmath>
+#include <cstddef>
 #include <limits>
 #include <span>
+
+#include <Eigen/Core>
 
 namespace wpi::math {
 

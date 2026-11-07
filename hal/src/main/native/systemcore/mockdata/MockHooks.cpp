@@ -8,7 +8,7 @@ extern "C" {
 
 void HALSIM_SetRuntimeType(HAL_RuntimeType type) {}
 
-void HALSIM_WaitForProgramStart(void) {}
+void HALSIM_WaitForProgramStart(HAL_Bool waitForFirstNotifier) {}
 
 void HALSIM_SetProgramStarted(HAL_Bool started) {}
 
@@ -32,13 +32,15 @@ HAL_Bool HALSIM_IsTimingPaused(void) {
   return false;
 }
 
-void HALSIM_StepTiming(uint64_t delta) {}
+void HALSIM_StepTiming(int64_t delta) {}
 
-void HALSIM_StepTimingAsync(uint64_t delta) {}
+void HALSIM_StepTimingAsync(int64_t delta) {}
 
 void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {}
 
 void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler) {}
+
+void HALSIM_SetWriteDisplayAnsi(HALSIM_WriteDisplayAnsiHandler handler) {}
 
 int32_t HALSIM_RegisterSimPeriodicBeforeCallback(
     HALSIM_SimPeriodicCallback callback, void* param) {

@@ -46,7 +46,16 @@ HALSimWSProviderDriverStation::~HALSimWSProviderDriverStation() {
 
 void HALSimWSProviderDriverStation::RegisterCallbacks() {
   m_enabledCbKey = REGISTER(Enabled, ">enabled", bool, boolean);
-  m_robotModeCbKey = REGISTER(RobotMode, ">robotMode", int, enum);
+  m_robotModeCbKey = HALSIM_RegisterDriverStationRobotModeCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        int mode = value->data.v_enum;
+        // Keep legacy mode flags for older consumers such as the Romi server.
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            wpi::util::json::object(">robotMode", mode, ">autonomous",
+                                    mode == HAL_ROBOT_MODE_AUTONOMOUS, ">test",
+                                    mode == HAL_ROBOT_MODE_UTILITY));
+      },
+      this, true);
   m_estopCbKey = REGISTER(EStop, ">estop", bool, boolean);
   m_fmsCbKey = REGISTER(FmsAttached, ">fms", bool, boolean);
   m_dsCbKey = REGISTER(DsAttached, ">ds", bool, boolean);

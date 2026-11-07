@@ -49,4 +49,14 @@ public final class DriverStationErrors {
   public static void reportWarning(String warning, StackTraceElement[] stackTrace) {
     DriverStationBackend.reportWarning(warning, stackTrace);
   }
+
+  /**
+   * Report crash to Driver Station. Appends provided stack trace to crash message.
+   *
+   * @param details The crash details to report.
+   * @param stackTrace The stack trace to append
+   */
+  public static void reportCrash(String details, StackTraceElement[] stackTrace) {
+    DriverStationBackend.reportCrash(details, stackTrace);
+  }
 }

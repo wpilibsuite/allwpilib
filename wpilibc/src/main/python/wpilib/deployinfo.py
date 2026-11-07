@@ -1,9 +1,8 @@
 from ._wpilib import RobotBase
 import json
-import typing
 
 
-def getDeployData() -> typing.Optional[typing.Dict[str, str]]:
+def get_deploy_data() -> dict[str, str] | None:
     """
     Utility function useful for retrieving deploy-related information
     that pyfrc stores with your robot code. The dictionary has the
@@ -23,7 +22,7 @@ def getDeployData() -> typing.Optional[typing.Dict[str, str]]:
 
     :returns: None in simulation, or a dictionary
     """
-    if not RobotBase.isReal():
+    if not RobotBase.is_real():
         return None
 
     try:

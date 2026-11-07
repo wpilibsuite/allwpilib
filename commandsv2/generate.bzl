@@ -7,6 +7,7 @@ def __generate_wpilib_new_commands_impl(ctx):
     args = ctx.actions.args()
     args.add("--output_directory", output_dir.path)
     args.add("--template_root", "commandsv2/src/generate")
+    args.add("--python_output_directory", "__none__")
 
     ctx.actions.run(
         inputs = ctx.attr._templates.files,

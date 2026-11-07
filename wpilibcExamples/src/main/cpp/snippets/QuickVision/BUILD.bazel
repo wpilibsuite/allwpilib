@@ -1,0 +1,21 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+
+filegroup(
+    name = "sources",
+    srcs = glob(["cpp/**/*.cpp"]),
+    visibility = [
+        "//wpilibcExamples/src/main/cpp/snippets:__pkg__",
+    ],
+)
+
+cc_binary(
+    name = "QuickVision",
+    srcs = [":sources"],
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        "//cameraserver",
+        "//wpilibc",
+    ],
+)

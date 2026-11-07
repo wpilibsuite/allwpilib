@@ -5,7 +5,7 @@
 package org.wpilib.math.controller.proto;
 
 import org.wpilib.math.controller.DifferentialDriveFeedforward;
-import org.wpilib.math.proto.ProtobufDifferentialDriveFeedforward;
+import org.wpilib.math.controller.proto.detail.ProtobufDifferentialDriveFeedforward;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 
@@ -34,9 +34,9 @@ public final class DifferentialDriveFeedforwardProto
 
   @Override
   public void pack(ProtobufDifferentialDriveFeedforward msg, DifferentialDriveFeedforward value) {
-    msg.setKvLinear(value.kVLinear);
-    msg.setKaLinear(value.kALinear);
-    msg.setKvAngular(value.kVAngular);
-    msg.setKaAngular(value.kAAngular);
+    msg.setKvLinear(value.kvLinear);
+    msg.setKaLinear(value.kaLinear);
+    msg.setKvAngular(value.kvAngular);
+    msg.setKaAngular(value.kaAngular);
   }
 }

@@ -20,6 +20,7 @@
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/Signal.h"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/protobuf/ProtobufMessageDatabase.hpp"
 #include "wpi/util/struct/DynamicStruct.hpp"
 
 namespace wpi::log {
@@ -44,8 +45,26 @@ class DataLogReaderEntry : public wpi::log::StartRecordData {
 
 class DataLogReaderThread {
  public:
+  using EntryAddedCallback =
+      std::function<void(DataLogReaderThread&, const DataLogReaderEntry&)>;
+
   explicit DataLogReaderThread(wpi::log::DataLogReader reader)
-      : m_reader{std::move(reader)}, m_thread{[this] { ReadMain(); }} {}
+      : DataLogReaderThread{std::move(reader), EntryAddedCallback{}} {}
+
+  /**
+   * Connects the callback before starting the reader thread. The callback runs
+   * on the reader thread and receives this object so it can query entries.
+   */
+  DataLogReaderThread(wpi::log::DataLogReader reader,
+                      EntryAddedCallback entryAddedCallback)
+      : m_reader{std::move(reader)} {
+    if (entryAddedCallback) {
+      sigEntryAdded.connect(
+          [this, callback = std::move(entryAddedCallback)](
+              const DataLogReaderEntry& entry) { callback(*this, entry); });
+    }
+    m_thread = std::thread{[this] { ReadMain(); }};
+  }
   ~DataLogReaderThread();
 
   bool IsDone() const { return m_done; }
@@ -88,8 +107,9 @@ class DataLogReaderThread {
   wpi::util::StructDescriptorDatabase& GetStructDatabase() {
     return m_structDb;
   }
-  upb_DefPool* GetProtobufDatabase() { return m_protoPool; }
-  upb_Arena* GetProtobufArena() { return m_arena; }
+  wpi::util::ProtobufMessageDatabase& GetProtobufDatabase() {
+    return m_protoDb;
+  }
 
   const wpi::log::DataLogReader& GetReader() const { return m_reader; }
 
@@ -108,8 +128,7 @@ class DataLogReaderThread {
   std::map<std::string, DataLogReaderEntry, std::less<>> m_entriesByName;
   wpi::util::DenseMap<int, DataLogReaderEntry*> m_entriesById;
   wpi::util::StructDescriptorDatabase m_structDb;
-  upb_DefPool* m_protoPool = upb_DefPool_New();
-  upb_Arena* m_arena = upb_Arena_New();
+  wpi::util::ProtobufMessageDatabase m_protoDb;
   std::thread m_thread;
 };
 

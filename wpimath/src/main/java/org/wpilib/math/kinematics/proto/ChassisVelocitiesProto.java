@@ -5,7 +5,7 @@
 package org.wpilib.math.kinematics.proto;
 
 import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.proto.ProtobufChassisVelocities;
+import org.wpilib.math.kinematics.proto.detail.ProtobufChassisVelocities;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

@@ -2,10 +2,14 @@
 
 #pragma once
 
+#include <cstddef>
 #include <initializer_list>
 
+#include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <gch/small_vector.hpp>
+
+namespace slp {
 
 /// Appends sparse matrices to list of triplets at the given offset.
 ///
@@ -58,3 +62,5 @@ void append_diagonal_as_triplets(
     triplets.emplace_back(row_offset + row, col_offset + row, diag[row]);
   }
 }
+
+}  // namespace slp

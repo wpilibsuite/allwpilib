@@ -3,6 +3,8 @@ import ctypes.util
 import pathlib
 import sys
 
+INIT_MODULE = "native.halsim_gui._init_robotpy_native_halsim_gui"
+
 import pytest
 
 
@@ -18,11 +20,14 @@ def test_halsim_gui():
     import ntcore
 
     import halsim_gui as base
+    from halsim_gui.main import _get_extension_path
 
-    loaded = 0
-    for fname in (pathlib.Path(base.__file__).parent / "lib").iterdir():
-        if fname.is_file() and fname.suffix in (".dll", ".dylib", ".so"):
-            ctypes.CDLL(str(fname))
-            loaded += 1
+    sys.modules.pop(INIT_MODULE, None)
 
-    assert loaded
+    ext = pathlib.Path(_get_extension_path())
+    assert INIT_MODULE not in sys.modules
+    assert ext.is_file()
+    assert ext.suffix in (".dll", ".dylib", ".so")
+    ctypes.CDLL(str(ext))
+
+    assert base.load_extension

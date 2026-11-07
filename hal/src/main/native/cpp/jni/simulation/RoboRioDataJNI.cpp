@@ -321,6 +321,57 @@ Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_setBrownoutVoltage
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
+ * Method:    registerBrownoutRecoveryVoltageCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_registerBrownoutRecoveryVoltageCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallbackNoIndex(
+      env, callback, initialNotify,
+      &HALSIM_RegisterRoboRioBrownoutRecoveryVoltageCallback);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
+ * Method:    cancelBrownoutRecoveryVoltageCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_cancelBrownoutRecoveryVoltageCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  return sim::FreeCallbackNoIndex(
+      env, handle, &HALSIM_CancelRoboRioBrownoutRecoveryVoltageCallback);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
+ * Method:    getBrownoutRecoveryVoltage
+ * Signature: ()D
+ */
+JNIEXPORT jdouble JNICALL
+Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_getBrownoutRecoveryVoltage
+  (JNIEnv*, jclass)
+{
+  return HALSIM_GetRoboRioBrownoutRecoveryVoltage();
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
+ * Method:    setBrownoutRecoveryVoltage
+ * Signature: (D)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_setBrownoutRecoveryVoltage
+  (JNIEnv*, jclass, jdouble value)
+{
+  HALSIM_SetRoboRioBrownoutRecoveryVoltage(value);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
  * Method:    registerCPUTempCallback
  * Signature: (Ljava/lang/Object;Z)I
  */

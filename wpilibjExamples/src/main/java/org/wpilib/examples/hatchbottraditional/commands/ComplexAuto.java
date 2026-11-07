@@ -21,13 +21,13 @@ public class ComplexAuto extends SequentialCommandGroup {
     addCommands(
         // Drive forward the specified distance
         new DriveDistance(
-            AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveVelocity, drive),
+            AutoConstants.AUTO_DRIVE_DISTANCE_INCHES, AutoConstants.AUTO_DRIVE_VELOCITY, drive),
 
         // Release the hatch
         new ReleaseHatch(hatch),
 
         // Drive backward the specified distance
         new DriveDistance(
-            AutoConstants.kAutoBackupDistanceInches, -AutoConstants.kAutoDriveVelocity, drive));
+            AutoConstants.AUTO_BACKUP_DISTANCE_INCHES, -AutoConstants.AUTO_DRIVE_VELOCITY, drive));
   }
 }

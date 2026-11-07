@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/hal/DIO.h"
 #include "wpi/hal/Errors.h"
@@ -24,14 +24,14 @@ void TestDigitalIoInitializationCallback(const char* name, void* param,
   gTestDigitalIoCallbackValue = *value;
 }
 
-TEST(DigitalIoSimTest, DigitalIoInitialization) {
+TEST_CASE("DigitalIoSimTest DigitalIoInitialization", "[hal][mockdata]") {
   const int INDEX_TO_TEST = 3;
 
   int callbackParam = 0;
   int callbackId = HALSIM_RegisterDIOInitializedCallback(
       INDEX_TO_TEST, &TestDigitalIoInitializationCallback, &callbackParam,
       false);
-  ASSERT_TRUE(0 != callbackId);
+  REQUIRE(0 != callbackId);
 
   int32_t status = 0;
   int32_t channel = 0;
@@ -41,31 +41,31 @@ TEST(DigitalIoSimTest, DigitalIoInitialization) {
   channel = 8000;
   gTestDigitalIoCallbackName = "Unset";
   digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
-  EXPECT_EQ(HAL_INVALID_HANDLE, digitalIoHandle);
-  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  CHECK(HAL_INVALID_HANDLE == digitalIoHandle);
+  CHECK(HAL_USE_LAST_ERROR == status);
   HAL_GetLastError(&status);
-  EXPECT_EQ(HAL_RESOURCE_OUT_OF_RANGE, status);
-  EXPECT_STREQ("Unset", gTestDigitalIoCallbackName.c_str());
+  CHECK(HAL_RESOURCE_OUT_OF_RANGE == status);
+  CHECK("Unset" == gTestDigitalIoCallbackName);
 
   // Successful setup
   status = 0;
   channel = INDEX_TO_TEST;
   gTestDigitalIoCallbackName = "Unset";
   digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
-  EXPECT_TRUE(HAL_INVALID_HANDLE != digitalIoHandle);
-  EXPECT_EQ(0, status);
-  EXPECT_STREQ("Initialized", gTestDigitalIoCallbackName.c_str());
+  CHECK(HAL_INVALID_HANDLE != digitalIoHandle);
+  CHECK(0 == status);
+  CHECK("Initialized" == gTestDigitalIoCallbackName);
 
   // Double initialize... should fail
   status = 0;
   channel = INDEX_TO_TEST;
   gTestDigitalIoCallbackName = "Unset";
   digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
-  EXPECT_EQ(HAL_INVALID_HANDLE, digitalIoHandle);
-  EXPECT_EQ(HAL_USE_LAST_ERROR, status);
+  CHECK(HAL_INVALID_HANDLE == digitalIoHandle);
+  CHECK(HAL_USE_LAST_ERROR == status);
   HAL_GetLastError(&status);
-  EXPECT_EQ(HAL_RESOURCE_IS_ALLOCATED, status);
-  EXPECT_STREQ("Unset", gTestDigitalIoCallbackName.c_str());
+  CHECK(HAL_RESOURCE_IS_ALLOCATED == status);
+  CHECK("Unset" == gTestDigitalIoCallbackName);
 
   // Reset, should allow you to re-register
   wpi::hal::HandleBase::ResetGlobalHandles();
@@ -78,9 +78,9 @@ TEST(DigitalIoSimTest, DigitalIoInitialization) {
   channel = INDEX_TO_TEST;
   gTestDigitalIoCallbackName = "Unset";
   digitalIoHandle = HAL_InitializeDIOPort(channel, true, nullptr, &status);
-  EXPECT_TRUE(HAL_INVALID_HANDLE != digitalIoHandle);
-  EXPECT_EQ(0, status);
-  EXPECT_STREQ("Initialized", gTestDigitalIoCallbackName.c_str());
+  CHECK(HAL_INVALID_HANDLE != digitalIoHandle);
+  CHECK(0 == status);
+  CHECK("Initialized" == gTestDigitalIoCallbackName);
   HALSIM_CancelDIOInitializedCallback(INDEX_TO_TEST, callbackId);
 }
 

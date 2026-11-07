@@ -7,14 +7,11 @@
 #include <utility>
 
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/NullDeleter.hpp"
-#include "wpi/util/SensorUtil.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
-Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
+Solenoid::Solenoid(CANPort busId, int module, PneumaticsModuleType moduleType,
                    int channel)
     : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
       m_channel{channel} {
@@ -29,12 +26,10 @@ Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
                            m_channel);
   }
 
-  m_module->ReportUsage(fmt::format("Solenoid[{}]", m_channel), "Solenoid");
-  wpi::util::SendableRegistry::Add(this, "Solenoid",
-                                   m_module->GetModuleNumber(), m_channel);
+  m_module->ReportUsage("Solenoid", m_channel, "Solenoid");
 }
 
-Solenoid::Solenoid(int busId, PneumaticsModuleType moduleType, int channel)
+Solenoid::Solenoid(CANPort busId, PneumaticsModuleType moduleType, int channel)
     : Solenoid{busId, PneumaticsBase::GetDefaultForType(moduleType), moduleType,
                channel} {}
 
@@ -74,10 +69,10 @@ void Solenoid::StartPulse() {
   m_module->FireOneShot(m_channel);
 }
 
-void Solenoid::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Solenoid");
-  builder.SetActuator(true);
-  builder.AddBooleanProperty(
-      "Value", [=, this] { return Get(); },
-      [=, this](bool value) { Set(value); });
+void Solenoid::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("Value", Get());
+}
+
+std::string_view Solenoid::GetTelemetryType() const {
+  return "Solenoid";
 }

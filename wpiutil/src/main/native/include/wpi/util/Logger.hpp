@@ -4,10 +4,9 @@
 
 #pragma once
 
+#include <format>
 #include <functional>
 #include <utility>
-
-#include <fmt/format.h>
 
 namespace wpi::util {
 
@@ -42,13 +41,13 @@ class Logger {
              const char* msg);
 
   void LogV(unsigned int level, const char* file, unsigned int line,
-            fmt::string_view format, fmt::format_args args);
+            std::string_view format, std::format_args args);
 
   template <typename... Args>
   void Log(unsigned int level, const char* file, unsigned int line,
-           fmt::string_view format, Args&&... args) {
+           std::string_view format, Args&&... args) {
     if (m_func && level >= m_min_level) {
-      LogV(level, file, line, format, fmt::make_format_args(args...));
+      LogV(level, file, line, format, std::make_format_args(args...));
     }
   }
 

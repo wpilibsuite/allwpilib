@@ -8,7 +8,7 @@ import java.io.File;
 import org.wpilib.framework.RobotBase;
 
 /**
- * Class for interacting with the Filesystem, particularly, interacting with FRC-related paths on
+ * Class for interacting with the Filesystem, particularly, interacting with WPILib-related paths on
  * the system, such as the launch and deploy directories.
  *
  * <p>This class is primarily used for obtaining resources in src/main/deploy, and the systemcore

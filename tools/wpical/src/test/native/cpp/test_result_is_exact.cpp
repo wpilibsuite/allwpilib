@@ -2,18 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <fstream>
-#include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_message.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <mrcal_wrapper.h>
 
 #include "path_lookup.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace cv;
 
@@ -21,7 +26,6 @@ struct cmpByFilename {
   bool operator()(const std::string& a, const std::string& b) const {
     auto a2 = std::stoi(a.substr(3, a.length() - 7));
     auto b2 = std::stoi(b.substr(3, b.length() - 7));
-    // std::cout << a2 << " _ " << b2 << std::endl;
     return a2 < b2;
   }
 };
@@ -30,7 +34,7 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
                               cv::Size imagerSize) {
   std::ifstream file(fname);
   if (!file.is_open()) {
-    std::cerr << "Unable to open file corners.vnl" << std::endl;
+    wpi::util::println(stderr, "Unable to open file corners.vnl");
     return {};
   }
 
@@ -110,11 +114,10 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
   }
 
   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-  std::cout << "Seed took: "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(end -
-                                                                     begin)
-                   .count()
-            << "[ms]" << std::endl;
+  wpi::util::println(
+      "Seed took: {}[ms]",
+      std::chrono::duration_cast<std::chrono::milliseconds>(end - begin)
+          .count());
 
   auto cal_result = mrcal_main(observations_board, frames_rt_toref, boardSize,
                                0.030, imagerSize, 1200);
@@ -148,23 +151,29 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
 
 const std::string projectRootPath = PROJECT_ROOT_PATH;
 
-TEST(MrcalResultExactlyMatchesTest, lifecam_1280) {
+TEST_CASE("MrcalResultExactlyMatchesTest lifecam_1280", "[wpical]") {
   auto calculated_intrinsics{
       calibrate(LookupPath(projectRootPath + "/lifecam_1280p_10x10.vnl"),
                 {10, 10}, {1280, 720})};
 
   // ## generated with mrgingham --jobs 4 --gridn 10
   // /home/mmorley/photonvision/test-resources/calibrationSquaresImg/lifecam/2024-01-02_lifecam_1280/*.png
-  // # generated on 2024-12-01 11:51:55 with   /usr/bin/mrcal-calibrate-cameras
-  // --corners-cache corners.vnl --lensmodel LENSMODEL_OPENCV8 --focal 1200
-  // --object-spacing 0.0254 --object-width-n 10 '*.png'
+  // # generated on 2026-07-22 23:57:29 with   ./mrcal-calibrate-cameras
+  // --corners-cache ../lifecam_1280p_10x10.vnl --lensmodel LENSMODEL_OPENCV8
+  // --focal 1200 --object-spacing 0.0254 --object-width-n 10 --image-directory
+  // /home/gold856/photonvision/test-resources/calibrationSquaresImg/lifecam/2024-01-02_lifecam_1280/
+  // '*.png'
   std::vector<double> mrcal_cli_groundtruth_intrinsics{
-      1130.892767,  1129.149453,    609.9417222,    349.6457279,
-      0.1489878273, -1.348622726,   0.002839630852, 0.001135629909,
-      2.560627057,  -0.03170208336, 0.0695788644,   -0.09547554864};
+      1131.171517,  1129.437477,    609.574878,     349.7414005,
+      0.1039356761, -1.133505033,   0.002868861125, 0.001091292882,
+      2.699775641,  -0.07902839361, 0.3027812824,   -0.0003332983907};
 
-  for (int i = 0; i < 12; i++) {
-    EXPECT_NEAR(mrcal_cli_groundtruth_intrinsics[i], calculated_intrinsics[i],
-                1e-6);
+  REQUIRE(calculated_intrinsics.size() ==
+          mrcal_cli_groundtruth_intrinsics.size());
+
+  for (size_t i = 0; i < mrcal_cli_groundtruth_intrinsics.size(); i++) {
+    UNSCOPED_INFO("i = " << i);
+    CHECK(mrcal_cli_groundtruth_intrinsics[i] ==
+          Catch::Approx(calculated_intrinsics[i]).margin(1e-6));
   }
 }

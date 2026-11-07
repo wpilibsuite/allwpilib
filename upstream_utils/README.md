@@ -43,7 +43,7 @@ Copy the updated upstream files into the thirdparty files within allwpilib.
 ## Adding patch to thirdparty library
 
 The example below will add a new patch file to a hypothetical library called
-`lib` (Replace `<lib>` with `llvm`, `fmt`, `eigen`, ... in the following steps).
+`lib` (Replace `<lib>` with `llvm`, `imgui`, `eigen`, ... in the following steps).
 
 Start in the `upstream_utils` folder. Make sure a clone of the upstream repo exists.
 ```bash
