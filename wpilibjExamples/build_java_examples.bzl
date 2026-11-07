@@ -4,7 +4,7 @@ load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 
 _EXAMPLE_DEPS = [
-    "//allwpilib-java:allwpilib-java",
+    "//allwpilib-java/src/main/java",
     "//apriltag/src/main/java",
     "//cameraserver/src/main/java",
     "//cscore/src/main/java",
@@ -24,7 +24,6 @@ _EXAMPLE_DEPS = [
     "//xrpVendordep/src/main/java",
     "//wpiunits/src/main/java",
     "//epilogue-runtime/src/main/java",
-
     "@bzlmodrio-opencv//libraries/java/opencv",
 ]
 
