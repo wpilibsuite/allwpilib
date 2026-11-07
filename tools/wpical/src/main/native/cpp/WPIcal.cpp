@@ -640,7 +640,6 @@ static void DisplayMainMenu() {
 
   if (about) {
     ImGui::OpenPopup("About");
-    about = false;
   }
   if (ImGui::BeginPopupModal("About", nullptr,
                              ImGuiWindowFlags_AlwaysAutoResize)) {

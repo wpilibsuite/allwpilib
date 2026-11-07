@@ -28,7 +28,8 @@ class MyRobot(wpilib.TimedRobot):
         self.timer = wpilib.Timer()
 
         # Called once at the beginning of the robot program.
-        # Replace this with a call to a trajectory generator.
+        # Replace this with a call to a trajectory generator. Field poses use
+        # field center as the origin, with zero heading toward the blue wall.
         self.trajectory = wpimath.HolonomicTrajectory(
             [
                 wpimath.HolonomicSample(

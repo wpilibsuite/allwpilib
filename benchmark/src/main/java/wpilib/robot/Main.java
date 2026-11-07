@@ -16,8 +16,11 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Twist3d;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N5;
+import org.wpilib.math.numbers.N7;
 
 public class Main {
   /**
@@ -68,9 +71,30 @@ public class Main {
 
   @Benchmark
   @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public Transform3d twist3dExp() {
+    return Geometry3dBenchmark.twist3dExp();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public Twist3d transform3dLog() {
+    return Geometry3dBenchmark.transform3dLog();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
   public Matrix<N5, N5> dare() {
     return DAREBenchmark.dare();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.MICROSECONDS)
+  public Matrix<N7, N7> matrixExp() {
+    return MatrixExpBenchmark.matrixExp();
   }
 
   @Benchmark

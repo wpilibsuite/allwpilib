@@ -126,13 +126,18 @@ std::vector<FieldTag> Field::GetTags() const {
 
 void Field::SetOrigin(OriginPosition origin) {
   switch (origin) {
-    case OriginPosition::BLUE_ALLIANCE_WALL_RIGHT_SIDE:
+    case OriginPosition::FIELD_CENTER:
       SetOrigin(wpi::math::Pose3d{});
+      break;
+    case OriginPosition::BLUE_ALLIANCE_WALL_RIGHT_SIDE:
+      SetOrigin(wpi::math::Pose3d{
+          wpi::math::Translation3d{m_fieldLength / 2, m_fieldWidth / 2, 0_m},
+          wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}});
       break;
     case OriginPosition::RED_ALLIANCE_WALL_RIGHT_SIDE:
       SetOrigin(wpi::math::Pose3d{
-          wpi::math::Translation3d{m_fieldLength, m_fieldWidth, 0_m},
-          wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}});
+          wpi::math::Translation3d{-m_fieldLength / 2, -m_fieldWidth / 2, 0_m},
+          wpi::math::Rotation3d{}});
       break;
     default:
       throw std::invalid_argument("Invalid origin");

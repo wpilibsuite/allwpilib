@@ -68,7 +68,8 @@ class CallbackOpMode : public wpi::OpMode {
   explicit CallbackOpMode(std::atomic<uint32_t>& callbackCount)
       : m_callbackCount(callbackCount) {}
 
-  std::vector<wpi::internal::PeriodicPriorityQueue::Callback> GetCallbacks() {
+  std::vector<wpi::internal::PeriodicPriorityQueue::Callback> GetCallbacks()
+      override {
     std::vector<wpi::internal::PeriodicPriorityQueue::Callback> callbacks;
     callbacks.emplace_back([&count = m_callbackCount] { count++; },
                            std::chrono::nanoseconds{0}, 20_ms);

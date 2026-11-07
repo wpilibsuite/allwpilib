@@ -75,7 +75,7 @@ bool IsBluetoothAddress(std::string_view address) {
   }
 
   for (int i = 0; i < 6; ++i) {
-    size_t pos = static_cast<size_t>(i * 3);
+    size_t pos = static_cast<size_t>(i) * 3;
     if (i < 5 && address[pos + 2] != ':') {
       return false;
     }

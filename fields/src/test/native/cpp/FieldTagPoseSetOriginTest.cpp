@@ -31,12 +31,29 @@ TEST_CASE("FieldTagPoseSetOriginTest TransformationMatches",
                           4_ft, 4_ft, 4_ft,
                           wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}}}}};
 
-  field.SetOrigin(Field::OriginPosition::RED_ALLIANCE_WALL_RIGHT_SIDE);
+  CHECK(field.GetOrigin() == wpi::math::Pose3d{});
+  CHECK(*field.GetTagPose(1) == wpi::math::Pose3d{});
 
-  auto mirrorPose = wpi::math::Pose3d{
-      54_ft, 27_ft, 0_ft, wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}};
-  CHECK(mirrorPose == *field.GetTagPose(1));
-  mirrorPose = wpi::math::Pose3d{50_ft, 23_ft, 4_ft,
-                                 wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}};
-  CHECK(mirrorPose == *field.GetTagPose(2));
+  field.SetOrigin(Field::OriginPosition::RED_ALLIANCE_WALL_RIGHT_SIDE);
+  CHECK(*field.GetTagPose(1) ==
+        wpi::math::Pose3d{27_ft, 13.5_ft, 0_ft, wpi::math::Rotation3d{}});
+  CHECK(*field.GetTagPose(2) ==
+        wpi::math::Pose3d{31_ft, 17.5_ft, 4_ft,
+                          wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}});
+
+  field.SetOrigin(Field::OriginPosition::BLUE_ALLIANCE_WALL_RIGHT_SIDE);
+  CHECK(*field.GetTagPose(1) ==
+        wpi::math::Pose3d{27_ft, 13.5_ft, 0_ft,
+                          wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}});
+  CHECK(*field.GetTagPose(2) ==
+        wpi::math::Pose3d{23_ft, 9.5_ft, 4_ft, wpi::math::Rotation3d{}});
+
+  auto origin = wpi::math::Pose3d{
+      -2_m, 1_m, 0.5_m, wpi::math::Rotation3d{10_deg, 20_deg, 30_deg}};
+  field.SetOrigin(origin);
+  CHECK(*field.GetTagPose(2) == field.GetTags()[1].pose.RelativeTo(origin));
+
+  field.SetOrigin(Field::OriginPosition::FIELD_CENTER);
+  CHECK(field.GetOrigin() == wpi::math::Pose3d{});
+  CHECK(*field.GetTagPose(2) == field.GetTags()[1].pose);
 }
