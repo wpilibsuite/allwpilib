@@ -15,6 +15,7 @@ from ._telemetry import (
     get_table,
     keep_duplicates,
     log,
+    log_unit,
     set_property,
 )
 
@@ -29,6 +30,7 @@ __all__ = [
     "get_table",
     "keep_duplicates",
     "log",
+    "log_unit",
     "set_property",
 ]
 

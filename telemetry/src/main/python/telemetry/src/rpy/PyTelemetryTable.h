@@ -79,6 +79,19 @@ class PyTelemetryTable {
                    std::string_view value);
 
   /**
+   * Logs a double value with unit metadata.
+   *
+   * Sets the JSON-encoded "unit" property before logging the value.
+   * No unit conversion is performed.
+   *
+   * @param name entry name
+   * @param value value in the given unit
+   * @param unit unit symbol (for example, "m/s")
+   */
+  void LogUnit(std::string_view name, double value,
+               std::string_view unit) const;
+
+  /**
    * Logs a telemetry value.
    *
    * Sequences must pass an explicit element_type. Use bool, int, float, or str

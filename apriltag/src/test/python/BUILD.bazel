@@ -9,7 +9,7 @@ robotpy_py_test(
         "*.jpg",
     ]),
     deps = [
-        "//apriltag:robotpy-apriltag",
+        "//apriltag/src/main/python",
         requirement("pytest"),
         requirement("opencv-python"),
     ],

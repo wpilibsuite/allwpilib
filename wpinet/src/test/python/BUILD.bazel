@@ -5,7 +5,7 @@ robotpy_py_test(
     name = "python",
     srcs = glob(["test_*.py"]),
     deps = [
-        "//wpinet:robotpy-wpinet",
+        "//wpinet/src/main/python",
         requirement("pytest"),
     ],
 )

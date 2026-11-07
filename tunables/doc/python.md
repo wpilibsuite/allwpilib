@@ -176,12 +176,6 @@ class UpdatingComplex(tunables.ComplexTunable):
 
 `tunables.Selectable` is a pure-Python `ComplexTunable`. It publishes the same `default`, `options`, and `selected` child entries as Java and C++ and uses the tunable type string `"Selectable"`.
 
-With the standard NetworkTables backend, a selectable published at `auto` also
-appears as a legacy SendableChooser at `/SmartDashboard/auto`, alongside the
-modern `/Tunables/auto` table. Old and new dashboards control the same selection
-without changes to robot code. This compatibility view is supplied by the native
-NetworkTables backend and follows option changes, backend migration, and removal.
-
 ```py
 chooser = tunables.Selectable[int]()
 chooser.add("one", 1)

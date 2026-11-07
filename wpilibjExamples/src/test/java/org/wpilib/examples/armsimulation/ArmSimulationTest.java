@@ -6,6 +6,7 @@ package org.wpilib.examples.armsimulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.math.util.UnitConversions.radiansToDegrees;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +15,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.RobotMode;
-import org.wpilib.math.util.Units;
 import org.wpilib.preferences.Preferences;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.EncoderSim;
@@ -99,12 +99,12 @@ class ArmSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(encoderSim.getDistance()), 2.0);
+      assertEquals(setpoint, radiansToDegrees(encoderSim.getDistance()), 2.0);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(encoderSim.getDistance()), 2.0);
+      assertEquals(setpoint, radiansToDegrees(encoderSim.getDistance()), 2.0);
     }
 
     {
@@ -126,12 +126,12 @@ class ArmSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(encoderSim.getDistance()), 2.0);
+      assertEquals(setpoint, radiansToDegrees(encoderSim.getDistance()), 2.0);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(setpoint, Units.radiansToDegrees(encoderSim.getDistance()), 2.0);
+      assertEquals(setpoint, radiansToDegrees(encoderSim.getDistance()), 2.0);
     }
 
     {

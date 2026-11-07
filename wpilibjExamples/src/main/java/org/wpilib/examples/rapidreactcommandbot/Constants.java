@@ -4,7 +4,7 @@
 
 package org.wpilib.examples.rapidreactcommandbot;
 
-import org.wpilib.math.util.Units;
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -27,7 +27,7 @@ public final class Constants {
     public static final boolean RIGHT_ENCODER_REVERSED = true;
 
     public static final int ENCODER_CPR = 1024;
-    public static final double WHEEL_DIAMETER = Units.inchesToMeters(6);
+    public static final double WHEEL_DIAMETER = inchesToMeters(6);
     public static final double ENCODER_DISTANCE_PER_PULSE =
         // Assumes the encoders are directly mounted on the wheel shafts
         (WHEEL_DIAMETER * Math.PI) / ENCODER_CPR;

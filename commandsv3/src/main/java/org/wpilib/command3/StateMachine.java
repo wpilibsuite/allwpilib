@@ -57,6 +57,7 @@ import org.wpilib.annotation.PostConstructionInitializer;
  */
 public final class StateMachine implements Command {
   private final String m_name;
+  private int m_priority = DEFAULT_PRIORITY;
   private State m_initialState = null;
   private final List<State> m_states = new ArrayList<>();
 
@@ -75,11 +76,47 @@ public final class StateMachine implements Command {
     m_name = name;
   }
 
+  /**
+   * Sets the priority level of the state machine command.
+   *
+   * <p>Because state machines do not directly require any mechanisms, the priority level will be
+   * inherited by any state commands that have inherent priority levels lower than the state
+   * machine's. This allows state machines to effectively make state commands higher priority than
+   * normal, which can be useful for ensuring that commands in the state machine cannot be
+   * interrupted by commands that would otherwise be able to interrupt them.
+   *
+   * @param priority The new priority level of the state machine command.
+   * @see #priority()
+   */
+  public void setPriority(int priority) {
+    m_priority = priority;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>Because state machines do not directly require any mechanisms, the priority level will be
+   * inherited by any state commands that have inherent priority levels lower than the state
+   * machine's. This allows state machines to effectively make state commands higher priority than
+   * normal, which can be useful for ensuring that commands in the state machine cannot be
+   * interrupted by commands that would otherwise be able to interrupt them.
+   */
+  @Override
+  public int priority() {
+    return m_priority;
+  }
+
   @Override
   public String name() {
     return m_name;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>State machine commands do not have any requirements of their own. Commands bound to the
+   * various states that the machine moves through may have requirements, however.
+   */
   @Override
   public Set<Mechanism> requirements() {
     // The machine itself doesn't have any requirements. Commands bound to the various states that
