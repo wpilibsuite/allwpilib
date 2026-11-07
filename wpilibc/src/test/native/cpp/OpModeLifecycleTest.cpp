@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <memory>
+#include <string_view>
 #include <thread>
 #include <vector>
 
@@ -27,6 +28,7 @@ struct Counts {
   std::atomic<uint32_t> periodic{0};
   std::atomic<uint32_t> end{0};
   std::atomic<uint32_t> destructed{0};
+  std::vector<std::string_view> teardownEvents;
 };
 
 class LifecycleOpMode : public wpi::OpMode {
@@ -35,12 +37,19 @@ class LifecycleOpMode : public wpi::OpMode {
     m_counts.constructed++;
   }
 
-  ~LifecycleOpMode() override { m_counts.destructed++; }
+  ~LifecycleOpMode() override {
+    m_counts.teardownEvents.emplace_back("destroy");
+    m_counts.destructed++;
+  }
 
   void DisabledPeriodic() override { m_counts.disabledPeriodic++; }
   void Start() override { m_counts.start++; }
   void Periodic() override { m_counts.periodic++; }
-  void End() override { m_counts.end++; }
+  void End() override {
+    m_counts.teardownEvents.emplace_back("end");
+    m_counts.end++;
+  }
+  void Close() override { m_counts.teardownEvents.emplace_back("close"); }
 
  private:
   Counts& m_counts;
@@ -137,6 +146,8 @@ TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest EnabledTransition",
 
   robot.EndCompetition();
   robotThread.join();
+  CHECK(counts.teardownEvents ==
+        std::vector<std::string_view>{"end", "close", "destroy"});
 }
 
 TEST_CASE_METHOD(OpModeLifecycleTest,
@@ -239,6 +250,9 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
 
   robot.EndCompetition();
   robotThread.join();
+  CHECK(counts1.teardownEvents ==
+        std::vector<std::string_view>{"close", "destroy"});
+  CHECK(counts2.teardownEvents.empty());
 }
 
 TEST_CASE_METHOD(OpModeLifecycleTest,

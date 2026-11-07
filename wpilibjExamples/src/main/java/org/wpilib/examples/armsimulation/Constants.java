@@ -4,7 +4,8 @@
 
 package org.wpilib.examples.armsimulation;
 
-import org.wpilib.math.util.Units;
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
 
 public class Constants {
   public static final int MOTOR_PORT = 0;
@@ -25,7 +26,7 @@ public class Constants {
 
   public static final double ARM_REDUCTION = 200;
   public static final double ARM_MASS = 8.0; // Kilograms
-  public static final double ARM_LENGTH = Units.inchesToMeters(30);
-  public static final double MIN_ANGLE_RADS = Units.degreesToRadians(-75);
-  public static final double MAX_ANGLE_RADS = Units.degreesToRadians(255);
+  public static final double ARM_LENGTH = inchesToMeters(30);
+  public static final double MIN_ANGLE_RADS = degreesToRadians(-75);
+  public static final double MAX_ANGLE_RADS = degreesToRadians(255);
 }

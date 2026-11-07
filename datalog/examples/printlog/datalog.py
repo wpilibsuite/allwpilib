@@ -265,7 +265,7 @@ class DataLogReader:
 if __name__ == "__main__":
     import mmap
     import sys
-    from datetime import datetime, timezone
+    from datetime import UTC, datetime
 
     if len(sys.argv) != 2:
         print("Usage: datalog.py <file>", file=sys.stderr)
@@ -325,7 +325,7 @@ if __name__ == "__main__":
                     if entry.name == "systemTime" and entry.type == "int64":
                         val = record.getInteger()
                         dt = datetime.fromtimestamp(
-                            val // 1_000_000, tz=timezone.utc
+                            val // 1_000_000, tz=UTC
                         ).astimezone()
                         print(f"  {dt:%Y-%m-%d %H:%M:%S}.{val % 1_000_000:06d}")
                         continue

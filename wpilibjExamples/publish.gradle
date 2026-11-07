@@ -3,11 +3,13 @@ apply plugin: 'maven-publish'
 def baseExamplesArtifactId = 'examples'
 def baseTemplatesArtifactId = 'templates'
 def baseCommandsArtifactId = 'commands'
+def baseSnippetsArtifactId = 'snippets'
 def artifactGroupId = 'org.wpilib.wpilibj'
 
 def examplesZipBaseName = makeZipBaseName(artifactGroupId, baseExamplesArtifactId)
 def templatesZipBaseName = makeZipBaseName(artifactGroupId, baseTemplatesArtifactId)
 def commandsZipBaseName = makeZipBaseName(artifactGroupId, baseCommandsArtifactId)
+def snippetsZipBaseName = makeZipBaseName(artifactGroupId, baseSnippetsArtifactId)
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -72,13 +74,36 @@ task javaCommandsZip(type: Zip) {
     }
 }
 
+task javaSnippetsZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = snippetsZipBaseName
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from(mainFile) {
+        into '/'
+    }
+
+    from('src/main/java/org/wpilib/snippets') {
+        into 'snippets'
+    }
+
+    from('src/test/java/org/wpilib/snippets') {
+        into 'snippets_test'
+    }
+}
+
 build.dependsOn javaTemplatesZip
 build.dependsOn javaExamplesZip
 build.dependsOn javaCommandsZip
+build.dependsOn javaSnippetsZip
 
 addTaskToCopyAllOutputs(javaTemplatesZip)
 addTaskToCopyAllOutputs(javaExamplesZip)
 addTaskToCopyAllOutputs(javaCommandsZip)
+addTaskToCopyAllOutputs(javaSnippetsZip)
 
 publishing {
     publications {
@@ -102,6 +127,14 @@ publishing {
             artifact javaCommandsZip
 
             artifactId = baseCommandsArtifactId
+            groupId = artifactGroupId
+            version = wpilibVersioning.version.get()
+        }
+
+        snippets(MavenPublication) {
+            artifact javaSnippetsZip
+
+            artifactId = baseSnippetsArtifactId
             groupId = artifactGroupId
             version = wpilibVersioning.version.get()
         }

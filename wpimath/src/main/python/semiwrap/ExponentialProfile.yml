@@ -1,5 +1,14 @@
 classes:
   wpi::math::ExponentialProfile:
+    doc_code_blocks:
+    - |
+      constraints = ExponentialProfile.Constraints.from_characteristics(MAX_V, kV, kA)
+      previous_profiled_reference = ExponentialProfile.State(initial_reference, 0.0)
+      profile = ExponentialProfile(constraints)
+    - |
+      previous_profiled_reference = profile.calculate(
+          time_since_previous_update, previous_profiled_reference, unprofiled_reference
+      )
     force_type_casters:
     - wpi::units::meters_per_second_t
     template_params:

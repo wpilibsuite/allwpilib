@@ -1188,9 +1188,14 @@ void TunableRegistry::MoveTunable(uint32_t uid, detail::TunableBase* tunable) {
   auto it = inst.tunables.find(uid);
   if (it != inst.tunables.end()) {
     it->second->tunable = tunable;
-    // ComplexTunable rebinds config parents after its base constructor
-    // completes. Downcasting here would access a ComplexTunable that is not yet
-    // constructed.
+    if (it->second->type == detail::TunableTypeValue::COMPLEX) {
+      for (auto&& child : it->second->children) {
+        if (child.ownedMember && child.child->config &&
+            child.child->config->parent) {
+          child.child->config->parent = static_cast<ComplexTunable*>(tunable);
+        }
+      }
+    }
   } else {
     ReportWarning(std::format(
         "attempted to move tunable with uid {} that is not registered", uid));

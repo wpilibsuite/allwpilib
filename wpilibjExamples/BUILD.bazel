@@ -106,3 +106,10 @@ maven_export(
     target = ":templates-zip",
     visibility = ["//visibility:public"],
 )
+
+maven_export(
+    name = "snippets_publish",
+    maven_coordinates = "org.wpilib.wpilibj:snippets:$(WPILIB_VERSION)",
+    target = ":snippets-zip",
+    visibility = ["//visibility:public"],
+)

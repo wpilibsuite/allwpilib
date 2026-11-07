@@ -269,7 +269,7 @@ def gen_modinit_hpp(
         target_compatible_with = robotpy_compatibility_select(),
     )
 
-def run_header_gen(name, casters_pickle, trampoline_subpath, header_gen_config, deps = [], generation_defines = [], local_native_libraries = [], header_to_dat_deps = [], name_transforms = [], yml_prefix = "src/main/python/"):
+def run_header_gen(name, casters_pickle, trampoline_subpath, header_gen_config, deps = [], generation_defines = [], local_native_libraries = [], header_to_dat_deps = [], name_transforms = [], yml_prefix = ""):
     generation_includes = []
     header_to_dat_deps = list(header_to_dat_deps)
 
