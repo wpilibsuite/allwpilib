@@ -46,7 +46,7 @@
       "Hardware",
       "ExpansionHub",
       "FTC",
-      "OpModes"
+      "OpMode"
     ],
     "foldername": "expansionhubsample",
     "gradlebase": "java",

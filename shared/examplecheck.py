@@ -85,7 +85,6 @@ TAGS = {
     "Skeleton",
     "FTC",
     "ExpansionHub",
-    "OpModes",
 }
 
 

@@ -33,7 +33,8 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    // Replace this with a call to a trajectory generator
+    // Replace this with a call to a trajectory generator. Field poses use
+    // field center as the origin, with zero heading toward the blue wall.
     trajectory =
         new HolonomicTrajectory(
             List.of(
