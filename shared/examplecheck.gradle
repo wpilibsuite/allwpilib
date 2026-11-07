@@ -68,7 +68,7 @@ def tagList = [
         /* (try to keep this section minimal) */
         "EventLoop", "Mechanism2d", "Preferences", "Skeleton",
 
-        "FTC", "ExpansionHub", "OpModes"
+        "FTC", "ExpansionHub"
 ]
 
 tasks.register('checkTemplates') {
