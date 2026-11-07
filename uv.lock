@@ -21,6 +21,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "black" },
+    { name = "cxxheaderparser" },
     { name = "grpcio-tools" },
     { name = "jinja2" },
     { name = "protobuf" },
@@ -40,6 +41,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "black", specifier = "==25.12.0" },
+    { name = "cxxheaderparser", specifier = ">=2.1.0" },
     { name = "grpcio-tools", specifier = "==1.68.0" },
     { name = "jinja2", specifier = "==3.1.6" },
     { name = "protobuf", specifier = "==5.28.3" },
@@ -102,11 +104,11 @@ wheels = [
 
 [[package]]
 name = "cxxheaderparser"
-version = "2.0.0"
+version = "2.2.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f5/09/a6c4058b713b9b719e2561eb7e76f4c266ef1fe4084cb4af3b5e75a3bd27/cxxheaderparser-2.0.0.tar.gz", hash = "sha256:6298f40fcedf8a3a7dbec679c4e88686f24f34edb5bdc1fdca65c1802a4205ab", size = 57357, upload-time = "2026-08-26T02:52:24.993Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1e/c3/546f5d26067f412818b353f28037d480c02f21a1d35b1d1248735c0eaabd/cxxheaderparser-2.2.0.tar.gz", hash = "sha256:220f9f4efadfbc8ebbbdea82ae0ba0e11d82f118efce3b701f19945a937cb515", size = 60687, upload-time = "2026-10-11T19:36:35.844Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/81/61/f97b3552ba7502921b4ae075c0d5068db6452e62c279363566870a2cd938/cxxheaderparser-2.0.0-py3-none-any.whl", hash = "sha256:d545e6e627bc7d305204a9fe1e9ea4f88983419ec3a6c0fec1e3f419c3006a07", size = 63859, upload-time = "2026-08-26T02:52:23.616Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/7f/9785e4e42e0e3481471bbb008f737595944cf03a91e23e00ac2b4a04b170/cxxheaderparser-2.2.0-py3-none-any.whl", hash = "sha256:cccf8db541be342fc6e2450dec168a77bafe87a65a4a89b547b529c92dbe792e", size = 67367, upload-time = "2026-10-11T19:36:34.407Z" },
 ]
 
 [package.optional-dependencies]
