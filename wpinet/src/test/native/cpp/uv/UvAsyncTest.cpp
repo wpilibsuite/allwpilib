@@ -41,7 +41,13 @@
 
 namespace wpi::net::uv {
 
-TEST_CASE("UvAsyncTest CallbackOnly", "[uv][async]") {
+#ifdef __clang__
+#define NO_THREAD_SAFETY_ANALYSIS [[clang::no_thread_safety_analysis]]
+#else
+#define NO_THREAD_SAFETY_ANALYSIS
+#endif
+
+NO_THREAD_SAFETY_ANALYSIS TEST_CASE("UvAsyncTest CallbackOnly", "[uv][async]") {
   std::atomic_int async_cb_called{0};
   int prepare_cb_called = 0;
   int close_cb_called = 0;
@@ -60,7 +66,7 @@ TEST_CASE("UvAsyncTest CallbackOnly", "[uv][async]") {
 
   prepare->error.connect([&](Error) { fail = true; });
   prepare->closed.connect([&] { close_cb_called++; });
-  prepare->prepare.connect([&] {
+  prepare->prepare.connect([&] NO_THREAD_SAFETY_ANALYSIS {
     if (prepare_cb_called++) {
       return;
     }
