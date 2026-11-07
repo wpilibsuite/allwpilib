@@ -343,7 +343,6 @@
     "name": "DataLogCustom",
     "description": "Log custom robot data to the WPILib data log.",
     "tags": [
-      "Telemetry",
       "DataLog"
     ],
     "foldername": "DataLogCustom",
