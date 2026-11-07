@@ -6,30 +6,19 @@ load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "gene
 def define_native_wrapper(name, pyproject_toml = None):
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = native.glob(["src/main/native/include/**"]) + native.glob([
-            "src/main/native/thirdparty/ada/include/**",
-            "src/main/native/thirdparty/llhttp/include/**",
-            "src/main/native/thirdparty/tcpsockets/include/**",
-        ]) + [
-            "@libuv//:include_files",
-        ] + [
+        srcs = native.glob(["src/main/native/include/**"]) + [
             "//:LICENSE.md",
         ],
-        out = "native/wpinet/include",
-        include_external_repositories = ["*libuv*"],
+        out = "native/datalog/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
-            "include": "",
-            "wpinet/src/main/native/include": "",
-            "wpinet/src/main/native/thirdparty/ada/include": "",
-            "wpinet/src/main/native/thirdparty/llhttp/include": "",
-            "wpinet/src/main/native/thirdparty/tcpsockets/include": "",
+            "datalog/src/main/native/include": "",
         },
         verbose = False,
         visibility = ["//visibility:public"],
     )
 
-    libinit_files = ["native/wpinet/_init_robotpy_native_wpinet.py"]
+    libinit_files = ["native/datalog/_init_robotpy_native_datalog.py"]
 
     generate_native_files(
         name = name,
@@ -38,34 +27,35 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
         libinit_files = libinit_files,
-        pc_files = ["native/wpinet/robotpy-native-wpinet.pc"],
+        pc_files = ["native/datalog/robotpy-native-datalog.pc"],
     )
 
     copy_native_file(
-        name = "wpinet",
-        library = "shared/wpinet",
-        base_path = "native/wpinet/",
+        name = "datalog",
+        library = "shared/datalog",
+        base_path = "native/datalog/",
     )
 
     robotpy_library(
         name = name,
-        distribution = "robotpy-native-wpinet",
+        distribution = "robotpy-native-datalog",
         srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
-            ":wpinet.copy_lib",
+            ":datalog.copy_lib",
             "{}.copy_headers".format(name),
         ],
         deps = [
             "//wpiutil:robotpy-native-wpiutil",
         ],
-        summary = "WPILib Networking Library",
+        strip_path_prefixes = ["datalog"],
+        summary = "WPILib Utility Library",
+        project_urls = None,
+        author_email = None,
         requires = ["robotpy-native-wpiutil==0.0.0"],
         python_requires = ">=3.12",
-        strip_path_prefixes = ["wpinet"],
         entry_points = {
-            "pkg_config": [
-                "wpinet = native.wpinet",
-            ],
+            "pkg_config": ["datalog = native.datalog"],
         },
+        visibility = ["//visibility:public"],
     )

@@ -9,16 +9,16 @@ def define_native_wrapper(name, pyproject_toml = None):
         srcs = native.glob(["src/main/native/include/**"]) + [
             "//:LICENSE.md",
         ],
-        out = "native/datalog/include",
+        out = "native/tunables/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
-            "datalog/src/main/native/include": "",
+            "tunables/src/main/native/include": "",
         },
         verbose = False,
         visibility = ["//visibility:public"],
     )
 
-    libinit_files = ["native/datalog/_init_robotpy_native_datalog.py"]
+    libinit_files = ["native/tunables/_init_robotpy_native_tunables.py"]
 
     generate_native_files(
         name = name,
@@ -27,34 +27,35 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
         libinit_files = libinit_files,
-        pc_files = ["native/datalog/robotpy-native-datalog.pc"],
+        pc_files = ["native/tunables/robotpy-native-tunables.pc"],
     )
 
     copy_native_file(
-        name = "datalog",
-        library = "shared/datalog",
-        base_path = "native/datalog/",
+        name = "tunables",
+        library = "shared/tunables",
+        base_path = "native/tunables/",
     )
 
     robotpy_library(
         name = name,
-        distribution = "robotpy-native-datalog",
+        distribution = "robotpy-native-tunables",
         srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
-            ":datalog.copy_lib",
+            ":tunables.copy_lib",
             "{}.copy_headers".format(name),
         ],
         deps = [
             "//wpiutil:robotpy-native-wpiutil",
         ],
-        summary = "WPILib Utility Library",
+        strip_path_prefixes = ["tunables"],
+        summary = "WPILib Tunables Library",
+        project_urls = None,
+        author_email = None,
         requires = ["robotpy-native-wpiutil==0.0.0"],
-        python_requires = ">=3.12",
-        strip_path_prefixes = ["datalog"],
+        python_requires = None,
         entry_points = {
-            "pkg_config": [
-                "datalog = native.datalog",
-            ],
+            "pkg_config": ["tunables = native.tunables"],
         },
+        visibility = ["//visibility:public"],
     )

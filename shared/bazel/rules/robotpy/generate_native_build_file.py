@@ -2,6 +2,7 @@ import argparse
 import json
 import pathlib
 
+import jinja2
 import tomli
 from jinja2 import BaseLoader, Environment
 from packaging.markers import Marker
@@ -47,10 +48,16 @@ def main():
         wpilib_project = fixup_root_package_name(base_project)
         return f"//{fixup_root_package_name(wpilib_project)}:{fixup_python_dep_name(library)}"
 
+    def jsonify(item):
+        if isinstance(item, jinja2.runtime.Undefined):
+            return "None"
+        return json.dumps(item)
+
     env = Environment(loader=BaseLoader)
     env.filters["double_quotes"] = double_quotes
     env.filters["get_pc_dep"] = get_pc_dep
     env.filters["get_python_dep"] = get_python_dep
+    env.filters["jsonify"] = jsonify
     env.filters["strip_src_prefix"] = lambda x: (
         pathlib.PurePath(x).as_posix().removeprefix("src/")
     )
@@ -216,17 +223,16 @@ def define_native_wrapper(name, pyproject_toml = None):
             "{{dep | get_python_dep}}",
         {%- endfor %}
         ],
-        summary = "{{raw_project_config.description}}",
-        requires = {{raw_project_config.dependencies | double_quotes}},
-        python_requires = "{{raw_project_config["requires-python"]}}",
         strip_path_prefixes = ["{{root_package}}"],
+        summary = "{{raw_project_config.description}}",
+        project_urls = {{raw_project_config.urls | jsonify}},
+        author_email = None,
+        requires = {{raw_project_config.dependencies | double_quotes}},
+        python_requires = {{raw_project_config["requires-python"] | jsonify}},
         entry_points = {
-            "pkg_config": [
-            {%- for pcfile in pc_files %}
-                "{{pcfile.name}} = native.{{project_name}}",
-            {%- endfor %}
-            ],
+            "pkg_config": [{%- for pcfile in pc_files %}"{{pcfile.name}} = native.{{project_name}}"{% if not loop.last %}, {% endif %}{%- endfor %}],
         },
+        visibility = ["//visibility:public"],
     )
 
 """
