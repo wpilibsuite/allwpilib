@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib, wpilog
 
 
@@ -26,6 +28,7 @@ class MyRobot(wpilib.TimedRobot):
         self.string_log = wpilog.StringLogEntry(log, "/my/string")
 
     # Log the custom entries periodically.
+    @override
     def teleop_periodic(self):
         self.boolean_log.append(True)
         self.double_log.append(3.5)
