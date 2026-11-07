@@ -17,7 +17,10 @@
  */
 class Drivetrain {
  public:
-  Drivetrain() { imu.ResetYaw(); }
+  Drivetrain() {
+    // Start facing the blue alliance wall so yaw zero aligns with field +X.
+    imu.ResetYaw();
+  }
 
   void Drive(wpi::units::meters_per_second_t xVelocity,
              wpi::units::meters_per_second_t yVelocity,

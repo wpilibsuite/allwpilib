@@ -19,6 +19,10 @@ void Log(std::string_view name, pybind11::object value,
       name, std::move(value), std::move(elementType), typeString);
 }
 
+void LogUnit(std::string_view name, double value, std::string_view unit) {
+  PyTelemetryTable{wpi::telemetry::GetTable()}.LogUnit(name, value, unit);
+}
+
 void KeepDuplicates(std::string_view name) {
   wpi::telemetry::KeepDuplicates(name);
 }

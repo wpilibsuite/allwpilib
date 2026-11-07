@@ -20,5 +20,7 @@ classes:
         no_release_gil: true
       SetProperty:
         no_release_gil: true
+      LogUnit:
+        no_release_gil: true
       Log:
         no_release_gil: true

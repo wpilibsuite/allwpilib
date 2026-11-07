@@ -4,14 +4,16 @@
 
 #include "commands/TeleopArcadeDrive.hpp"
 
+#include <utility>
+
 #include "subsystems/Drivetrain.hpp"
 
 TeleopArcadeDrive::TeleopArcadeDrive(
     Drivetrain* subsystem, std::function<double()> xaxisVelocitySupplier,
     std::function<double()> zaxisRotateSuppplier)
     : drive{subsystem},
-      xaxisVelocitySupplier{xaxisVelocitySupplier},
-      zaxisRotateSupplier{zaxisRotateSuppplier} {
+      xaxisVelocitySupplier{std::move(xaxisVelocitySupplier)},
+      zaxisRotateSupplier{std::move(zaxisRotateSuppplier)} {
   AddRequirements(subsystem);
 }
 

@@ -4,7 +4,7 @@ wpilib_java_junit5_test(
     name = "java",
     srcs = glob(["**/*.java"]),
     deps = [
-        "//cscore:cscore-java",
-        "//wpiutil:wpiutil-java",
+        "//cscore/src/main/java",
+        "//wpiutil/src/main/java",
     ],
 )

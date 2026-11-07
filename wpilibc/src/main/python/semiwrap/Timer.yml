@@ -6,6 +6,12 @@ classes:
     methods:
       Timer:
       CreateStarted:
+        doc_code_blocks:
+        - |
+          from wpilib import Timer
+
+          timer = Timer()
+          timer.start()
       Get:
       Reset:
       Start:

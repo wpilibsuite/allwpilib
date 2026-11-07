@@ -24,7 +24,8 @@ template <typename Callback>
 class CallbackListenerData {
  public:
   CallbackListenerData() = default;
-  explicit CallbackListenerData(Callback callback_) : callback(callback_) {}
+  explicit CallbackListenerData(Callback callback_)
+      : callback(std::move(callback_)) {}
   explicit CallbackListenerData(unsigned int poller_uid_)
       : poller_uid(poller_uid_) {}
 

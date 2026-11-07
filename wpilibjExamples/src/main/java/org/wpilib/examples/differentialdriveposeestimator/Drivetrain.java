@@ -83,7 +83,7 @@ public class Drivetrain {
           imu.getRotation2d(),
           leftEncoder.getDistance(),
           rightEncoder.getDistance(),
-          Pose2d.ZERO,
+          Pose2d.ZERO, // Field center, facing the blue alliance wall.
           VecBuilder.fill(0.05, 0.05, degreesToRadians(5)),
           VecBuilder.fill(0.5, 0.5, degreesToRadians(30)));
 
@@ -125,6 +125,7 @@ public class Drivetrain {
 
     cameraToObjectEntry = cameraToObjectTopic.getEntry(defaultVal);
 
+    // Built-in tag poses use the same centered field frame as the pose estimator.
     objectInField = Field.loadField(Fields.FRC_2024_CRESCENDO).getTagPose(1).get();
   }
 

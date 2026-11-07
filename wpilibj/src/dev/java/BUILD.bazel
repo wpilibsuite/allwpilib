@@ -5,11 +5,11 @@ java_binary(
     srcs = ["org/wpilib/DevMain.java"],
     main_class = "org.wpilib.DevMain",
     deps = [
-        "//hal:hal-java",
-        "//ntcore:ntcore-java",
-        "//telemetry:telemetry-java",
-        "//tunables:tunables-java",
-        "//wpimath:wpimath-java",
-        "//wpiutil:wpiutil-java",
+        "//hal/src/main/java",
+        "//ntcore/src/main/java",
+        "//telemetry/src/main/java",
+        "//tunables/src/main/java",
+        "//wpimath/src/main/java",
+        "//wpiutil/src/main/java",
     ],
 )

@@ -422,16 +422,12 @@ class DynamicStruct {
                       size_t arrIndex = 0) const {
     assert(field->IsInt());
     uint64_t raw = GetFieldImpl(field, arrIndex);
-    switch (field->m_size) {
-      case 1:
-        return static_cast<int8_t>(raw);
-      case 2:
-        return static_cast<int16_t>(raw);
-      case 4:
-        return static_cast<int32_t>(raw);
-      default:
-        return raw;
+    // Signed integer widths are 1 through 64, including non-bitfield integers.
+    // Extend the declared sign bit, not the storage unit's sign bit.
+    if ((raw & (uint64_t{1} << (field->m_bitWidth - 1))) != 0) {
+      raw |= ~field->m_bitMask;
     }
+    return std::bit_cast<int64_t>(raw);
   }
 
   /**

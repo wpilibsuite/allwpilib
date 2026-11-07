@@ -4,8 +4,8 @@ wpilib_java_junit5_test(
     name = "java",
     srcs = glob(["**/*.java"]),
     deps = [
-        "//tunables:tunables-java",
-        "//wpiutil:wpiutil-java",
+        "//tunables/src/main/java",
+        "//wpiutil/src/main/java",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )

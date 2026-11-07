@@ -136,4 +136,33 @@ class LTVDifferentialDriveControllerTest {
                     endPose.getRotation().getRadians() - finalRobotPose.getRotation().getRadians()),
                 ANGULAR_TOLERANCE));
   }
+
+  @Test
+  void testNoTurnFromLateralErrorAtStandstill() {
+    final double DT = 0.02;
+
+    final var controller =
+        new LTVDifferentialDriveController(
+            plant,
+            TRACKWIDTH,
+            VecBuilder.fill(0.0625, 0.125, 2.5, 0.95, 0.95),
+            VecBuilder.fill(12.0, 12.0),
+            DT);
+
+    // Lateral error can't be corrected while stopped, so the controller
+    // shouldn't turn in place in response to it
+    for (double velocity : new double[] {-1e-6, 0.0, 1e-6}) {
+      var output =
+          controller.calculate(
+              Pose2d.ZERO,
+              velocity,
+              velocity,
+              new Pose2d(0.0, 0.1, Rotation2d.ZERO),
+              velocity,
+              velocity);
+
+      assertEquals(0.0, output.left, 1e-3);
+      assertEquals(0.0, output.right, 1e-3);
+    }
+  }
 }
