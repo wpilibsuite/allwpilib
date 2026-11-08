@@ -21,6 +21,12 @@ Vectord<2> StateDynamics(const Vectord<2>& x) {
   return Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}} * x;
 }
 
+Vectord<2> StateDependentInputDynamics(const Vectord<2>& x,
+                                       const Vectord<1>& u) {
+  return Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}} * x +
+         Matrixd<2, 1>{0.0, 1.0 + x(0) * x(0)} * u;
+}
+
 TEST_CASE("ControlAffinePlantInversionFeedforwardTest Calculate", "[wpimath]") {
   wpi::math::ControlAffinePlantInversionFeedforward<2, 1> feedforward{&Dynamics,
                                                                       20_ms};
@@ -40,6 +46,22 @@ TEST_CASE("ControlAffinePlantInversionFeedforwardTest CalculateState",
   Vectord<2> nextR{3, 3};
 
   CHECK_NEAR(48, feedforward.Calculate(r, nextR)(0, 0), 1e-6);
+}
+
+TEST_CASE("ControlAffinePlantInversionFeedforwardTest CalculateStateDependentB",
+          "[wpimath]") {
+  wpi::math::ControlAffinePlantInversionFeedforward<2, 1> feedforward{
+      &StateDependentInputDynamics, 20_ms};
+
+  // B(r) = [0, 1 + 2²]ᵀ = [0, 5]ᵀ, ṙ − f(r) = [48, 48]ᵀ
+  Vectord<2> r{2, 2};
+  Vectord<2> nextR{3, 3};
+  CHECK_NEAR(9.6, feedforward.Calculate(r, nextR)(0, 0), 1e-6);
+
+  // B(r) = [0, 1 + 3²]ᵀ = [0, 10]ᵀ, ṙ − f(r) = [47, 47]ᵀ
+  r = Vectord<2>{3, 3};
+  nextR = Vectord<2>{4, 4};
+  CHECK_NEAR(4.7, feedforward.Calculate(r, nextR)(0, 0), 1e-6);
 }
 
 }  // namespace wpi::math

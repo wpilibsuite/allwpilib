@@ -17,13 +17,13 @@ import org.wpilib.math.util.Num;
  *
  * <p>If given the vector valued function as f(x, u) where x is the state vector and u is the input
  * vector, the B matrix(continuous input matrix) is calculated through a {@link NumericalJacobian}.
- * In this case f has to be control-affine (of the form f(x) + Bu).
+ * In this case f has to be control-affine (of the form f(x) + B(x)u).
  *
  * <p>The feedforward is calculated as <strong> u_ff = B<sup>+</sup> (rDot - f(x))</strong>, where
  * <strong> B<sup>+</sup> </strong> is the pseudoinverse of B.
  *
- * <p>This feedforward does not account for a dynamic B matrix, B is either determined or supplied
- * when the feedforward is created and remains constant.
+ * <p>If f(x, u) is given, B is recomputed at the current reference on every call to calculate(), so
+ * B may depend on the state. If B is supplied, it remains constant.
  *
  * <p>For more on the underlying math, read <a
  * href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">https://file.tavsys.net/control/controls-engineering-in-frc.pdf</a>.
@@ -38,7 +38,12 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
   /** The computed feedforward. */
   private Matrix<Inputs, N1> m_uff;
 
-  private final Matrix<States, Inputs> m_B;
+  private Matrix<States, Inputs> m_B;
+
+  /** Whether B is recomputed from f(x, u) in calculate(). */
+  private final boolean m_recomputeB;
+
+  private final Nat<States> m_states;
 
   private final Nat<Inputs> m_inputs;
 
@@ -53,7 +58,7 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
    * @param states A {@link Nat} representing the number of states.
    * @param inputs A {@link Nat} representing the number of inputs.
    * @param f A vector-valued function of x, the state, and u, the input, that returns the
-   *     derivative of the state vector. HAS to be control-affine (of the form f(x) + Bu).
+   *     derivative of the state vector. HAS to be control-affine (of the form f(x) + B(x)u).
    * @param dt The timestep between calls of calculate() in seconds.
    */
   public ControlAffinePlantInversionFeedforward(
@@ -63,11 +68,11 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
       double dt) {
     this.m_dt = dt;
     this.m_f = f;
+    this.m_states = states;
     this.m_inputs = inputs;
 
-    this.m_B =
-        NumericalJacobian.numericalJacobianU(
-            states, inputs, m_f, new Matrix<>(states, Nat.N1()), new Matrix<>(inputs, Nat.N1()));
+    this.m_B = new Matrix<>(states, inputs);
+    this.m_recomputeB = true;
 
     m_r = new Matrix<>(states, Nat.N1());
     m_uff = new Matrix<>(inputs, Nat.N1());
@@ -93,10 +98,12 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
       Matrix<States, Inputs> B,
       double dt) {
     this.m_dt = dt;
+    this.m_states = states;
     this.m_inputs = inputs;
 
     this.m_f = (x, u) -> f.apply(x);
     this.m_B = B;
+    this.m_recomputeB = false;
 
     m_r = new Matrix<>(states, Nat.N1());
     m_uff = new Matrix<>(inputs, Nat.N1());
@@ -182,6 +189,12 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
    */
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> r, Matrix<States, N1> nextR) {
     var rDot = nextR.minus(r).div(m_dt);
+
+    if (m_recomputeB) {
+      m_B =
+          NumericalJacobian.numericalJacobianU(
+              m_states, m_inputs, m_f, r, new Matrix<>(m_inputs, Nat.N1()));
+    }
 
     // ṙ = f(r) + Bu
     // Bu = ṙ − f(r)

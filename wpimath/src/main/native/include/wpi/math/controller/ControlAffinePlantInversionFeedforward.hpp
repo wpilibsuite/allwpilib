@@ -21,14 +21,15 @@ namespace wpi::math {
  * If given the vector valued function as f(x, u) where x is the state
  * vector and u is the input vector, the B matrix(continuous input matrix)
  * is calculated through a NumericalJacobian. In this case f has to be
- * control-affine (of the form f(x) + Bu).
+ * control-affine (of the form f(x) + B(x)u).
  *
  * The feedforward is calculated as
  * <strong> u_ff = B<sup>+</sup> (rDot - f(x)) </strong>, where <strong>
  * B<sup>+</sup> </strong> is the pseudoinverse of B.
  *
- * This feedforward does not account for a dynamic B matrix, B is either
- * determined or supplied when the feedforward is created and remains constant.
+ * If f(x, u) is given, B is recomputed at the current reference on every call
+ * to Calculate(), so B may depend on the state. If B is supplied, it remains
+ * constant.
  *
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
@@ -49,16 +50,16 @@ class ControlAffinePlantInversionFeedforward {
    * @param f  A vector-valued function of x, the state, and
    *           u, the input, that returns the derivative of
    *           the state vector. HAS to be control-affine
-   *           (of the form f(x) + Bu).
+   *           (of the form f(x) + B(x)u).
    * @param dt The timestep between calls of calculate().
    */
   ControlAffinePlantInversionFeedforward(
       std::function<StateVector(const StateVector&, const InputVector&)> f,
       wpi::units::second_t dt)
-      : m_dt(dt), m_f(f) {
-    m_B = NumericalJacobianU<States, States, Inputs>(f, StateVector::Zero(),
-                                                     InputVector::Zero());
-
+      : m_B(Matrixd<States, Inputs>::Zero()),
+        m_dt(dt),
+        m_f(f),
+        m_recomputeB(true) {
     Reset();
   }
 
@@ -74,7 +75,7 @@ class ControlAffinePlantInversionFeedforward {
   ControlAffinePlantInversionFeedforward(
       std::function<StateVector(const StateVector&)> f,
       const Matrixd<States, Inputs>& B, wpi::units::second_t dt)
-      : m_B(B), m_dt(dt) {
+      : m_B(B), m_dt(dt), m_recomputeB(false) {
     m_f = [=](const StateVector& x, const InputVector& u) -> StateVector {
       return f(x);
     };
@@ -165,6 +166,11 @@ class ControlAffinePlantInversionFeedforward {
   InputVector Calculate(const StateVector& r, const StateVector& nextR) {
     StateVector rDot = (nextR - r) / m_dt.value();
 
+    if (m_recomputeB) {
+      m_B = NumericalJacobianU<States, States, Inputs>(m_f, r,
+                                                       InputVector::Zero());
+    }
+
     // ṙ = f(r) + Bu
     // Bu = ṙ − f(r)
     // u = B⁺(ṙ − f(r))
@@ -183,6 +189,11 @@ class ControlAffinePlantInversionFeedforward {
    * The model dynamics.
    */
   std::function<StateVector(const StateVector&, const InputVector&)> m_f;
+
+  /**
+   * Whether B is recomputed from f(x, u) in Calculate().
+   */
+  bool m_recomputeB;
 
   // Current reference
   StateVector m_r;
