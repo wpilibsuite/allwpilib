@@ -25,7 +25,6 @@ class RoboRioData {
   HAL_SIMDATAVALUE_DEFINE_NAME(TeamNumber)
 
   HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(SerialNumber)
-  HAL_SIMCALLBACKREGISTRY_DEFINE_NAME(Comments);
 
  public:
   SimDataValue<double, HAL_MakeDouble, GetVInVoltageName> vInVoltage{12.0};
@@ -49,12 +48,6 @@ class RoboRioData {
   void GetSerialNumber(struct WPI_String* serialNumber);
   void SetSerialNumber(std::string_view serialNumber);
 
-  int32_t RegisterCommentsCallback(HAL_RoboRioStringCallback callback,
-                                   void* param, HAL_Bool initialNotify);
-  void CancelCommentsCallback(int32_t uid);
-  void GetComments(struct WPI_String* comments);
-  void SetComments(std::string_view comments);
-
   virtual void ResetData();
 
  private:
@@ -66,9 +59,6 @@ class RoboRioData {
 
   SimCallbackRegistry<HAL_RoboRioStringCallback, GetSerialNumberName>
       m_serialNumberCallbacks;
-
-  SimCallbackRegistry<HAL_RoboRioStringCallback, GetCommentsName>
-      m_commentsCallbacks;
 };
 extern RoboRioData* SimRoboRioData;
 }  // namespace wpi::hal

@@ -32,6 +32,4 @@ classes:
       SetTeamNumber:
       GetSerialNumber:
       SetSerialNumber:
-      GetComments:
-      SetComments:
       ResetData:
