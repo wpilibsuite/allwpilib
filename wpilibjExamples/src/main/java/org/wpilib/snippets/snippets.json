@@ -378,5 +378,15 @@
     "foldername": "gamedata2026",
     "gradlebase": "java",
     "robotclass": "Robot"
+  },
+  {
+    "name": "DataLogCustom",
+    "description": "Log custom robot data to the WPILib data log.",
+    "tags": [
+      "DataLog"
+    ],
+    "foldername": "datalogcustom",
+    "gradlebase": "java",
+    "robotclass": "Robot"
   }
 ]
