@@ -5,8 +5,8 @@ robotpy_project(
     srcs = glob(["**/*.py"]),
     main = "robot.py",
     deps = [
-        "//datalog:robotpy-wpilog",
-        "//drivers:wpilib-drivers",
-        "//wpiutil:robotpy-wpiutil",
+        "//datalog/src/main/python",
+        "//drivers/src/main/python",
+        "//wpiutil/src/main/python",
     ],
 )
