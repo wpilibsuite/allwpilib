@@ -2934,6 +2934,9 @@
           "flashbax": {
             "/wheelhouse/simple/flashbax/flashbax-0.1.3-py3-none-any.whl": ""
           },
+          "flask": {
+            "Flask-1.1.2-py2.py3-none-any.whl": "sha256:8a4fdd8936eba2512e9c85df320a37e694c93945b33ef33c89946a340a238557"
+          },
           "flatbuffers": {
             "/wheelhouse/simple/flatbuffers/flatbuffers-25.12.19-py2.py3-none-any.whl": ""
           },
@@ -3003,6 +3006,9 @@
           "joblib": {
             "/wheelhouse/simple/joblib/joblib-1.5.3-py3-none-any.whl": ""
           },
+          "keras": {
+            "keras-3.12.3-py3-none-any.whl": "sha256:145585ef980f443b298f720afa0c2c432949f519a27088fea51396748eb74ac3"
+          },
           "kiwisolver": {
             "/wheelhouse/simple/kiwisolver/kiwisolver-1.4.6-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl": ""
           },
@@ -3071,6 +3077,9 @@
           },
           "nvidia-cuda-runtime-cu12": {
             "/wheelhouse/simple/nvidia-cuda-runtime-cu12/nvidia_cuda_runtime_cu12-12.6.68-py3-none-manylinux2014_x86_64.whl": ""
+          },
+          "nvidia-cudnn-cu12": {
+            "nvidia_cudnn_cu12-9.23.2.1-py3-none-manylinux_2_27_x86_64.whl": "sha256:a5e706320218dc7d661b0e13402f204eeccd07b18d061b4d60668f80e464dd1e"
           },
           "nvidia-cufft-cu12": {
             "/wheelhouse/simple/nvidia-cufft-cu12/nvidia_cufft_cu12-11.2.6.59-py3-none-manylinux2014_x86_64.whl": ""
@@ -3159,6 +3168,9 @@
           "python-gflags": {
             "/wheelhouse/simple/python-gflags/python_gflags-3.1.2-py3-none-any.whl": ""
           },
+          "pytz": {
+            "pytz-2020.1-py2.py3-none-any.whl": "sha256:a494d53b6d39c3c6e44c3bec237336e14305e4f29bbf800b599253057fbb79ed"
+          },
           "pyyaml": {
             "/wheelhouse/simple/pyyaml/PyYAML-6.0.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": ""
           },
@@ -3192,8 +3204,15 @@
           "tenacity": {
             "/wheelhouse/simple/tenacity/tenacity-9.0.0-py3-none-any.whl": ""
           },
+          "tensorboard": {
+            "tensorboard-2.20.0-py3-none-any.whl": "sha256:9dc9f978cb84c0723acf9a345d96c184f0293d18f166bb8d59ee098e6cfaaba6"
+          },
           "tensorboard-data-server": {
             "/wheelhouse/simple/tensorboard-data-server/tensorboard_data_server-0.7.2-py3-none-manylinux_2_31_x86_64.whl": ""
+          },
+          "tensorflow": {
+            "tensorflow-2.20.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "sha256:7abd7f3a010e0d354dc804182372779a722d474c4d8a3db8f4a3f5baef2a591e",
+            "tensorflow-2.20.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl": "sha256:5fa3729b0126f75a99882b89fb7d536515721eda8014a63e259e780ba0a37372"
           },
           "tensorflow-datasets": {
             "/wheelhouse/simple/tensorflow-datasets/tensorflow_datasets-4.9.3-py3-none-any.whl": ""
@@ -3209,6 +3228,9 @@
           },
           "termcolor": {
             "/wheelhouse/simple/termcolor/termcolor-2.4.0-py3-none-any.whl": ""
+          },
+          "tf-keras": {
+            "tf_keras-2.20.1-py3-none-any.whl": "sha256:3f0e0a34d9a4c8758f24fdc1053e6e335f16ab5534c7d34f1899b8924779760c"
           },
           "toml": {
             "/wheelhouse/simple/toml/toml-0.10.2-py2.py3-none-any.whl": ""
