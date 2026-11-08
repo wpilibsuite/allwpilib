@@ -39,8 +39,6 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
   private Matrix<Inputs, N1> m_uff;
 
   private Matrix<States, Inputs> m_B;
-
-  /** Whether B is recomputed from f(x, u) in calculate(). */
   private final boolean m_recomputeB;
 
   private final Nat<States> m_states;

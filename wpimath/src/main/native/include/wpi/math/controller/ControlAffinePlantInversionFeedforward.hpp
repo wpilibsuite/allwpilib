@@ -57,9 +57,9 @@ class ControlAffinePlantInversionFeedforward {
       std::function<StateVector(const StateVector&, const InputVector&)> f,
       wpi::units::second_t dt)
       : m_B(Matrixd<States, Inputs>::Zero()),
+        m_recomputeB(true),
         m_dt(dt),
-        m_f(f),
-        m_recomputeB(true) {
+        m_f(f) {
     Reset();
   }
 
@@ -75,7 +75,7 @@ class ControlAffinePlantInversionFeedforward {
   ControlAffinePlantInversionFeedforward(
       std::function<StateVector(const StateVector&)> f,
       const Matrixd<States, Inputs>& B, wpi::units::second_t dt)
-      : m_B(B), m_dt(dt), m_recomputeB(false) {
+      : m_B(B), m_recomputeB(false), m_dt(dt) {
     m_f = [=](const StateVector& x, const InputVector& u) -> StateVector {
       return f(x);
     };
@@ -182,6 +182,7 @@ class ControlAffinePlantInversionFeedforward {
 
  private:
   Matrixd<States, Inputs> m_B;
+  bool m_recomputeB;
 
   wpi::units::second_t m_dt;
 
@@ -189,11 +190,6 @@ class ControlAffinePlantInversionFeedforward {
    * The model dynamics.
    */
   std::function<StateVector(const StateVector&, const InputVector&)> m_f;
-
-  /**
-   * Whether B is recomputed from f(x, u) in Calculate().
-   */
-  bool m_recomputeB;
 
   // Current reference
   StateVector m_r;

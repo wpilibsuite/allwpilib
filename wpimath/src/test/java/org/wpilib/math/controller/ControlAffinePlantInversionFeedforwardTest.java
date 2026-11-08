@@ -35,15 +35,31 @@ class ControlAffinePlantInversionFeedforwardTest {
 
   @Test
   void testCalculateStateDependentB() {
-    ControlAffinePlantInversionFeedforward<N2, N1> feedforward =
+    var feedforward =
         new ControlAffinePlantInversionFeedforward<>(
             Nat.N2(), Nat.N1(), this::getStateDependentInputDynamics, 0.02);
 
-    // B(r) = [0, 1 + 2²]ᵀ = [0, 5]ᵀ, ṙ − f(r) = [48, 48]ᵀ
+    // f(x, u) = x + B(x)u, where B(x) = [0, 1 + x₀²]ᵀ
+    //
+    // ṙ = (rₖ₊₁ − rₖ)/dt
+    // ṙ = f(rₖ, 0) + B(rₖ)u
+    // u = B(rₖ)⁺(ṙ − f(rₖ, 0))
+    //   = B(rₖ)⁺(ṙ − rₖ)
+    //   = B(rₖ)ᵀ(ṙ − rₖ) / (B(rₖ)ᵀB(rₖ))
+    //
+    // rₖ = [2, 2]ᵀ, rₖ₊₁ = [3, 3]ᵀ, dt = 0.02
+    // B(rₖ) = [0, 1 + 2²]ᵀ = [0, 5]ᵀ
+    // ṙ = ([3, 3]ᵀ − [2, 2]ᵀ)/0.02 = [50, 50]ᵀ
+    // ṙ − rₖ = [50, 50]ᵀ − [2, 2]ᵀ = [48, 48]ᵀ
+    // u = (0 ⋅ 48 + 5 ⋅ 48) / (0² + 5²) = 240/25 = 9.6
     assertEquals(
         9.6, feedforward.calculate(VecBuilder.fill(2, 2), VecBuilder.fill(3, 3)).get(0, 0), 1e-6);
 
-    // B(r) = [0, 1 + 3²]ᵀ = [0, 10]ᵀ, ṙ − f(r) = [47, 47]ᵀ
+    // rₖ = [3, 3]ᵀ, rₖ₊₁ = [4, 4]ᵀ, dt = 0.02
+    // B(rₖ) = [0, 1 + 3²]ᵀ = [0, 10]ᵀ
+    // ṙ = ([4, 4]ᵀ − [3, 3]ᵀ)/0.02 = [50, 50]ᵀ
+    // ṙ − rₖ = [50, 50]ᵀ − [3, 3]ᵀ = [47, 47]ᵀ
+    // u = (0 ⋅ 47 + 10 ⋅ 47) / (0² + 10²) = 470/100 = 4.7
     assertEquals(
         4.7, feedforward.calculate(VecBuilder.fill(3, 3), VecBuilder.fill(4, 4)).get(0, 0), 1e-6);
   }
