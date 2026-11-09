@@ -10,6 +10,7 @@
 #include "wpi/driverstation/POVDirection.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
 #include "wpi/hal/DriverStationTypes.hpp"
+#include "wpi/util/Alert.hpp"
 #include "wpi/util/Synchronization.h"
 
 namespace wpi::log {
@@ -27,7 +28,36 @@ class Color;
 namespace wpi::internal {
 
 using wpi::hal::RobotMode;
+enum class JoystickResourceAlert { BUTTON, AXIS, POV };
 
+struct JoystickAlertState {
+  wpi::util::Alert alert;
+  bool active = false;
+};
+
+struct JoystickAlerts {
+  bool Initialize();
+  void Release();
+  bool PrepareForReport(bool silenceJoystickAlerts);
+  void Refresh();
+  void ClearAllAlerts();
+  void ClearResourceAlerts();
+  void RefreshResourceAlert(JoystickResourceAlert type);
+  bool IsResourceAlertAvailable(JoystickResourceAlert type) const;
+  void ReportResourceWarning(JoystickResourceAlert type, int resource);
+  void ReportTouchpadFingerWarning(int touchpad, int finger);
+  bool SetAlert(JoystickAlertState& alertState, bool active,
+                std::string_view alertText = {});
+
+  int stick = 0;
+  bool initialized = false;
+  JoystickAlertState connectionAlert;
+  std::array<JoystickAlertState, 3> resourceAlerts;
+  JoystickAlertState touchpadFingerAlert;
+  std::array<int, 3> resourceAlertValues{};
+  int touchpadFingerAlertTouchpad = 0;
+  int touchpadFingerAlertFinger = 0;
+};
 /**
  * Provide access to the network communication data to / from the Driver
  * Station.
