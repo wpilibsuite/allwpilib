@@ -3,6 +3,7 @@ base = [
   "AddressableLED",
   "AprilTagsVision",
   "CANPDP",
+  "DataLogCustom",
   "DigitalCommunication",
   "DutyCycleInput",
   "EventLoop",

@@ -11,6 +11,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.dense.row.misc.TransposeAlgs_DDRM;
 import org.ejml.interfaces.decomposition.CholeskyDecomposition_F64;
 import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.jni.EigenJNI;
@@ -351,9 +352,69 @@ public class Matrix<R extends Num, C extends Num>
     return new Matrix<>(this.m_storage.solve(Objects.requireNonNull(b).m_storage));
   }
 
+  // Coefficients for (13, 13) Padé approximant of exp(A) are from the following program:
+  //
+  // #!/usr/bin/env python
+  //
+  // import mpmath as mp
+  //
+  // # https://en.wikipedia.org/wiki/IEEE_754#Basic_and_interchange_formats
+  // mp.mp.prec = 53  # double precision
+  //
+  // L = 13
+  // M = 13
+  // p, q = mp.pade(mp.taylor(mp.exp, 0, L + M), L, M)
+  //
+  // print("final double[] exp_pade_p = {")
+  // for p_k in p:
+  //     print(f"{p_k},")
+  // print("};")
+  // print("final double[] exp_pade_q = {")
+  // for q_k in q:
+  //     print(f"{q_k},")
+  // print("};")
+  private static final int EXP_PADE_NUM_COEFFS = 14;
+  private static final double[] exp_pade_p = {
+    1.0,
+    0.499990230081164,
+    0.119995046409932,
+    0.0183321303805272,
+    0.00199256821044989,
+    0.000163023228899284,
+    1.03503116756581e-05,
+    5.17494197262237e-07,
+    2.04264137492554e-08,
+    6.30408624558965e-10,
+    1.48321142940355e-11,
+    2.52798500184321e-13,
+    2.80856861084989e-15,
+    1.542952427598e-17,
+  };
+  private static final double[] exp_pade_q = {
+    1.0,
+    -0.500009769918836,
+    0.120004816328768,
+    -0.0183344676554892,
+    0.00199292268802792,
+    -0.00016306127289381,
+    1.03533632064684e-05,
+    -5.17682297838286e-07,
+    2.04354204459939e-08,
+    -6.30742323603127e-10,
+    1.48414840237133e-11,
+    -2.52988721915697e-13,
+    2.81109127187942e-15,
+    -1.54461768813769e-17,
+  };
+
+  static {
+    assert exp_pade_p.length == EXP_PADE_NUM_COEFFS;
+    assert exp_pade_q.length == EXP_PADE_NUM_COEFFS;
+  }
+
   /**
-   * Computes the matrix exponential using Eigen's solver. This method only works for square
-   * matrices, and will otherwise throw an {@link MatrixDimensionException}.
+   * Computes the matrix exponential. This method only works for square matrices, and will otherwise
+   * throw an {@link MatrixDimensionException}.
    *
    * @return The exponential of A.
    */
@@ -366,12 +427,60 @@ public class Matrix<R extends Num, C extends Num>
               + " x "
               + this.getNumCols());
     }
-    Matrix<R, C> toReturn = new Matrix<>(new SimpleMatrix(this.getNumRows(), this.getNumCols()));
-    EigenJNI.exp(
-        this.m_storage.getDDRM().getData(),
-        this.getNumRows(),
-        toReturn.m_storage.getDDRM().getData());
-    return toReturn;
+
+    // Scale down A
+    //
+    //   A_scaled = A⋅2⁻ⁿ
+    final int n = (int) Math.max(0.0, Math.ceil(Math.log(this.normIndP1()) / Math.log(2.0)));
+    var A_scaled = this.m_storage.scale(Math.pow(2.0, -n));
+
+    //     13
+    // P = Σ pₖA_scaledᵏ
+    //    k=0
+    //
+    //     13
+    // Q = Σ qₖA_scaledᵏ
+    //    k=0
+    var P = SimpleMatrix.identity(this.getNumRows());
+    CommonOps_DDRM.scale(exp_pade_p[0], P.getDDRM());
+    var Q = SimpleMatrix.identity(this.getNumRows());
+    CommonOps_DDRM.scale(exp_pade_q[0], Q.getDDRM());
+    var A_scaled_pow = A_scaled;
+    int k = 1;
+    while (true) {
+      // P += A_scaled_pow * exp_pade_p[k]
+      CommonOps_DDRM.add(P.getDDRM(), A_scaled_pow.scale(exp_pade_p[k]).getDDRM(), P.getDDRM());
+      // Q += A_scaled_pow * exp_pade_q[k]
+      CommonOps_DDRM.add(Q.getDDRM(), A_scaled_pow.scale(exp_pade_q[k]).getDDRM(), Q.getDDRM());
+
+      ++k;
+      if (k < EXP_PADE_NUM_COEFFS) {
+        A_scaled_pow = A_scaled_pow.mult(A_scaled);
+      } else {
+        break;
+      }
+    }
+
+    // https://mpmath.org/doc/current/calculus/approximation.html#mpmath.pade
+    // defines the Padé approximant as exp(A_scaled)Q ≈ P, so:
+    //
+    //   exp(A_scaled) ≈ P / Q
+    //   exp(A_scaled) ≈ (Qᵀ \ Pᵀ)ᵀ
+    CommonOps_DDRM.transpose(Q.getDDRM());
+    CommonOps_DDRM.transpose(P.getDDRM());
+    var exp_A_scaled = Q.solve(P);
+    CommonOps_DDRM.transpose(exp_A_scaled.getDDRM());
+
+    // Unscale via repeated squaring
+    //
+    //   exp(A⋅2⁻ⁿ) = exp(A_scaled)
+    //   exp(A)^2⁻ⁿ = exp(A_scaled)
+    //   exp(A) = exp(A_scaled)^2ⁿ
+    for (int i = 0; i < n; ++i) {
+      exp_A_scaled = exp_A_scaled.mult(exp_A_scaled);
+    }
+
+    return new Matrix<>(exp_A_scaled);
   }
 
   /**
@@ -679,7 +788,115 @@ public class Matrix<R extends Num, C extends Num>
   }
 
   /**
-   * Performs an inplace Cholesky rank update (or downdate).
+   * Givens rotation.
+   *
+   * <p>Given a and b, find c = cosθ and s = sinθ such that
+   *
+   * <pre>
+   * [c  -s][a] = [r]
+   * [s   c][b]   [0]
+   * </pre>
+   *
+   * <p>where r = √(a² + b²) is the length of the vector (a, b).
+   */
+  private class GivensRotation {
+    public final double c;
+    public final double s;
+    public final double r;
+
+    /**
+     * Construct a Givens rotation.
+     *
+     * @param a a.
+     * @param b b.
+     */
+    GivensRotation(double a, double b) {
+      if (b == 0.0) {
+        c = a < 0.0 ? -1.0 : 1.0;
+        s = 0.0;
+        r = Math.abs(a);
+        return;
+      }
+
+      if (a == 0.0) {
+        c = 0.0;
+        s = b < 0.0 ? 1.0 : -1.0;
+        r = Math.abs(b);
+        return;
+      }
+
+      // Safe-range thresholds following [1].
+      //
+      // When both |a| and |b| lie in (rtmin, rtmax), the direct formula
+      // r = a * √(1 + (b/a)²) cannot over- or underflow before the true result
+      // would. Outside that range we prescale by max(|a|, |b|) (clamped into
+      // [safe_min, safe_max]) so that the squared sum stays in the
+      // representable range. This preserves the existing Eigen sign convention
+      // (r ≥ 0, sign carried in c).
+      //
+      // [1] Anderson, "Algorithm 978: Safe Scaling in the Level 1 BLAS",
+      //     ACM TOMS 44(1), 2017.
+      final double safe_min = Double.MIN_VALUE;
+      final double safe_max = 1.0 / safe_min;
+      final double rtmin = Math.sqrt(safe_min);
+      final double rtmax = Math.sqrt(safe_max / 2.0);
+      final double abs_a = Math.abs(a);
+      final double abs_b = Math.abs(b);
+      final double mx = Math.max(abs_a, abs_b);
+      final double mn = Math.min(abs_a, abs_b);
+
+      if (mx < rtmax && mn > rtmin) {
+        // Safe range: existing direct formulas are stable.
+        if (abs_a > abs_b) {
+          double t = b / a;
+          double u = Math.sqrt(1.0 + t * t);
+          if (a < 0.0) {
+            u = -u;
+          }
+          c = 1.0 / u;
+          s = -t * c;
+          r = a * u;
+        } else {
+          double t = a / b;
+          double u = Math.sqrt(1.0 + t * t);
+          if (b < 0.0) {
+            u = -u;
+          }
+          s = -1.0 / u;
+          c = -t * s;
+          r = b * u;
+        }
+      } else {
+        // Out of safe range: prescale by max(|a|, |b|) clamped into
+        // [safe_min, safe_max].
+        final double scale = Math.clamp(mx, safe_min, safe_max);
+        final double as = a / scale;
+        final double bs = b / scale;
+        if (abs_a > abs_b) {
+          double t = bs / as;
+          double u = Math.sqrt(1.0 + t * t);
+          if (as < 0.0) {
+            u = -u;
+          }
+          c = 1.0 / u;
+          s = -t * c;
+          r = (as * u) * scale;
+        } else {
+          double t = as / bs;
+          double u = Math.sqrt(1.0 + t * t);
+          if (bs < 0.0) {
+            u = -u;
+          }
+          s = -1.0 / u;
+          c = -t * s;
+          r = (bs * u) * scale;
+        }
+      }
+    }
+  }
+
+  /**
+   * Performs an in-place Cholesky rank update (or downdate).
    *
    * <p>If this matrix contains L where A = LLᵀ before the update, it will contain L where LLᵀ = A +
    * σvvᵀ after the update.
@@ -687,9 +904,92 @@ public class Matrix<R extends Num, C extends Num>
    * @param v Vector to use for the update.
    * @param sigma Sigma to use for the update.
    * @param lowerTriangular Whether this matrix is lower triangular.
+   * @return True if rank update (or downdate) succeeded.
    */
-  public void rankUpdate(Matrix<R, N1> v, double sigma, boolean lowerTriangular) {
-    EigenJNI.rankUpdate(this.getData(), this.getNumRows(), v.getData(), sigma, lowerTriangular);
+  public boolean rankUpdate(Matrix<R, N1> v, double sigma, boolean lowerTriangular) {
+    if (sigma == 0.0) {
+      return true;
+    }
+
+    int n = getNumCols();
+
+    if (!lowerTriangular) {
+      TransposeAlgs_DDRM.square(this.m_storage.getDDRM());
+    }
+
+    final double[] ω = v.getStorage().getDDRM().data.clone();
+
+    if (sigma > 0.0) {
+      // This algorithm based on Givens rotations only works for updates
+
+      final double sqrt_sigma = Math.sqrt(sigma);
+      for (int i = 0; i < n; ++i) {
+        ω[i] *= sqrt_sigma;
+      }
+
+      for (int j = 0; j < n; ++j) {
+        final var g = new GivensRotation(get(j, j), -ω[j]);
+        set(j, j, g.r);
+
+        // Apply rotation in the plane
+        if (g.c == 1.0 && g.s == 0.0) {
+          continue;
+        }
+        for (int k = j + 1; k < n; ++k) {
+          final double l_kj = get(k, j);
+          final double ω_k = ω[k];
+          set(k, j, g.c * l_kj + g.s * ω_k);
+          ω[k] = -g.s * l_kj + g.c * ω_k;
+        }
+      }
+    } else {
+      // Algorithm 3.1 from https://christian-igel.github.io/paper/AMERCMAUfES.pdf
+      // where α = 1 and their β is our σ
+      double b = 1.0;
+      for (int j = 0; j < n; ++j) {
+        final double l_jj = get(j, j);
+        if (l_jj == 0.0) {
+          if (!lowerTriangular) {
+            TransposeAlgs_DDRM.square(this.m_storage.getDDRM());
+          }
+          return false;
+        }
+
+        final double l_jj2 = l_jj * l_jj;
+        final double σω_j2 = sigma * ω[j] * ω[j];
+        final double x = l_jj2 + σω_j2 / b;
+        if (x < 0.0) {
+          if (!lowerTriangular) {
+            TransposeAlgs_DDRM.square(this.m_storage.getDDRM());
+          }
+          return false;
+        }
+        final double lp_jj = Math.sqrt(x);
+        set(j, j, lp_jj);
+
+        final double γ = l_jj2 * b + σω_j2;
+        if (γ == 0.0) {
+          if (!lowerTriangular) {
+            TransposeAlgs_DDRM.square(this.m_storage.getDDRM());
+          }
+          return false;
+        }
+
+        for (int k = j + 1; k < n; ++k) {
+          final double l_kj = get(k, j);
+          ω[k] -= ω[j] / l_jj * l_kj;
+          set(k, j, lp_jj / l_jj * l_kj + lp_jj * sigma * ω[j] / γ * ω[k]);
+        }
+
+        b += σω_j2 / l_jj2;
+      }
+    }
+
+    if (!lowerTriangular) {
+      TransposeAlgs_DDRM.square(this.m_storage.getDDRM());
+    }
+
+    return true;
   }
 
   @Override

@@ -436,22 +436,6 @@ Java_org_wpilib_hardware_hal_HALUtil_getSerialNumber
 
 /*
  * Class:     org_wpilib_hardware_hal_HALUtil
- * Method:    getComments
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getComments
-  (JNIEnv* env, jclass)
-{
-  WPI_String comments;
-  HAL_GetComments(&comments);
-  jstring ret = MakeJString(env, wpi::util::to_string_view(&comments));
-  WPI_FreeString(&comments);
-  return ret;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_HALUtil
  * Method:    getTeamNumber
  * Signature: ()I
  */

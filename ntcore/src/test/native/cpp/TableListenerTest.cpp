@@ -294,7 +294,7 @@ TEST_CASE("TableListenerTest DestroyInstanceWhileInCallback",
 
   wpi::nt::IntegerPublisher publisher =
       state->inst.GetIntegerTopic("/Preferences/key").Publish();
-  T_CHECK(wpi::util::WaitForObject(state->listenerCalledEvent, 1.0, NULL),
+  T_CHECK(wpi::util::WaitForObject(state->listenerCalledEvent, 1.0, nullptr),
           "[Test thread] WaitForObject(listenerCalledEvent)");
 
   // Check preconditions.
@@ -332,7 +332,7 @@ TEST_CASE("TableListenerTest DestroyInstanceWhileInCallback",
   if (timedOut) {
     T_INFO("[Test thread] Timed out waiting for destroyerThreadReadyEvent");
     wpi::util::SetEvent(state->exitListenerEvent);
-    wpi::util::WaitForObject(state->listenerDoneEvent, 3.0, NULL);
+    wpi::util::WaitForObject(state->listenerDoneEvent, 3.0, nullptr);
     T_FAIL("Timed out waiting for destroyerThreadReadyEvent");
 
     if (destroyerThread.joinable()) {
@@ -347,7 +347,7 @@ TEST_CASE("TableListenerTest DestroyInstanceWhileInCallback",
   T_INFO("[Test thread] Sending exitListenerEvent");
   wpi::util::SetEvent(state->exitListenerEvent);
 
-  T_CHECK(wpi::util::WaitForObject(state->listenerDoneEvent, 3.0, NULL),
+  T_CHECK(wpi::util::WaitForObject(state->listenerDoneEvent, 3.0, nullptr),
           "[Test thread] Timed out waiting for listenerDoneEvent");
   T_CHECK(
       wpi::util::WaitForObject(state->destroyerThreadDoneEvent, 1.0, &timedOut),
@@ -384,7 +384,7 @@ TEST_CASE_METHOD(TableListenerTest,
 
   wpi::nt::IntegerPublisher publisher =
       m_inst.GetIntegerTopic("/ResetTest/key").Publish();
-  CHECK(wpi::util::WaitForObject(listenerCalledEvent, 1.0, NULL));
+  CHECK(wpi::util::WaitForObject(listenerCalledEvent, 1.0, nullptr));
 
   // Reset the instance from another thread while the listener is blocked.
   auto resetThread =
@@ -414,7 +414,7 @@ TEST_CASE_METHOD(TableListenerTest,
   if (resetThread.joinable()) {
     resetThread.join();
   }
-  CHECK(wpi::util::WaitForObject(listenerDoneEvent, 1.0, NULL));
+  CHECK(wpi::util::WaitForObject(listenerDoneEvent, 1.0, nullptr));
 
   // Adding a listener after Reset() must succeed and return a valid handle.
   NT_Listener postResetListener =

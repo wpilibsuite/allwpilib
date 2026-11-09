@@ -139,7 +139,7 @@ class TunableMemberStructBase : public TunableMemberBase {
                           std::span<uint8_t> buf) const = 0;
 
  protected:
-  virtual ~TunableMemberStructBase() = default;
+  ~TunableMemberStructBase() override = default;
 };
 
 class TunableMemberProtobufBase : public TunableMemberBase {
@@ -167,7 +167,7 @@ class TunableMemberProtobufBase : public TunableMemberBase {
           fn) const = 0;
 
  protected:
-  virtual ~TunableMemberProtobufBase() = default;
+  ~TunableMemberProtobufBase() override = default;
 };
 
 /**

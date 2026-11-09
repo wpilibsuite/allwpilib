@@ -502,36 +502,6 @@ Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_setSerialNumber
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
- * Method:    getComments
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL
-Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_getComments
-  (JNIEnv* env, jclass)
-{
-  WPI_String str;
-  HALSIM_GetRoboRioComments(&str);
-  auto jstr = MakeJString(env, wpi::util::to_string_view(&str));
-  WPI_FreeString(&str);
-  return jstr;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
- * Method:    setComments
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_setComments
-  (JNIEnv* env, jclass, jstring comments)
-{
-  JStringRef commentsJString{env, comments};
-  auto str = wpi::util::make_string(commentsJString);
-  HALSIM_SetRoboRioComments(&str);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
  * Method:    resetData
  * Signature: ()V
  */

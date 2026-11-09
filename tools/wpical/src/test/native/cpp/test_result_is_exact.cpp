@@ -78,7 +78,7 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
         weight = std::pow(0.5, level);
       }
       points[filename].push_back(
-          mrcal_point3_t{stod(x_str), stod(y_str), weight});
+          mrcal_point3_t{{stod(x_str), stod(y_str), weight}});
       // std::printf("put %s\n", *name);
     } catch (std::exception const& e) {
       std::perror(e.what());
@@ -141,8 +141,9 @@ std::vector<double> calibrate(const std::string& fname, cv::Size boardSize,
                 stats.calobject_warp.y2);
     std::printf("dt, seeding + solve: %f ms\n", dt_ms / 1e6);
     std::printf("Intrinsics [%zu]: ", stats.intrinsics.size());
-    for (auto i : stats.intrinsics)
+    for (auto i : stats.intrinsics) {
       std::printf("%f ", i);
+    }
     std::printf("\n");
   }
 

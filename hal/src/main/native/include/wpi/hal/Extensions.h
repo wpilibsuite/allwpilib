@@ -19,11 +19,11 @@
  * the HAL completely, 0 for success, and > 0 for a non fatal error.
  * @{
  */
-typedef int halsim_extension_init_func_t(void);
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef int halsim_extension_init_func_t(void);
 
 /**
  * Loads a single extension from a direct path.

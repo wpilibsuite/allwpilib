@@ -139,18 +139,17 @@ void wpi::glass::DisplayAlerts(AlertsModel* model, bool showIds) {
       ++levelEnd;
     }
 
-    const char* levelLabel = "Unknown";
-    switch (level) {
-      case AlertData::Level::HIGH:
-        levelLabel = ICON_FA_CIRCLE_XMARK " High";
-        break;
-      case AlertData::Level::MEDIUM:
-        levelLabel = ICON_FA_TRIANGLE_EXCLAMATION " Medium";
-        break;
-      case AlertData::Level::LOW:
-        levelLabel = ICON_FA_CIRCLE_INFO " Low";
-        break;
-    }
+    const char* levelLabel = [&] {
+      switch (level) {
+        case AlertData::Level::HIGH:
+          return ICON_FA_CIRCLE_XMARK " High";
+        case AlertData::Level::MEDIUM:
+          return ICON_FA_TRIANGLE_EXCLAMATION " Medium";
+        case AlertData::Level::LOW:
+          return ICON_FA_CIRCLE_INFO " Low";
+      }
+      return "Unknown";
+    }();
 
     ImGui::PushStyleColor(ImGuiCol_Text, GetLevelColor(level));
     bool levelOpen = TreeNodeEx(levelLabel, ImGuiTreeNodeFlags_DefaultOpen);

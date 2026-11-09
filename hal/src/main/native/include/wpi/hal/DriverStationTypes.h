@@ -23,6 +23,10 @@
 #define HAL_CONTROLWORD_FMS_ATTACHED_MASK 0x1000000000000000LL
 #define HAL_CONTROLWORD_DS_ATTACHED_MASK 0x2000000000000000LL
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct HAL_ControlWord {
   int64_t value;
 };
@@ -183,10 +187,6 @@ struct HAL_OpModeOption {
   int32_t backgroundColor;  // 0x00RRGGBB or -1 for default
 };
 typedef struct HAL_OpModeOption HAL_OpModeOption;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 inline HAL_ControlWord HAL_MakeControlWord(int64_t opModeHash,
                                            HAL_RobotMode robotMode,
