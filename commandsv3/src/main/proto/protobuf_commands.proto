@@ -11,7 +11,7 @@ Or use the generate_files.py script:
 allwpilib $ ./commandsv3/generate_files.py --protoc=protoc-quickbuf
 
 # Linux
-allwpilib $ ./commandsv3/generate_files.py --quickbuf_plugin protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
+allwpilib $ ./commandsv3/generate_files.py --quickbuf_plugin protoc-gen-quickbuf-1.4-linux-x86_64.exe
  */
 
 message ProtobufMechanism {
@@ -43,6 +43,12 @@ message ProtobufCommand {
   // How long the command has taken to run, in aggregate.
   // Only included in a message for an actively running command.
   optional double total_time_ms = 7;
+
+  // If this command is both the default command for its required mechanism
+  // and was scheduled by the default command scheduling logic.
+  // Only included in a message where the command object is configured as the
+  // default command for a mechanism.
+  optional bool is_default_command = 8;
 }
 
 message ProtobufScheduler {

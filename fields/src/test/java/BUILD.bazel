@@ -5,9 +5,9 @@ wpilib_java_junit5_test(
     srcs = glob(["**/*.java"]),
     resources = ["//fields:test-resources"],
     deps = [
-        "//fields:fields-java",
-        "//wpimath:wpimath-java",
-        "//wpiutil:wpiutil-java",
+        "//fields/src/main/java",
+        "//wpimath/src/main/java",
+        "//wpiutil/src/main/java",
         "@maven//:io_avaje_avaje_jsonb",
     ],
 )

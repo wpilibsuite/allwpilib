@@ -363,15 +363,11 @@ void ListenerStorage::Reset() {
     if (m_resetting) {
       return;
     }
-    if (!m_thread) {
-      DoReset();
-      return;
-    }
-
     // A callback may be running; wait for it to complete.
     m_resetting = true;
   }
 
+  // Join even if the thread exited during synchronization manager shutdown.
   m_thread.Join();
 
   std::scoped_lock lock{m_mutex};

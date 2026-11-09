@@ -5,7 +5,7 @@ visibility([
     "//robotpyExamples/...",
 ])
 
-_WPILIB_WHEEL = "//wpilibc:robotpy-wpilib"
+_WPILIB_WHEEL = "//wpilibc/src/main/python"
 _CLI_MAIN = "//robotpyExamples:robotpy_entry_point"
 
 def robotpy_project(
@@ -15,7 +15,7 @@ def robotpy_project(
         data = [],
         deps = [],
         sim_deps = [
-            "//simulation/halsim_gui:robotpy-halsim-gui",
+            "//simulation/halsim_gui/src/main/python",
         ],
         test_srcs = [],
         test_data = [],

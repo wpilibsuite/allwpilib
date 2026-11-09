@@ -1,0 +1,24 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "robotpy_library")
+
+robotpy_library(
+    name = "python",
+    srcs = glob(["**/*.py"]),
+    author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
+    description_file = "README.md",
+    distribution = "robotpy-commands-v2",
+    extra_distinfo_files = {"LICENSE": "licenses/LICENSE"},
+    imports = ["."],
+    project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+    python_requires = ">=3.11",
+    requires = [
+        "wpilib==0.0.0",
+        "typing_extensions>=4.1.0,<5",
+    ],
+    strip_path_prefixes = ["commandsv2/src/main/python"],
+    summary = "WPILib command framework v2",
+    deps = [
+        "//wpilibc/src/main/python",
+        requirement("typing-extensions"),
+    ],
+)

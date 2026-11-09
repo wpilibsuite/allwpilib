@@ -51,7 +51,7 @@ class Drivetrain:
                 self.back_left.get_position(),
                 self.back_right.get_position(),
             ),
-            wpimath.Pose2d(),
+            wpimath.Pose2d(),  # Field center, facing the blue alliance wall.
             (0.05, 0.05, wpimath.units.degrees_to_radians(5)),
             (0.5, 0.5, wpimath.units.degrees_to_radians(30)),
         )

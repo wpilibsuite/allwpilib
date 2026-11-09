@@ -143,7 +143,7 @@ public class DrivetrainSplineTrajectory extends Trajectory<DrivetrainSplineSampl
             .map(
                 s ->
                     new DrivetrainSplineSample(
-                        s.time + this.duration, s.pose, s.velocity, s.acceleration, s.curvature));
+                        s.time + duration(), s.pose, s.velocity, s.acceleration, s.curvature));
 
     return new DrivetrainSplineTrajectory(Stream.concat(samples.stream(), timeShifted).toList());
   }

@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// ImPlot v1.0
+// ImPlot v1.1
 
 // Table of Contents:
 //
@@ -62,9 +62,9 @@
 #endif
 
 // ImPlot version string.
-#define IMPLOT_VERSION "1.0"
+#define IMPLOT_VERSION "1.1"
 // ImPlot version integer encoded as XYYZZ (X=major, YY=minor, ZZ=patch).
-#define IMPLOT_VERSION_NUM 10000
+#define IMPLOT_VERSION_NUM 10100
 // Macro for templated plotting functions; keeps header clean.
 #define IMPLOT_TMP template <typename T> IMPLOT_API
 
@@ -173,26 +173,27 @@ enum ImPlotFlags_ {
 
 // Options for plot axes (see SetupAxis).
 enum ImPlotAxisFlags_ {
-    ImPlotAxisFlags_None          = 0,       // default
-    ImPlotAxisFlags_NoLabel       = 1 << 0,  // the axis label will not be displayed (axis labels are also hidden if the supplied string name is nullptr)
-    ImPlotAxisFlags_NoGridLines   = 1 << 1,  // no grid lines will be displayed
-    ImPlotAxisFlags_NoTickMarks   = 1 << 2,  // no tick marks will be displayed
-    ImPlotAxisFlags_NoTickLabels  = 1 << 3,  // no text labels will be displayed
-    ImPlotAxisFlags_NoInitialFit  = 1 << 4,  // axis will not be initially fit to data extents on the first rendered frame
-    ImPlotAxisFlags_NoMenus       = 1 << 5,  // the user will not be able to open context menus with right-click
-    ImPlotAxisFlags_NoSideSwitch  = 1 << 6,  // the user will not be able to switch the axis side by dragging it
-    ImPlotAxisFlags_NoHighlight   = 1 << 7,  // the axis will not have its background highlighted when hovered or held
-    ImPlotAxisFlags_Opposite      = 1 << 8,  // axis ticks and labels will be rendered on the conventionally opposite side (i.e, right or top)
-    ImPlotAxisFlags_Foreground    = 1 << 9,  // grid lines will be displayed in the foreground (i.e. on top of data) instead of the background
-    ImPlotAxisFlags_Invert        = 1 << 10, // the axis will be inverted
-    ImPlotAxisFlags_AutoFit       = 1 << 11, // axis will be auto-fitting to data extents
-    ImPlotAxisFlags_RangeFit      = 1 << 12, // axis will only fit points if the point is in the visible range of the **orthogonal** axis
-    ImPlotAxisFlags_PanStretch    = 1 << 13, // panning in a locked or constrained state will cause the axis to stretch if possible
-    ImPlotAxisFlags_LockMin       = 1 << 14, // the axis minimum value will be locked when panning/zooming
-    ImPlotAxisFlags_LockMax       = 1 << 15, // the axis maximum value will be locked when panning/zooming
-    ImPlotAxisFlags_Lock          = ImPlotAxisFlags_LockMin | ImPlotAxisFlags_LockMax,
-    ImPlotAxisFlags_NoDecorations = ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_NoTickMarks | ImPlotAxisFlags_NoTickLabels,
-    ImPlotAxisFlags_AuxDefault    = ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_Opposite
+    ImPlotAxisFlags_None             = 0,       // default
+    ImPlotAxisFlags_NoLabel          = 1 << 0,  // the axis label will not be displayed (axis labels are also hidden if the supplied string name is nullptr)
+    ImPlotAxisFlags_NoGridLines      = 1 << 1,  // no grid lines will be displayed
+    ImPlotAxisFlags_NoTickMarks      = 1 << 2,  // no tick marks will be displayed
+    ImPlotAxisFlags_NoTickLabels     = 1 << 3,  // no text labels will be displayed
+    ImPlotAxisFlags_NoInitialFit     = 1 << 4,  // axis will not be initially fit to data extents on the first rendered frame
+    ImPlotAxisFlags_NoMenus          = 1 << 5,  // the user will not be able to open context menus with right-click
+    ImPlotAxisFlags_NoSideSwitch     = 1 << 6,  // the user will not be able to switch the axis side by dragging it
+    ImPlotAxisFlags_NoHighlight      = 1 << 7,  // the axis will not have its background highlighted when hovered or held
+    ImPlotAxisFlags_Opposite         = 1 << 8,  // axis ticks and labels will be rendered on the conventionally opposite side (i.e, right or top)
+    ImPlotAxisFlags_Foreground       = 1 << 9,  // grid lines will be displayed in the foreground (i.e. on top of data) instead of the background
+    ImPlotAxisFlags_Invert           = 1 << 10, // the axis will be inverted
+    ImPlotAxisFlags_AutoFit          = 1 << 11, // axis will be auto-fitting to data extents
+    ImPlotAxisFlags_RangeFit         = 1 << 12, // axis will only fit points if the point is in the visible range of the **orthogonal** axis
+    ImPlotAxisFlags_PanStretch       = 1 << 13, // panning in a locked or constrained state will cause the axis to stretch if possible
+    ImPlotAxisFlags_LockMin          = 1 << 14, // the axis minimum value will be locked when panning/zooming
+    ImPlotAxisFlags_LockMax          = 1 << 15, // the axis maximum value will be locked when panning/zooming
+    ImPlotAxisFlags_TickLabelsInside = 1 << 16, // axis tick labels will be drawn inside the plot area (applies only to the innermost axes)
+    ImPlotAxisFlags_Lock             = ImPlotAxisFlags_LockMin | ImPlotAxisFlags_LockMax,
+    ImPlotAxisFlags_NoDecorations    = ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_NoTickMarks | ImPlotAxisFlags_NoTickLabels,
+    ImPlotAxisFlags_AuxDefault       = ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_Opposite
 };
 
 // Options for subplots (see BeginSubplot)
@@ -239,6 +240,8 @@ enum ImPlotDragToolFlags_ {
     ImPlotDragToolFlags_NoFit     = 1 << 1, // the drag tool won't be considered for plot fits
     ImPlotDragToolFlags_NoInputs  = 1 << 2, // lock the tool from user inputs
     ImPlotDragToolFlags_Delayed   = 1 << 3, // tool rendering will be delayed one frame; useful when applying position-constraints
+    ImPlotDragToolFlags_NoMove    = 1 << 4, // the tool can't be moved; it still catches and reports clicks and hovers, but shows no move cursor
+    ImPlotDragToolFlags_NoResize  = 1 << 5, // DragRect's corners and edges can't resize it; they still catch and report clicks and hovers, but show no resize cursor
 };
 
 // Flags for ColormapScale
@@ -448,6 +451,8 @@ enum ImPlotMarker_ {
     ImPlotMarker_Cross,     // a cross marker (not fill-able)
     ImPlotMarker_Plus,      // a plus marker (not fill-able)
     ImPlotMarker_Asterisk,  // a asterisk marker (not fill-able)
+    ImPlotMarker_Vertical,   // a vertical line marker (not fill-able)
+    ImPlotMarker_Horizontal, // a horizontal line marker (not fill-able)
     ImPlotMarker_COUNT
 };
 
@@ -501,7 +506,7 @@ enum ImPlotBin_ {
 //    spec.LineColor = ImVec4(1,0,0,1);
 //    spec.LineWeight = 2.0f;
 //    spec.Marker = ImPlotMarker_Circle;
-//    spec.Flags = ImPlotItemFlags_NoLegend | ImPlotLineFlags_Segments;
+//    spec.Flags = (ImPlotItemFlags)ImPlotItemFlags_NoLegend | ImPlotLineFlags_Segments;
 //    ImPlot::PlotLine("MyLine", xs, ys, 100, spec);
 //
 // 2. Inline using (ImPlotProp,value) pairs (order does NOT matter):
@@ -510,7 +515,7 @@ enum ImPlotBin_ {
 //      ImPlotProp_LineColor, ImVec4(1,0,0,1),
 //      ImPlotProp_LineWeight, 2.0f,
 //      ImPlotProp_Marker, ImPlotMarker_Circle,
-//      ImPlotProp_Flags, ImPlotItemFlags_NoLegend | ImPlotLineFlags_Segments
+//      ImPlotProp_Flags, (ImPlotItemFlags)ImPlotItemFlags_NoLegend | ImPlotLineFlags_Segments
 //    });
 struct ImPlotSpec {
     ImVec4          LineColor       = IMPLOT_AUTO_COL;       // line color (applies to lines, bar edges); IMPLOT_AUTO_COL will use next Colormap color or current item color
@@ -1141,6 +1146,10 @@ IMPLOT_API void CancelPlotSelection();
 // Hides or shows the next plot item (i.e. as if it were toggled from the legend).
 // Use ImPlotCond_Always if you need to forcefully set this every frame.
 IMPLOT_API void HideNextItem(bool hidden = true, ImPlotCond cond = ImPlotCond_Once);
+// Returns true if the plot item #label_id in the current plot is hidden (i.e. toggled off from the legend or by HideNextItem).
+// Can be called before the item is submitted (e.g. to skip expensive work for a hidden item), in which case it reports
+// the state from the previous frame. Returns false for items that have never been submitted. See also IsLastItemHidden.
+IMPLOT_API bool IsItemHidden(const char* label_id);
 
 // Use the following around calls to Begin/EndPlot to align l/r/t/b padding.
 // Consider using Begin/EndSubplots first. They are more feature rich and
@@ -1238,6 +1247,8 @@ IMPLOT_API void PopStyleVar(int count = 1);
 
 // Gets the last item primary color (i.e. its legend icon color)
 IMPLOT_API ImVec4 GetLastItemColor();
+// Returns true if the last plot item is hidden (i.e. toggled off from the legend or by HideNextItem).
+IMPLOT_API bool IsLastItemHidden();
 
 // Returns the null terminated string name for an ImPlotCol.
 IMPLOT_API const char* GetStyleColorName(ImPlotCol idx);

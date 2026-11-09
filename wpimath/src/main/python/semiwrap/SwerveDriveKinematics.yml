@@ -30,19 +30,23 @@ classes:
           However, if you wish to change the center of rotation for evasive
           maneuvers, vision alignment, or for any other use case, you can do so.
 
-          :param chassisVelocities:    The desired chassis velocity.
-          :param centerOfRotation: The center of rotation. For example, if you set the
+          In the case that the desired chassis velocities are zero (i.e. the robot
+          will be stationary), the previously calculated module angle will be
+          maintained.
+
+          :param chassis_velocities: The desired chassis velocity.
+          :param center_of_rotation: The center of rotation. For example, if you set the
            center of rotation at one corner of the robot and provide a chassis velocity
            that only has a dtheta component, the robot will rotate around that corner.
 
-          :returns: An array containing the module states. Use caution because these
+          :returns: A tuple containing the module states. Use caution because these
                     module states are not normalized. Sometimes, a user input may cause one of
                     the module velocities to go above the attainable max velocity. Use the
-                    :meth:`desaturateWheelVelocities` function to rectify this issue.
+                    :meth:`desaturate_wheel_velocities` function to rectify this issue.
                     In addition, you can use Python unpacking syntax
                     to directly assign the module states to variables::
 
-                      fl, fr, bl, br = kinematics.toSwerveModuleVelocities(chassisVelocities)
+                      fl, fr, bl, br = kinematics.to_swerve_module_velocities(chassis_velocities)
       ToWheelVelocities:
       ToChassisVelocities:
         overloads:

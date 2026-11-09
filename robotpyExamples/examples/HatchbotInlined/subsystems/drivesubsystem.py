@@ -16,12 +16,7 @@ import constants
 class DriveSubsystem(commands2.Subsystem):
     def __init__(self) -> None:
         self.left1 = wpilib_drivers.PWMVictorSPX(constants.LEFT_MOTOR1_PORT)
-        self.left2 = wpilib_drivers.PWMVictorSPX(constants.LEFT_MOTOR2_PORT)
         self.right1 = wpilib_drivers.PWMVictorSPX(constants.RIGHT_MOTOR1_PORT)
-        self.right2 = wpilib_drivers.PWMVictorSPX(constants.RIGHT_MOTOR2_PORT)
-
-        self.left1.add_follower(self.left2)
-        self.right1.add_follower(self.right2)
 
         # We need to invert one side of the drivetrain so that positive velocities
         # result in both sides moving forward. Depending on how your robot's
@@ -34,13 +29,13 @@ class DriveSubsystem(commands2.Subsystem):
         # The left-side drive encoder
         self.left_encoder = wpilib.Encoder(
             *constants.LEFT_ENCODER_PORTS,
-            reverse_direction=constants.LEFT_ENCODER_REVERSED
+            reverse_direction=constants.LEFT_ENCODER_REVERSED,
         )
 
         # The right-side drive encoder
         self.right_encoder = wpilib.Encoder(
             *constants.RIGHT_ENCODER_PORTS,
-            reverse_direction=constants.RIGHT_ENCODER_REVERSED
+            reverse_direction=constants.RIGHT_ENCODER_REVERSED,
         )
 
         # Sets the distance per pulse for the encoders

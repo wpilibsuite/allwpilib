@@ -20,7 +20,7 @@ class HatchSubsystem(commands2.Subsystem):
         self.hatch_solenoid = wpilib.DoubleSolenoid(
             constants.HATCH_SOLENOID_BUS,
             constants.HATCH_SOLENOID_MODULE_TYPE,
-            *constants.HATCH_SOLENOID_PORTS
+            *constants.HATCH_SOLENOID_PORTS,
         )
 
     def grab_hatch(self) -> commands2.Command:

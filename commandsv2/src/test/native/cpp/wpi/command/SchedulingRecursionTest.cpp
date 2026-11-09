@@ -171,7 +171,7 @@ TEST_CASE_METHOD(SchedulingRecursionTest,
 
 class EndCommand : public CommandHelper<Command, EndCommand> {
  public:
-  explicit EndCommand(std::function<void(bool)> end) : m_end(end) {}
+  explicit EndCommand(std::function<void(bool)> end) : m_end(std::move(end)) {}
   void End(bool interrupted) override { m_end(interrupted); }
   bool IsFinished() override { return true; }
 

@@ -4,6 +4,6 @@ wpilib_java_junit5_test(
     name = "java",
     srcs = glob(["**/*.java"]),
     deps = [
-        "//wpiunits:wpiunits-java",
+        "//wpiunits/src/main/java",
     ],
 )

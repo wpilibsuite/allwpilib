@@ -63,36 +63,6 @@ void RoboRioData::SetSerialNumber(std::string_view serialNumber) {
   m_serialNumberCallbacks(m_serialNumber.c_str(), m_serialNumber.size());
 }
 
-int32_t RoboRioData::RegisterCommentsCallback(
-    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
-  std::scoped_lock lock(m_commentsMutex);
-  int32_t uid = m_commentsCallbacks.Register(callback, param);
-  if (initialNotify) {
-    callback(GetCommentsName(), param, m_comments.c_str(),
-             m_serialNumber.size());
-  }
-  return uid;
-}
-
-void RoboRioData::CancelCommentsCallback(int32_t uid) {
-  m_commentsCallbacks.Cancel(uid);
-}
-
-void RoboRioData::GetComments(struct WPI_String* comments) {
-  std::scoped_lock lock(m_commentsMutex);
-  auto write = WPI_AllocateString(comments, m_comments.size());
-  m_comments.copy(write, m_comments.size());
-}
-
-void RoboRioData::SetComments(std::string_view comments) {
-  if (comments.size() > 64) {
-    comments = comments.substr(0, 64);
-  }
-  std::scoped_lock lock(m_commentsMutex);
-  m_comments = std::string(comments);
-  m_commentsCallbacks(m_comments.c_str(), m_comments.size());
-}
-
 extern "C" {
 void HALSIM_ResetRoboRioData(void) {
   SimRoboRioData->ResetData();
@@ -125,21 +95,6 @@ void HALSIM_GetRoboRioSerialNumber(struct WPI_String* serialNumber) {
 }
 void HALSIM_SetRoboRioSerialNumber(const struct WPI_String* serialNumber) {
   SimRoboRioData->SetSerialNumber(wpi::util::to_string_view(serialNumber));
-}
-
-int32_t HALSIM_RegisterRoboRioCommentsCallback(
-    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimRoboRioData->RegisterCommentsCallback(callback, param,
-                                                  initialNotify);
-}
-void HALSIM_CancelRoboRioCommentsCallback(int32_t uid) {
-  SimRoboRioData->CancelCommentsCallback(uid);
-}
-void HALSIM_GetRoboRioComments(struct WPI_String* comments) {
-  SimRoboRioData->GetComments(comments);
-}
-void HALSIM_SetRoboRioComments(const struct WPI_String* comments) {
-  SimRoboRioData->SetComments(wpi::util::to_string_view(comments));
 }
 
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,

@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// ImPlot v1.0
+// ImPlot v1.1
 
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -79,28 +79,7 @@ static IMPLOT_INLINE float  ImInvSqrt(float x) { return 1.0f / sqrtf(x); }
 // [SECTION] Template instantiation utility
 //-----------------------------------------------------------------------------
 
-// By default, templates are instantiated for `float`, `double`, and for the following integer types, which are defined in imgui.h:
-//     signed char         ImS8;   // 8-bit signed integer
-//     unsigned char       ImU8;   // 8-bit unsigned integer
-//     signed short        ImS16;  // 16-bit signed integer
-//     unsigned short      ImU16;  // 16-bit unsigned integer
-//     signed int          ImS32;  // 32-bit signed integer == int
-//     unsigned int        ImU32;  // 32-bit unsigned integer
-//     signed   long long  ImS64;  // 64-bit signed integer
-//     unsigned long long  ImU64;  // 64-bit unsigned integer
-// (note: this list does *not* include `long`, `unsigned long` and `long double`)
-//
-// You can customize the supported types by defining IMPLOT_CUSTOM_NUMERIC_TYPES at compile time to define your own type list.
-//    As an example, you could use the compile time define given by the line below in order to support only float and double.
-//        -DIMPLOT_CUSTOM_NUMERIC_TYPES="(float)(double)"
-//    In order to support all known C++ types, use:
-//        -DIMPLOT_CUSTOM_NUMERIC_TYPES="(signed char)(unsigned char)(signed short)(unsigned short)(signed int)(unsigned int)(signed long)(unsigned long)(signed long long)(unsigned long long)(float)(double)(long double)"
-
-#ifdef IMPLOT_CUSTOM_NUMERIC_TYPES
-    #define IMPLOT_NUMERIC_TYPES IMPLOT_CUSTOM_NUMERIC_TYPES
-#else
-    #define IMPLOT_NUMERIC_TYPES (ImS8)(ImU8)(ImS16)(ImU16)(ImS32)(ImU32)(ImS64)(ImU64)(float)(double)
-#endif
+// The list of supported types, IMPLOT_NUMERIC_TYPES, is defined in implot_internal.h.
 
 // CALL_INSTANTIATE_FOR_NUMERIC_TYPES will duplicate the template instantiation code `INSTANTIATE_MACRO(T)` on supported types.
 #define _CAT(x, y) _CAT_(x, y)
@@ -161,7 +140,14 @@ static inline double ImStdDev(const TContainer& values, int count) {
     return sqrt(x);
 }
 
-IMPLOT_INLINE void GetLineRenderProps(const ImDrawList& draw_list, float& half_weight, ImVec2& tex_uv0, ImVec2& tex_uv1) {
+IMPLOT_INLINE void GetLineRenderProps(ImDrawList& draw_list, float& half_weight, ImVec2& tex_uv0, ImVec2& tex_uv1) {
+#if IMGUI_VERSION_NUM >= 19299 || defined(IM_DRAWLIST_TEX_LINES_SAMPLE_COUNT)
+    float fringe;
+    draw_list._SelectLineTexture(half_weight * 2.0f, &tex_uv0, &tex_uv1, &fringe, draw_list.Flags);
+    //tex_uv0.x -= 0.5f * draw_list._Data->FontAtlas->TexUvScale.x; // Changed in features/drawlist_v193 but seems unncessary?
+    //tex_uv1.x -= 0.5f * draw_list._Data->FontAtlas->TexUvScale.x;
+    half_weight += fringe * 0.5f;
+#else
     const bool aa = ImHasFlag(draw_list.Flags, ImDrawListFlags_AntiAliasedLines) &&
                     ImHasFlag(draw_list.Flags, ImDrawListFlags_AntiAliasedLinesUseTex);
     if (aa) {
@@ -173,6 +159,7 @@ IMPLOT_INLINE void GetLineRenderProps(const ImDrawList& draw_list, float& half_w
     else {
         tex_uv0 = tex_uv1 = draw_list._Data->TexUvWhitePixel;
     }
+#endif
 }
 
 IMPLOT_INLINE void PrimLine(ImDrawList& draw_list, const ImVec2& P1, const ImVec2& P2, float half_weight, ImU32 col, const ImVec2& tex_uv0, const ImVec2 tex_uv1) {
@@ -355,6 +342,7 @@ ImPlotItem* GetItem(const char* label_id) {
 }
 
 bool IsItemHidden(const char* label_id) {
+    IM_ASSERT_USER_ERROR(GImPlot->CurrentItems != nullptr, "IsItemHidden() needs to be called within an itemized context!");
     ImPlotItem* item = GetItem(label_id);
     return item != nullptr && !item->Show;
 }
@@ -371,8 +359,16 @@ ImVec4 GetLastItemColor() {
     return ImVec4();
 }
 
+bool IsLastItemHidden() {
+    ImPlotContext& gp = *GImPlot;
+    if (gp.PreviousItem)
+        return !gp.PreviousItem->Show;
+    return false;
+}
+
 void BustItemCache() {
     ImPlotContext& gp = *GImPlot;
+    gp.PreviousItem = nullptr; // it points into the item pools freed below
     for (int p = 0; p < gp.Plots.GetBufSize(); ++p) {
         ImPlotPlot& plot = *gp.Plots.GetByIndex(p);
         plot.Items.Reset();
@@ -390,6 +386,7 @@ void BustColorCache(const char* plot_title_id) {
     }
     else {
         ImGuiID id = ImGui::GetCurrentWindow()->GetID(plot_title_id);
+        gp.PreviousItem = nullptr; // it may point into the item pool freed below
         ImPlotPlot* plot = gp.Plots.GetByKey(id);
         if (plot != nullptr)
             plot->Items.Reset();
@@ -693,15 +690,7 @@ struct GetterError {
 //-----------------------------------------------------------------------------
 
 struct GetterConstColor {
-    GetterConstColor(ImU32 color, float alpha = 1.0f) {
-        ImU32 col = color;
-        if (alpha < 1.0f) {
-            ImVec4 col_vec = ImGui::ColorConvertU32ToFloat4(col);
-            col_vec.w *= alpha;
-            col = ImGui::GetColorU32(col_vec);
-        }
-        Color = col;
-    }
+    GetterConstColor(ImU32 color) : Color(color) { }
     template <typename I> IMPLOT_INLINE ImU32 operator[](I) const { return Color; }
     ImU32 Color;
 };
@@ -1825,6 +1814,8 @@ constexpr ImVec2 MARKER_LINE_RIGHT[6]    = {ImVec2(1,0),  ImVec2(-0.5, SQRT_3_2)
 constexpr ImVec2 MARKER_LINE_ASTERISK[6] = {ImVec2(-SQRT_3_2, -0.5f), ImVec2(SQRT_3_2, 0.5f),  ImVec2(-SQRT_3_2, 0.5f), ImVec2(SQRT_3_2, -0.5f), ImVec2(0, -1), ImVec2(0, 1)};
 constexpr ImVec2 MARKER_LINE_PLUS[4]     = {ImVec2(-1, 0), ImVec2(1, 0), ImVec2(0, -1), ImVec2(0, 1)};
 constexpr ImVec2 MARKER_LINE_CROSS[4]    = {ImVec2(-SQRT_1_2,-SQRT_1_2),ImVec2(SQRT_1_2,SQRT_1_2),ImVec2(SQRT_1_2,-SQRT_1_2),ImVec2(-SQRT_1_2,SQRT_1_2)};
+constexpr ImVec2 MARKER_LINE_VERTICAL[2] = {ImVec2(0, -1), ImVec2(0, 1)};
+constexpr ImVec2 MARKER_LINE_HORIZONTAL[2] = {ImVec2(-1, 0), ImVec2(1, 0)};
 
 template <typename _Getter, typename _GetterFillColor, typename _GetterLineColor, typename _GetterSize>
 void RenderMarkers(const _Getter& getter, ImPlotMarker marker, bool rend_fill, const _GetterFillColor& col_fill_getter, bool rend_line, const _GetterLineColor& col_line_getter, const _GetterSize& size_getter, float weight) {
@@ -1851,6 +1842,8 @@ void RenderMarkers(const _Getter& getter, ImPlotMarker marker, bool rend_fill, c
             case ImPlotMarker_Asterisk  : RenderPrimitives3<RendererMarkersLine>(getter,col_line_getter,size_getter,MARKER_LINE_ASTERISK,6,weight); break;
             case ImPlotMarker_Plus      : RenderPrimitives3<RendererMarkersLine>(getter,col_line_getter,size_getter,MARKER_LINE_PLUS,    4,weight); break;
             case ImPlotMarker_Cross     : RenderPrimitives3<RendererMarkersLine>(getter,col_line_getter,size_getter,MARKER_LINE_CROSS,   4,weight); break;
+            case ImPlotMarker_Vertical  : RenderPrimitives3<RendererMarkersLine>(getter,col_line_getter,size_getter,MARKER_LINE_VERTICAL,2,weight); break;
+            case ImPlotMarker_Horizontal: RenderPrimitives3<RendererMarkersLine>(getter,col_line_getter,size_getter,MARKER_LINE_HORIZONTAL,2,weight); break;
         }
     }
 }
@@ -1921,7 +1914,7 @@ void PlotLineEx(const char* label_id, const _Getter& getter, const ImPlotSpec& s
                     RenderPrimitives3<RendererShaded>(getter,getter2,color_getter);
                 } else {
                     const ImU32 col_fill = ImGui::GetColorU32(s.Spec.FillColor);
-                    GetterConstColor color_getter(col_fill, s.Spec.FillAlpha);
+                    GetterConstColor color_getter(col_fill);
                     RenderPrimitives3<RendererShaded>(getter,getter2,color_getter);
                 }
             }
@@ -2012,7 +2005,7 @@ template <typename Getter>
 void PlotScatterEx(const char* label_id, const Getter& getter, const ImPlotSpec& spec) {
     // force scatter to render a marker even if none
     ImPlotMarker marker = spec.Marker == ImPlotMarker_None ? ImPlotMarker_Auto: spec.Marker;
-    if (BeginItemEx(label_id, Fitter1<Getter>(getter), spec, spec.LineColor, marker)) {
+    if (BeginItemEx(label_id, Fitter1<Getter>(getter), spec, spec.MarkerLineColor, marker)) {
         if (getter.Count <= 0) {
             EndItem();
             return;
@@ -2149,7 +2142,11 @@ void PlotPolygonEx(const char* label_id, const Getter& getter, const ImPlotSpec&
         }
         if (s.RenderLine && getter.Count >= 2) {
             const ImU32 col_line = ImGui::GetColorU32(s.Spec.LineColor);
+#if IMGUI_VERSION_NUM < 19276
             draw_list.AddPolyline(points, getter.Count, col_line, ImDrawFlags_Closed, s.Spec.LineWeight);
+#else
+            draw_list.AddPolyline(points, getter.Count, col_line, s.Spec.LineWeight, ImDrawFlags_Closed);
+#endif
         }
         IM_FREE(points);
 
@@ -2188,7 +2185,7 @@ void PlotStairsEx(const char* label_id, const Getter& getter, const ImPlotSpec& 
                         GetterIdxColor color_getter(s.Spec.FillColors, getter.Count, s.Spec.FillAlpha);
                         RenderPrimitives2<RendererStairsPreShaded>(getter, color_getter);
                     } else {
-                        GetterConstColor color_getter(col_fill, s.Spec.FillAlpha);
+                        GetterConstColor color_getter(col_fill);
                         RenderPrimitives2<RendererStairsPreShaded>(getter, color_getter);
                     }
                 } else {
@@ -2196,7 +2193,7 @@ void PlotStairsEx(const char* label_id, const Getter& getter, const ImPlotSpec& 
                         GetterIdxColor color_getter(s.Spec.FillColors, getter.Count, s.Spec.FillAlpha);
                         RenderPrimitives2<RendererStairsPostShaded>(getter, color_getter);
                     } else {
-                        GetterConstColor color_getter(col_fill, s.Spec.FillAlpha);
+                        GetterConstColor color_getter(col_fill);
                         RenderPrimitives2<RendererStairsPostShaded>(getter, color_getter);
                     }
                 }
@@ -2274,7 +2271,7 @@ void PlotShadedEx(const char* label_id, const Getter1& getter1, const Getter2& g
                 RenderPrimitives3<RendererShaded>(getter1,getter2,color_getter);
             } else {
                 const ImU32 col = ImGui::GetColorU32(s.Spec.FillColor);
-                GetterConstColor color_getter(col, s.Spec.FillAlpha);
+                GetterConstColor color_getter(col);
                 RenderPrimitives3<RendererShaded>(getter1,getter2,color_getter);
             }
         }
@@ -2347,7 +2344,7 @@ void PlotBarsVEx(const char* label_id, const Getter1& getter1, const Getter2 get
                 GetterIdxColor fill_getter(s.Spec.FillColors, getter1.Count, s.Spec.FillAlpha);
                 RenderPrimitives3<RendererBarsFillV>(getter1, getter2, fill_getter, width);
             } else {
-                GetterConstColor fill_getter(col_fill, s.Spec.FillAlpha);
+                GetterConstColor fill_getter(col_fill);
                 RenderPrimitives3<RendererBarsFillV>(getter1, getter2, fill_getter, width);
             }
             if (rend_line && col_fill == col_line)
@@ -2383,7 +2380,7 @@ void PlotBarsHEx(const char* label_id, const Getter1& getter1, const Getter2& ge
                 GetterIdxColor fill_getter(s.Spec.FillColors, getter1.Count, s.Spec.FillAlpha);
                 RenderPrimitives3<RendererBarsFillH>(getter1, getter2, fill_getter, height);
             } else {
-                GetterConstColor fill_getter(col_fill, s.Spec.FillAlpha);
+                GetterConstColor fill_getter(col_fill);
                 RenderPrimitives3<RendererBarsFillH>(getter1, getter2, fill_getter, height);
             }
             if (rend_line && col_fill == col_line)
@@ -2557,10 +2554,10 @@ void PlotErrorBarsVEx(const char* label_id, const _GetterPos& getter_pos, const 
         for (int i = 0; i < getter_pos.Count; ++i) {
             ImVec2 p1 = PlotToPixels(getter_neg[i],IMPLOT_AUTO,IMPLOT_AUTO);
             ImVec2 p2 = PlotToPixels(getter_pos[i],IMPLOT_AUTO,IMPLOT_AUTO);
-            draw_list.AddLine(p1,p2,col, s.Spec.LineWeight);
+            draw_list.AddLine(p1, p2, col, s.Spec.LineWeight);
             if (rend_whisker) {
-                draw_list.AddLine(p1 - ImVec2(half_whisker, 0), p1 + ImVec2(half_whisker, 0), col, s.Spec.LineWeight);
-                draw_list.AddLine(p2 - ImVec2(half_whisker, 0), p2 + ImVec2(half_whisker, 0), col, s.Spec.LineWeight);
+                AddLineH(&draw_list, p1.x - half_whisker, p1.x + half_whisker, p1.y, col, s.Spec.LineWeight);
+                AddLineH(&draw_list, p2.x - half_whisker, p2.x + half_whisker, p2.y, col, s.Spec.LineWeight);
             }
         }
         EndItem();
@@ -2584,8 +2581,8 @@ void PlotErrorBarsHEx(const char* label_id, const _GetterPos& getter_pos, const 
             ImVec2 p2 = PlotToPixels(getter_pos[i],IMPLOT_AUTO,IMPLOT_AUTO);
             draw_list.AddLine(p1, p2, col, s.Spec.LineWeight);
             if (rend_whisker) {
-                draw_list.AddLine(p1 - ImVec2(0, half_whisker), p1 + ImVec2(0, half_whisker), col, s.Spec.LineWeight);
-                draw_list.AddLine(p2 - ImVec2(0, half_whisker), p2 + ImVec2(0, half_whisker), col, s.Spec.LineWeight);
+                AddLineV(&draw_list, p1.x, p1.y - half_whisker, p1.y + half_whisker, col, s.Spec.LineWeight);
+                AddLineV(&draw_list, p2.x, p2.y - half_whisker, p2.y + half_whisker, col, s.Spec.LineWeight);
             }
         }
         EndItem();
@@ -3498,7 +3495,15 @@ void PlotText(const char* text, double x, double y, const ImVec2& pixel_offset, 
 //-----------------------------------------------------------------------------
 
 void PlotDummy(const char* label_id, const ImPlotSpec& spec) {
-    if (BeginItem(label_id, spec))
+    // Pick the first non-auto color from the spec to override the legend icon color
+    ImVec4 item_col = spec.LineColor;
+    if (IsColorAuto(item_col))
+        item_col = spec.FillColor;
+    if (IsColorAuto(item_col))
+        item_col = spec.MarkerLineColor;
+    if (IsColorAuto(item_col))
+        item_col = spec.MarkerFillColor;
+    if (BeginItem(label_id, spec, item_col, spec.Marker))
         EndItem();
 }
 

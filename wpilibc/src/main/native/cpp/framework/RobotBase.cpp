@@ -245,6 +245,10 @@ RobotBase::RobotBase() {
   m_programStartTimePublisher.Set(
       static_cast<int64_t>(wpi::util::GetProgramStartTime()));
 
+  m_wpilibVersionPublisher =
+      inst.GetStringTopic("/Robot/WPILibVersion").Publish();
+  m_wpilibVersionPublisher.Set(GetWPILibVersion());
+
   connListenerHandle =
       inst.AddConnectionListener(false, [&](const wpi::nt::Event& event) {
         if (event.Is(wpi::nt::EventFlags::CONNECTED)) {

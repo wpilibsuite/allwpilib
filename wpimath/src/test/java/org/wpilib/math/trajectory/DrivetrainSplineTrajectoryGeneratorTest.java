@@ -54,7 +54,7 @@ class DrivetrainSplineTrajectoryGeneratorTest {
 
     final double dt = 0.02;
 
-    for (double t = 0.0; t < trajectory.duration; t += dt) {
+    for (double t = 0.0; t < trajectory.duration(); t += dt) {
       var point = trajectory.sampleAt(t);
 
       assertAll(
@@ -71,7 +71,7 @@ class DrivetrainSplineTrajectoryGeneratorTest {
             new TrajectoryConfig(feetToMeters(12), feetToMeters(12)));
 
     assertEquals(traj.samples.size(), 1);
-    assertEquals(traj.duration, 0, 1e-6);
+    assertEquals(traj.duration(), 0, 1e-6);
   }
 
   @Test

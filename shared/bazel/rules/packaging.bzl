@@ -38,28 +38,32 @@ def pkg_files_headers(name, dep):
         strip_prefix = "",
     )
 
-def pkg_java_src_files(name):
+def pkg_java_src_files(name, java_srcs_root = "", generated_java_srcs = None, resource_srcs = None, proto_srcs = None):
+    generated_java_srcs = generated_java_srcs or []
+    resource_srcs = resource_srcs or []
+    proto_srcs = proto_srcs or []
+
     pkg_files(
         name = name + "-java-srcs",
-        srcs = native.glob(["src/main/java/**"]),
-        strip_prefix = "src/main/java",
+        srcs = native.glob([(java_srcs_root + "/**") if java_srcs_root else "**"], exclude = ["BUILD.bazel"]),
+        strip_prefix = java_srcs_root,
     )
 
     pkg_files(
         name = name + "-generated-java-srcs",
-        srcs = native.glob(["src/generated/main/java/**/*.java"], allow_empty = True),
+        srcs = generated_java_srcs,
         strip_prefix = "src/generated/main/java",
     )
 
     pkg_files(
         name = name + "-resource-srcs",
-        srcs = native.glob(["src/main/resources/**"], allow_empty = True),
+        srcs = resource_srcs,
         strip_prefix = "src/main/resources",
     )
 
     pkg_files(
         name = name + "-proto-srcs",
-        srcs = native.glob(["src/main/proto/**"], allow_empty = True),
+        srcs = proto_srcs,
         strip_prefix = "src/main/proto",
     )
 
@@ -74,8 +78,14 @@ def pkg_java_src_files(name):
         ],
     )
 
-def zip_java_srcs(name, extra_pkgs = []):
-    pkg_java_src_files("{}-sources.pkg".format(name))
+def zip_java_srcs(name, extra_pkgs = [], java_srcs_root = "", generated_java_srcs = None, resource_srcs = None, proto_srcs = None):
+    pkg_java_src_files(
+        "{}-sources.pkg".format(name),
+        java_srcs_root = java_srcs_root,
+        generated_java_srcs = generated_java_srcs,
+        resource_srcs = resource_srcs,
+        proto_srcs = proto_srcs,
+    )
 
     pkg_zip(
         name = "lib{}-java-sources".format(name),

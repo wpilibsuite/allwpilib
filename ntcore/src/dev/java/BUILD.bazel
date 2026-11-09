@@ -5,7 +5,7 @@ java_binary(
     srcs = ["org/wpilib/networktables/DevMain.java"],
     main_class = "org.wpilib.networktables.DevMain",
     deps = [
-        "//ntcore:ntcore-java",
-        "//wpiutil:wpiutil-java",
+        "//ntcore/src/main/java",
+        "//wpiutil/src/main/java",
     ],
 )

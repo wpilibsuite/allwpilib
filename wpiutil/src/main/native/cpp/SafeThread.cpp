@@ -100,14 +100,16 @@ void detail::SafeThreadOwnerBase::Stop() {
 
 void detail::SafeThreadOwnerBase::Join() {
   std::unique_lock lock(m_mutex);
-  if (auto thr = m_thread.lock()) {
-    auto stdThread = std::move(m_stdThread);
-    m_thread.reset();
-    lock.unlock();
+  auto thr = m_thread.lock();
+  auto stdThread = std::move(m_stdThread);
+  m_thread.reset();
+  lock.unlock();
+  if (thr) {
     thr->Stop();
+  }
+  // The thread can still be joinable after its SafeThread object is destroyed.
+  if (stdThread.joinable()) {
     stdThread.join();
-  } else if (m_stdThread.joinable()) {
-    m_stdThread.detach();
   }
 }
 

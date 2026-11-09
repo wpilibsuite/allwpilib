@@ -6,9 +6,9 @@
 
 #include <utility>
 
+#include "wpi/math/protobuf/trajectory.npb.h"
 #include "wpi/math/trajectory/proto/DifferentialSampleProto.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/trajectory.npb.h"
 
 std::optional<wpi::math::DifferentialTrajectory> wpi::util::Protobuf<
     wpi::math::DifferentialTrajectory>::Unpack(InputStream& stream) {

@@ -1603,6 +1603,87 @@ def test_remove_opmode():
     assert options[0].name == "OneArgOpMode"
 
 
+@pytest.mark.parametrize("started", [False, True])
+@pytest.mark.parametrize("self_cycle", [False, True])
+def test_opmode_close_with_retained_reference(started, self_cycle):
+    instances = []
+
+    class ClosingOpMode(wpilib.PeriodicOpMode):
+        def __init__(self):
+            super().__init__()
+            self.events = []
+            self.callback_count = 0
+            self.periodic_count = 0
+            self.counts_at_close = None
+            if self_cycle:
+                self.cycle = self
+            self.add_periodic(self.callback, 0.02)
+            instances.append(self)
+
+        def callback(self):
+            self.callback_count += 1
+
+        def periodic(self):
+            self.periodic_count += 1
+
+        def end(self):
+            self.events.append("end")
+
+        def close(self):
+            self.events.append("close")
+            self.counts_at_close = (self.callback_count, self.periodic_count)
+
+    robot = OpModeRobot(auto_discover=False)
+    robot.add_opmode(ClosingOpMode, RobotMode.TELEOPERATED, "ClosingOpMode")
+    robot.publish_opmodes()
+    option = wsim.DriverStationSim.get_opmode_options()[0]
+    robot_thread = threading.Thread(target=robot.start_competition, daemon=True)
+    try:
+        robot_thread.start()
+        wsim.wait_for_program_start()
+        wsim.DriverStationSim.set_ds_attached(True)
+        wsim.DriverStationSim.set_enabled(False)
+        wsim.DriverStationSim.set_robot_mode(RobotMode.TELEOPERATED)
+        wsim.DriverStationSim.set_opmode(option.id)
+        wsim.DriverStationSim.notify_new_data()
+        wsim.step_timing(0.10)
+        instance = instances[0]
+        assert instance.callback_count > 0
+        assert instance.events == []
+
+        if started:
+            wsim.DriverStationSim.set_enabled(True)
+            wsim.DriverStationSim.notify_new_data()
+            wsim.step_timing(0.06)
+            assert instance.periodic_count > 0
+            wsim.DriverStationSim.set_enabled(False)
+        else:
+            wsim.DriverStationSim.set_opmode(0)
+        wsim.DriverStationSim.notify_new_data()
+        wsim.step_timing(0.06)
+
+        assert instance.events == (["end", "close"] if started else ["close"])
+        counts_after_close = (instance.callback_count, instance.periodic_count)
+        assert instance.counts_at_close == counts_after_close
+        wsim.step_timing(0.10)
+        assert (instance.callback_count, instance.periodic_count) == counts_after_close
+        assert instance.events.count("close") == 1
+    finally:
+        robot.end_competition()
+        if robot_thread.is_alive():
+            robot_thread.join()
+        wsim.DriverStationSim.reset_data()
+        wsim.DriverStationSim.notify_new_data()
+        for instance in instances:
+            if self_cycle:
+                del instance.cycle
+
+
+def test_opmode_default_close():
+    # Existing subclasses need not implement cleanup.
+    MockOpMode().close()
+
+
 @pytest.fixture
 def periodic_robot_test_fixture():
     class MyMockRobot(MockRobot):

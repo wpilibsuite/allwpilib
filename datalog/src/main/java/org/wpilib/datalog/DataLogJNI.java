@@ -91,6 +91,23 @@ public class DataLogJNI {
   static native void bgSetFilename(long impl, String filename);
 
   /**
+   * Requests a background transfer to another directory.
+   *
+   * @param impl data log background writer implementation handle
+   * @param dir destination directory
+   * @param maxSize maximum file size to transfer, in bytes
+   */
+  static native void bgSetDir(long impl, String dir, long maxSize);
+
+  /**
+   * Gets the current log directory.
+   *
+   * @param impl data log background writer implementation handle
+   * @return log directory
+   */
+  static native String bgGetDir(long impl);
+
+  /**
    * Create a new Data Log foreground writer.
    *
    * @param filename filename to use
