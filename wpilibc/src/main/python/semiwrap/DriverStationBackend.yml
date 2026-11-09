@@ -37,3 +37,10 @@ classes:
       SilenceJoystickConnectionAlert:
       IsJoystickConnectionAlertSilenced:
       StartDataLog:
+  wpi::internal::JoystickAlertState:
+    ignore: true
+  wpi::internal::JoystickAlerts:
+    ignore: true
+enums:
+  JoystickResourceAlert:
+    ignore: true

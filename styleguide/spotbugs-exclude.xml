@@ -13,7 +13,7 @@
   <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
     <Or>
-      <Class name="org.wpilib.driverstation.internal.DriverStationBackend" />
+      <Class name="org.wpilib.driverstation.internal.JoystickAlerts" />
       <Class name="org.wpilib.driverstation.RobotState" />
       <Class name="org.wpilib.driverstation.GenericHID" />
       <Class name="org.wpilib.command2.CommandScheduler" />
