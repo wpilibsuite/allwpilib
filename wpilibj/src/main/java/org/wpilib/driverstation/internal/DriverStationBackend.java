@@ -22,13 +22,6 @@ import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.hardware.hal.MatchInfoData;
-import org.wpilib.networktables.BooleanPublisher;
-import org.wpilib.networktables.IntegerPublisher;
-import org.wpilib.networktables.NetworkTableInstance;
-import org.wpilib.networktables.StringPublisher;
-import org.wpilib.networktables.StringTopic;
-import org.wpilib.networktables.StructPublisher;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.util.concurrent.EventVector;
 
@@ -119,134 +112,6 @@ public final class DriverStationBackend {
       m_povs = new byte[count];
       for (int i = 0; i < count; i++) {
         m_povs[i] = 0;
-      }
-    }
-  }
-
-  private static class MatchDataSender {
-    private static final String SMART_DASHBOARD_TYPE = "DriverStation";
-
-    final StringPublisher gameData;
-    final StringPublisher eventName;
-    final IntegerPublisher matchNumber;
-    final IntegerPublisher replayNumber;
-    final IntegerPublisher matchType;
-    final BooleanPublisher alliance;
-    final IntegerPublisher station;
-    final IntegerPublisher allianceStation;
-    final StructPublisher<ControlWord> controlWord;
-    final StringPublisher opMode;
-    String oldEventName = "";
-    String oldGameData = "";
-    int oldMatchNumber;
-    int oldReplayNumber;
-    int oldMatchType;
-    boolean oldIsRedAlliance = true;
-    int oldStationNumber = 1;
-    int oldAllianceStation = 0;
-    final ControlWord oldControlWord = new ControlWord();
-    final ControlWord currentControlWord = new ControlWord();
-    final MatchInfoData matchInfo = new MatchInfoData();
-
-    MatchDataSender() {
-      var table = NetworkTableInstance.getDefault().getTable("DriverStation");
-      table
-          .getStringTopic(".type")
-          .publishEx(
-              StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + SMART_DASHBOARD_TYPE + "\"}")
-          .set(SMART_DASHBOARD_TYPE);
-      gameData = table.getStringTopic("GameData").publish();
-      gameData.set("");
-      eventName = table.getStringTopic("EventName").publish();
-      eventName.set("");
-      matchNumber = table.getIntegerTopic("MatchNumber").publish();
-      matchNumber.set(0);
-      replayNumber = table.getIntegerTopic("ReplayNumber").publish();
-      replayNumber.set(0);
-      matchType = table.getIntegerTopic("MatchType").publish();
-      matchType.set(0);
-      alliance = table.getBooleanTopic("IsRedAlliance").publish();
-      alliance.set(true);
-      station = table.getIntegerTopic("StationNumber").publish();
-      station.set(1);
-      allianceStation = table.getIntegerTopic("AllianceStationID").publish();
-      allianceStation.set(0);
-      controlWord = table.getStructTopic("ControlWord", ControlWord.struct).publish();
-      controlWord.set(oldControlWord);
-      opMode = table.getStringTopic("OpMode").publish();
-      opMode.set("");
-    }
-
-    @SuppressWarnings("VariableDeclarationUsageDistance")
-    private void sendMatchData() {
-      AllianceStationID allianceID = DriverStationJNI.getAllianceStation();
-      final int stationNumber =
-          switch (allianceID) {
-            case BLUE_1, RED_1 -> 1;
-            case BLUE_2, RED_2 -> 2;
-            case BLUE_3, RED_3 -> 3;
-            case UNKNOWN -> 0;
-          };
-      final boolean isRedAlliance =
-          switch (allianceID) {
-            case BLUE_1, BLUE_2, BLUE_3 -> false;
-            case RED_1, RED_2, RED_3, UNKNOWN -> true;
-          };
-
-      DriverStationJNI.getMatchInfo(matchInfo);
-
-      String currentEventName = matchInfo.eventName;
-      String currentGameData;
-      int currentMatchNumber = matchInfo.matchNumber;
-      int currentReplayNumber = matchInfo.replayNumber;
-      int currentMatchType = matchInfo.matchType;
-      m_cacheDataMutex.lock();
-      try {
-        currentGameData = DriverStationBackend.m_gameData;
-      } finally {
-        m_cacheDataMutex.unlock();
-      }
-      DriverStationJNI.getControlWord(currentControlWord);
-
-      if (oldIsRedAlliance != isRedAlliance) {
-        alliance.set(isRedAlliance);
-        oldIsRedAlliance = isRedAlliance;
-      }
-      if (oldStationNumber != stationNumber) {
-        station.set(stationNumber);
-        oldStationNumber = stationNumber;
-      }
-      if (oldAllianceStation != allianceID.ordinal()) {
-        allianceStation.set(allianceID.ordinal());
-        oldAllianceStation = allianceID.ordinal();
-      }
-      if (!oldEventName.equals(currentEventName)) {
-        eventName.set(currentEventName);
-        oldEventName = currentEventName;
-      }
-      if (!oldGameData.equals(currentGameData)) {
-        gameData.set(currentGameData);
-        oldGameData = currentGameData;
-      }
-      if (currentMatchNumber != oldMatchNumber) {
-        matchNumber.set(currentMatchNumber);
-        oldMatchNumber = currentMatchNumber;
-      }
-      if (currentReplayNumber != oldReplayNumber) {
-        replayNumber.set(currentReplayNumber);
-        oldReplayNumber = currentReplayNumber;
-      }
-      if (currentMatchType != oldMatchType) {
-        matchType.set(currentMatchType);
-        oldMatchType = currentMatchType;
-      }
-      if (!currentControlWord.equals(oldControlWord)) {
-        long currentOpModeId = currentControlWord.getOpModeId();
-        if (currentOpModeId != oldControlWord.getOpModeId()) {
-          opMode.set(RobotState.opModeToString(currentOpModeId));
-        }
-        controlWord.set(currentControlWord);
-        oldControlWord.update(currentControlWord);
       }
     }
   }
@@ -412,7 +277,6 @@ public final class DriverStationBackend {
   private static HALJoystickButtons[] m_joystickButtons = new HALJoystickButtons[JOYSTICK_PORTS];
   private static HALJoystickTouchpads[] m_joystickTouchpads =
       new HALJoystickTouchpads[JOYSTICK_PORTS];
-  private static String m_gameData = "";
   private static ControlWord m_controlWord = new ControlWord();
   private static EventVector m_refreshEvents = new EventVector();
 
@@ -987,6 +851,7 @@ public final class DriverStationBackend {
    * Copy data from the DS task for the user. If no new data exists, it will just be returned,
    * otherwise the data will be copied from the DS polling loop.
    */
+  @SuppressWarnings("VariableDeclarationUsageDistance")
   public static void refreshData() {
     DriverStationJNI.refreshDSData();
 
@@ -1061,8 +926,6 @@ public final class DriverStationBackend {
       m_joystickTouchpads = m_joystickTouchpadsCache;
       m_joystickTouchpadsCache = currentTouchpads;
 
-      m_gameData = m_gameDataCache;
-
       ControlWord currentWord = m_controlWord;
       m_controlWord = m_controlWordCache;
       m_controlWordCache = currentWord;
@@ -1077,7 +940,7 @@ public final class DriverStationBackend {
 
     m_refreshEvents.wakeup();
 
-    m_matchDataSender.sendMatchData();
+    m_matchDataSender.sendMatchData(m_controlWord, m_gameDataCache);
     if (dataLogSender != null) {
       dataLogSender.send(WPIUtilJNI.now());
     }
