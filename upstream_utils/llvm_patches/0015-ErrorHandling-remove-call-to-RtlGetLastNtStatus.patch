@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 17 Sep 2024 21:19:52 -0700
-Subject: [PATCH 15/34] ErrorHandling: remove call to RtlGetLastNtStatus()
+Subject: [PATCH 15/32] ErrorHandling: remove call to RtlGetLastNtStatus()
 
 ---
  llvm/lib/Support/ErrorHandling.cpp | 23 -----------------------
  1 file changed, 23 deletions(-)
 
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 0a7d0c3953994618043ca3058c321ef43eb1394f..74e0d633faf0fd9c07a430539cc9d0f25ce0a6af 100644
+index fbf06adadd5e962bd7c3a139e574b0a346dba12a..3c60918bdd810fa3119e639f7a6a1de13080325f 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -246,34 +246,11 @@ void LLVMResetFatalErrorHandler() {
+@@ -230,34 +230,11 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
  #include <ntstatus.h>
  #include <winerror.h>
  

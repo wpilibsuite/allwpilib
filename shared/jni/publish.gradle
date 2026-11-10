@@ -9,8 +9,6 @@ def zipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-cpp")
 ext.zipBaseName = zipBaseName
 def jniCvStaticBaseName = makeZipBaseName(artifactGroupId, "${nativeName}-jnicvstatic")
 
-def licenseFile = file("$rootDir/LICENSE.md")
-
 task cppSourcesZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = zipBaseName
@@ -97,7 +95,7 @@ model {
                 value.each { binary ->
                     if (binary.buildable) {
                         if (binary instanceof SharedLibraryBinarySpec) {
-                            task.dependsOn binary.tasks.link
+                            includeSharedLibraryDebugSymbols(task, binary)
                             task.inputs.file(binary.sharedLibraryFile)
                             task.from(binary.sharedLibraryFile) {
                                 into nativeUtils.getPlatformPath(binary) + '/shared'

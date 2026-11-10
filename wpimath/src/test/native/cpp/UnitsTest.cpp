@@ -23,6 +23,7 @@
 #include "wpi/math/TestAssertions.hpp"
 
 #include "wpi/telemetry/MockTelemetryBackend.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 #include "wpi/telemetry/TelemetryRegistry.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/tunables/ComplexTunable.hpp"
@@ -3435,6 +3436,33 @@ TEST_CASE_METHOD(UnitTelemetry, "UnitTelemetry Log", "[wpimath]") {
   REQUIRE(actions[5].path == "/testwatt");
   REQUIRE(std::holds_alternative<double>(actions[5].value));
   REQUIRE(std::get<double>(actions[5].value) == 3);
+}
+
+TEST_CASE_METHOD(UnitTelemetry, "UnitTelemetry LogTemperature", "[wpimath]") {
+  SECTION("Celsius") {
+    wpi::telemetry::GetTable("/test").Log("temperature", wpi::units::celsius_t{25});
+  }
+  SECTION("Fahrenheit") {
+    wpi::telemetry::GetTable("/test").Log("temperature",
+                                        wpi::units::fahrenheit_t{77});
+  }
+  SECTION("Kelvin") {
+    wpi::telemetry::GetTable("/test").Log("temperature", wpi::units::kelvin_t{298.15});
+  }
+
+  auto actions = mock->GetActions();
+  REQUIRE(actions.size() == 2u);
+  REQUIRE(actions[0].path == "/test/temperature");
+  REQUIRE(std::holds_alternative<
+          wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(actions[0].value));
+  const auto& property =
+      std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+          actions[0].value);
+  REQUIRE(property.key == "unit");
+  REQUIRE(property.value == "\"K\"");
+  REQUIRE(actions[1].path == "/test/temperature");
+  REQUIRE(std::holds_alternative<double>(actions[1].value));
+  REQUIRE_NEAR(std::get<double>(actions[1].value), 298.15, 1e-9);
 }
 
 TEST_CASE_METHOD(UnitTunable, "UnitTunable PublishAndTune", "[wpimath]") {

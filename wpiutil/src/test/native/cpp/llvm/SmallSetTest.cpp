@@ -18,6 +18,7 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <algorithm>
 #include <string>
+#include <type_traits>
 
 using namespace wpi::util;
 
@@ -252,6 +253,22 @@ TEST_CASE("SmallSetTest IteratorIncMoveCopy", "[wpiutil][llvm]") {
   auto Iter2 = s1.begin();
   Iter = std::move(Iter2);
   CHECK("str 0" == *Iter);
+}
+
+template <typename T>
+constexpr bool is_const_ref = std::is_const_v<std::remove_reference_t<T>>;
+
+TEST_CASE("SmallSetTest IteratorDerefConst", "[wpiutil][llvm]") {
+  // Verify that dereference of SmallSet's iterator gives const-reference.
+  SmallSet<int, 4> sint;
+  CHECK(is_const_ref<decltype(sint)::const_iterator::reference>);
+  CHECK((is_const_ref<decltype(*sint.begin())> &&
+               is_const_ref<decltype(*sint.end())>));
+
+  SmallSet<std::string, 4> sstr;
+  CHECK(is_const_ref<decltype(sstr)::const_iterator::reference>);
+  CHECK((is_const_ref<decltype(*sstr.begin())> &&
+               is_const_ref<decltype(*sstr.end())>));
 }
 
 TEST_CASE("SmallSetTest EqualityComparisonTest", "[wpiutil][llvm]") {

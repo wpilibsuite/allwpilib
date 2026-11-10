@@ -9,32 +9,32 @@ import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedByte;
 
 public final class ProtobufSplineDescriptor {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1091,
-    "Ch13cGltYXRoL3Byb3RvYnVmL3NwbGluZS5wcm90bxIJd3BpLnByb3RvIogBChpQcm90b2J1ZkN1Ymlj" + 
-    "SGVybWl0ZVNwbGluZRIbCgl4X2luaXRpYWwYASADKAFSCHhJbml0aWFsEhcKB3hfZmluYWwYAiADKAFS" + 
-    "BnhGaW5hbBIbCgl5X2luaXRpYWwYAyADKAFSCHlJbml0aWFsEhcKB3lfZmluYWwYBCADKAFSBnlGaW5h" + 
-    "bCKKAQocUHJvdG9idWZRdWludGljSGVybWl0ZVNwbGluZRIbCgl4X2luaXRpYWwYASADKAFSCHhJbml0" + 
-    "aWFsEhcKB3hfZmluYWwYAiADKAFSBnhGaW5hbBIbCgl5X2luaXRpYWwYAyADKAFSCHlJbml0aWFsEhcK" + 
-    "B3lfZmluYWwYBCADKAFSBnlGaW5hbEJBCiNvcmcud3BpbGliLm1hdGguc3BsaW5lLnByb3RvLmRldGFp" + 
-    "bEIYUHJvdG9idWZTcGxpbmVEZXNjcmlwdG9yUAFKswUKBhIEAAAWAQoICgEMEgMAABIKCAoBAhIDAgAS" + 
-    "CggKAQgSAwQAPAoJCgIIARIDBAA8CggKAQgSAwYAOQoJCgIICBIDBgA5CggKAQgSAwgAIgoJCgIIChID" + 
-    "CAAiCgoKAgQAEgQKAA8BCgoKAwQAARIDCggiCgsKBAQAAgASAwsCIAoMCgUEAAIABBIDCwIKCgwKBQQA" + 
-    "AgAFEgMLCxEKDAoFBAACAAESAwsSGwoMCgUEAAIAAxIDCx4fCgsKBAQAAgESAwwCHgoMCgUEAAIBBBID" + 
-    "DAIKCgwKBQQAAgEFEgMMCxEKDAoFBAACAQESAwwSGQoMCgUEAAIBAxIDDBwdCgsKBAQAAgISAw0CIAoM" + 
-    "CgUEAAICBBIDDQIKCgwKBQQAAgIFEgMNCxEKDAoFBAACAgESAw0SGwoMCgUEAAICAxIDDR4fCgsKBAQA" + 
-    "AgMSAw4CHgoMCgUEAAIDBBIDDgIKCgwKBQQAAgMFEgMOCxEKDAoFBAACAwESAw4SGQoMCgUEAAIDAxID" + 
-    "DhwdCgoKAgQBEgQRABYBCgoKAwQBARIDEQgkCgsKBAQBAgASAxICIAoMCgUEAQIABBIDEgIKCgwKBQQB" + 
-    "AgAFEgMSCxEKDAoFBAECAAESAxISGwoMCgUEAQIAAxIDEh4fCgsKBAQBAgESAxMCHgoMCgUEAQIBBBID" + 
-    "EwIKCgwKBQQBAgEFEgMTCxEKDAoFBAECAQESAxMSGQoMCgUEAQIBAxIDExwdCgsKBAQBAgISAxQCIAoM" + 
-    "CgUEAQICBBIDFAIKCgwKBQQBAgIFEgMUCxEKDAoFBAECAgESAxQSGwoMCgUEAQICAxIDFB4fCgsKBAQB" + 
-    "AgMSAxUCHgoMCgUEAQIDBBIDFQIKCgwKBQQBAgMFEgMVCxEKDAoFBAECAwESAxUSGQoMCgUEAQIDAxID" + 
-    "FRwdYgZwcm90bzM=");
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(1092,
+    "Ch53cGkvbWF0aC9wcm90b2J1Zi9zcGxpbmUucHJvdG8SCXdwaS5wcm90byKIAQoaUHJvdG9idWZDdWJp" + 
+    "Y0hlcm1pdGVTcGxpbmUSGwoJeF9pbml0aWFsGAEgAygBUgh4SW5pdGlhbBIXCgd4X2ZpbmFsGAIgAygB" + 
+    "UgZ4RmluYWwSGwoJeV9pbml0aWFsGAMgAygBUgh5SW5pdGlhbBIXCgd5X2ZpbmFsGAQgAygBUgZ5Rmlu" + 
+    "YWwiigEKHFByb3RvYnVmUXVpbnRpY0hlcm1pdGVTcGxpbmUSGwoJeF9pbml0aWFsGAEgAygBUgh4SW5p" + 
+    "dGlhbBIXCgd4X2ZpbmFsGAIgAygBUgZ4RmluYWwSGwoJeV9pbml0aWFsGAMgAygBUgh5SW5pdGlhbBIX" + 
+    "Cgd5X2ZpbmFsGAQgAygBUgZ5RmluYWxCQQojb3JnLndwaWxpYi5tYXRoLnNwbGluZS5wcm90by5kZXRh" + 
+    "aWxCGFByb3RvYnVmU3BsaW5lRGVzY3JpcHRvclABSrMFCgYSBAAAFgEKCAoBDBIDAAASCggKAQISAwIA" + 
+    "EgoICgEIEgMEADwKCQoCCAESAwQAPAoICgEIEgMGADkKCQoCCAgSAwYAOQoICgEIEgMIACIKCQoCCAoS" + 
+    "AwgAIgoKCgIEABIECgAPAQoKCgMEAAESAwoIIgoLCgQEAAIAEgMLAiAKDAoFBAACAAQSAwsCCgoMCgUE" + 
+    "AAIABRIDCwsRCgwKBQQAAgABEgMLEhsKDAoFBAACAAMSAwseHwoLCgQEAAIBEgMMAh4KDAoFBAACAQQS" + 
+    "AwwCCgoMCgUEAAIBBRIDDAsRCgwKBQQAAgEBEgMMEhkKDAoFBAACAQMSAwwcHQoLCgQEAAICEgMNAiAK" + 
+    "DAoFBAACAgQSAw0CCgoMCgUEAAICBRIDDQsRCgwKBQQAAgIBEgMNEhsKDAoFBAACAgMSAw0eHwoLCgQE" + 
+    "AAIDEgMOAh4KDAoFBAACAwQSAw4CCgoMCgUEAAIDBRIDDgsRCgwKBQQAAgMBEgMOEhkKDAoFBAACAwMS" + 
+    "Aw4cHQoKCgIEARIEEQAWAQoKCgMEAQESAxEIJAoLCgQEAQIAEgMSAiAKDAoFBAECAAQSAxICCgoMCgUE" + 
+    "AQIABRIDEgsRCgwKBQQBAgABEgMSEhsKDAoFBAECAAMSAxIeHwoLCgQEAQIBEgMTAh4KDAoFBAECAQQS" + 
+    "AxMCCgoMCgUEAQIBBRIDEwsRCgwKBQQBAgEBEgMTEhkKDAoFBAECAQMSAxMcHQoLCgQEAQICEgMUAiAK" + 
+    "DAoFBAECAgQSAxQCCgoMCgUEAQICBRIDFAsRCgwKBQQBAgIBEgMUEhsKDAoFBAECAgMSAxQeHwoLCgQE" + 
+    "AQIDEgMVAh4KDAoFBAECAwQSAxUCCgoMCgUEAQIDBRIDFQsRCgwKBQQBAgMBEgMVEhkKDAoFBAECAwMS" + 
+    "AxUcHWIGcHJvdG8z");
 
-  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("wpimath/protobuf/spline.proto", "wpi.proto", descriptorData);
+  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("wpi/math/protobuf/spline.proto", "wpi.proto", descriptorData);
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufCubicHermiteSpline_descriptor = descriptor.internalContainedType(45, 136, "ProtobufCubicHermiteSpline", "wpi.proto.ProtobufCubicHermiteSpline");
+  static final Descriptors.Descriptor wpi_proto_ProtobufCubicHermiteSpline_descriptor = descriptor.internalContainedType(46, 136, "ProtobufCubicHermiteSpline", "wpi.proto.ProtobufCubicHermiteSpline");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufQuinticHermiteSpline_descriptor = descriptor.internalContainedType(184, 138, "ProtobufQuinticHermiteSpline", "wpi.proto.ProtobufQuinticHermiteSpline");
+  static final Descriptors.Descriptor wpi_proto_ProtobufQuinticHermiteSpline_descriptor = descriptor.internalContainedType(185, 138, "ProtobufQuinticHermiteSpline", "wpi.proto.ProtobufQuinticHermiteSpline");
 
   /**
    * @return this proto file's descriptor.

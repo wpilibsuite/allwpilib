@@ -21,11 +21,16 @@ def main():
     parser = make_arg_parser(dirname, dirname.parent, GeneratorTypes.NANOPB)
     parser.set_defaults(
         proto_directory=dirname / "src/test/proto",
-        output_directory=dirname / "src/generated/test/native/cpp",
+        output_directory=dirname / "src/generated/test",
     )
     args = parser.parse_args()
 
-    generate_nanopb(args.nanopb, args.output_directory, args.proto_directory)
+    generate_nanopb(
+        args.nanopb,
+        args.output_directory / "native/cpp",
+        args.output_directory / "native/include",
+        args.proto_directory,
+    )
 
 
 if __name__ == "__main__":

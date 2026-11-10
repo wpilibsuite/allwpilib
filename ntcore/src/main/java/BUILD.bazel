@@ -1,0 +1,27 @@
+load("//shared/bazel/rules:java_rules.bzl", "patch_module")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_java_library")
+
+wpilib_jni_java_library(
+    name = "ntcore-java",
+    srcs = glob(["**/*.java"]) + ["//ntcore:generated_java"],
+    generated_java_srcs = ["//ntcore:generated_java"],
+    javacopts = patch_module(
+        "wpilib.ntcore",
+        ["ntcore/src/generated/main/java"],
+    ),
+    maven_artifact_name = "ntcore-java",
+    maven_group_id = "org.wpilib.ntcore",
+    native_libs = ["//ntcore:shared/ntcorejni"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//datalog/src/main/java",
+        "//wpiutil/src/main/java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":ntcore-java",
+    visibility = ["//visibility:public"],
+)

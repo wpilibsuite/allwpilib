@@ -1,8 +1,6 @@
 # validated: 2024-01-19 DS aaea85ff1656 ParallelCommandGroup.java
 from __future__ import annotations
 
-from typing import Dict
-
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler
 from .exceptions import IllegalCommandUse
@@ -27,7 +25,7 @@ class ParallelCommandGroup(Command):
         :param commands: the commands to include in this composition.
         """
         super().__init__()
-        self._commands: Dict[Command, bool] = {}
+        self._commands: dict[Command, bool] = {}
         self._runs_when_disabled = True
         self._interrupt_behavior = InterruptionBehavior.CANCEL_INCOMING
         self.add_commands(*commands)

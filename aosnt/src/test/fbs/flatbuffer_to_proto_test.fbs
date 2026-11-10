@@ -1,0 +1,49 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+// A mirror of ProtobufControlData from mrccomm's MrcComm.proto, written the way
+// a schema has to be for FlatbufferToProto to reproduce that protobuf. Ids are
+// the proto's field numbers minus one.
+
+namespace wpi.aosnt.testing;
+
+attribute "proto_type";
+
+// mrc.proto.ProtobufFingerData
+table FingerData {
+  x:uint (id: 0);
+  y:uint (id: 1);
+  down:bool (id: 2);
+}
+
+// mrc.proto.ProtobufTouchpadData
+table TouchpadData {
+  fingers:[FingerData] (id: 0);
+}
+
+// mrc.proto.ProtobufJoystickData
+table JoystickData {
+  available_buttons:ulong (id: 0);
+  buttons:ulong (id: 1);
+  available_axes:uint (id: 2);
+  axes:[int] (id: 3, proto_type: "sint32");
+  // The proto's nibble-packed POVCount and POVs. Reflection cannot invent that
+  // packing, so the schema carries the packed words.
+  pov_count:uint (id: 4);
+  povs:uint (id: 5);
+  touchpads:[TouchpadData] (id: 6);
+}
+
+// mrc.proto.ProtobufControlData
+table ControlData {
+  // The proto has no field 1.
+  reserved_0:byte (id: 0, deprecated);
+  match_time:int (id: 1);
+  joysticks:[JoystickData] (id: 2);
+  current_op_mode:ulong (id: 3, proto_type: "fixed64");
+  control_word:uint (id: 4);
+  game_data:string (id: 5);
+}
+
+root_type ControlData;

@@ -89,9 +89,26 @@ class WPILIB_DLLEXPORT DifferentialTrajectory
 WPILIB_DLLEXPORT
 void to_json(wpi::util::json& json, const DifferentialTrajectory& trajectory);
 
-WPILIB_DLLEXPORT
-void from_json(const wpi::util::json& json, DifferentialTrajectory& trajectory);
-
 }  // namespace wpi::math
+
+namespace wpi::util {
+
+class json;
+
+template <typename T>
+struct json_serializer;
+
+/**
+ * Deserializes a DifferentialTrajectory from JSON.
+ *
+ * @throws std::invalid_argument if the trajectory has no samples or doesn't
+ *         start at time zero.
+ */
+template <>
+struct WPILIB_DLLEXPORT json_serializer<wpi::math::DifferentialTrajectory> {
+  static wpi::math::DifferentialTrajectory from(const json& json);
+};
+
+}  // namespace wpi::util
 
 #include "proto/DifferentialTrajectoryProto.hpp"

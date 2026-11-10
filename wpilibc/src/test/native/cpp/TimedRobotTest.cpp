@@ -17,9 +17,11 @@
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/nt/StringTopic.hpp"
 #include "wpi/simulation/AlertSim.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
+#include "wpi/system/WPILibVersion.hpp"
 #include "wpi/telemetry/Telemetry.hpp"
 #include "wpi/telemetry/TelemetryRegistry.hpp"
 #include "wpi/tunables/Tunable.hpp"
@@ -185,6 +187,20 @@ TEST_CASE_METHOD(TimedRobotTest,
   MockRobot robot;
 
   CHECK(static_cast<int64_t>(wpi::util::GetProgramStartTime()) == sub.Get(-1));
+}
+
+TEST_CASE_METHOD(TimedRobotTest,
+                 "TimedRobotTest ConstructorPublishesWPILibVersion",
+                 "[wpilibc]") {
+  auto topic = wpi::nt::NetworkTableInstance::GetDefault().GetStringTopic(
+      "/Robot/WPILibVersion");
+  {
+    MockRobot robot;
+    auto sub = topic.Subscribe("");
+
+    CHECK(sub.Get() == GetWPILibVersion());
+  }
+  CHECK_FALSE(topic.Exists());
 }
 
 TEST_CASE_METHOD(

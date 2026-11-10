@@ -13,5 +13,11 @@ dependencies {
     implementation(project(':epilogue-runtime'))
     api project(':commandsv2')
 
+    implementation(project(':hal'))
+    implementation(project(':ntcore'))
+    implementation(project(':tunables'))
+    implementation(project(':wpilibj'))
+    implementation(project(':wpimath'))
+
     testImplementation libs.compile.testing
 }

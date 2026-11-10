@@ -1,6 +1,7 @@
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
-load("@rules_pkg//:mappings.bzl", "pkg_filegroup", "pkg_files")
+load("@rules_pkg//:mappings.bzl", "pkg_attributes", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_library_files", "wpilib_cc_static_library_strip_prefix")
 load("//shared/bazel/rules:publishing.bzl", "architectures_pkg_zip", "platform_prefix", "wpilib_maven_export")
 
 def _headers_impl(ctx):
@@ -37,22 +38,32 @@ def pkg_files_headers(name, dep):
         strip_prefix = "",
     )
 
-def pkg_java_src_files(name):
+def pkg_java_src_files(name, java_srcs_root = "", generated_java_srcs = None, resource_srcs = None, proto_srcs = None):
+    generated_java_srcs = generated_java_srcs or []
+    resource_srcs = resource_srcs or []
+    proto_srcs = proto_srcs or []
+
     pkg_files(
         name = name + "-java-srcs",
-        srcs = native.glob(["src/main/java/**"]),
-        strip_prefix = "src/main/java",
+        srcs = native.glob([(java_srcs_root + "/**") if java_srcs_root else "**"], exclude = ["BUILD.bazel"]),
+        strip_prefix = java_srcs_root,
     )
 
     pkg_files(
         name = name + "-generated-java-srcs",
-        srcs = native.glob(["src/generated/main/java/**/*.java"], allow_empty = True),
+        srcs = generated_java_srcs,
         strip_prefix = "src/generated/main/java",
     )
 
     pkg_files(
+        name = name + "-resource-srcs",
+        srcs = resource_srcs,
+        strip_prefix = "src/main/resources",
+    )
+
+    pkg_files(
         name = name + "-proto-srcs",
-        srcs = native.glob(["src/main/proto/**"], allow_empty = True),
+        srcs = proto_srcs,
         strip_prefix = "src/main/proto",
     )
 
@@ -60,14 +71,21 @@ def pkg_java_src_files(name):
         name = name,
         srcs = [
             name + "-java-srcs",
+            name + "-resource-srcs",
             name + "-proto-srcs",
             name + "-generated-java-srcs",
             "//shared/bazel/rules:src_jar_dummy_manifest",
         ],
     )
 
-def zip_java_srcs(name, extra_pkgs = []):
-    pkg_java_src_files("{}-sources.pkg".format(name))
+def zip_java_srcs(name, extra_pkgs = [], java_srcs_root = "", generated_java_srcs = None, resource_srcs = None, proto_srcs = None):
+    pkg_java_src_files(
+        "{}-sources.pkg".format(name),
+        java_srcs_root = java_srcs_root,
+        generated_java_srcs = generated_java_srcs,
+        resource_srcs = resource_srcs,
+        proto_srcs = proto_srcs,
+    )
 
     pkg_zip(
         name = "lib{}-java-sources".format(name),
@@ -115,11 +133,9 @@ def package_default_jni_project(
     """
     pkg_files(
         name = "{}-static-files".format(name),
-        srcs = [
-            ":static/{}".format(name),
-        ],
+        srcs = wpilib_cc_static_library_files("static/" + name),
         prefix = platform_prefix("static"),
-        strip_prefix = "static",
+        strip_prefix = wpilib_cc_static_library_strip_prefix("static/" + name),
     )
 
     pkg_filegroup(
@@ -171,11 +187,9 @@ def package_default_cc_project(
     """
     pkg_files(
         name = "{}-static-files".format(name),
-        srcs = [
-            ":static/{}".format(name),
-        ],
+        srcs = wpilib_cc_static_library_files("static/" + name),
         prefix = platform_prefix("static"),
-        strip_prefix = "static",
+        strip_prefix = wpilib_cc_static_library_strip_prefix("static/" + name),
     )
 
     pkg_filegroup(
@@ -277,13 +291,18 @@ def package_shared_cc_project(
         name,
         maven_group_id,
         maven_artifact_name,
-        architectures = None):
+        architectures = None,
+        include_headers = True,
+        include_sources = True):
     """Packages the C++ shared libraries for a project.
 
     This assumes that shared libraries exist for the project, and that they
     are compatible with the relevant architectures.  This triggers the
     transitions, packages them up, and deploys them for all native platforms
     plus systemcore.
+
+    include_headers / include_sources can be turned off to match projects
+    which do not publish those zips in gradle.
     """
     pkg_filegroup(
         name = "{}-shared-files".format(name),
@@ -302,13 +321,17 @@ def package_shared_cc_project(
         architectures = architectures,
     )
 
+    extra_classifiers = {}
+    if include_headers:
+        extra_classifiers["headers"] = ":{}-hdrs-zip".format(name)
+    if include_sources:
+        extra_classifiers["sources"] = ":{}-srcs-zip".format(name)
+
     wpilib_maven_export(
         name = "{}-cpp_publish".format(name),
-        classifier_artifacts = _filter_artifacts(architectures, {
-            "headers": ":{}-hdrs-zip".format(name),
+        classifier_artifacts = _filter_artifacts(architectures, extra_classifiers | {
             "linuxsystemcore": ":{}_shared_zip-opt-systemcore".format(name),
             "linuxsystemcoredebug": ":{}_shared_zip-dbg-systemcore".format(name),
-            "sources": ":{}-srcs-zip".format(name),
         }),
         linux_artifacts = _filter_artifacts(architectures, {
             "linuxx86-64": ":{}_shared_zip-opt-linux-x86-64".format(name),
@@ -342,11 +365,9 @@ def package_static_cc_project(
     """
     pkg_files(
         name = "{}-static-files".format(name),
-        srcs = [
-            ":static/{}".format(name),
-        ],
+        srcs = wpilib_cc_static_library_files("static/" + name),
         prefix = platform_prefix("static"),
-        strip_prefix = "static",
+        strip_prefix = wpilib_cc_static_library_strip_prefix("static/" + name),
     )
 
     architectures_pkg_zip(
@@ -389,18 +410,35 @@ def package_binary_cc_project(
         maven_group_id,
         maven_artifact_name,
         extra_files = [],
+        extra_binaries = [],
         architectures = None,
-        renames = None):
+        renames = None,
+        systemcore = False):
     """Packages the C++ binary targets for a project.
 
     This assumes that static libraries exist for the project, and that they
     are compatible with the relevant architectures.  This triggers the
-    transitions, packages them up, and deploys them for just the native
-    platforms.
+    transitions, packages them up, and deploys them for the native platforms,
+    and for the SystemCore too if `systemcore` is set.
+
+    `extra_binaries` ship beside `name` in the same directory, for tools that
+    are only useful next to the binary they are packaged with.
     """
+    linux_artifacts = {
+        "linuxx86-64": ":{}_zip-opt-linux-x86-64".format(name),
+    }
+
+    # wpilib_maven_export keeps linux_artifacts only on a Linux host, and the
+    # SystemCore is cross compiled from every host.
+    classifier_artifacts = {}
+    if systemcore:
+        classifier_artifacts["linuxsystemcore"] = ":{}_zip-opt-systemcore".format(name)
+
     pkg_files(
         name = "{}-files".format(name),
-        srcs = [name],
+        srcs = [name] + extra_binaries,
+        # Keep the binaries executable once unzipped.
+        attributes = pkg_attributes(mode = "0755"),
         prefix = platform_prefix(""),
         renames = renames,
     )
@@ -417,10 +455,8 @@ def package_binary_cc_project(
     wpilib_maven_export(
         name = "{}_publish".format(name),
         maven_coordinates = "{}:{}:$(WPILIB_VERSION)".format(maven_group_id, maven_artifact_name),
-        classifier_artifacts = {},
-        linux_artifacts = _filter_artifacts(architectures, {
-            "linuxx86-64": ":{}_zip-opt-linux-x86-64".format(name),
-        }),
+        classifier_artifacts = _filter_artifacts(architectures, classifier_artifacts),
+        linux_artifacts = _filter_artifacts(architectures, linux_artifacts),
         osx_artifacts = _filter_artifacts(architectures, {
             "osxuniversalstatic": ":{}_zip-opt-osxuniversal".format(name),
         }),

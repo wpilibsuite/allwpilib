@@ -4,7 +4,7 @@
 
 #include <string_view>
 
-#ifndef RUNNING_SYSID_TESTS
+#if !defined(RUNNING_SYSID_TESTS) && !defined(RUNNING_IMGUI_TESTS)
 
 void Application(std::string_view saveDir);
 

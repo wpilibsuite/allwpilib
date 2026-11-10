@@ -29,7 +29,10 @@ HttpCameraImpl::HttpCameraImpl(std::string_view name, CS_HttpCameraKind kind,
     : SourceImpl{name, logger, notifier, telemetry}, m_kind{kind} {}
 
 HttpCameraImpl::~HttpCameraImpl() {
-  m_active = false;
+  {
+    std::scoped_lock lock(m_mutex);
+    m_active = false;
+  }
 
   // force wakeup of monitor thread
   m_monitorCond.notify_one();
@@ -545,6 +548,8 @@ void HttpCameraImpl::NumSinksChanged() {
 }
 
 void HttpCameraImpl::NumSinksEnabledChanged() {
+  // Synchronize with the enable predicate check before notifying.
+  std::scoped_lock lock(m_mutex);
   m_sinkEnabledCond.notify_one();
 }
 

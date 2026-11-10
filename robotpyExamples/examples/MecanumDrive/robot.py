@@ -6,6 +6,8 @@
 #
 
 
+from typing import override
+
 import wpilib
 import wpilib_drivers
 
@@ -42,6 +44,7 @@ class MyRobot(wpilib.TimedRobot):
             front_left, rear_left, front_right, rear_right
         )
 
+    @override
     def teleop_periodic(self) -> None:
         self.robot_drive.drive_cartesian(
             -self.joystick.get_y(),

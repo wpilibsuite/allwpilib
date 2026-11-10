@@ -1,0 +1,15 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+// The other of two schemas whose enums share a package and a value name.
+
+namespace wpi.aosnt.testing.clash;
+
+enum State:byte { Off, Ready }
+
+table Second {
+  state:State (id: 0);
+}
+
+root_type Second;

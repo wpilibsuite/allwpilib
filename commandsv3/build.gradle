@@ -4,6 +4,7 @@ ext {
     baseId = 'commandsv3'
     groupId = 'org.wpilib'
 
+    nativeName = 'commands3'
     devMain = 'org.wpilib.command3.DevMain'
 }
 
@@ -14,6 +15,7 @@ evaluationDependsOn(':ntcore')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpilibj')
+evaluationDependsOn(':tunables')
 
 dependencies {
     annotationProcessor project(':javacPlugin')
@@ -24,6 +26,7 @@ dependencies {
     implementation project(':hal')
     implementation project(':wpimath')
     implementation project(':wpilibj')
+    implementation project(':tunables')
     api(libs.quickbuf.runtime)
     testAnnotationProcessor project(':javacPlugin')
     testAnnotationProcessor project(':epilogue-processor')
@@ -43,8 +46,8 @@ test {
     // For reflective access to the continuation classes
     jvmArgs += [
         '--add-opens',
-        'java.base/jdk.internal.vm=ALL-UNNAMED',
+        'java.base/jdk.internal.vm=wpilib.command3,ALL-UNNAMED',
         '--add-opens',
-        'java.base/java.lang=ALL-UNNAMED',
+        'java.base/java.lang=wpilib.command3,ALL-UNNAMED'
     ]
 }

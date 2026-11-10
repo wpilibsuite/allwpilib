@@ -1,24 +1,34 @@
 extra_includes:
 - wpi/tunables/TunableTable.hpp
+- rpy/PyTunable.h
 
 classes:
   wpi::tunables::ComplexTunable:
+    force_depends:
+    - wpi::tunables::TunableTable
+    - wpi::tunables::python::PyTunable
     ignored_bases:
-    - detail::TunableBase  # TODO(telemetry PR)
+    - detail::TunableBase
     methods:
       GetTunableType:
       PublishTunable:
-        ignore_py: true
       UpdateTunable:
       ComplexTunable:
-        overloads:
-          "":
-          const ForceTunableRegister&:
-            ignore: true
+        ignore: true
       PublishChildTunable:
-        ignore_py: true
         overloads:
           std::string_view, detail::TunableBase&:
+            cpp_code: |
+              [](ComplexTunable_Trampoline& self, std::string_view name,
+                 wpi::tunables::python::PyTunable& tunable) {
+                auto& base = tunable.GetBase();
+                py::gil_scoped_release release;
+                self.PublishChildTunable(name, base);
+              }
           std::string_view, ComplexTunable&:
       RemoveChildTunable:
       SetChildTunableChanged:
+    inline_code: |
+      .def(py::init([]() {
+        return std::make_unique<ComplexTunable_Trampoline>();
+      }))

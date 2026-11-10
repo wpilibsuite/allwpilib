@@ -65,13 +65,6 @@ const char* HAL_GetErrorMessage(int32_t code);
 void HAL_GetSerialNumber(struct WPI_String* serialNumber);
 
 /**
- * Returns the comments from the Systemcore web interface.
- *
- * @param[out] comments The comments string. Free with WPI_FreeString
- */
-void HAL_GetComments(struct WPI_String* comments);
-
-/**
  * Returns the team number configured for the robot controller.
  * @return team number, or 0 if not found.
  */

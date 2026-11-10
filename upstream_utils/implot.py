@@ -28,7 +28,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "implot"
     url = "https://github.com/epezent/implot.git"
-    tag = "v1.0"
+    tag = "v1.1"
 
     implot = Lib(name, url, tag, copy_upstream_src)
     implot.main()

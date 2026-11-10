@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Fri, 14 Jul 2023 17:33:08 -0700
-Subject: [PATCH 1/9] Revert "win,process: write minidumps when sending SIGQUIT
- (#3840)"
+Subject: [PATCH 01/10] Revert "win,process: write minidumps when sending
+ SIGQUIT (#3840)"
 
 This reverts commit 748d894e82abcdfff7429cf745003e182c47f163.
 ---

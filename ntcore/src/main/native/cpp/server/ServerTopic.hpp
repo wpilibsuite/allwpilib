@@ -31,15 +31,31 @@ struct TopicClientData {
 
   bool AddSubscriber(ServerSubscriber* sub) {
     bool added = subscribers.insert(sub).second;
-    auto& options = sub->GetOptions();
-    if (!options.topicsOnly) {
+    RecalculateSendMode();
+    return added;
+  }
+
+  bool RemoveSubscriber(ServerSubscriber* sub) {
+    bool removed = subscribers.erase(sub);
+    if (removed) {
+      RecalculateSendMode();
+    }
+    return removed;
+  }
+
+  void RecalculateSendMode() {
+    sendMode = net::ValueSendMode::DISABLED;
+    for (auto subscriber : subscribers) {
+      auto& options = subscriber->GetOptions();
+      if (options.topicsOnly) {
+        continue;
+      }
       if (options.sendAll) {
         sendMode = net::ValueSendMode::ALL;
-      } else if (sendMode == net::ValueSendMode::DISABLED) {
-        sendMode = net::ValueSendMode::NORMAL;
+        return;
       }
+      sendMode = net::ValueSendMode::NORMAL;
     }
-    return added;
   }
 };
 

@@ -94,6 +94,62 @@ public final class StringUtils {
   }
 
   /**
+   * Gets the nesting of class simple names from outer class to the given class.
+   *
+   * @param clazz the class element
+   * @return a deque of enclosing class simple names down to the class simple name
+   */
+  public static Deque<String> classNesting(TypeElement clazz) {
+    Deque<String> nesting = new ArrayDeque<>();
+    Element enclosing = clazz.getEnclosingElement();
+    while (!(enclosing instanceof PackageElement)) {
+      nesting.addFirst(enclosing.getSimpleName().toString());
+      enclosing = enclosing.getEnclosingElement();
+    }
+    nesting.addLast(clazz.getSimpleName().toString());
+    return nesting;
+  }
+
+  /**
+   * Gets the nested type name used in source code within the class's package (e.g. {@code
+   * "Example.Robot"}).
+   *
+   * @param clazz the class element
+   * @return the nested type name
+   */
+  public static String nestedTypeName(TypeElement clazz) {
+    return String.join(".", classNesting(clazz));
+  }
+
+  /**
+   * Gets the simple class name of the Epilogue service generated for the given robot class (e.g.
+   * {@code "Example$Robot_EpilogueService"}).
+   *
+   * @param clazz the robot class
+   * @return the service class simple name
+   */
+  public static String serviceSimpleClassName(TypeElement clazz) {
+    return String.join("$", classNesting(clazz)) + "_EpilogueService";
+  }
+
+  /**
+   * Gets the fully qualified class name of the Epilogue service generated for the given robot
+   * class.
+   *
+   * @param clazz the robot class
+   * @return the service class qualified name
+   */
+  public static String serviceClassName(TypeElement clazz) {
+    Element enclosing = clazz.getEnclosingElement();
+    while (!(enclosing instanceof PackageElement p)) {
+      enclosing = enclosing.getEnclosingElement();
+    }
+    String packageName = p.getQualifiedName().toString();
+    String simpleName = serviceSimpleClassName(clazz);
+    return packageName.isEmpty() ? simpleName : packageName + "." + simpleName;
+  }
+
+  /**
    * Gets the name of the field used to hold a logger for data of the given type.
    *
    * @param clazz the data type that the logger supports
@@ -113,13 +169,11 @@ public final class StringUtils {
   public static String loggerClassName(TypeElement clazz) {
     var config = clazz.getAnnotation(Logged.class);
 
-    Deque<String> nesting = new ArrayDeque<>();
+    Deque<String> nesting = classNesting(clazz);
     Element enclosing = clazz.getEnclosingElement();
     while (!(enclosing instanceof PackageElement p)) {
-      nesting.addFirst(enclosing.getSimpleName().toString());
       enclosing = enclosing.getEnclosingElement();
     }
-    nesting.addLast(clazz.getSimpleName().toString());
     String packageName = p.getQualifiedName().toString();
 
     String className;
@@ -129,7 +183,7 @@ public final class StringUtils {
       className = capitalize(config.name()).replaceAll(" ", "");
     }
 
-    return packageName + "." + className + "Logger";
+    return packageName.isEmpty() ? className + "Logger" : packageName + "." + className + "Logger";
   }
 
   /**

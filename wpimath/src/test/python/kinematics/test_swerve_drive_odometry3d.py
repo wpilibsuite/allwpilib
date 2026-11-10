@@ -1,9 +1,7 @@
 import pytest
-import math
 import random
 
 from wpimath import (
-    ChassisVelocities,
     DrivetrainSplineTrajectoryGenerator,
     Pose3d,
     Pose2d,

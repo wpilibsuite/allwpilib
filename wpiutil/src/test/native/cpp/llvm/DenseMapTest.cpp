@@ -93,8 +93,6 @@ public:
 std::set<CtorTester *> CtorTester::Constructed;
 
 struct CtorTesterMapInfo {
-  static inline CtorTester getEmptyKey() { return CtorTester(-1); }
-  static inline CtorTester getTombstoneKey() { return CtorTester(-2); }
   static unsigned getHashValue(const CtorTester &Val) {
     return Val.getValue() * 37u;
   }
@@ -710,8 +708,6 @@ TEST_CASE("DenseMapCustomTest LookupOrConstness", "[wpiutil][llvm]") {
 // Key traits that allows lookup with either an unsigned or char* key;
 // In the latter case, "a" == 0, "b" == 1 and so on.
 struct TestDenseMapInfo {
-  static inline unsigned getEmptyKey() { return ~0; }
-  static inline unsigned getTombstoneKey() { return ~0U - 1; }
   static unsigned getHashValue(const unsigned& Val) { return Val * 37U; }
   static unsigned getHashValue(const char* Val) {
     return (unsigned)(Val[0] - 'a') * 37U;
@@ -767,8 +763,6 @@ TEST_CASE("DenseMapCustomTest SmallDenseMapInitializerList", "[wpiutil][llvm]") 
 }
 
 struct ContiguousDenseMapInfo {
-  static inline unsigned getEmptyKey() { return ~0; }
-  static inline unsigned getTombstoneKey() { return ~0U - 1; }
   static unsigned getHashValue(const unsigned& Val) { return Val; }
   static bool isEqual(const unsigned& LHS, const unsigned& RHS) {
     return LHS == RHS;
@@ -893,8 +887,6 @@ struct AlwaysEqType {
 namespace wpi::util {
 template <typename T>
 struct DenseMapInfo<T, std::enable_if_t<std::is_base_of_v<A, T>>> {
-  static inline T getEmptyKey() { return {static_cast<int>(~0)}; }
-  static inline T getTombstoneKey() { return {static_cast<int>(~0U - 1)}; }
   static unsigned getHashValue(const T &Val) { return Val.value; }
   static bool isEqual(const T &LHS, const T &RHS) {
     return LHS.value == RHS.value;
@@ -903,8 +895,6 @@ struct DenseMapInfo<T, std::enable_if_t<std::is_base_of_v<A, T>>> {
 
 template <> struct DenseMapInfo<AlwaysEqType> {
   using T = AlwaysEqType;
-  static inline T getEmptyKey() { return {}; }
-  static inline T getTombstoneKey() { return {}; }
   static unsigned getHashValue(const T &Val) { return 0; }
   static bool isEqual(const T &LHS, const T &RHS) {
     return false;
@@ -951,6 +941,9 @@ TEST_CASE("DenseMapCustomTest VariantSupport", "[wpiutil][llvm]") {
 
 TEST_CASE("DenseMapCustomTest InitSize", "[wpiutil][llvm]") {
   constexpr unsigned ElemSize = sizeof(std::pair<int *, int>);
+  // getMemorySize() counts the bucket array plus the packed used-bit array: one
+  // uint32 word per 32 buckets (a single word covers all counts used here).
+  constexpr unsigned UsedSize = sizeof(uint32_t);
 
   {
     DenseMap<int *, int> Map;
@@ -962,59 +955,62 @@ TEST_CASE("DenseMapCustomTest InitSize", "[wpiutil][llvm]") {
   }
   {
     DenseMap<int *, int> Map(1);
-    CHECK(ElemSize * 4U == Map.getMemorySize());
+    CHECK(ElemSize * 4U + UsedSize == Map.getMemorySize());
   }
   {
     DenseMap<int *, int> Map(2);
-    CHECK(ElemSize * 4U == Map.getMemorySize());
+    CHECK(ElemSize * 4U + UsedSize == Map.getMemorySize());
   }
   {
     DenseMap<int *, int> Map(3);
-    CHECK(ElemSize * 8U == Map.getMemorySize());
+    CHECK(ElemSize * 8U + UsedSize == Map.getMemorySize());
   }
   {
     int A, B;
     DenseMap<int *, int> Map = {{&A, 1}, {&B, 2}};
-    CHECK(ElemSize * 4U == Map.getMemorySize());
+    CHECK(ElemSize * 4U + UsedSize == Map.getMemorySize());
   }
   {
     int A, B, C;
     DenseMap<int *, int> Map = {{&A, 1}, {&B, 2}, {&C, 3}};
-    CHECK(ElemSize * 8U == Map.getMemorySize());
+    CHECK(ElemSize * 8U + UsedSize == Map.getMemorySize());
   }
 }
 
 TEST_CASE("SmallDenseMapCustomTest InitSize", "[wpiutil][llvm]") {
   constexpr unsigned ElemSize = sizeof(std::pair<int *, int>);
+  // getMemorySize() counts the bucket array plus the packed used-bit array: one
+  // uint32 word per 32 buckets (a single word covers all counts used here).
+  constexpr unsigned UsedSize = sizeof(uint32_t);
   {
     SmallDenseMap<int *, int> Map;
-    CHECK(ElemSize * 4U == Map.getMemorySize());
+    CHECK(ElemSize * 4U + UsedSize == Map.getMemorySize());
   }
   {
     SmallDenseMap<int *, int> Map(0);
-    CHECK(ElemSize * 4U == Map.getMemorySize());
+    CHECK(ElemSize * 4U + UsedSize == Map.getMemorySize());
   }
   {
     SmallDenseMap<int *, int> Map(1);
-    CHECK(ElemSize * 4U == Map.getMemorySize());
+    CHECK(ElemSize * 4U + UsedSize == Map.getMemorySize());
   }
   {
     SmallDenseMap<int *, int> Map(2);
-    CHECK(ElemSize * 4U == Map.getMemorySize());
+    CHECK(ElemSize * 4U + UsedSize == Map.getMemorySize());
   }
   {
     SmallDenseMap<int *, int> Map(3);
-    CHECK(ElemSize * 8U == Map.getMemorySize());
+    CHECK(ElemSize * 8U + UsedSize == Map.getMemorySize());
   }
   {
     int A, B;
     SmallDenseMap<int *, int> Map = {{&A, 1}, {&B, 2}};
-    CHECK(ElemSize * 4U == Map.getMemorySize());
+    CHECK(ElemSize * 4U + UsedSize == Map.getMemorySize());
   }
   {
     int A, B, C;
     SmallDenseMap<int *, int> Map = {{&A, 1}, {&B, 2}, {&C, 3}};
-    CHECK(ElemSize * 8U == Map.getMemorySize());
+    CHECK(ElemSize * 8U + UsedSize == Map.getMemorySize());
   }
 }
 
@@ -1077,5 +1073,61 @@ TEST_CASE("DenseMapCustomTest ValueDtor", "[wpiutil][llvm]") {
   }
   CHECK(0u == CtorTester::getNumConstructed());
 }
+
+TEST_CASE("DenseMapCustomTest RemoveIf", "[wpiutil][llvm]") {
+  // Use enough entries to exercise the large representation and force the
+  // same-size rehash inside remove_if to restore the probe invariant.
+  DenseMap<int, int> Map;
+  for (int I = 0; I < 100; ++I)
+    Map[I] = I * 10;
+
+  // Remove all even keys.
+  CHECK(Map.remove_if([](const auto &E) { return E.first % 2 == 0; }));
+  CHECK(Map.size() == 50u);
+  for (int I = 0; I < 100; ++I) {
+    auto It = Map.find(I);
+    if (I % 2 == 0) {
+      CHECK(It == Map.end());
+    } else {
+      REQUIRE(It != Map.end());
+      CHECK(It->second == I * 10);
+    }
+  }
+
+  // A predicate that matches nothing returns false and leaves the map alone.
+  CHECK_FALSE(Map.remove_if([](const auto &) { return false; }));
+  CHECK(Map.size() == 50u);
+
+  // Remove everything.
+  CHECK(Map.remove_if([](const auto &) { return true; }));
+  CHECK(Map.empty());
+}
+
+TEST_CASE("DenseMapCustomTest RemoveIfValueDtor", "[wpiutil][llvm]") {
+  // remove_if must destroy the values of removed entries exactly once, and the
+  // rehash must not leak or double-destroy surviving values.
+  CHECK(0u == CtorTester::getNumConstructed());
+  {
+    DenseMap<int, CtorTester> Map;
+    for (int I = 0; I < 16; ++I)
+      Map.try_emplace(I, CtorTester(I));
+    CHECK(16u == CtorTester::getNumConstructed());
+    CHECK(Map.remove_if([](const auto &E) { return E.first < 10; }));
+    CHECK(6u == CtorTester::getNumConstructed());
+    CHECK(Map.size() == 6u);
+  }
+  CHECK(0u == CtorTester::getNumConstructed());
+}
+
+#if LLVM_ENABLE_ABI_BREAKING_CHECKS
+TEST_CASE("DenseMapCustomTest EraseInvalidatesIterators", "[wpiutil][llvm]") {
+  DenseMap<int, int> M;
+  M.try_emplace(1, 10);
+  M.try_emplace(2, 20);
+  auto It = M.find(1);
+  M.erase(M.find(2));
+  CHECK_DEATH((void)It->second, "invalid iterator access");
+}
+#endif
 
 } // namespace

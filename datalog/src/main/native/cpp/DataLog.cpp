@@ -282,7 +282,7 @@ uint8_t* DataLog::Reserve(size_t size) {
     if (m_free.empty()) {
       if (m_outgoing.size() >= MAX_BUFFER_COUNT) {
         [[unlikely]]
-        if (BufferFull()) {
+        if (!m_paused && BufferFull()) {
           m_paused = true;
         }
       }

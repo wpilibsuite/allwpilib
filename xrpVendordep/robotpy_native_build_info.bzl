@@ -6,7 +6,9 @@ load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "gene
 def define_native_wrapper(name, pyproject_toml = None):
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = native.glob(["src/main/native/include/**"]),
+        srcs = native.glob(["src/main/native/include/**"]) + [
+            "//:LICENSE.md",
+        ],
         out = "native/xrp/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
@@ -48,7 +50,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         ],
         summary = "WPILib XRP vendor library",
         requires = ["robotpy-native-wpilib==0.0.0"],
-        python_requires = ">=3.11",
+        python_requires = ">=3.12",
         strip_path_prefixes = ["xrpVendordep"],
         entry_points = {
             "pkg_config": [

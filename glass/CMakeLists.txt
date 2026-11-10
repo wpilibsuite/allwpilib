@@ -40,6 +40,23 @@ install(
     DESTINATION "${include_dest}/glass"
 )
 
+if(WPILIB_WITH_IMGUI_TESTS)
+    add_library(libglass_for_tests STATIC ${libglass_src})
+    set_target_properties(libglass_for_tests PROPERTIES DEBUG_POSTFIX "d")
+    set_property(TARGET libglass_for_tests PROPERTY FOLDER "tests")
+    wpilib_target_warnings(libglass_for_tests)
+    target_link_libraries(
+        libglass_for_tests
+        PUBLIC wpigui_for_tests wpimath wpiutil fields fieldimages
+    )
+    target_include_directories(
+        libglass_for_tests
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/thirdparty/mrccomm/include>
+    )
+endif()
+
 if(WPILIB_WITH_TESTS)
     wpilib_add_test(glass src/test/native/cpp)
     target_link_libraries(glass_test libglass)
@@ -71,6 +88,18 @@ target_include_directories(
 install(TARGETS libglassnt EXPORT libglassnt)
 export(TARGETS libglassnt FILE libglassnt.cmake NAMESPACE libglassnt::)
 install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
+
+if(WPILIB_WITH_IMGUI_TESTS)
+    add_library(libglassnt_for_tests STATIC ${libglassnt_src})
+    set_target_properties(libglassnt_for_tests PROPERTIES DEBUG_POSTFIX "d")
+    set_property(TARGET libglassnt_for_tests PROPERTY FOLDER "tests")
+    wpilib_target_warnings(libglassnt_for_tests)
+    target_link_libraries(libglassnt_for_tests PUBLIC ntcore libglass_for_tests)
+    target_include_directories(
+        libglassnt_for_tests
+        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/libnt/native/include>
+    )
+endif()
 
 #
 # glass application
@@ -108,5 +137,15 @@ if(WPILIB_WITH_EXECUTABLES)
         set_target_properties(glass PROPERTIES WIN32_EXECUTABLE YES)
     elseif(APPLE)
         set_target_properties(glass PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "Glass")
+    endif()
+
+    if(WPILIB_WITH_IMGUI_TESTS)
+        wpilib_add_imgui_test(glass src/test/native/imgui)
+        wpilib_link_macos_gui(glass_imgui_test)
+        target_sources(
+            glass_imgui_test
+            PRIVATE ${glass_src} ${glass_resources_src} ${glass_rc} ${APP_ICON_MACOSX}
+        )
+        target_link_libraries(glass_imgui_test libglassnt_for_tests libglass_for_tests)
     endif()
 endif()

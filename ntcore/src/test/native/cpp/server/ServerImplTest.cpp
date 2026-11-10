@@ -12,6 +12,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -25,6 +26,7 @@
 #include "../net/MockWireConnection.hpp"
 #include "Handle.hpp"
 #include "net/Message.hpp"
+#include "net/WireDecoder.hpp"
 #include "net/WireEncoder.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
@@ -184,6 +186,56 @@ static std::vector<uint8_t> EncodeServerBinary(const T& msgs) {
     }
   }
   return data;
+}
+
+static std::pair<int, Value> DecodeServerBinary1(
+    std::span<const uint8_t> data) {
+  int id = 0;
+  Value value;
+  std::string error;
+  bool decoded = net::WireDecodeBinary(&data, &id, &value, &error, 0);
+  UNSCOPED_INFO(error);
+  REQUIRE(decoded);
+  REQUIRE(data.empty());
+  return {id, value};
+}
+
+static void ProcessPublish(server::ServerImpl& server, int clientId, int pubuid,
+                           std::string_view name) {
+  std::vector<net::ClientMessage> msgs;
+  msgs.emplace_back(net::ClientMessage{net::PublishMsg{
+      pubuid, std::string{name}, "double", wpi::util::json::object(), {}}});
+  server.ProcessIncomingText(clientId, EncodeText(msgs));
+}
+
+static void ProcessSubscribe(server::ServerImpl& server, int clientId,
+                             int subuid, std::vector<std::string> topicNames,
+                             const PubSubOptions& options) {
+  std::vector<net::ClientMessage> msgs;
+  msgs.emplace_back(net::ClientMessage{
+      net::SubscribeMsg{subuid, std::move(topicNames), options}});
+  server.ProcessIncomingText(clientId, EncodeText(msgs));
+}
+
+static void ProcessUnsubscribe(server::ServerImpl& server, int clientId,
+                               int subuid) {
+  std::vector<net::ClientMessage> msgs;
+  msgs.emplace_back(net::ClientMessage{net::UnsubscribeMsg{subuid}});
+  server.ProcessIncomingText(clientId, EncodeText(msgs));
+}
+
+static void ProcessValue(server::ServerImpl& server, int clientId, int pubuid,
+                         const Value& value) {
+  std::vector<net::ClientMessage> msgs;
+  msgs.emplace_back(net::ClientMessage{net::ClientValueMsg{pubuid, value}});
+  server.ProcessIncomingBinary(clientId, EncodeServerBinary(msgs));
+}
+
+static void DrainAndClear(server::ServerImpl& server,
+                          net::MockWireConnection& wire, uint64_t curTimeMs) {
+  server.SendAllOutgoing(curTimeMs, true);
+  wire.writeTextCalls.clear();
+  wire.writeBinaryCalls.clear();
 }
 
 TEST_CASE_METHOD(ServerImplTest, "ServerImplTest PublishLocal",
@@ -564,6 +616,257 @@ TEST_CASE_METHOD(ServerImplTest,
       net::MockWireConnection::FlushCall, net::MockWireConnection::ReadyCall,
       net::MockWireConnection::WriteBinaryCall,
       net::MockWireConnection::FlushCall>(wire.calls);
+}
+
+TEST_CASE_METHOD(
+    ServerImplTest,
+    "ServerImplTest ReplacingSendAllSubscriptionRestoresCoalescing",
+    "[ntcore][server]") {
+  net::MockWireConnection pubWire;
+  net::MockWireConnection subWire;
+  pubWire.version = 0x0400;
+  subWire.version = 0x0400;
+  SetPeriodicRecorder pubSetPeriodic;
+  SetPeriodicRecorder subSetPeriodic;
+
+  auto [pubName, pubId] = server.AddClient("pub", "pub", false, pubWire,
+                                           pubSetPeriodic.AsStdFunction());
+  auto [subName, subId] = server.AddClient("sub", "sub", false, subWire,
+                                           subSetPeriodic.AsStdFunction());
+
+  constexpr int pubuid = 1;
+  constexpr int subuid = 1;
+  ProcessPublish(server, pubId, pubuid, "topic");
+  ProcessSubscribe(server, subId, subuid, {"topic"},
+                   PubSubOptions{.sendAll = true});
+  DrainAndClear(server, subWire, 5);
+
+  ProcessSubscribe(server, subId, subuid, {"topic"}, PubSubOptions{});
+  DrainAndClear(server, subWire, 10);
+
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(1.0, 10'000));
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(2.0, 20'000));
+  server.SendAllOutgoing(15, true);
+
+  REQUIRE(subWire.writeBinaryCalls.size() == 1u);
+  auto [topicId, value] = DecodeServerBinary1(subWire.writeBinaryCalls[0]);
+  CHECK(topicId >= 0);
+  CHECK(value.time() == 20'000);
+  CHECK(value.GetDouble() == 2.0);
+}
+
+TEST_CASE_METHOD(
+    ServerImplTest,
+    "ServerImplTest RemovingSendAllSubscriptionLeavesNormalCoalescing",
+    "[ntcore][server]") {
+  net::MockWireConnection pubWire;
+  net::MockWireConnection subWire;
+  pubWire.version = 0x0400;
+  subWire.version = 0x0400;
+  SetPeriodicRecorder pubSetPeriodic;
+  SetPeriodicRecorder subSetPeriodic;
+
+  auto [pubName, pubId] = server.AddClient("pub", "pub", false, pubWire,
+                                           pubSetPeriodic.AsStdFunction());
+  auto [subName, subId] = server.AddClient("sub", "sub", false, subWire,
+                                           subSetPeriodic.AsStdFunction());
+
+  constexpr int pubuid = 1;
+  constexpr int normalSubuid = 1;
+  constexpr int allSubuid = 2;
+  ProcessPublish(server, pubId, pubuid, "topic");
+  ProcessSubscribe(server, subId, normalSubuid, {"topic"}, PubSubOptions{});
+  ProcessSubscribe(server, subId, allSubuid, {"topic"},
+                   PubSubOptions{.sendAll = true});
+  DrainAndClear(server, subWire, 5);
+
+  ProcessUnsubscribe(server, subId, allSubuid);
+  DrainAndClear(server, subWire, 10);
+
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(1.0, 10'000));
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(2.0, 20'000));
+  server.SendAllOutgoing(15, true);
+
+  REQUIRE(subWire.writeBinaryCalls.size() == 1u);
+  auto [topicId, value] = DecodeServerBinary1(subWire.writeBinaryCalls[0]);
+  CHECK(topicId >= 0);
+  CHECK(value.time() == 20'000);
+  CHECK(value.GetDouble() == 2.0);
+}
+
+TEST_CASE_METHOD(
+    ServerImplTest,
+    "ServerImplTest RemovingFinalValueSubscriptionStopsFutureDelivery",
+    "[ntcore][server]") {
+  net::MockWireConnection pubWire;
+  net::MockWireConnection subWire;
+  pubWire.version = 0x0400;
+  subWire.version = 0x0400;
+  SetPeriodicRecorder pubSetPeriodic;
+  SetPeriodicRecorder subSetPeriodic;
+
+  auto [pubName, pubId] = server.AddClient("pub", "pub", false, pubWire,
+                                           pubSetPeriodic.AsStdFunction());
+  auto [subName, subId] = server.AddClient("sub", "sub", false, subWire,
+                                           subSetPeriodic.AsStdFunction());
+
+  constexpr int pubuid = 1;
+  constexpr int subuid = 1;
+  ProcessPublish(server, pubId, pubuid, "topic");
+  ProcessSubscribe(server, subId, subuid, {"topic"}, PubSubOptions{});
+  DrainAndClear(server, subWire, 5);
+
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(1.0, 10'000));
+  ProcessUnsubscribe(server, subId, subuid);
+  server.SendAllOutgoing(10, true);
+
+  REQUIRE(subWire.writeBinaryCalls.size() == 1u);
+  auto [topicId, value] = DecodeServerBinary1(subWire.writeBinaryCalls[0]);
+  CHECK(topicId >= 0);
+  CHECK(value.time() == 10'000);
+  CHECK(value.GetDouble() == 1.0);
+  subWire.writeBinaryCalls.clear();
+
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(2.0, 20'000));
+  server.SendAllOutgoing(15, true);
+  CHECK(subWire.writeBinaryCalls.empty());
+}
+
+TEST_CASE_METHOD(ServerImplTest,
+                 "ServerImplTest "
+                 "ReplacingValueSubscriptionWithTopicsOnlyStopsFutureDelivery",
+                 "[ntcore][server]") {
+  net::MockWireConnection pubWire;
+  net::MockWireConnection subWire;
+  pubWire.version = 0x0400;
+  subWire.version = 0x0400;
+  SetPeriodicRecorder pubSetPeriodic;
+  SetPeriodicRecorder subSetPeriodic;
+
+  auto [pubName, pubId] = server.AddClient("pub", "pub", false, pubWire,
+                                           pubSetPeriodic.AsStdFunction());
+  auto [subName, subId] = server.AddClient("sub", "sub", false, subWire,
+                                           subSetPeriodic.AsStdFunction());
+
+  constexpr int pubuid = 1;
+  constexpr int subuid = 1;
+  ProcessPublish(server, pubId, pubuid, "topic");
+  ProcessSubscribe(server, subId, subuid, {"topic"}, PubSubOptions{});
+  DrainAndClear(server, subWire, 5);
+
+  ProcessSubscribe(server, subId, subuid, {"topic"},
+                   PubSubOptions{.topicsOnly = true});
+  DrainAndClear(server, subWire, 10);
+
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(1.0, 10'000));
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(2.0, 20'000));
+  server.SendAllOutgoing(15, true);
+
+  CHECK(subWire.writeBinaryCalls.empty());
+}
+
+TEST_CASE_METHOD(
+    ServerImplTest,
+    "ServerImplTest ReplacingSubscriptionTopicSelectionStopsOldTopicDelivery",
+    "[ntcore][server]") {
+  net::MockWireConnection pubWire;
+  net::MockWireConnection subWire;
+  pubWire.version = 0x0400;
+  subWire.version = 0x0400;
+  SetPeriodicRecorder pubSetPeriodic;
+  SetPeriodicRecorder subSetPeriodic;
+
+  auto [pubName, pubId] = server.AddClient("pub", "pub", false, pubWire,
+                                           pubSetPeriodic.AsStdFunction());
+  auto [subName, subId] = server.AddClient("sub", "sub", false, subWire,
+                                           subSetPeriodic.AsStdFunction());
+
+  constexpr int pubuid = 1;
+  constexpr int subuid = 1;
+  ProcessPublish(server, pubId, pubuid, "old");
+  ProcessSubscribe(server, subId, subuid, {"old"}, PubSubOptions{});
+  DrainAndClear(server, subWire, 5);
+
+  ProcessSubscribe(server, subId, subuid, {"new"}, PubSubOptions{});
+  DrainAndClear(server, subWire, 10);
+
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(1.0, 10'000));
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(2.0, 20'000));
+  server.SendAllOutgoing(15, true);
+
+  CHECK(subWire.writeBinaryCalls.empty());
+}
+
+TEST_CASE_METHOD(
+    ServerImplTest,
+    "ServerImplTest RemainingOverlappingSendAllSubscriptionKeepsAll",
+    "[ntcore][server]") {
+  net::MockWireConnection pubWire;
+  net::MockWireConnection subWire;
+  pubWire.version = 0x0400;
+  subWire.version = 0x0400;
+  SetPeriodicRecorder pubSetPeriodic;
+  SetPeriodicRecorder subSetPeriodic;
+
+  auto [pubName, pubId] = server.AddClient("pub", "pub", false, pubWire,
+                                           pubSetPeriodic.AsStdFunction());
+  auto [subName, subId] = server.AddClient("sub", "sub", false, subWire,
+                                           subSetPeriodic.AsStdFunction());
+
+  constexpr int pubuid = 1;
+  constexpr int exactSubuid = 1;
+  constexpr int prefixSubuid = 2;
+  ProcessPublish(server, pubId, pubuid, "topic");
+  ProcessSubscribe(server, subId, exactSubuid, {"topic"},
+                   PubSubOptions{.sendAll = true});
+  ProcessSubscribe(server, subId, prefixSubuid, {"top"},
+                   PubSubOptions{.sendAll = true, .prefixMatch = true});
+  DrainAndClear(server, subWire, 5);
+
+  ProcessUnsubscribe(server, subId, exactSubuid);
+  DrainAndClear(server, subWire, 10);
+
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(1.0, 10'000));
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(2.0, 20'000));
+  server.SendAllOutgoing(15, true);
+
+  REQUIRE(subWire.writeBinaryCalls.size() == 2u);
+  auto [topicId0, value0] = DecodeServerBinary1(subWire.writeBinaryCalls[0]);
+  auto [topicId1, value1] = DecodeServerBinary1(subWire.writeBinaryCalls[1]);
+  CHECK(topicId0 == topicId1);
+  CHECK(value0.time() == 10'000);
+  CHECK(value0.GetDouble() == 1.0);
+  CHECK(value1.time() == 20'000);
+  CHECK(value1.GetDouble() == 2.0);
+}
+
+TEST_CASE_METHOD(ServerImplTest,
+                 "ServerImplTest LocalUnsubscribeStopsFutureDelivery",
+                 "[ntcore][server]") {
+  server.SetLocal(&local, &queue);
+
+  net::MockWireConnection pubWire;
+  pubWire.version = 0x0400;
+  SetPeriodicRecorder pubSetPeriodic;
+
+  auto [pubName, pubId] = server.AddClient("pub", "pub", false, pubWire,
+                                           pubSetPeriodic.AsStdFunction());
+
+  constexpr int pubuid = 1;
+  constexpr int subuid = 1;
+  ProcessPublish(server, pubId, pubuid, "topic");
+  queue.msgs.emplace_back(
+      net::ClientMessage{net::SubscribeMsg{subuid, {"topic"}, {}}});
+  REQUIRE_FALSE(server.ProcessLocalMessages(UINT_MAX));
+  local.calls.clear();
+  local.setValueCalls.clear();
+
+  queue.msgs.emplace_back(net::ClientMessage{net::UnsubscribeMsg{subuid}});
+  REQUIRE_FALSE(server.ProcessLocalMessages(UINT_MAX));
+
+  ProcessValue(server, pubId, pubuid, Value::MakeDouble(1.0, 10'000));
+
+  CHECK(local.setValueCalls.empty());
 }
 
 TEST_CASE_METHOD(ServerImplTest, "ServerImplTest InvalidPubUid",

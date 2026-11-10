@@ -6,8 +6,6 @@ from util import *  # type: ignore
 if TYPE_CHECKING:
     from .util import *
 
-import pytest
-
 
 def test_wait_until(scheduler: commands2.CommandScheduler):
     condition = OOBoolean()

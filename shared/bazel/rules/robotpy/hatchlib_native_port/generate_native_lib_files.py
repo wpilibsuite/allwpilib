@@ -198,9 +198,6 @@ class NativelibHook:
             )
 
             if pcfile.enable_if and not Marker(pcfile.enable_if).evaluate():
-                print(
-                    f"{pcfile.pcfile} skipped because enable_if did not match current environment"
-                )
                 continue
 
             pcfiles.append(pcfile)

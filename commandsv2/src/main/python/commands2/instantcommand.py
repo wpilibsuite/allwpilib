@@ -1,7 +1,7 @@
 # validated: 2024-01-19 DS 5cf961edb973 InstantCommand.java
 from __future__ import annotations
 
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from .functionalcommand import FunctionalCommand
 from .subsystem import Subsystem
@@ -15,7 +15,7 @@ class InstantCommand(FunctionalCommand):
     """
 
     def __init__(
-        self, to_run: Optional[Callable[[], None]] = None, *requirements: Subsystem
+        self, to_run: Callable[[], None] | None = None, *requirements: Subsystem
     ):
         """
         Creates a new InstantCommand that runs the given Callable with the given requirements.

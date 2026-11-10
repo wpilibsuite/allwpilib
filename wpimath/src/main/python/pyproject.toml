@@ -16,7 +16,7 @@ requires = [
 name = "robotpy-wpimath"
 version = "0.0.0"
 description = "Binary wrapper for WPILib Math library"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -91,7 +91,9 @@ scan_headers_ignore = [
     "type_casters/*",
     "unsupported/*",
     "wpi/units/*",
-    "wpimath/protobuf/*",
+    "wpi/math/protobuf/*",
+
+    "wpi/math/trajectory/TrajectorySample.hpp",
 
     "wpi/math/util/MathShared.hpp",
 
@@ -1597,7 +1599,6 @@ HolonomicSample = "wpi/math/trajectory/HolonomicSample.hpp"
 HolonomicTrajectory = "wpi/math/trajectory/HolonomicTrajectory.hpp"
 Trajectory = "wpi/math/trajectory/Trajectory.hpp"
 TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
-TrajectorySample = "wpi/math/trajectory/TrajectorySample.hpp"
 TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
 
 # wpi/math/trajectory/constraint

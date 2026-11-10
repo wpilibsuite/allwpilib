@@ -259,6 +259,122 @@ TEST_CASE("NetworkOutgoingQueueTest NormalValueShrinkUpdatesTotalSize",
   CHECK(value2.GetDouble() == 3.0);
 }
 
+TEST_CASE(
+    "NetworkOutgoingQueueTest "
+    "NormalValueShrinkBelowBackpressureUpdatesTotalSize",
+    "[ntcore][network-outgoing-queue]") {
+  RecordingWireConnection wire;
+  NetworkOutgoingQueue<ServerMessage> queue{wire, false};
+
+  queue.SendValue(
+      1, Value::MakeRaw(std::vector<uint8_t>(1100 * 1024, 'x'), 10'000),
+      ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'y'), 20'000),
+                  ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'z'), 30'000),
+                  ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'w'), 40'000),
+                  ValueSendMode::ALL);
+
+  queue.SendOutgoing(5, true);
+
+  REQUIRE(wire.binaryWrites.size() == 3u);
+
+  auto [id0, value0] = DecodeBinary(wire.binaryWrites[0]);
+  CHECK(id0 == 1);
+  CHECK(value0.time() == 20'000);
+  CHECK(value0.GetRaw().size() == 32u);
+
+  auto [id1, value1] = DecodeBinary(wire.binaryWrites[1]);
+  CHECK(id1 == 1);
+  CHECK(value1.time() == 30'000);
+  CHECK(value1.GetRaw().size() == 32u);
+
+  auto [id2, value2] = DecodeBinary(wire.binaryWrites[2]);
+  CHECK(id2 == 1);
+  CHECK(value2.time() == 40'000);
+  CHECK(value2.GetRaw().size() == 32u);
+}
+
+TEST_CASE("NetworkOutgoingQueueTest NormalValueGrowThenDrainClearsTotalSize",
+          "[ntcore][network-outgoing-queue]") {
+  RecordingWireConnection wire;
+  NetworkOutgoingQueue<ServerMessage> queue{wire, false};
+
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'x'), 10'000),
+                  ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(4096, 'y'), 20'000),
+                  ValueSendMode::NORMAL);
+  queue.SendOutgoing(5, true);
+
+  wire.binaryWrites.clear();
+
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'z'), 30'000),
+                  ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'w'), 40'000),
+                  ValueSendMode::ALL);
+  queue.SendOutgoing(10, true);
+
+  REQUIRE(wire.binaryWrites.size() == 2u);
+
+  auto [id0, value0] = DecodeBinary(wire.binaryWrites[0]);
+  CHECK(id0 == 1);
+  CHECK(value0.time() == 30'000);
+  CHECK(value0.GetRaw().size() == 32u);
+
+  auto [id1, value1] = DecodeBinary(wire.binaryWrites[1]);
+  CHECK(id1 == 1);
+  CHECK(value1.time() == 40'000);
+  CHECK(value1.GetRaw().size() == 32u);
+}
+
+TEST_CASE(
+    "NetworkOutgoingQueueTest NormalValueGrowAcrossBackpressureLimitCoalesces",
+    "[ntcore][network-outgoing-queue]") {
+  RecordingWireConnection wire;
+  NetworkOutgoingQueue<ServerMessage> queue{wire, false};
+
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'x'), 10'000),
+                  ValueSendMode::NORMAL);
+  queue.SendValue(
+      1, Value::MakeRaw(std::vector<uint8_t>(1024 * 1024, 'y'), 20'000),
+      ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(64, 'z'), 30'000),
+                  ValueSendMode::ALL);
+
+  queue.SendOutgoing(5, true);
+
+  REQUIRE(wire.binaryWrites.size() == 1u);
+
+  auto [id, value] = DecodeBinary(wire.binaryWrites[0]);
+  CHECK(id == 1);
+  CHECK(value.time() == 30'000);
+  CHECK(value.GetRaw().size() == 64u);
+}
+
+TEST_CASE("NetworkOutgoingQueueTest OlderNormalValueDoesNotChangeTotalSize",
+          "[ntcore][network-outgoing-queue]") {
+  RecordingWireConnection wire;
+  NetworkOutgoingQueue<ServerMessage> queue{wire, false};
+
+  queue.SendValue(
+      1, Value::MakeRaw(std::vector<uint8_t>(1100 * 1024, 'x'), 20'000),
+      ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'y'), 10'000),
+                  ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(64, 'z'), 30'000),
+                  ValueSendMode::ALL);
+
+  queue.SendOutgoing(5, true);
+
+  REQUIRE(wire.binaryWrites.size() == 1u);
+
+  auto [id, value] = DecodeBinary(wire.binaryWrites[0]);
+  CHECK(id == 1);
+  CHECK(value.time() == 30'000);
+  CHECK(value.GetRaw().size() == 64u);
+}
+
 TEST_CASE("NetworkOutgoingQueueTest NormalValueReplacesAfterPeriodChange",
           "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;

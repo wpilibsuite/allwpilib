@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import telemetry
 import wpilib
 
@@ -23,6 +25,7 @@ class MyRobot(wpilib.TimedRobot):
         # Object for dealing with the Power Distribution Panel (PDP).
         self.pdp = wpilib.PowerDistribution(wpilib.CANPort.CAN_S0)
 
+    @override
     def robot_periodic(self):
         # Put the PDP itself to the dashboard
         telemetry.log("PDP", self.pdp)

@@ -1,6 +1,3 @@
-import pytest
-import math
-
 from wpimath import (
     CoordinateSystem,
     Pose3d,

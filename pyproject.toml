@@ -1,0 +1,44 @@
+[project]
+name = "allwpilib"
+version = "0.0.0"
+description = "WPILib monorepo dependencies"
+license = "BSD-3-Clause"
+license-files = ["LICENSE.md", "ThirdPartyNotices.txt"]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.2.6",
+    "opencv-python~=4.6",
+    "pytest>=8.4.2",
+    "pytest-reraise",
+    "robotpy-cli~=2027.0.1b1",
+]
+classifiers = [
+    "Private :: Do Not Upload",
+]
+
+[dependency-groups]
+dev = [
+    "black==25.12.0",
+    "cxxheaderparser>=2.1.0",
+    "grpcio-tools==1.68.0",
+    "jinja2==3.1.6",
+    "protobuf==5.28.3",
+    "pytest-order",
+    "semiwrap==0.8.1",
+]
+
+[tool.pyright]
+exclude = [
+    "bazel-*",
+    "*/bin",
+    "*/build",
+    "*/src/*/java",
+    "*/src/*/native",
+    # Default excludes
+    "**/__pycache__",
+    "**/.*",
+]
+
+[tool.ruff]
+extend-exclude = ["thirdparty"]

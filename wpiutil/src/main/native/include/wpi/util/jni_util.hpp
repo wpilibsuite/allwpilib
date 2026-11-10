@@ -70,7 +70,7 @@ class JClass {
 
   explicit operator bool() const { return m_cls; }
 
-  operator jclass() const { return m_cls; }
+  operator jclass() const { return m_cls; }  // NOLINT
 
  protected:
   jclass m_cls = nullptr;
@@ -159,7 +159,7 @@ class JStringRef {
         env->ReleaseStringCritical(str, chars);
       }
     } else {
-      wpi::util::print(stderr, "JStringRef was passed a null pointer at\n",
+      wpi::util::print(stderr, "JStringRef was passed a null pointer at\n{}",
                        GetJavaStackTrace(env));
     }
     // Ensure str is null-terminated.
@@ -327,7 +327,7 @@ class JSpanBase {
         m_elements{static_cast<std::remove_cv_t<T>*>(
             bb ? env->GetDirectBufferAddress(bb) : nullptr)} {
     if (!bb) {
-      wpi::util::print(stderr, "JSpan was passed a null pointer at\n",
+      wpi::util::print(stderr, "JSpan was passed a null pointer at\n{}",
                        GetJavaStackTrace(env));
     }
   }
@@ -346,7 +346,7 @@ class JSpanBase {
         m_elements = ArrHelper::GetArrayElements(env, jarr);
       }
     } else {
-      wpi::util::print(stderr, "JSpan was passed a null pointer at\n",
+      wpi::util::print(stderr, "JSpan was passed a null pointer at\n{}",
                        GetJavaStackTrace(env));
     }
   }

@@ -110,7 +110,7 @@ void testFollowTrajectory(
         t,
         groundTruthState.pose.Rotation() +
             wpi::math::Rotation2d{distribution(generator) * 0.05_rad} -
-            trajectory.InitialPose().Rotation(),
+            trajectory.Start().pose.Rotation(),
         wheelPositions);
 
     if (debug) {
@@ -194,8 +194,8 @@ TEST_CASE("MecanumDrivePoseEstimatorTest AccuracyFacingTrajectory",
             state.ForwardVelocity() * state.curvature};
       },
       [&](wpi::math::DrivetrainSplineSample& state) { return state.pose; },
-      trajectory.InitialPose(), {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
-      20_ms, 100_ms, 250_ms, true, false);
+      trajectory.Start().pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
+      100_ms, 250_ms, true, false);
 }
 
 TEST_CASE("MecanumDrivePoseEstimatorTest BadInitialPose", "[wpimath]") {
@@ -226,7 +226,7 @@ TEST_CASE("MecanumDrivePoseEstimatorTest BadInitialPose", "[wpimath]") {
       auto pose_offset = wpi::math::Rotation2d{offset_direction_degs};
       auto heading_offset = wpi::math::Rotation2d{offset_heading_degs};
 
-      auto initial_pose = trajectory.InitialPose() +
+      auto initial_pose = trajectory.Start().pose +
                           wpi::math::Transform2d{
                               wpi::math::Translation2d{pose_offset.Cos() * 1_m,
                                                        pose_offset.Sin() * 1_m},

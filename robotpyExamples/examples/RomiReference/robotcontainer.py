@@ -4,8 +4,6 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import typing
-
 import commands2
 import commands2.button
 import telemetry
@@ -79,7 +77,7 @@ class RobotContainer:
         self.chooser.add("Auto Routine Time", AutonomousTime(self.drivetrain))
         tunables.publish("Autonomous", self.chooser)
 
-    def get_autonomous_command(self) -> typing.Optional[commands2.Command]:
+    def get_autonomous_command(self) -> commands2.Command | None:
         return self.chooser.get_selected()
 
     def get_arcade_drive_command(self) -> ArcadeDrive:

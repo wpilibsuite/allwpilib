@@ -509,7 +509,7 @@ class TelemetryTableTest {
 
   public static final class MutableStructThing implements StructSerializable {
     public static final Struct<MutableStructThing> struct =
-        new CloneableStruct<>(MutableStructThing.class);
+        new CloneableStruct(MutableStructThing.class);
 
     int value;
 
@@ -601,8 +601,8 @@ class TelemetryTableTest {
     }
   }
 
-  private static final class CloneableStruct<T extends MutableStructThing> extends MockStruct<T> {
-    CloneableStruct(Class<T> cls) {
+  private static final class CloneableStruct extends MockStruct<MutableStructThing> {
+    CloneableStruct(Class<MutableStructThing> cls) {
       super(cls);
     }
 
@@ -617,7 +617,7 @@ class TelemetryTableTest {
     }
 
     @Override
-    public T clone(T obj) {
+    public MutableStructThing clone(MutableStructThing obj) {
       return getTypeClass().cast(new MutableStructThing(obj.value));
     }
   }

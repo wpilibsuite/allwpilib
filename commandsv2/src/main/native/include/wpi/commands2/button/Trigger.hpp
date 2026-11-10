@@ -26,6 +26,14 @@ class Command;
  * <p>Triggers can easily be composed for advanced functionality using the
  * {@link #operator!}, {@link #operator||}, {@link #operator&&} operators.
  *
+ * <table>
+ * <caption>Positive trigger command bindings</caption>
+ * <tr><th>Method</th><th>Schedules</th><th>Cancels on false</th></tr>
+ * <tr><td>OnTrue()</td><td>On a rising edge</td><td>No</td></tr>
+ * <tr><td>IfTrue()</td><td>On every true poll</td><td>No</td></tr>
+ * <tr><td>WhileTrue()</td><td>On a rising edge</td><td>Yes</td></tr>
+ * </table>
+ *
  * <p>This class is provided by the Commands v2 VendorDep
  */
 class Trigger {
@@ -94,6 +102,35 @@ class Trigger {
    * @return The trigger, for chained calls.
    */
   Trigger OnTrue(CommandPtr&& command);
+
+  /**
+   * Starts the given command on every event-loop poll where the condition is
+   * true.
+   *
+   * <p>This does not cancel the command when the condition becomes false; use
+   * WhileTrue() for that behavior. Scheduling an already-running command
+   * follows ordinary scheduler behavior and does not restart it.
+   *
+   * <p>Takes a raw pointer, and so is non-owning; users are responsible for the
+   * lifespan of the command.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  Trigger IfTrue(Command* command);
+
+  /**
+   * Starts the given command on every event-loop poll where the condition is
+   * true. Moves command ownership to the button scheduler.
+   *
+   * <p>This does not cancel the command when the condition becomes false; use
+   * WhileTrue() for that behavior. Scheduling an already-running command
+   * follows ordinary scheduler behavior and does not restart it.
+   *
+   * @param command The command to bind.
+   * @return The trigger, for chained calls.
+   */
+  Trigger IfTrue(CommandPtr&& command);
 
   /**
    * Starts the given command whenever the condition changes from `true` to

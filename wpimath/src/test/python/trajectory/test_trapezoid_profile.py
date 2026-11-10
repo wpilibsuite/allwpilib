@@ -5,7 +5,7 @@
 
 import math
 
-from wpimath import TrapezoidProfile
+from wpimath import TrapezoidProfile, TrapezoidProfileRadiansConstraints
 
 DT = 0.01  # 10 ms
 
@@ -24,6 +24,15 @@ def assert_feasible(initial, final, max_accel):
     max_vel_change = max_accel * DT
     assert_less_than_or_close(abs(delta_x), max_pos_change, 1e-10)
     assert_less_than_or_close(abs(delta_v), max_vel_change, 1e-10)
+
+
+def test_constraints_repr():
+    assert repr(TrapezoidProfile.Constraints(1.75, 0.75)) == (
+        "TrapezoidProfileConstraints(max_velocity=1.75, max_acceleration=0.75)"
+    )
+    assert repr(TrapezoidProfileRadiansConstraints(1.75, 0.75)) == (
+        "TrapezoidProfileRadiansConstraints(max_velocity=1.75, max_acceleration=0.75)"
+    )
 
 
 def test_timing():

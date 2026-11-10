@@ -61,7 +61,7 @@ py::object ntvalue2py(const wpi::nt::Value& ntvalue) {
         auto b = py::bool_(v.data.arr_boolean.arr[i]);
         PyList_SET_ITEM(l.ptr(), i, b.release().ptr());
       }
-      return std::move(l);
+      return l;
     }
 
     case NT_DOUBLE_ARRAY: {
@@ -70,7 +70,7 @@ py::object ntvalue2py(const wpi::nt::Value& ntvalue) {
         auto d = py::float_(v.data.arr_double.arr[i]);
         PyList_SET_ITEM(l.ptr(), i, d.release().ptr());
       }
-      return std::move(l);
+      return l;
     }
 
     case NT_STRING_ARRAY: {
@@ -91,7 +91,7 @@ py::object ntvalue2py(const wpi::nt::Value& ntvalue) {
         auto d = py::int_(v.data.arr_int.arr[i]);
         PyList_SET_ITEM(l.ptr(), i, d.release().ptr());
       }
-      return std::move(l);
+      return l;
     }
 
     case NT_FLOAT_ARRAY: {
@@ -100,7 +100,7 @@ py::object ntvalue2py(const wpi::nt::Value& ntvalue) {
         auto d = py::float_(v.data.arr_float.arr[i]);
         PyList_SET_ITEM(l.ptr(), i, d.release().ptr());
       }
-      return std::move(l);
+      return l;
     }
 
     default:

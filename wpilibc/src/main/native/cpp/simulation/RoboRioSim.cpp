@@ -181,19 +181,6 @@ void RoboRioSim::SetSerialNumber(std::string_view serialNumber) {
   HALSIM_SetRoboRioSerialNumber(&str);
 }
 
-std::string RoboRioSim::GetComments() {
-  WPI_String comments;
-  HALSIM_GetRoboRioComments(&comments);
-  std::string serial{wpi::util::to_string_view(&comments)};
-  WPI_FreeString(&comments);
-  return serial;
-}
-
-void RoboRioSim::SetComments(std::string_view comments) {
-  auto str = wpi::util::make_string(comments);
-  HALSIM_SetRoboRioComments(&str);
-}
-
 void RoboRioSim::ResetData() {
   HALSIM_ResetRoboRioData();
 }

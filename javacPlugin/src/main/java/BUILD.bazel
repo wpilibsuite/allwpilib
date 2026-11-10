@@ -1,0 +1,20 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
+
+wpilib_java_library(
+    name = "javacPlugin",
+    srcs = glob(["**/*.java"]),
+    maven_artifact_name = "javac-plugin-java",
+    maven_group_id = "org.wpilib",
+    resource_srcs = ["//javacPlugin:resources-files"],
+    resources = ["//javacPlugin:resources-files"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiannotations/src/main/java",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":javacPlugin",
+    visibility = ["//visibility:public"],
+)

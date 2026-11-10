@@ -14,8 +14,6 @@
 
 using namespace wpi::glass;
 
-wpi::util::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
-
 std::string wpi::glass::MakeSourceId(std::string_view id, int index) {
   return std::format("{}[{}]", id, index);
 }
@@ -123,7 +121,7 @@ std::string& DataSource::GetNameStorage(std::string_view id) {
 
 void DataSource::Register() {
   gContext->sources.insert_or_assign(m_id, this);
-  sourceCreated(m_id.c_str(), this);
+  gContext->sourceCreated(m_id.c_str(), this);
 }
 
 void DataSource::DragDropTooltip() const {

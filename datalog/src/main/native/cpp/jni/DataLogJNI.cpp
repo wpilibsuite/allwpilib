@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "DataLogJNI.hpp"
-
 #include <jni.h>
 
 #include <algorithm>
@@ -34,22 +32,6 @@ static const JExceptionInit exceptions[] = {
     {"java/lang/IndexOutOfBoundsException", &indexOobEx},
     {"java/io/IOException", &ioEx},
     {"java/lang/NullPointerException", &nullPointerEx}};
-
-void wpi::ThrowIllegalArgumentException(JNIEnv* env, std::string_view msg) {
-  illegalArgEx.Throw(env, msg);
-}
-
-void wpi::ThrowIndexOobException(JNIEnv* env, std::string_view msg) {
-  indexOobEx.Throw(env, msg);
-}
-
-void wpi::ThrowIOException(JNIEnv* env, std::string_view msg) {
-  ioEx.Throw(env, msg);
-}
-
-void wpi::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
-  nullPointerEx.Throw(env, msg);
-}
 
 namespace {
 class buf_ostream : public wpi::util::raw_uvector_ostream {
@@ -103,15 +85,15 @@ Java_org_wpilib_datalog_DataLogJNI_bgCreate
    jstring extraHeader)
 {
   if (!dir) {
-    wpi::ThrowNullPointerException(env, "dir is null");
+    nullPointerEx.Throw(env, "dir is null");
     return 0;
   }
   if (!filename) {
-    wpi::ThrowNullPointerException(env, "filename is null");
+    nullPointerEx.Throw(env, "filename is null");
     return 0;
   }
   if (!extraHeader) {
-    wpi::ThrowNullPointerException(env, "extraHeader is null");
+    nullPointerEx.Throw(env, "extraHeader is null");
     return 0;
   }
   return reinterpret_cast<jlong>(new DataLogBackgroundWriter{
@@ -129,15 +111,53 @@ Java_org_wpilib_datalog_DataLogJNI_bgSetFilename
   (JNIEnv* env, jclass, jlong impl, jstring filename)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   if (!filename) {
-    wpi::ThrowNullPointerException(env, "filename is null");
+    nullPointerEx.Throw(env, "filename is null");
     return;
   }
   reinterpret_cast<DataLogBackgroundWriter*>(impl)->SetFilename(
       JStringRef{env, filename});
+}
+
+/*
+ * Class:     org_wpilib_datalog_DataLogJNI
+ * Method:    bgSetDir
+ * Signature: (JLjava/lang/String;J)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_datalog_DataLogJNI_bgSetDir
+  (JNIEnv* env, jclass, jlong impl, jstring dir, jlong maxSize)
+{
+  if (impl == 0) {
+    nullPointerEx.Throw(env, "impl is null");
+    return;
+  }
+  if (!dir) {
+    nullPointerEx.Throw(env, "dir is null");
+    return;
+  }
+  reinterpret_cast<DataLogBackgroundWriter*>(impl)->SetDir(JStringRef{env, dir},
+                                                           maxSize);
+}
+
+/*
+ * Class:     org_wpilib_datalog_DataLogJNI
+ * Method:    bgGetDir
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_org_wpilib_datalog_DataLogJNI_bgGetDir
+  (JNIEnv* env, jclass, jlong impl)
+{
+  if (impl == 0) {
+    nullPointerEx.Throw(env, "impl is null");
+    return nullptr;
+  }
+  return MakeJString(
+      env, reinterpret_cast<DataLogBackgroundWriter*>(impl)->GetDir());
 }
 
 /*
@@ -150,18 +170,18 @@ Java_org_wpilib_datalog_DataLogJNI_fgCreate
   (JNIEnv* env, jclass, jstring filename, jstring extraHeader)
 {
   if (!filename) {
-    wpi::ThrowNullPointerException(env, "filename is null");
+    nullPointerEx.Throw(env, "filename is null");
     return 0;
   }
   if (!extraHeader) {
-    wpi::ThrowNullPointerException(env, "extraHeader is null");
+    nullPointerEx.Throw(env, "extraHeader is null");
     return 0;
   }
   std::error_code ec;
   auto writer = new DataLogWriter{JStringRef{env, filename}, ec,
                                   JStringRef{env, extraHeader}};
   if (ec) {
-    wpi::ThrowIOException(env, ec.message());
+    ioEx.Throw(env, ec.message());
     delete writer;
     return 0;
   }
@@ -194,7 +214,7 @@ Java_org_wpilib_datalog_DataLogJNI_fgCreateMemory
   (JNIEnv* env, jclass, jstring extraHeader)
 {
   if (!extraHeader) {
-    wpi::ThrowNullPointerException(env, "extraHeader is null");
+    nullPointerEx.Throw(env, "extraHeader is null");
     return 0;
   }
   auto writer = new DataLogWriter{std::make_unique<buf_ostream>(),
@@ -212,7 +232,7 @@ Java_org_wpilib_datalog_DataLogJNI_flush
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->Flush();
@@ -228,7 +248,7 @@ Java_org_wpilib_datalog_DataLogJNI_copyWriteBuffer
   (JNIEnv* env, jclass, jlong impl, jbyteArray buf, jint start)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return 0;
   }
   auto writer = reinterpret_cast<DataLogWriter*>(impl);
@@ -255,7 +275,7 @@ Java_org_wpilib_datalog_DataLogJNI_pause
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->Pause();
@@ -271,7 +291,7 @@ Java_org_wpilib_datalog_DataLogJNI_resume
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->Resume();
@@ -287,7 +307,7 @@ Java_org_wpilib_datalog_DataLogJNI_stop
   (JNIEnv* env, jclass, jlong impl)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->Stop();
@@ -304,7 +324,7 @@ Java_org_wpilib_datalog_DataLogJNI_addSchema
    jbyteArray schema, jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AddSchema(
@@ -323,7 +343,7 @@ Java_org_wpilib_datalog_DataLogJNI_addSchemaString
    jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   JStringRef schemaStr{env, schema};
@@ -345,7 +365,7 @@ Java_org_wpilib_datalog_DataLogJNI_start
    jstring metadata, jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return 0;
   }
   return reinterpret_cast<DataLog*>(impl)->Start(
@@ -363,7 +383,7 @@ Java_org_wpilib_datalog_DataLogJNI_finish
   (JNIEnv* env, jclass, jlong impl, jint entry, jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->Finish(entry, timestamp);
@@ -380,7 +400,7 @@ Java_org_wpilib_datalog_DataLogJNI_setMetadata
    jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->SetMetadata(
@@ -410,26 +430,26 @@ Java_org_wpilib_datalog_DataLogJNI_appendRaw
    jint length, jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   if (!value) {
-    wpi::ThrowNullPointerException(env, "value is null");
+    nullPointerEx.Throw(env, "value is null");
     return;
   }
   if (start < 0) {
-    wpi::ThrowIndexOobException(env, "start must be >= 0");
+    indexOobEx.Throw(env, "start must be >= 0");
     return;
   }
   if (length < 0) {
-    wpi::ThrowIndexOobException(env, "length must be >= 0");
+    indexOobEx.Throw(env, "length must be >= 0");
     return;
   }
   CriticalJSpan<const jbyte> cvalue{env, value};
   size_t startPos = static_cast<size_t>(start);
   size_t lengthSize = static_cast<size_t>(length);
   if (startPos > cvalue.size() || lengthSize > cvalue.size() - startPos) {
-    wpi::ThrowIndexOobException(env, "start + len must be within array length");
+    indexOobEx.Throw(env, "start + len must be within array length");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendRaw(
@@ -447,19 +467,19 @@ Java_org_wpilib_datalog_DataLogJNI_appendRawBuffer
    jint length, jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   if (!value) {
-    wpi::ThrowNullPointerException(env, "value is null");
+    nullPointerEx.Throw(env, "value is null");
     return;
   }
   if (start < 0) {
-    wpi::ThrowIndexOobException(env, "start must be >= 0");
+    indexOobEx.Throw(env, "start must be >= 0");
     return;
   }
   if (length < 0) {
-    wpi::ThrowIndexOobException(env, "length must be >= 0");
+    indexOobEx.Throw(env, "length must be >= 0");
     return;
   }
   auto cvalue = JSpan<const jbyte>::Create(
@@ -467,11 +487,9 @@ Java_org_wpilib_datalog_DataLogJNI_appendRawBuffer
   if (!cvalue) {
     if (cvalue.error() ==
         JSpan<const jbyte>::DirectBufferError::OUT_OF_BOUNDS) {
-      wpi::ThrowIndexOobException(env,
-                                  "start + len must be within buffer capacity");
+      indexOobEx.Throw(env, "start + len must be within buffer capacity");
     } else {
-      wpi::ThrowIllegalArgumentException(env,
-                                         "value must be a native ByteBuffer");
+      illegalArgEx.Throw(env, "value must be a native ByteBuffer");
     }
     return;
   }
@@ -489,7 +507,7 @@ Java_org_wpilib_datalog_DataLogJNI_appendBoolean
   (JNIEnv* env, jclass, jlong impl, jint entry, jboolean value, jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendBoolean(entry, value, timestamp);
@@ -505,7 +523,7 @@ Java_org_wpilib_datalog_DataLogJNI_appendInteger
   (JNIEnv* env, jclass, jlong impl, jint entry, jlong value, jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendInteger(entry, value, timestamp);
@@ -521,7 +539,7 @@ Java_org_wpilib_datalog_DataLogJNI_appendFloat
   (JNIEnv* env, jclass, jlong impl, jint entry, jfloat value, jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendFloat(entry, value, timestamp);
@@ -537,7 +555,7 @@ Java_org_wpilib_datalog_DataLogJNI_appendDouble
   (JNIEnv* env, jclass, jlong impl, jint entry, jdouble value, jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendDouble(entry, value, timestamp);
@@ -553,7 +571,7 @@ Java_org_wpilib_datalog_DataLogJNI_appendString
   (JNIEnv* env, jclass, jlong impl, jint entry, jstring value, jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendString(entry, JStringRef{env, value},
@@ -571,11 +589,11 @@ Java_org_wpilib_datalog_DataLogJNI_appendBooleanArray
    jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   if (!value) {
-    wpi::ThrowNullPointerException(env, "value is null");
+    nullPointerEx.Throw(env, "value is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendBooleanArray(
@@ -593,11 +611,11 @@ Java_org_wpilib_datalog_DataLogJNI_appendIntegerArray
    jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   if (!value) {
-    wpi::ThrowNullPointerException(env, "value is null");
+    nullPointerEx.Throw(env, "value is null");
     return;
   }
   JSpan<const jlong> jarr{env, value};
@@ -626,11 +644,11 @@ Java_org_wpilib_datalog_DataLogJNI_appendFloatArray
    jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   if (!value) {
-    wpi::ThrowNullPointerException(env, "value is null");
+    nullPointerEx.Throw(env, "value is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendFloatArray(
@@ -648,11 +666,11 @@ Java_org_wpilib_datalog_DataLogJNI_appendDoubleArray
    jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   if (!value) {
-    wpi::ThrowNullPointerException(env, "value is null");
+    nullPointerEx.Throw(env, "value is null");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendDoubleArray(
@@ -670,11 +688,11 @@ Java_org_wpilib_datalog_DataLogJNI_appendStringArray
    jlong timestamp)
 {
   if (impl == 0) {
-    wpi::ThrowNullPointerException(env, "impl is null");
+    nullPointerEx.Throw(env, "impl is null");
     return;
   }
   if (!value) {
-    wpi::ThrowNullPointerException(env, "value is null");
+    nullPointerEx.Throw(env, "value is null");
     return;
   }
   size_t len = env->GetArrayLength(value);
@@ -684,8 +702,7 @@ Java_org_wpilib_datalog_DataLogJNI_appendStringArray
     JLocal<jstring> elem{
         env, static_cast<jstring>(env->GetObjectArrayElement(value, i))};
     if (!elem) {
-      wpi::ThrowNullPointerException(
-          env, std::format("string at element {} is null", i));
+      nullPointerEx.Throw(env, std::format("string at element {} is null", i));
       return;
     }
     arr.emplace_back(JStringRef{env, elem}.str());
@@ -702,16 +719,16 @@ Java_org_wpilib_datalog_DataLogJNI_createFileLogger
   (JNIEnv* env, jclass, jstring file, jlong log, jstring key)
 {
   if (!file) {
-    wpi::ThrowNullPointerException(env, "file is null");
+    nullPointerEx.Throw(env, "file is null");
     return 0;
   }
   auto* f = reinterpret_cast<wpi::log::DataLog*>(log);
   if (!f) {
-    wpi::ThrowNullPointerException(env, "log is null");
+    nullPointerEx.Throw(env, "log is null");
     return 0;
   }
   if (!key) {
-    wpi::ThrowNullPointerException(env, "key is null");
+    nullPointerEx.Throw(env, "key is null");
     return 0;
   }
   return reinterpret_cast<jlong>(new wpi::log::FileLogger{

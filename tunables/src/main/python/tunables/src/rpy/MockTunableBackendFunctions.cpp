@@ -3,48 +3,83 @@
 #include <stdint.h>
 
 #include <concepts>
-#include <memory>
 #include <span>
 #include <string>
-#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <wpi/tunables/TunableConfig.hpp>
-#include <wpi/tunables/TunableRegistry.hpp>
-#include <wpi/tunables/detail/TunableBase.hpp>
-#include <wpi/tunables/detail/TunableDetail.hpp>
-#include <wpystruct.h>
+#include <wpybuffer.h>
 
-#include "TunableValuePython.h"
+#include "wpi/tunables/TunableConfig.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/detail/TunableDetail.hpp"
+#include "wpystruct.h"
 
 namespace py = pybind11;
 
 namespace wpi::tunables::python {
 namespace {
 
-template <typename T, typename F>
-void SetVector(wpi::tunables::MockTunableBackend& self, std::string_view path,
-               const py::sequence& value, F setter) {
-  std::vector<T> data;
-  const size_t size = py::len(value);
-  data.reserve(size);
-  for (size_t i = 0; i < size; ++i) {
-    data.emplace_back(value[static_cast<py::ssize_t>(i)].cast<T>());
+bool IsWpiStruct(py::handle value) {
+  return py::hasattr(py::type::of(value), "WPIStruct");
+}
+
+std::vector<uint8_t> ToRawVector(py::handle value) {
+  std::vector<uint8_t> data;
+  for (py::handle item : py::reinterpret_borrow<py::iterable>(value)) {
+    int integer = item.cast<int>();
+    if (integer < 0 || integer > 255) {
+      throw py::value_error("raw tunable values must be in range 0-255");
+    }
+    data.emplace_back(static_cast<uint8_t>(integer));
   }
-  (self.*setter)(path, std::span<const T>{data.data(), data.size()});
+  return data;
+}
+
+template <typename T, typename Iterable>
+std::vector<T> ToVector(const Iterable& value) {
+  std::vector<T> data;
+  for (py::handle item : value) {
+    data.emplace_back(item.cast<T>());
+  }
+  return data;
+}
+
+std::vector<WPyStruct> ToStructVector(StructIterable value,
+                                      WPyStructInfo& info) {
+  std::vector<py::object> values;
+  for (py::handle item : value) {
+    values.emplace_back(py::reinterpret_borrow<py::object>(item));
+  }
+  if (values.empty()) {
+    throw py::value_error("struct tunable arrays require at least one value");
+  }
+  if (!IsWpiStruct(values.front())) {
+    throw py::type_error("struct tunable arrays require WPIStruct values");
+  }
+
+  py::type type = py::type::of(values.front());
+  std::vector<WPyStruct> data;
+  data.reserve(values.size());
+  for (auto&& item : values) {
+    if (!py::type::of(item).is(type)) {
+      throw py::type_error("struct tunable arrays require one WPIStruct type");
+    }
+    data.emplace_back(std::move(item));
+  }
+  info = WPyStructInfo{std::move(type)};
+  return data;
 }
 
 template <typename T>
 py::object ValueToPython(const T& value) {
-  if constexpr (std::same_as<T, std::vector<uint8_t>>) {
-    return py::bytes{reinterpret_cast<const char*>(value.data()), value.size()};
-  } else {
-    return py::cast(value);
-  }
+  return py::cast(value);
+}
+
+py::bytes ValueToPython(const std::vector<uint8_t>& value) {
+  return py::bytes{reinterpret_cast<const char*>(value.data()), value.size()};
 }
 
 template <typename T>
@@ -61,7 +96,7 @@ py::object ReadTunableValue(
   throw py::type_error("tunable has unexpected type");
 }
 
-py::object ReadStructValue(
+py::bytes ReadStructValue(
     const wpi::tunables::TunableRegistry::TunableInfo& info) {
   if (auto v = wpi::tunables::detail::CastTunable<
           wpi::tunables::detail::TunableStructTag, false>(info.tunable,
@@ -83,9 +118,17 @@ py::object ReadStructValue(
 }  // namespace
 
 void SetRaw(wpi::tunables::MockTunableBackend& self, std::string_view path,
-            py::handle value) {
-  auto raw = ToRawVector(value);
-  self.SetRaw(path, std::span<const uint8_t>{raw.data(), raw.size()});
+            RawValue value) {
+  if (wpi::util::python::IsBytesLike(value)) {
+    auto raw = wpi::util::python::RequestContiguousBuffer(
+        py::reinterpret_borrow<py::buffer>(value));
+    self.SetRaw(path,
+                std::span<const uint8_t>{static_cast<const uint8_t*>(raw.ptr),
+                                         static_cast<size_t>(raw.view()->len)});
+  } else {
+    auto raw = ToRawVector(value);
+    self.SetRaw(path, std::span<const uint8_t>{raw});
+  }
 }
 
 void SetStruct(wpi::tunables::MockTunableBackend& self, std::string_view path,
@@ -97,60 +140,55 @@ void SetStruct(wpi::tunables::MockTunableBackend& self, std::string_view path,
 }
 
 void SetStructVector(wpi::tunables::MockTunableBackend& self,
-                     std::string_view path, const py::sequence& value) {
-  WPyStructInfo info{GetStructSequenceType(value)};
-  auto data = ToStructVector(value);
+                     std::string_view path, StructIterable value) {
+  WPyStructInfo info;
+  auto data = ToStructVector(std::move(value), info);
   self.SetStructVector<WPyStruct, WPyStructInfo>(
-      path, std::span<const WPyStruct>{data.data(), data.size()},
-      std::move(info));
+      path, std::span<const WPyStruct>{data}, std::move(info));
 }
 
 void SetBoolVector(wpi::tunables::MockTunableBackend& self,
-                   std::string_view path, const py::sequence& value) {
-  const size_t size = py::len(value);
-  auto data = std::make_unique<bool[]>(size);
-  for (size_t i = 0; i < size; ++i) {
-    data[i] = value[static_cast<py::ssize_t>(i)].cast<bool>();
-  }
-  self.SetBoolVector(path, std::span<const bool>{data.get(), size});
+                   std::string_view path, py::typing::Iterable<bool> value) {
+  self.SetBoolVector(path, ToVector<bool>(value));
 }
 
 void SetInt32Vector(wpi::tunables::MockTunableBackend& self,
-                    std::string_view path, const py::sequence& value) {
-  SetVector<int32_t>(self, path, value,
-                     &wpi::tunables::MockTunableBackend::SetInt32Vector);
+                    std::string_view path,
+                    py::typing::Iterable<int32_t> value) {
+  auto data = ToVector<int32_t>(value);
+  self.SetInt32Vector(path, std::span<const int32_t>{data});
 }
 
 void SetInt64Vector(wpi::tunables::MockTunableBackend& self,
-                    std::string_view path, const py::sequence& value) {
-  SetVector<int64_t>(self, path, value,
-                     &wpi::tunables::MockTunableBackend::SetInt64Vector);
+                    std::string_view path,
+                    py::typing::Iterable<int64_t> value) {
+  auto data = ToVector<int64_t>(value);
+  self.SetInt64Vector(path, std::span<const int64_t>{data});
 }
 
 void SetFloatVector(wpi::tunables::MockTunableBackend& self,
-                    std::string_view path, const py::sequence& value) {
-  SetVector<float>(self, path, value,
-                   &wpi::tunables::MockTunableBackend::SetFloatVector);
+                    std::string_view path, py::typing::Iterable<float> value) {
+  auto data = ToVector<float>(value);
+  self.SetFloatVector(path, std::span<const float>{data});
 }
 
 void SetDoubleVector(wpi::tunables::MockTunableBackend& self,
-                     std::string_view path, const py::sequence& value) {
-  SetVector<double>(self, path, value,
-                    &wpi::tunables::MockTunableBackend::SetDoubleVector);
+                     std::string_view path,
+                     py::typing::Iterable<double> value) {
+  auto data = ToVector<double>(value);
+  self.SetDoubleVector(path, std::span<const double>{data});
 }
 
 void SetStringVector(wpi::tunables::MockTunableBackend& self,
-                     std::string_view path, const py::sequence& value) {
-  SetVector<std::string>(self, path, value,
-                         &wpi::tunables::MockTunableBackend::SetStringVector);
+                     std::string_view path,
+                     py::typing::Iterable<std::string> value) {
+  auto data = ToVector<std::string>(value);
+  self.SetStringVector(path, std::span<const std::string>{data});
 }
 
-py::object GetUid(const wpi::tunables::MockTunableBackend& self,
-                  std::string_view path) {
-  if (auto uid = self.GetUid(path)) {
-    return py::int_{*uid};
-  }
-  return py::none{};
+std::optional<uint32_t> GetUid(const wpi::tunables::MockTunableBackend& self,
+                               std::string_view path) {
+  return self.GetUid(path);
 }
 
 py::object GetTunableValue(const wpi::tunables::MockTunableBackend& self,

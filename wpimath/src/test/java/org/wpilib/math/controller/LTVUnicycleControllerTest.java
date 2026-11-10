@@ -36,7 +36,7 @@ class LTVUnicycleControllerTest {
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
 
-    final var duration = trajectory.duration;
+    final var duration = trajectory.duration();
     for (int i = 0; i < (duration / DT); ++i) {
       var state = trajectory.sampleAt(DT * i);
 
@@ -59,5 +59,25 @@ class LTVUnicycleControllerTest {
                 MathUtil.angleModulus(
                     endPose.getRotation().getRadians() - finalRobotPose.getRotation().getRadians()),
                 ANGULAR_TOLERANCE));
+  }
+
+  @Test
+  void testNoTurnFromLateralErrorAtStandstill() {
+    final double DT = 0.02;
+
+    final var controller =
+        new LTVUnicycleController(
+            VecBuilder.fill(0.0625, 0.125, 2.5), VecBuilder.fill(4.0, 4.0), DT);
+
+    // Lateral error can't be corrected while stopped, so the controller
+    // shouldn't turn in place in response to it
+    for (double velocity : new double[] {-1e-6, 0.0, 1e-6}) {
+      var output =
+          controller.calculate(Pose2d.ZERO, new Pose2d(0.0, 0.1, Rotation2d.ZERO), velocity, 0.0);
+
+      assertEquals(velocity, output.vx, 1e-3);
+      assertEquals(0.0, output.vy);
+      assertEquals(0.0, output.omega, 1e-3);
+    }
   }
 }

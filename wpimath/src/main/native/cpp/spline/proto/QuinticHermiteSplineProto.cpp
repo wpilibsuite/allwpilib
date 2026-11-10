@@ -4,8 +4,8 @@
 
 #include "wpi/math/spline/proto/QuinticHermiteSplineProto.hpp"
 
+#include "wpi/math/protobuf/spline.npb.h"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/spline.npb.h"
 
 std::optional<wpi::math::QuinticHermiteSpline> wpi::util::Protobuf<
     wpi::math::QuinticHermiteSpline>::Unpack(InputStream& stream) {

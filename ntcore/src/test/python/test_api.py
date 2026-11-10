@@ -4,9 +4,9 @@
 # works correctly
 #
 
-import pytest
-
 import logging
+
+import pytest
 
 logger = logging.getLogger("test")
 
@@ -124,7 +124,7 @@ def test_basic(nt_live):
 #         ct.put_boolean("foo", True)
 
 #     st = nt_server.get_table("t")
-#     assert st.get_boolean("foo", None) == True
+#     assert st.get_boolean("foo", None) is True
 
 #     # Client disconnect testing
 #     nt_client.shutdown()
@@ -135,7 +135,7 @@ def test_basic(nt_live):
 #         nt_client.start_test()
 #         ct = nt_client.get_table("t")
 
-#     assert ct.get_boolean("foo", None) == True
+#     assert ct.get_boolean("foo", None) is True
 
 #     # Server disconnect testing
 #     nt_server.shutdown()
@@ -150,4 +150,4 @@ def test_basic(nt_live):
 #         nt_server.start_test()
 
 #     st = nt_server.get_table("t")
-#     assert st.get_boolean("foo", None) == True
+#     assert st.get_boolean("foo", None) is True

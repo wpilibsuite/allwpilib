@@ -1,0 +1,19 @@
+load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
+
+wpilib_imgui_cc_test(
+    name = "glass_imgui_tests",
+    size = "small",
+    srcs = [
+        "//glass:app-native-srcs",
+        "//glass:generate-resources",
+        "//glass:generate-version",
+    ] + glob(["*.cpp"]),
+    deps = [
+        "//glass:glassnt_for_tests",
+    ],
+)
+
+alias(
+    name = "imgui",
+    actual = ":glass_imgui_tests",
+)

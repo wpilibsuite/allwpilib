@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import telemetry
 import wpilib
 import wpilib_drivers
@@ -53,9 +55,11 @@ class MyRobot(wpilib.TimedRobot):
         self.motor.set_expiration(0.1)
         self.motor.feed()
 
+    @override
     def robot_periodic(self):
         """The robot_periodic function is called every control packet no matter the robot mode."""
         telemetry.log("Encoder", self.encoder.get_distance())
 
+    @override
     def teleop_periodic(self):
         self.motor.set_throttle(self.joystick.get_y())

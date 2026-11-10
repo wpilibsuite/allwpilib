@@ -1,7 +1,7 @@
 # validated: 2024-01-19 DS aaea85ff1656 ConditionalCommand.java
 from __future__ import annotations
 
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from telemetry import TelemetryTable
 
@@ -19,7 +19,7 @@ class ConditionalCommand(Command):
     subsystems its components require.
     """
 
-    selected_command: Optional[Command]
+    selected_command: Command | None
 
     def __init__(
         self, on_true: Command, on_false: Command, condition: Callable[[], bool]

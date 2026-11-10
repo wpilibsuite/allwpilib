@@ -32,7 +32,7 @@ class DifferentialDriveVoltageConstraintTest {
             new TrajectoryConfig(1, 1).addConstraint(constraint));
 
     final double dt = 0.02;
-    for (double t = 0.0; t < trajectory.duration; t += dt) {
+    for (double t = 0.0; t < trajectory.duration(); t += dt) {
       var point = trajectory.sampleAt(t);
 
       var differentialSample = new DifferentialSample(point, kinematics);

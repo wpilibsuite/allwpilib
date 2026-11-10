@@ -1,0 +1,34 @@
+Subject: [PATCH] Read the version without make
+
+configure shells out to make to print VERSION_MAJOR and VERSION_MINOR from
+Makefile.common, which reads them out of liburing.spec.  Shell builtins get the
+same two numbers, so a cross build does not have to provide make just to
+configure.  The Windows SystemCore builds have bash but no make.
+
+--- a/configure
++++ b/configure
+@@ -593,11 +593,19 @@
+ print_config "CXX" "$cxx"
+ 
+ # generate io_uring_version.h
+-# Reset MAKEFLAGS
+-MAKEFLAGS=
+-MAKE_PRINT_VARS="include Makefile.common\nprint-%%: ; @echo \$(\$*)\n"
+-VERSION_MAJOR=$(printf "$MAKE_PRINT_VARS" | make -s --no-print-directory -f - print-VERSION_MAJOR)
+-VERSION_MINOR=$(printf "$MAKE_PRINT_VARS" | make -s --no-print-directory -f - print-VERSION_MINOR)
++# Makefile.common reads these out of liburing.spec, so read them directly.
++# Shell builtins do it without make, which a cross build does not have to
++# provide just to configure.
++liburing_version=
++while read -r liburing_key liburing_value liburing_rest; do
++	if [ "$liburing_key" = "Version:" ]; then
++		liburing_version="$liburing_value"
++		break
++	fi
++done < liburing.spec
++VERSION_MAJOR="${liburing_version%%.*}"
++VERSION_MINOR="${liburing_version#*.}"
++VERSION_MINOR="${VERSION_MINOR%%.*}"
+ io_uring_version_h="src/include/liburing/io_uring_version.h"
+ cat > $io_uring_version_h << EOF
+ /* SPDX-License-Identifier: MIT */

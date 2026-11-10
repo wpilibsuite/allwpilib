@@ -54,6 +54,7 @@ class StagedCommandBuilderTest {
             .requiring(List.of(mech))
             .executing(Coroutine::park)
             .whenCanceled(no_op)
+            .whenExited(no_op)
             .until(() -> false)
             .withPriority(10)
             .named("Name");
@@ -138,6 +139,16 @@ class StagedCommandBuilderTest {
     var ignored = execStage.named("cmd");
 
     var err = assertThrows(IllegalStateException.class, () -> execStage.whenCanceled(() -> {}));
+    assertEquals("Command builders cannot be reused", err.getMessage());
+  }
+
+  @Test
+  void execution_whenExited_throwsAfterBuild() {
+    var builder = new StagedCommandBuilder();
+    var execStage = builder.noRequirements().executing(c -> {});
+    var ignored = execStage.named("cmd");
+
+    var err = assertThrows(IllegalStateException.class, () -> execStage.whenExited(() -> {}));
     assertEquals("Command builders cannot be reused", err.getMessage());
   }
 

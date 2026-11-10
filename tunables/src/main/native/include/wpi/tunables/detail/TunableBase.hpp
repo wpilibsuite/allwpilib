@@ -6,7 +6,6 @@
 
 #include <stdint.h>
 
-#include <cstdint>
 #include <type_traits>
 
 #include "wpi/tunables/TunableRegistry.hpp"

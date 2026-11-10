@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -82,9 +81,26 @@ class WPILIB_DLLEXPORT HolonomicTrajectory
 WPILIB_DLLEXPORT
 void to_json(wpi::util::json& json, const HolonomicTrajectory& trajectory);
 
-WPILIB_DLLEXPORT
-void from_json(const wpi::util::json& json, HolonomicTrajectory& trajectory);
-
 }  // namespace wpi::math
+
+namespace wpi::util {
+
+class json;
+
+template <typename T>
+struct json_serializer;
+
+/**
+ * Deserializes a HolonomicTrajectory from JSON.
+ *
+ * @throws std::invalid_argument if the trajectory has no samples or doesn't
+ *         start at time zero.
+ */
+template <>
+struct WPILIB_DLLEXPORT json_serializer<wpi::math::HolonomicTrajectory> {
+  static wpi::math::HolonomicTrajectory from(const json& json);
+};
+
+}  // namespace wpi::util
 
 #include "wpi/math/trajectory/proto/HolonomicTrajectoryProto.hpp"
