@@ -233,14 +233,16 @@ public final class NumericalIntegration {
     };
 
     // final double[7]
+    // Table 1's "b̂" values are actually the error weights b̂ᵢ − bᵢ for
+    // i = 1..6 (and b̂₇ = −1/66), so b̂ = b + those values here.
     final double[] b2 = {
-      0.001780011052226,
-      0.000816434459657,
-      -0.007880878010262,
-      0.144711007173263,
-      -0.582357165452555,
-      0.458082105929187,
-      1.0 / 66.0
+      0.09824077787029123,
+      0.010816434459657,
+      0.4720087724042376,
+      1.5237195812770048,
+      -3.872426680888636,
+      2.7827926300289607,
+      -1.0 / 66.0
     };
 
     // Loop until dt has elapsed
@@ -393,14 +395,16 @@ public final class NumericalIntegration {
     };
 
     // final double[7]
+    // Table 1's "b̂" values are actually the error weights b̂ᵢ − bᵢ for
+    // i = 1..6 (and b̂₇ = −1/66), so b̂ = b + those values here.
     final double[] b2 = {
-      0.001780011052226,
-      0.000816434459657,
-      -0.007880878010262,
-      0.144711007173263,
-      -0.582357165452555,
-      0.458082105929187,
-      1.0 / 66.0
+      0.09824077787029123,
+      0.010816434459657,
+      0.4720087724042376,
+      1.5237195812770048,
+      -3.872426680888636,
+      2.7827926300289607,
+      -1.0 / 66.0
     };
 
     // final double[6]
@@ -464,6 +468,7 @@ public final class NumericalIntegration {
       if (truncationError <= maxError) {
         // Accept the step
         y = newY;
+        t += h;
         dtElapsed += h;
       }
 

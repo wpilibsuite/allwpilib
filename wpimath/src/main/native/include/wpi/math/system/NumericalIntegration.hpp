@@ -107,10 +107,12 @@ T Tsit5(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
                                        -3.290069515436081,
                                        2.324710524099774,
                                        0.0};
-  constexpr std::array<double, DIM> b2{0.001780011052226,  0.000816434459657,
-                                       -0.007880878010262, 0.144711007173263,
-                                       -0.582357165452555, 0.458082105929187,
-                                       1.0 / 66.0};
+  // Table 1's "b̂" values are actually the error weights b̂ᵢ − bᵢ for
+  // i = 1..6 (and b̂₇ = −1/66), so b̂ = b + those values here.
+  constexpr std::array<double, DIM> b2{0.09824077787029123, 0.010816434459657,
+                                       0.4720087724042376,  1.5237195812770048,
+                                       -3.872426680888636,  2.7827926300289607,
+                                       -1.0 / 66.0};
 
   // Loop until dt has elapsed
   double dtElapsed = 0.0;
@@ -191,13 +193,15 @@ T Tsit5(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
                                        -3.290069515436081,
                                        2.324710524099774,
                                        0.0};
-  constexpr std::array<double, DIM> b2{0.001780011052226,  0.000816434459657,
-                                       -0.007880878010262, 0.144711007173263,
-                                       -0.582357165452555, 0.458082105929187,
-                                       1.0 / 66.0};
+  // Table 1's "b̂" values are actually the error weights b̂ᵢ − bᵢ for
+  // i = 1..6 (and b̂₇ = −1/66), so b̂ = b + those values here.
+  constexpr std::array<double, DIM> b2{0.09824077787029123, 0.010816434459657,
+                                       0.4720087724042376,  1.5237195812770048,
+                                       -3.872426680888636,  2.7827926300289607,
+                                       -1.0 / 66.0};
 
-  constexpr std::array<double, DIM - 1> c{
-      0.161, 0.327, 0.9, 0.9800255409045097, 1.0, 1.0};
+  constexpr std::array<double, DIM - 1> c{0.161, 0.327, 0.9, 0.9800255409045097,
+                                          1.0,   1.0};
 
   // Loop until dt has elapsed
   double dtElapsed = 0.0;
@@ -227,6 +231,7 @@ T Tsit5(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
     if (truncationError <= maxError) {
       // Accept the step
       y = newY;
+      t += wpi::units::second_t{h};
       dtElapsed += h;
     }
 
