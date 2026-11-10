@@ -53,7 +53,9 @@ class IncorrectCoroutineUseDetectorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Coroutine `outerCoroutine` may not be in scope. Consider using `innerCoroutine`",
+        "[WPILib] Coroutine `outerCoroutine` may not be in scope. Consider using `innerCoroutine`."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CoroutineMayNotBeInScope\")",
         error.getMessage(null));
     assertEquals(7, error.getColumnNumber()); // leading "o" in "outerCoroutine.yield()"
   }
@@ -89,7 +91,9 @@ class IncorrectCoroutineUseDetectorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Coroutine `outerCoroutine` may not be in scope. Consider using `innerCoroutine`",
+        "[WPILib] Coroutine `outerCoroutine` may not be in scope. Consider using `innerCoroutine`."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CoroutineMayNotBeInScope\")",
         error.getMessage(null));
     // leading "o" in "outerCoroutine" passed to `method(outerCoroutine)`
     assertEquals(14, error.getColumnNumber());
@@ -127,7 +131,9 @@ class IncorrectCoroutineUseDetectorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Coroutine `outerCoroutine` may not be in scope. Consider using `a` or `b`",
+        "[WPILib] Coroutine `outerCoroutine` may not be in scope. Consider using `a` or `b`."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CoroutineMayNotBeInScope\")",
         error.getMessage(null));
     // leading "o" in "outerCoroutine" passed to `method(outerCoroutine)`
     assertEquals(14, error.getColumnNumber());
@@ -169,7 +175,9 @@ class IncorrectCoroutineUseDetectorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Coroutine `outerCoroutine` may not be in scope. Consider using `a`, `b`, or `c`",
+        "[WPILib] Coroutine `outerCoroutine` may not be in scope. Consider using `a`, `b`, or `c`."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CoroutineMayNotBeInScope\")",
         error.getMessage(null));
     // leading "o" in "outerCoroutine" passed to `method(outerCoroutine)`
     assertEquals(14, error.getColumnNumber());
@@ -203,7 +211,10 @@ class IncorrectCoroutineUseDetectorTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Captured coroutines may not be stored in fields", error.getMessage(null));
+    assertEquals(
+        "[WPILib] Captured coroutines may not be stored in fields. If this is intentional,"
+            + " the error may be silenced with @SuppressWarnings(\"WPILib.CoroutineCapture\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -238,12 +249,18 @@ class IncorrectCoroutineUseDetectorTest {
     assertEquals(2, compilation.errors().size());
 
     var error1 = compilation.errors().get(0);
-    assertEquals("Captured coroutines may not be stored in fields", error1.getMessage(null));
+    assertEquals(
+        "[WPILib] Captured coroutines may not be stored in fields. If this is intentional,"
+            + " the error may be silenced with @SuppressWarnings(\"WPILib.CoroutineCapture\")",
+        error1.getMessage(null));
     assertEquals(11, error1.getLineNumber());
     assertEquals("coroutineField = outerCoroutine;", getErrorSource(error1));
 
     var error2 = compilation.errors().get(1);
-    assertEquals("Captured coroutines may not be stored in fields", error2.getMessage(null));
+    assertEquals(
+        "[WPILib] Captured coroutines may not be stored in fields. If this is intentional,"
+            + " the error may be silenced with @SuppressWarnings(\"WPILib.CoroutineCapture\")",
+        error2.getMessage(null));
     assertEquals("coroutineField = innerCoroutine;", getErrorSource(error2));
     assertEquals(12, error2.getLineNumber());
   }

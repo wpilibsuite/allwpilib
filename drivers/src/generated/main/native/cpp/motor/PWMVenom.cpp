@@ -6,7 +6,7 @@
 
 #include "wpi/drivers/motor/PWMVenom.hpp"
 
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -15,5 +15,5 @@ PWMVenom::PWMVenom(int channel) : PWMMotorController(channel) {
   m_pwm.SetOutputPeriod(5_ms);
   SetThrottle(0.0);
 
-  HAL_ReportUsage("IO", GetChannel(), "FusionVenom");
+  wpi::util::ReportUsage("IO", GetChannel(), "FusionVenom");
 }

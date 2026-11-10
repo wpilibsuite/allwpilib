@@ -14,6 +14,7 @@
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
+#include "wpi/util/Signal.h"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringMap.hpp"
 
@@ -65,9 +66,10 @@ class Context {
   wpi::util::StringMap<Storage> storageRoots;
   wpi::util::StringMap<bool> deviceHidden;
   wpi::util::StringMap<DataSource*> sources;
+  wpi::util::sig::Signal<const char*, DataSource*> sourceCreated;
   Storage& sourceNameStorage;
   std::string& timestampDisplayModeStorage;
-  uint64_t timestampDisplayStartTime = 0;
+  int64_t timestampDisplayStartTime = 0;
   bool timestampDisplayStartTimeOverride = false;
   std::optional<int64_t> timestampDisplayServerTimeOffset;
   std::optional<int64_t> timestampDisplayServerStartTime;

@@ -16,8 +16,7 @@ static wpi::units::second_t now = 0_s;
 class DebouncerTest {
  public:
   DebouncerTest() {
-    WPI_SetNowImpl(
-        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
+    WPI_SetNowImpl([] { return wpi::units::nanosecond_t{now}.to<int64_t>(); });
   }
 
   ~DebouncerTest() { WPI_SetNowImpl(nullptr); }

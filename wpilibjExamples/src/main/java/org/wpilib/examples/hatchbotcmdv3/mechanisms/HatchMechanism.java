@@ -10,7 +10,7 @@ import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.REVERSE;
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Mechanism;
 import org.wpilib.examples.hatchbotcmdv3.Constants.HatchConstants;
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 import org.wpilib.telemetry.TelemetryLoggable;
@@ -20,7 +20,7 @@ import org.wpilib.telemetry.TelemetryTable;
 public class HatchMechanism implements Mechanism, TelemetryLoggable {
   private final DoubleSolenoid hatchSolenoid =
       new DoubleSolenoid(
-          CANBus.CAN_S0,
+          CANPort.CAN_S0,
           PneumaticsModuleType.CTRE_PCM,
           HatchConstants.HATCH_SOLENOID_PORTS[0],
           HatchConstants.HATCH_SOLENOID_PORTS[1]);
@@ -28,13 +28,26 @@ public class HatchMechanism implements Mechanism, TelemetryLoggable {
   /** Grabs the hatch. */
   public Command grabHatchCommand() {
     // implicitly require `this`
-    return this.run(coro -> hatchSolenoid.set(FORWARD)).named("Grab Hatch");
+    return this.run(
+            coroutine -> {
+              // Set the solenoid and then park the command, owning the mechanism until a different
+              // command is scheduled and interrupts it. This makes command's telemetry match what
+              // the robot is physically doing.
+              hatchSolenoid.set(FORWARD);
+              coroutine.park();
+            })
+        .named("Grab Hatch");
   }
 
   /** Releases the hatch. */
   public Command releaseHatchCommand() {
     // implicitly require `this`
-    return this.run(coro -> hatchSolenoid.set(REVERSE)).named("Release Hatch");
+    return this.run(
+            coroutine -> {
+              hatchSolenoid.set(REVERSE);
+              coroutine.park();
+            })
+        .named("Release Hatch");
   }
 
   @Override

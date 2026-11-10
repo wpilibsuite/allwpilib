@@ -21,6 +21,7 @@
 #include "wpi/units/base.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 namespace wpi::math {
 namespace detail {
@@ -68,8 +69,8 @@ class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
         m_profile{m_constraints} {
     if !consteval {
       int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
-      wpi::math::MathSharedStore::ReportUsage("ProfiledPIDController",
-                                              std::to_string(instances));
+      wpi::util::ReportUsage("ProfiledPIDController",
+                             std::to_string(instances));
     }
   }
 

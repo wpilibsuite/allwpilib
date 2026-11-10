@@ -1,9 +1,9 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.6.1",
-    "hatch-meson~=0.1.2",
-    "hatch-robotpy~=0.2.1",
+    "semiwrap==0.0.0",
+    "hatch-meson==0.0.0",
+    "hatch-robotpy==0.0.0",
     "hatchling",
     "robotpy-native-wpilib==0.0.0",
     "robotpy-telemetry==0.0.0",
@@ -18,7 +18,7 @@ requires = [
 name = "wpilib"
 version = "0.0.0"
 description = "Binary wrapper for WPILib"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
@@ -31,7 +31,7 @@ dependencies = [
     "robotpy-wpimath==0.0.0",
     "robotpy-hal==0.0.0",
     "pyntcore==0.0.0",
-    "robotpy-cli~=2027.0.0a1",
+    "robotpy-cli==0.0.0",
 
     # For running robot tests
     "pytest>=3.9",
@@ -143,10 +143,6 @@ Switch2ProController = "wpi/driverstation/Switch2ProController.hpp"
 SwitchN64Controller = "wpi/driverstation/SwitchN64Controller.hpp"
 SwitchProController = "wpi/driverstation/SwitchProController.hpp"
 XboxController = "wpi/driverstation/XboxController.hpp"
-NiDsPS4Controller = "wpi/driverstation/NiDsPS4Controller.hpp"
-NiDsPS5Controller = "wpi/driverstation/NiDsPS5Controller.hpp"
-NiDsStadiaController = "wpi/driverstation/NiDsStadiaController.hpp"
-NiDsXboxController = "wpi/driverstation/NiDsXboxController.hpp"
 
 # wpi/event
 BooleanEvent = "wpi/event/BooleanEvent.hpp"
@@ -166,7 +162,7 @@ AnalogAccelerometer = "wpi/hardware/accelerometer/AnalogAccelerometer.hpp"
 
 # wpi/hardware/bus
 CAN = "wpi/hardware/bus/CAN.hpp"
-CANBus = "wpi/hardware/bus/CANBus.hpp"
+CANPort = "wpi/hardware/bus/CANPort.hpp"
 I2C = "wpi/hardware/bus/I2C.hpp"
 SerialPort = "wpi/hardware/bus/SerialPort.hpp"
 
@@ -250,10 +246,11 @@ Timer = "wpi/system/Timer.hpp"
 Tracer = "wpi/system/Tracer.hpp"
 Watchdog = "wpi/system/Watchdog.hpp"
 
-# wpi/util
-Preferences = "wpi/util/Preferences.hpp"
-SensorUtil = "wpi/util/SensorUtil.hpp"
+# wpi/preferences
+Preferences = "wpi/preferences/Preferences.hpp"
 
+# wpi/util
+SensorUtil = "wpi/util/SensorUtil.hpp"
 
 [tool.semiwrap.extension_modules."wpilib.simulation._simulation"]
 name = "wpilib_simulation"
@@ -297,8 +294,6 @@ Switch2ProControllerSim = "wpi/simulation/Switch2ProControllerSim.hpp"
 SwitchN64ControllerSim = "wpi/simulation/SwitchN64ControllerSim.hpp"
 SwitchProControllerSim = "wpi/simulation/SwitchProControllerSim.hpp"
 XboxControllerSim = "wpi/simulation/XboxControllerSim.hpp"
-NiDsPS4ControllerSim = "wpi/simulation/NiDsPS4ControllerSim.hpp"
-NiDsPS5ControllerSim = "wpi/simulation/NiDsPS5ControllerSim.hpp"
 OnboardIMUSim = "wpi/simulation/OnboardIMUSim.hpp"
 PWMSim = "wpi/simulation/PWMSim.hpp"
 PneumaticsBaseSim = "wpi/simulation/PneumaticsBaseSim.hpp"
@@ -311,5 +306,3 @@ SimDeviceSim = "wpi/simulation/SimDeviceSim.hpp"
 SimHooks = "wpi/simulation/SimHooks.hpp"
 SingleJointedArmSim = "wpi/simulation/SingleJointedArmSim.hpp"
 SolenoidSim = "wpi/simulation/SolenoidSim.hpp"
-NiDsStadiaControllerSim = "wpi/simulation/NiDsStadiaControllerSim.hpp"
-NiDsXboxControllerSim = "wpi/simulation/NiDsXboxControllerSim.hpp"

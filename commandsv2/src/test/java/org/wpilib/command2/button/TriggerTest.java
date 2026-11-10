@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.CommandTestBase;
+import org.wpilib.command2.Commands;
 import org.wpilib.command2.FunctionalCommand;
 import org.wpilib.command2.RunCommand;
 import org.wpilib.command2.StartEndCommand;
@@ -41,6 +42,60 @@ class TriggerTest extends CommandTestBase {
     finished.set(true);
     scheduler.run();
     assertFalse(command1.isScheduled());
+  }
+
+  @Test
+  void ifTrueOneShotSchedulesOnEveryTruePoll() {
+    CommandScheduler scheduler = CommandScheduler.getInstance();
+    AtomicBoolean pressed = new AtomicBoolean(false);
+    AtomicInteger counter = new AtomicInteger();
+
+    new Trigger(pressed::get).ifTrue(Commands.runOnce(counter::incrementAndGet));
+
+    scheduler.run();
+    assertEquals(0, counter.get());
+
+    pressed.set(true);
+    scheduler.run();
+    assertEquals(1, counter.get());
+
+    scheduler.run();
+    assertEquals(2, counter.get());
+
+    pressed.set(false);
+    scheduler.run();
+    assertEquals(2, counter.get());
+  }
+
+  @Test
+  void ifTrueLongRunningCommandDoesNotRestartOrCancelOnFalse() {
+    CommandScheduler scheduler = CommandScheduler.getInstance();
+    AtomicBoolean pressed = new AtomicBoolean(false);
+    AtomicInteger startCounter = new AtomicInteger();
+    AtomicInteger endCounter = new AtomicInteger();
+    Command command =
+        new FunctionalCommand(
+            startCounter::incrementAndGet,
+            () -> {},
+            interrupted -> endCounter.incrementAndGet(),
+            () -> false);
+
+    new Trigger(pressed::get).ifTrue(command);
+
+    pressed.set(true);
+    scheduler.run();
+    assertEquals(1, startCounter.get());
+    assertTrue(command.isScheduled());
+
+    scheduler.run();
+    assertEquals(1, startCounter.get());
+    assertTrue(command.isScheduled());
+
+    pressed.set(false);
+    scheduler.run();
+    assertEquals(1, startCounter.get());
+    assertEquals(0, endCounter.get());
+    assertTrue(command.isScheduled());
   }
 
   @Test

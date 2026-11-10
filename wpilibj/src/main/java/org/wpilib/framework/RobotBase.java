@@ -26,6 +26,7 @@ import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.networktables.PubSubOption;
+import org.wpilib.networktables.StringPublisher;
 import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
@@ -37,6 +38,7 @@ import org.wpilib.tunable.TunableRegistry;
 import org.wpilib.units.Measure;
 import org.wpilib.units.Unit;
 import org.wpilib.util.Alert;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 
 /**
@@ -50,6 +52,7 @@ import org.wpilib.util.WPIUtilJNI;
  */
 public abstract class RobotBase implements AutoCloseable {
   private static final String PROGRAM_START_TIME_TOPIC = "/Robot/ProgramStartTime";
+  private static final String WPILIB_VERSION_TOPIC = "/Robot/WPILibVersion";
   private static final AtomicInteger s_nextWarningReporterId = new AtomicInteger();
 
   /** The ID of the main Java thread. */
@@ -58,6 +61,7 @@ public abstract class RobotBase implements AutoCloseable {
 
   private final MultiSubscriber m_suball;
   private final IntegerPublisher m_programStartTimePublisher;
+  private final StringPublisher m_wpilibVersionPublisher;
   private final Map<String, Alert> m_telemetryWarningAlerts = new HashMap<>();
   private final Map<String, Alert> m_tunableWarningAlerts = new HashMap<>();
   private final BiConsumer<String, String> m_telemetryWarningReporter =
@@ -75,11 +79,6 @@ public abstract class RobotBase implements AutoCloseable {
           @Override
           public void reportError(String error, StackTraceElement[] stackTrace) {
             DriverStationErrors.reportError(error, stackTrace);
-          }
-
-          @Override
-          public void reportUsage(String resource, String data) {
-            HAL.reportUsage(resource, data);
           }
 
           @Override
@@ -264,12 +263,15 @@ public abstract class RobotBase implements AutoCloseable {
     m_programStartTimePublisher = inst.getIntegerTopic(PROGRAM_START_TIME_TOPIC).publish();
     m_programStartTimePublisher.set(WPIUtilJNI.getProgramStartTime());
 
+    m_wpilibVersionPublisher = inst.getStringTopic(WPILIB_VERSION_TOPIC).publish();
+    m_wpilibVersionPublisher.set(WPILibVersion.Version);
+
     m_connListenerHandle =
         inst.addConnectionListener(
             false,
             event -> {
               if (event.is(NetworkTableEvent.Kind.CONNECTED)) {
-                HAL.reportUsage("NT/" + event.connInfo.remoteId, "");
+                UsageReporting.reportUsage("NT/" + event.connInfo.remoteId, "");
               }
             });
   }
@@ -296,6 +298,7 @@ public abstract class RobotBase implements AutoCloseable {
     closeWarningAlerts(m_tunableWarningAlerts);
     m_suball.close();
     m_programStartTimePublisher.close();
+    m_wpilibVersionPublisher.close();
     NetworkTableInstance.getDefault().removeListener(m_connListenerHandle);
   }
 
@@ -557,12 +560,13 @@ public abstract class RobotBase implements AutoCloseable {
     if (!HAL.initialize()) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }
+    UsageReporting.setReportUsageImpl(HAL::reportUsage);
 
     // Force refresh DS data
     DriverStationBackend.refreshData();
 
-    HAL.reportUsage("Language", "Java");
-    HAL.reportUsage("WPILibVersion", WPILibVersion.Version);
+    UsageReporting.reportUsage("Language", "Java");
+    UsageReporting.reportUsage("WPILibVersion", WPILibVersion.Version);
     HAL.publishWpilibVersion(WPILibVersion.Version + " (Java)");
 
     if (HAL.hasMain()) {

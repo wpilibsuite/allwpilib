@@ -686,10 +686,10 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::net::raw_socket_ostream& os) {
   Frame::Time lastFrameTime = 0;
   Frame::Time timePerFrame = 0;
   if (m_fps != 0) {
-    timePerFrame = 1000000.0 / m_fps;
+    timePerFrame = 1'000'000'000.0 / m_fps;
   }
   Frame::Time averageFrameTime = 0;
-  Frame::Time averagePeriod = 1000000;  // 1 second window
+  Frame::Time averagePeriod = 1'000'000'000;  // 1 second window
   if (averagePeriod < timePerFrame) {
     averagePeriod = timePerFrame * 10;
   }
@@ -729,9 +729,14 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::net::raw_socket_ostream& os) {
 
       // update average
       if (averageFrameTime != 0) {
-        averageFrameTime =
-            averageFrameTime * (averagePeriod - timePerFrame) / averagePeriod +
-            deltaTime * timePerFrame / averagePeriod;
+        // Use floating-point intermediates to avoid int64_t overflow after
+        // long frame gaps.
+        double weightedAverage =
+            (static_cast<double>(averageFrameTime) *
+                 (averagePeriod - timePerFrame) +
+             static_cast<double>(deltaTime) * timePerFrame) /
+            averagePeriod;
+        averageFrameTime = static_cast<Frame::Time>(weightedAverage);
       } else {
         averageFrameTime = deltaTime;
       }
@@ -774,7 +779,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::net::raw_socket_ostream& os) {
     // sending the content-length fixes random stream disruption observed
     // with firefox
     lastFrameTime = thisFrameTime;
-    double timestamp = lastFrameTime / 1000000.0;
+    double timestamp = lastFrameTime / 1'000'000'000.0;
     header.clear();
     oss << "\r\n--" BOUNDARY "\r\n" << "Content-Type: image/jpeg\r\n";
     wpi::util::print(oss, "Content-Length: {}\r\n", size);

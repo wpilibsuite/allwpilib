@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/math/linalg/struct/StructProto.hpp"
+#include "wpi/math/linalg/struct/MatrixStruct.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/util/ct_string.hpp"
 #include "wpi/util/struct/Struct.hpp"

@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 from wpimath import TrapezoidProfile
 
@@ -32,6 +34,7 @@ class MyRobot(wpilib.TimedRobot):
         # Note: These gains are fake, and will have to be tuned for your robot.
         self.motor.set_pid(1.3, 0.0, 0.7)
 
+    @override
     def teleop_periodic(self):
         if self.joystick.get_raw_button_pressed(2):
             self.goal = TrapezoidProfile.State(5, 0)

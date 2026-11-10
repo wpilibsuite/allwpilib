@@ -18,6 +18,7 @@
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 #include "wpi/util/circular_buffer.hpp"
 
@@ -102,8 +103,7 @@ class LinearFilter {
 
     if !consteval {
       ++instances;
-      wpi::math::MathSharedStore::ReportUsage("LinearFilter",
-                                              std::to_string(instances));
+      wpi::util::ReportUsage("LinearFilter", std::to_string(instances));
     }
   }
 

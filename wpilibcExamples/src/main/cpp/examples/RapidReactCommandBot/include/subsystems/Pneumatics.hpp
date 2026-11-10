@@ -38,6 +38,6 @@ class Pneumatics : wpi::cmd::SubsystemBase {
                                               OFFSET};
 
   // Compressor connected to a PH with a default CAN ID
-  wpi::Compressor compressor{wpi::CANBus::CAN_S0,
+  wpi::Compressor compressor{wpi::CANPort::CAN_S0,
                              wpi::PneumaticsModuleType::CTRE_PCM};
 };

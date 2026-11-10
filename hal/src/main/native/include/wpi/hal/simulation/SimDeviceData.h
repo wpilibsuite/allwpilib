@@ -7,6 +7,10 @@
 #include "wpi/hal/Types.h"
 #include "wpi/hal/Value.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void (*HALSIM_SimDeviceCallback)(const char* name, void* param,
                                          HAL_SimDeviceHandle handle);
 
@@ -14,10 +18,6 @@ typedef void (*HALSIM_SimValueCallback)(const char* name, void* param,
                                         HAL_SimValueHandle handle,
                                         int32_t direction,
                                         const struct HAL_Value* value);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 void HALSIM_SetSimDeviceEnabled(const char* prefix, HAL_Bool enabled);
 HAL_Bool HALSIM_IsSimDeviceEnabled(const char* name);

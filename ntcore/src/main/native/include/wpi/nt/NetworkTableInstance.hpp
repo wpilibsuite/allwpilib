@@ -136,6 +136,10 @@ class NetworkTableInstance final {
 
   /**
    * Destroys an instance (note: this has global effect).
+   * The default instance cannot be destroyed.
+   * This should not be called from a listener callback.
+   * The behavior of concurrent calls of this function on the same instance is
+   * undefined.
    *
    * @param inst Instance
    */
@@ -843,7 +847,7 @@ class NetworkTableInstance final {
    * updated; to receive updates as events, add a listener to the "time sync"
    * event.
    *
-   * @return Time offset in microseconds (optional)
+   * @return Time offset in nanoseconds (optional)
    */
   std::optional<int64_t> GetServerTimeOffset() const {
     return ::wpi::nt::GetServerTimeOffset(m_handle);

@@ -150,7 +150,7 @@ public final class TelemetryTable {
       }
       if (publishType) {
         if (!entry.isDiscard()) {
-          entry.logString(typeString, "string");
+          entry.logString(typeString, "string", 0);
         }
         return true;
       }
@@ -423,7 +423,7 @@ public final class TelemetryTable {
           case Struct<?> s when s.getTypeClass().isAssignableFrom(value.getClass()) -> {
             @SuppressWarnings("unchecked")
             Struct<? super T> s2 = (Struct<? super T>) s;
-            entry.logStruct(value, s2);
+            entry.logStruct(value, s2, 0);
           }
           case Struct<?> s ->
               TelemetryRegistry.reportWarning(
@@ -453,7 +453,7 @@ public final class TelemetryTable {
           case Protobuf<?, ?> s when s.getTypeClass().isAssignableFrom(value.getClass()) -> {
             @SuppressWarnings("unchecked")
             Protobuf<? super T, ?> s2 = (Protobuf<? super T, ?>) s;
-            entry.logProtobuf(value, s2);
+            entry.logProtobuf(value, s2, 0);
           }
           case Protobuf<?, ?> s ->
               TelemetryRegistry.reportWarning(
@@ -472,55 +472,55 @@ public final class TelemetryTable {
       case Boolean v -> {
         TelemetryEntry entry = getEntry(name);
         if (!entry.isDiscard()) {
-          entry.logBoolean(v.booleanValue());
+          entry.logBoolean(v.booleanValue(), 0);
         }
       }
       case Float v -> {
         TelemetryEntry entry = getEntry(name);
         if (!entry.isDiscard()) {
-          entry.logFloat(v.floatValue());
+          entry.logFloat(v.floatValue(), 0);
         }
       }
       case Double v -> {
         TelemetryEntry entry = getEntry(name);
         if (!entry.isDiscard()) {
-          entry.logDouble(v.doubleValue());
+          entry.logDouble(v.doubleValue(), 0);
         }
       }
       case Byte v -> {
         TelemetryEntry entry = getEntry(name);
         if (!entry.isDiscard()) {
-          entry.logLong(v.longValue());
+          entry.logLong(v.longValue(), 0);
         }
       }
       case Short v -> {
         TelemetryEntry entry = getEntry(name);
         if (!entry.isDiscard()) {
-          entry.logLong(v.longValue());
+          entry.logLong(v.longValue(), 0);
         }
       }
       case Integer v -> {
         TelemetryEntry entry = getEntry(name);
         if (!entry.isDiscard()) {
-          entry.logLong(v.longValue());
+          entry.logLong(v.longValue(), 0);
         }
       }
       case Long v -> {
         TelemetryEntry entry = getEntry(name);
         if (!entry.isDiscard()) {
-          entry.logLong(v.longValue());
+          entry.logLong(v.longValue(), 0);
         }
       }
       case Number v -> {
         TelemetryEntry entry = getEntry(name);
         if (!entry.isDiscard()) {
-          entry.logDouble(v.doubleValue());
+          entry.logDouble(v.doubleValue(), 0);
         }
       }
       case String v -> {
         TelemetryEntry entry = getEntry(name);
         if (!entry.isDiscard()) {
-          entry.logString(v, "string");
+          entry.logString(v, "string", 0);
         }
       }
       case Collection<?> _ -> {
@@ -543,7 +543,7 @@ public final class TelemetryTable {
           // fall back to string
           TelemetryEntry entry = getEntry(name);
           if (!entry.isDiscard()) {
-            entry.logString(value.toString(), "string");
+            entry.logString(value.toString(), "string", 0);
           }
         }
       }
@@ -563,7 +563,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logStruct(value, struct);
+    entry.logStruct(value, struct, 0);
   }
 
   /**
@@ -579,7 +579,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logProtobuf(value, proto);
+    entry.logProtobuf(value, proto, 0);
   }
 
   /**
@@ -608,7 +608,7 @@ public final class TelemetryTable {
           case Struct<?> s when s.getTypeClass().isAssignableFrom(componentType) -> {
             @SuppressWarnings("unchecked")
             Struct<? super T> s2 = (Struct<? super T>) s;
-            entry.logStructArray(value, s2);
+            entry.logStructArray(value, s2, 0);
           }
           case Struct<?> s ->
               TelemetryRegistry.reportWarning(
@@ -629,28 +629,28 @@ public final class TelemetryTable {
         for (int i = 0; i < v.length; i++) {
           arr[i] = v[i].booleanValue();
         }
-        entry.logBooleanArray(arr);
+        entry.logBooleanArray(arr, 0);
       }
       case Byte[] v -> {
         byte[] arr = new byte[v.length];
         for (int i = 0; i < v.length; i++) {
           arr[i] = v[i].byteValue();
         }
-        entry.logRaw(arr, "raw");
+        entry.logRaw(arr, "raw", 0);
       }
       case Float[] v -> {
         float[] arr = new float[v.length];
         for (int i = 0; i < v.length; i++) {
           arr[i] = v[i].floatValue();
         }
-        entry.logFloatArray(arr);
+        entry.logFloatArray(arr, 0);
       }
       case Double[] v -> {
         double[] arr = new double[v.length];
         for (int i = 0; i < v.length; i++) {
           arr[i] = v[i].doubleValue();
         }
-        entry.logDoubleArray(arr);
+        entry.logDoubleArray(arr, 0);
       }
       case Number[] v -> {
         logNumberArray(entry, v);
@@ -662,7 +662,7 @@ public final class TelemetryTable {
         for (int i = 0; i < value.length; i++) {
           strs[i] = String.valueOf(value[i]);
         }
-        entry.logStringArray(strs);
+        entry.logStringArray(strs, 0);
       }
     }
   }
@@ -680,7 +680,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logStructArray(value, struct);
+    entry.logStructArray(value, struct, 0);
   }
 
   /**
@@ -774,7 +774,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logStructArray(toArray(value, struct.getTypeClass()), struct);
+    entry.logStructArray(toArray(value, struct.getTypeClass()), struct, 0);
   }
 
   /**
@@ -788,7 +788,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logBoolean(value);
+    entry.logBoolean(value, 0);
   }
 
   /**
@@ -802,7 +802,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logByte(value);
+    entry.logByte(value, 0);
   }
 
   /**
@@ -816,7 +816,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logShort(value);
+    entry.logShort(value, 0);
   }
 
   /**
@@ -830,7 +830,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logInt(value);
+    entry.logInt(value, 0);
   }
 
   /**
@@ -844,7 +844,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logLong(value);
+    entry.logLong(value, 0);
   }
 
   /**
@@ -858,7 +858,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logFloat(value);
+    entry.logFloat(value, 0);
   }
 
   /**
@@ -872,7 +872,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logDouble(value);
+    entry.logDouble(value, 0);
   }
 
   /**
@@ -886,7 +886,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logString(value, "string");
+    entry.logString(value, "string", 0);
   }
 
   /**
@@ -901,7 +901,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logString(value, typeString);
+    entry.logString(value, typeString, 0);
   }
 
   /**
@@ -915,7 +915,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logBooleanArray(value);
+    entry.logBooleanArray(value, 0);
   }
 
   /**
@@ -929,7 +929,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logShortArray(value);
+    entry.logShortArray(value, 0);
   }
 
   /**
@@ -943,7 +943,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logIntArray(value);
+    entry.logIntArray(value, 0);
   }
 
   /**
@@ -957,7 +957,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logLongArray(value);
+    entry.logLongArray(value, 0);
   }
 
   /**
@@ -971,7 +971,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logFloatArray(value);
+    entry.logFloatArray(value, 0);
   }
 
   /**
@@ -985,7 +985,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logDoubleArray(value);
+    entry.logDoubleArray(value, 0);
   }
 
   /**
@@ -999,7 +999,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logStringArray(value);
+    entry.logStringArray(value, 0);
   }
 
   /**
@@ -1013,7 +1013,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logRaw(value, "raw");
+    entry.logRaw(value, "raw", 0);
   }
 
   /**
@@ -1028,7 +1028,7 @@ public final class TelemetryTable {
     if (entry.isDiscard()) {
       return;
     }
-    entry.logRaw(value, typeString);
+    entry.logRaw(value, typeString, 0);
   }
 
   @SuppressWarnings("unchecked")
@@ -1075,7 +1075,7 @@ public final class TelemetryTable {
       }
       arr[i++] = v;
     }
-    entry.logBooleanArray(arr);
+    entry.logBooleanArray(arr, 0);
   }
 
   private void logByteCollection(String name, TelemetryEntry entry, Collection<?> value) {
@@ -1088,7 +1088,7 @@ public final class TelemetryTable {
       }
       arr[i++] = v.byteValue();
     }
-    entry.logRaw(arr, "raw");
+    entry.logRaw(arr, "raw", 0);
   }
 
   private void logFloatCollection(String name, TelemetryEntry entry, Collection<?> value) {
@@ -1101,7 +1101,7 @@ public final class TelemetryTable {
       }
       arr[i++] = v.floatValue();
     }
-    entry.logFloatArray(arr);
+    entry.logFloatArray(arr, 0);
   }
 
   private void logDoubleCollection(String name, TelemetryEntry entry, Collection<?> value) {
@@ -1114,7 +1114,7 @@ public final class TelemetryTable {
       }
       arr[i++] = v.doubleValue();
     }
-    entry.logDoubleArray(arr);
+    entry.logDoubleArray(arr, 0);
   }
 
   private void logLongCollection(String name, TelemetryEntry entry, Collection<?> value) {
@@ -1127,7 +1127,7 @@ public final class TelemetryTable {
       }
       arr[i++] = v.longValue();
     }
-    entry.logLongArray(arr);
+    entry.logLongArray(arr, 0);
   }
 
   private void logStringCollection(String name, TelemetryEntry entry, Collection<?> value) {
@@ -1140,7 +1140,7 @@ public final class TelemetryTable {
       }
       arr[i++] = v;
     }
-    entry.logStringArray(arr);
+    entry.logStringArray(arr, 0);
   }
 
   private void logStructCollection(
@@ -1151,7 +1151,7 @@ public final class TelemetryTable {
   private <T> void logStructCollectionImpl(
       String name, TelemetryEntry entry, Collection<?> value, Struct<T> struct) {
     try {
-      entry.logStructArray(toArray(value, struct.getTypeClass()), struct);
+      entry.logStructArray(toArray(value, struct.getTypeClass()), struct, 0);
     } catch (ArrayStoreException e) {
       collectionElementTypeMismatch(name, struct.getTypeClass(), null);
     }
@@ -1163,7 +1163,7 @@ public final class TelemetryTable {
     for (Object element : value) {
       strs[i++] = String.valueOf(element);
     }
-    entry.logStringArray(strs);
+    entry.logStringArray(strs, 0);
   }
 
   private void collectionElementTypeMismatch(String name, Class<?> expectedType, Object element) {
@@ -1182,13 +1182,13 @@ public final class TelemetryTable {
       for (int i = 0; i < value.length; i++) {
         arr[i] = value[i].longValue();
       }
-      entry.logLongArray(arr);
+      entry.logLongArray(arr, 0);
     } else {
       double[] arr = new double[value.length];
       for (int i = 0; i < value.length; i++) {
         arr[i] = value[i].doubleValue();
       }
-      entry.logDoubleArray(arr);
+      entry.logDoubleArray(arr, 0);
     }
   }
 }

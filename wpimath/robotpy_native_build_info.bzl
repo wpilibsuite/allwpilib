@@ -9,11 +9,17 @@ def define_native_wrapper(name, pyproject_toml = None):
         srcs = native.glob(["src/main/native/include/**"]) + ["//wpimath:generated-native-include-files"] + native.glob([
             "src/main/native/thirdparty/gcem/include/**",
             "src/main/native/thirdparty/sleipnir/include/**",
-        ]),
+        ]) + [
+            "@eigen//:all_files",
+        ] + [
+            "//:LICENSE.md",
+        ],
         out = "native/wpimath/include",
+        include_external_repositories = ["*eigen*"],
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
-            "wpimath/src/generated/main/native/cpp": "",
+            "include": "",
+            "wpimath/src/generated/main/native/include": "",
             "wpimath/src/main/native/include": "",
             "wpimath/src/main/native/thirdparty/gcem/include": "",
             "wpimath/src/main/native/thirdparty/sleipnir/include": "",
@@ -58,7 +64,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         ],
         summary = "WPILib Math Library",
         requires = ["robotpy-native-telemetry==0.0.0", "robotpy-native-tunables==0.0.0", "robotpy-native-wpiutil==0.0.0"],
-        python_requires = ">=3.11",
+        python_requires = ">=3.12",
         strip_path_prefixes = ["wpimath"],
         entry_points = {
             "pkg_config": [

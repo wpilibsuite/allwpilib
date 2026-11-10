@@ -17,7 +17,7 @@ public class DoubleArrayLogEntry extends DataLogEntry {
    * @param log datalog
    * @param name name of the entry
    * @param metadata metadata
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    */
   public DoubleArrayLogEntry(DataLog log, String name, String metadata, long timestamp) {
     super(log, name, DATA_TYPE, metadata, timestamp);
@@ -39,7 +39,7 @@ public class DoubleArrayLogEntry extends DataLogEntry {
    *
    * @param log datalog
    * @param name name of the entry
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    */
   public DoubleArrayLogEntry(DataLog log, String name, long timestamp) {
     this(log, name, "", timestamp);
@@ -59,7 +59,7 @@ public class DoubleArrayLogEntry extends DataLogEntry {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void append(double[] value, long timestamp) {
     m_log.appendDoubleArray(m_entry, value, timestamp);
@@ -81,7 +81,7 @@ public class DoubleArrayLogEntry extends DataLogEntry {
    * pointing to the same underlying log entry name will likely result in unexpected results.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public synchronized void update(double[] value, long timestamp) {
     if (!equalsLast(value)) {

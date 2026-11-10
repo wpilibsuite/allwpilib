@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 
 from constants import Constants
@@ -19,12 +21,15 @@ class MyRobot(wpilib.TimedRobot):
         self.arm = Arm()
         self.joystick = wpilib.Joystick(Constants.JOYSTICK_PORT)
 
+    @override
     def simulation_periodic(self) -> None:
         self.arm.simulation_periodic()
 
+    @override
     def teleop_init(self) -> None:
         self.arm.load_preferences()
 
+    @override
     def teleop_periodic(self) -> None:
         if self.joystick.get_trigger():
             # Here, we run PID control like normal.
@@ -33,6 +38,7 @@ class MyRobot(wpilib.TimedRobot):
             # Otherwise, we disable the motor.
             self.arm.stop()
 
+    @override
     def disabled_init(self) -> None:
         # This just makes sure that our simulation code knows that the motor's off.
         self.arm.stop()

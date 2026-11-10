@@ -68,6 +68,33 @@ void WPI_DataLog_SetBackgroundWriterFilename(struct WPI_DataLog* datalog,
                                              const struct WPI_String* filename);
 
 /**
+ * Requests a background transfer of the current log file to another directory.
+ * Buffered records are flushed before checking the size. On success, logging
+ * continues in the new directory and the old file is removed. On failure or if
+ * the file exceeds maxSize, the original directory is retained. Existing files
+ * are never overwritten. Only applies to file-based background writers.
+ * Has no effect on stopped logs; replaces any request not yet started.
+ *
+ * @param datalog data log
+ * @param dir existing destination directory (empty means current directory)
+ * @param maxSize maximum file size to transfer, in bytes
+ */
+void WPI_DataLog_SetBackgroundWriterDir(struct WPI_DataLog* datalog,
+                                        const struct WPI_String* dir,
+                                        uint64_t maxSize);
+
+/**
+ * Gets the current directory of a background writer. Changes only after a
+ * successful transfer.
+ *
+ * @param datalog data log
+ * @param dir log directory (output), empty for callback writers; free with
+ *            WPI_FreeString()
+ */
+void WPI_DataLog_GetBackgroundWriterDir(struct WPI_DataLog* datalog,
+                                        struct WPI_String* dir);
+
+/**
  * Releases a data log object. Closes the file and returns resources to the
  * system.
  *
@@ -119,7 +146,7 @@ void WPI_DataLog_Stop(struct WPI_DataLog* datalog);
  * @param name Name
  * @param type Data type
  * @param metadata Initial metadata (e.g. data properties)
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  *
  * @return Entry index
  */
@@ -133,7 +160,7 @@ int WPI_DataLog_Start(struct WPI_DataLog* datalog,
  *
  * @param datalog data log
  * @param entry Entry index
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
                         int64_t timestamp);
@@ -144,7 +171,7 @@ void WPI_DataLog_Finish(struct WPI_DataLog* datalog, int entry,
  * @param datalog data log
  * @param entry Entry index
  * @param metadata New metadata for the entry
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
                              const struct WPI_String* metadata,
@@ -157,7 +184,7 @@ void WPI_DataLog_SetMetadata(struct WPI_DataLog* datalog, int entry,
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param data Byte array to record
  * @param len Length of byte array
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendRaw(struct WPI_DataLog* datalog, int entry,
                            const uint8_t* data, size_t len, int64_t timestamp);
@@ -168,7 +195,7 @@ void WPI_DataLog_AppendRaw(struct WPI_DataLog* datalog, int entry,
  * @param datalog data log
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param value Boolean value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendBoolean(struct WPI_DataLog* datalog, int entry,
                                int value, int64_t timestamp);
@@ -179,7 +206,7 @@ void WPI_DataLog_AppendBoolean(struct WPI_DataLog* datalog, int entry,
  * @param datalog data log
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param value Integer value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendInteger(struct WPI_DataLog* datalog, int entry,
                                int64_t value, int64_t timestamp);
@@ -190,7 +217,7 @@ void WPI_DataLog_AppendInteger(struct WPI_DataLog* datalog, int entry,
  * @param datalog data log
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param value Float value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendFloat(struct WPI_DataLog* datalog, int entry,
                              float value, int64_t timestamp);
@@ -201,7 +228,7 @@ void WPI_DataLog_AppendFloat(struct WPI_DataLog* datalog, int entry,
  * @param datalog data log
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param value Double value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendDouble(struct WPI_DataLog* datalog, int entry,
                               double value, int64_t timestamp);
@@ -212,7 +239,7 @@ void WPI_DataLog_AppendDouble(struct WPI_DataLog* datalog, int entry,
  * @param datalog data log
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param value String value to record
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendString(struct WPI_DataLog* datalog, int entry,
                               const struct WPI_String* value,
@@ -225,7 +252,7 @@ void WPI_DataLog_AppendString(struct WPI_DataLog* datalog, int entry,
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param arr Boolean array to record
  * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendBooleanArray(struct WPI_DataLog* datalog, int entry,
                                     const int* arr, size_t len,
@@ -238,7 +265,7 @@ void WPI_DataLog_AppendBooleanArray(struct WPI_DataLog* datalog, int entry,
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param arr Boolean array to record
  * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendBooleanArrayByte(struct WPI_DataLog* datalog, int entry,
                                         const uint8_t* arr, size_t len,
@@ -251,7 +278,7 @@ void WPI_DataLog_AppendBooleanArrayByte(struct WPI_DataLog* datalog, int entry,
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param arr Integer array to record
  * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendIntegerArray(struct WPI_DataLog* datalog, int entry,
                                     const int64_t* arr, size_t len,
@@ -264,7 +291,7 @@ void WPI_DataLog_AppendIntegerArray(struct WPI_DataLog* datalog, int entry,
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param arr Float array to record
  * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendFloatArray(struct WPI_DataLog* datalog, int entry,
                                   const float* arr, size_t len,
@@ -277,7 +304,7 @@ void WPI_DataLog_AppendFloatArray(struct WPI_DataLog* datalog, int entry,
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param arr Double array to record
  * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendDoubleArray(struct WPI_DataLog* datalog, int entry,
                                    const double* arr, size_t len,
@@ -290,7 +317,7 @@ void WPI_DataLog_AppendDoubleArray(struct WPI_DataLog* datalog, int entry,
  * @param entry Entry index, as returned by WPI_DataLog_Start()
  * @param arr String array to record
  * @param len Number of elements in array
- * @param timestamp Time stamp (may be 0 to indicate now)
+ * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
  */
 void WPI_DataLog_AppendStringArray(struct WPI_DataLog* datalog, int entry,
                                    const struct WPI_String* arr, size_t len,

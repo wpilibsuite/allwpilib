@@ -6,6 +6,7 @@ package org.wpilib.util;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,11 @@ import org.junit.jupiter.api.Test;
 class ErrorMessagesTest {
   @Test
   void requireNonNullParamNullTest() {
-    assertThrows(
-        NullPointerException.class, () -> requireNonNullParam(null, "testParam", "testMethod"));
+    var exception =
+        assertThrows(
+            NullPointerException.class, () -> requireNonNullParam(null, "testParam", "testMethod"));
+    assertTrue(
+        exception.getMessage().startsWith("Parameter testParam in method testMethod was null"));
   }
 
   @Test

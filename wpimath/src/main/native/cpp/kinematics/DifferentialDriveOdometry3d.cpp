@@ -10,6 +10,7 @@
 #include "wpi/math/kinematics/Odometry3d.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi::math;
 
@@ -18,5 +19,5 @@ DifferentialDriveOdometry3d::DifferentialDriveOdometry3d(
     wpi::units::meter_t rightDistance, const Pose3d& initialPose)
     : Odometry3d(DifferentialDriveKinematics{1_m}, gyroAngle,
                  {leftDistance, rightDistance}, initialPose) {
-  wpi::math::MathSharedStore::ReportUsage("DifferentialDriveOdometry3d", "");
+  wpi::util::ReportUsage("DifferentialDriveOdometry3d", "");
 }

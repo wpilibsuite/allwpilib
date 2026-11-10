@@ -609,7 +609,7 @@ HAL_PowerDistributionChannelData* HAL_GetPDPStreamData(HAL_PDPHandle handle,
     PdpStatus1 pdpStatus;
     std::memcpy(pdpStatus.data, messages[i].message.message.data,
                 sizeof(pdpStatus));
-    uint64_t timestamp = messages[i].message.timeStamp;
+    int64_t timestamp = messages[i].message.timeStamp;
 
     retData[*count].current =
         ((static_cast<uint32_t>(pdpStatus.bits.chan1_h8) << 2) |
@@ -666,7 +666,7 @@ HAL_PowerDistributionChannelData* HAL_GetPDPStreamData(HAL_PDPHandle handle,
     PdpStatus2 pdpStatus;
     std::memcpy(pdpStatus.data, messages[i].message.message.data,
                 sizeof(pdpStatus));
-    uint64_t timestamp = messages[i].message.timeStamp;
+    int64_t timestamp = messages[i].message.timeStamp;
 
     retData[*count].current =
         ((static_cast<uint32_t>(pdpStatus.bits.chan7_h8) << 2) |
@@ -723,7 +723,7 @@ HAL_PowerDistributionChannelData* HAL_GetPDPStreamData(HAL_PDPHandle handle,
     PdpStatus3 pdpStatus;
     std::memcpy(pdpStatus.data, messages[i].message.message.data,
                 sizeof(pdpStatus));
-    uint64_t timestamp = messages[i].message.timeStamp;
+    int64_t timestamp = messages[i].message.timeStamp;
 
     retData[*count].current =
         ((static_cast<uint32_t>(pdpStatus.bits.chan13_h8) << 2) |

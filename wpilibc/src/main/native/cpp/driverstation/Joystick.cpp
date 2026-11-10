@@ -8,7 +8,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -21,7 +21,7 @@ Joystick::Joystick(GenericHID& hid) : m_hid{&hid} {
   m_axes[Axis::TWIST] = DEFAULT_TWIST_CHANNEL;
   m_axes[Axis::THROTTLE] = DEFAULT_THROTTLE_CHANNEL;
 
-  HAL_ReportUsage("HID", hid.GetPort(), "Joystick");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "Joystick");
 }
 
 GenericHID& Joystick::GetHID() {

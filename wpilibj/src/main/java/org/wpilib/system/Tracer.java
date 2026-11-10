@@ -18,12 +18,12 @@ import org.wpilib.driverstation.DriverStationErrors;
  * which parts of an operation consumed the most time.
  */
 public class Tracer {
-  private static final long MIN_PRINT_PERIOD = 1000000; // microseconds
+  private static final long MIN_PRINT_PERIOD = 1_000_000_000; // nanoseconds
 
-  private long m_lastEpochsPrintTime; // microseconds
-  private long m_startTime; // microseconds
+  private long m_lastEpochsPrintTime; // nanoseconds
+  private long m_startTime; // nanoseconds
 
-  private final Map<String, Long> m_epochs = new HashMap<>(); // microseconds
+  private final Map<String, Long> m_epochs = new HashMap<>(); // nanoseconds
 
   /** Tracer constructor. */
   public Tracer() {
@@ -76,7 +76,7 @@ public class Tracer {
       StringBuilder sb = new StringBuilder();
       m_lastEpochsPrintTime = now;
       m_epochs.forEach(
-          (key, value) -> sb.append(String.format("\t%s: %.6fs\n", key, value / 1.0e6)));
+          (key, value) -> sb.append(String.format("\t%s: %.6fs\n", key, value / 1.0e9)));
       if (sb.length() > 0) {
         output.accept(sb.toString());
       }

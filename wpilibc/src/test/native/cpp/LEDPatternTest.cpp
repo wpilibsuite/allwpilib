@@ -214,12 +214,12 @@ TEST_CASE("LEDPatternTest ScrollRelativeForward", "[wpilibc]") {
   auto scroll =
       pattern.ScrollAtRelativeVelocity(wpi::units::hertz_t{1 / 256.0});
 
-  static uint64_t now = 0ull;
+  static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
 
   for (int time = 0; time < 500; time++) {
-    // convert time (seconds) to microseconds
-    now = time * 1000000ull;
+    // convert time (seconds) to nanoseconds
+    now = time * 1'000'000'000LL;
 
     scroll.ApplyTo(buffer);
 
@@ -258,12 +258,12 @@ TEST_CASE("LEDPatternTest ScrollRelativeBackward", "[wpilibc]") {
   auto scroll =
       pattern.ScrollAtRelativeVelocity(wpi::units::hertz_t{-1 / 256.0});
 
-  static uint64_t now = 0ull;
+  static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
 
   for (int time = 0; time < 500; time++) {
-    // convert time (seconds) to microseconds
-    now = time * 1000000ull;
+    // convert time (seconds) to nanoseconds
+    now = time * 1'000'000'000LL;
 
     scroll.ApplyTo(buffer);
 
@@ -302,12 +302,12 @@ TEST_CASE("LEDPatternTest ScrollAbsoluteForward", "[wpilibc]") {
   // or 0.00125 seconds per LED (800 LEDs/s)
   auto scroll = pattern.ScrollAtAbsoluteVelocity(16_mps, 2_cm);
 
-  static uint64_t now = 0ull;
+  static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
 
   for (int time = 0; time < 500; time++) {
-    // convert time (seconds) to microseconds
-    now = time * 1250ull;  // 1.25ms per LED
+    // convert time (seconds) to nanoseconds
+    now = time * 1'250'000;  // 1.25ms per LED
 
     scroll.ApplyTo(buffer);
 
@@ -346,12 +346,12 @@ TEST_CASE("LEDPatternTest ScrollAbsoluteBackward", "[wpilibc]") {
   // or 0.00125 seconds per LED (800 LEDs/s)
   auto scroll = pattern.ScrollAtAbsoluteVelocity(-16_mps, 2_cm);
 
-  static uint64_t now = 0ull;
+  static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
 
   for (int time = 0; time < 500; time++) {
-    // convert time (seconds) to microseconds
-    now = time * 1250ull;  // 1.25ms per LED
+    // convert time (seconds) to nanoseconds
+    now = time * 1'250'000;  // 1.25ms per LED
 
     scroll.ApplyTo(buffer);
 
@@ -606,10 +606,10 @@ TEST_CASE("LEDPatternTest BlinkSymmetric", "[wpilibc]") {
   // on for 2 seconds, off for 2 seconds
   auto pattern = white.Blink(2_s);
 
-  static uint64_t now = 0ull;
+  static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
   for (int t = 0; t < 8; t++) {
-    now = t * 1000000ull;  // time travel 1 second
+    now = t * 1'000'000'000LL;  // time travel 1 second
     UNSCOPED_INFO(std::format("Time {} seconds", t));
     pattern.ApplyTo(buffer);
 
@@ -639,10 +639,10 @@ TEST_CASE("LEDPatternTest BlinkAsymmetric", "[wpilibc]") {
   // on for 3 seconds, off for 1 second
   auto pattern = white.Blink(3_s, 1_s);
 
-  static uint64_t now = 0ull;
+  static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
   for (int t = 0; t < 8; t++) {
-    now = t * 1000000ull;  // time travel 1 second
+    now = t * 1'000'000'000LL;  // time travel 1 second
     UNSCOPED_INFO(std::format("Time {} seconds", t));
     pattern.ApplyTo(buffer);
 
@@ -693,41 +693,41 @@ TEST_CASE("LEDPatternTest Breathe", "[wpilibc]") {
   wpi::util::Color midGray{0.5, 0.5, 0.5};
   std::array<AddressableLED::LEDData, 1> buffer;
   auto white = LEDPattern::Solid(wpi::util::Color::WHITE);
-  auto pattern = white.Breathe(4_us);
+  auto pattern = white.Breathe(wpi::units::nanosecond_t{4});
 
-  static uint64_t now = 0ull;
+  static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
 
   {
-    now = 0ull;  // start
+    now = 0;  // start
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
     AssertIndexColor(buffer, 0, wpi::util::Color::WHITE);
   }
   {
-    now = 1ull;  // midway (down)
+    now = 1;  // midway (down)
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
     AssertIndexColor(buffer, 0, midGray);
   }
   {
-    now = 2ull;  // bottom
+    now = 2;  // bottom
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
     AssertIndexColor(buffer, 0, wpi::util::Color::BLACK);
   }
   {
-    now = 3ull;  // midway (up)
+    now = 3;  // midway (up)
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
     AssertIndexColor(buffer, 0, midGray);
   }
   {
-    now = 4ull;  // back to start
+    now = 4;  // back to start
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
@@ -972,15 +972,15 @@ TEST_CASE("LEDPatternTest RelativeScrollingMask", "[wpilibc]") {
 
   auto pattern = LEDPattern::Steps(colorSteps)
                      .Mask(LEDPattern::Steps(maskSteps))
-                     .ScrollAtRelativeVelocity(wpi::units::hertz_t{1e6 / 8.0});
+                     .ScrollAtRelativeVelocity(wpi::units::hertz_t{1e9 / 8.0});
 
   pattern.ApplyTo(buffer);
 
-  static uint64_t now = 0ull;
+  static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
 
   {
-    now = 0ull;  // start
+    now = 0;  // start
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
@@ -995,7 +995,7 @@ TEST_CASE("LEDPatternTest RelativeScrollingMask", "[wpilibc]") {
     AssertIndexColor(buffer, 7, wpi::util::Color::BLACK);
   }
   {
-    now = 1ull;
+    now = 1;
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
@@ -1010,7 +1010,7 @@ TEST_CASE("LEDPatternTest RelativeScrollingMask", "[wpilibc]") {
     AssertIndexColor(buffer, 7, wpi::util::Color::BLACK);
   }
   {
-    now = 2ull;
+    now = 2;
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
@@ -1025,7 +1025,7 @@ TEST_CASE("LEDPatternTest RelativeScrollingMask", "[wpilibc]") {
     AssertIndexColor(buffer, 7, wpi::util::Color::BLACK);
   }
   {
-    now = 3ull;
+    now = 3;
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
@@ -1061,11 +1061,11 @@ TEST_CASE("LEDPatternTest AbsoluteScrollingMask", "[wpilibc]") {
 
   pattern.ApplyTo(buffer);
 
-  static uint64_t now = 0ull;
+  static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
 
   {
-    now = 0ull;  // start
+    now = 0;  // start
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
@@ -1080,7 +1080,7 @@ TEST_CASE("LEDPatternTest AbsoluteScrollingMask", "[wpilibc]") {
     AssertIndexColor(buffer, 7, wpi::util::Color::BLACK);
   }
   {
-    now = 1000000ull;
+    now = 1'000'000'000LL;
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
@@ -1095,7 +1095,7 @@ TEST_CASE("LEDPatternTest AbsoluteScrollingMask", "[wpilibc]") {
     AssertIndexColor(buffer, 7, wpi::util::Color::BLACK);
   }
   {
-    now = 2000000ull;
+    now = 2'000'000'000;
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);
@@ -1110,7 +1110,7 @@ TEST_CASE("LEDPatternTest AbsoluteScrollingMask", "[wpilibc]") {
     AssertIndexColor(buffer, 7, wpi::util::Color::BLACK);
   }
   {
-    now = 3000000ull;
+    now = 3'000'000'000;
     UNSCOPED_INFO(std::format("Time {}", now));
 
     pattern.ApplyTo(buffer);

@@ -7,13 +7,13 @@ package org.wpilib.drive;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.function.DoubleConsumer;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.MotorController;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -48,7 +48,7 @@ import org.wpilib.telemetry.TelemetryTable;
  * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default. The driveCartesian or
  * drivePolar methods should be called periodically to avoid Motor Safety timeouts.
  */
-public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, AutoCloseable {
+public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable {
   private final DoubleConsumer m_frontLeftMotor;
   private final DoubleConsumer m_rearLeftMotor;
   private final DoubleConsumer m_frontRightMotor;
@@ -147,9 +147,6 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, A
     m_rearRightMotor = rearRightMotor;
   }
 
-  @Override
-  public void close() {}
-
   /**
    * Drive method for Mecanum platform.
    *
@@ -181,7 +178,7 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, A
   public void driveCartesian(
       double xVelocity, double yVelocity, double zRotation, Rotation2d gyroAngle) {
     if (!m_reported) {
-      HAL.reportUsage("RobotDrive", "MecanumCartesian");
+      UsageReporting.reportUsage("RobotDrive", "MecanumCartesian");
       m_reported = true;
     }
 
@@ -216,7 +213,7 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, A
    */
   public void drivePolar(double magnitude, Rotation2d angle, double zRotation) {
     if (!m_reported) {
-      HAL.reportUsage("RobotDrive", "MecanumPolar");
+      UsageReporting.reportUsage("RobotDrive", "MecanumPolar");
       m_reported = true;
     }
 

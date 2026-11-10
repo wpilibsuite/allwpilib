@@ -142,14 +142,18 @@ The basic analog input just reads a voltage. An analog input can also be configu
 | ----------------- | ------- | ------------------------------------------------ |
 | ``">new_data"``   | Boolean | One shot.  If set to true in a message, notifies the robot program that new DS and Joystick data is available. |
 | ``">enabled"``    | Boolean | True to enable the robot program |
-| ``">autonomous"`` | Boolean | True for autonomous mode; false for teleoperated mode |
-| ``">test"``       | Boolean | True for test mode; false for other modes |
+| ``">robotMode"``  | Integer | Robot mode: 0 = unknown, 1 = autonomous, 2 = teleoperated, 3 = utility. Independent of enabled state. |
+| ``">autonomous"`` | Boolean | Legacy output flag: true for autonomous mode; false for other modes. Sent with ``">robotMode"`` for compatibility. |
+| ``">test"``       | Boolean | Legacy output flag: true for utility mode; false for other modes. Sent with ``">robotMode"`` for compatibility. |
 | ``">estop"``      | Boolean | True to emergency stop (no motor outputs) |
 | ``">fms"``        | Boolean | True if the DS is connected to a Field Management System (FMS) |
 | ``">ds"``         | Boolean | True if a DS application is connected |
 | ``">station"``    | String  | Station color and number; supported values are ``"red1"``, ``"red2"``, ``"red3"``, ``"blue1"``, ``"blue2"``, ``"blue3"``. |
 | ``">match_time"`` | Float   | Match time countdown, in seconds, for each match period (e.g. for 15 second period, starts at 15 and counts down to 0).  If not in a match, -1. |
 | ``">game_data"``  | String  | Game-specific data; arbitrary string contents |
+
+Use ``">robotMode"`` to set the mode from a WebSocket client. The legacy
+``">autonomous"`` and ``">test"`` fields are only emitted by WPILib.
 
 #### Duty Cycle Input ("DutyCycle")
 

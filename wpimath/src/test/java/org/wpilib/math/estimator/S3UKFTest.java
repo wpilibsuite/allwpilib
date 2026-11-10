@@ -164,7 +164,7 @@ class S3UKFTest {
 
     var trueXhat = observer.getXhat();
 
-    double duration = trajectory.duration;
+    double duration = trajectory.duration();
     for (int i = 0; i < (duration / dt); ++i) {
       var ref = trajectory.sampleAt(dt * i);
       double vl = ref.forwardVelocity() * (1 - (ref.curvature * rb));
@@ -210,7 +210,7 @@ class S3UKFTest {
         AngleStatistics.angleResidual(2),
         AngleStatistics.angleAdd(2));
 
-    final var finalPosition = trajectory.sampleAt(trajectory.duration);
+    final var finalPosition = trajectory.sampleAt(trajectory.duration());
 
     assertEquals(finalPosition.pose.getTranslation().getX(), observer.getXhat(0), 0.055);
     assertEquals(finalPosition.pose.getTranslation().getY(), observer.getXhat(1), 0.15);

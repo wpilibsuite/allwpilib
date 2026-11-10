@@ -1,4 +1,0 @@
-classes:
-  wpi::Talon:
-    methods:
-      Talon:

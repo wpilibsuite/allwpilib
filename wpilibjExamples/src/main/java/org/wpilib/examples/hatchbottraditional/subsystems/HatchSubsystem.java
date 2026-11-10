@@ -9,7 +9,7 @@ import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.REVERSE;
 
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.examples.hatchbottraditional.Constants.HatchConstants;
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 import org.wpilib.telemetry.TelemetryTable;
@@ -18,7 +18,7 @@ import org.wpilib.telemetry.TelemetryTable;
 public class HatchSubsystem extends SubsystemBase {
   private final DoubleSolenoid hatchSolenoid =
       new DoubleSolenoid(
-          CANBus.CAN_S0,
+          CANPort.CAN_S0,
           PneumaticsModuleType.CTRE_PCM,
           HatchConstants.HATCH_SOLENOID_PORTS[0],
           HatchConstants.HATCH_SOLENOID_PORTS[1]);

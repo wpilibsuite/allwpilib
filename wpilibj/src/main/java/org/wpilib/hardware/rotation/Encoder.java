@@ -8,10 +8,10 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.wpilib.hardware.discrete.CounterBase;
 import org.wpilib.hardware.hal.EncoderJNI;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class to read quadrature encoders.
@@ -52,7 +52,7 @@ public class Encoder implements CounterBase, TelemetryLoggable, AutoCloseable {
           case X4 -> "Encoder:4x";
           default -> "Encoder";
         };
-    HAL.reportUsage("IO[" + aChannel + "," + bChannel + "]", typeStr);
+    UsageReporting.reportUsage("IO[" + aChannel + "," + bChannel + "]", typeStr);
   }
 
   /**

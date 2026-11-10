@@ -638,7 +638,17 @@ static void RenderGPUFrame(ImDrawData* drawData) {
     ImGui::RenderPlatformWindowsDefault();
   }
 
+  for (auto&& execute : gContext->preSwapExecutors) {
+    if (execute) {
+      execute();
+    }
+  }
   SDL_SubmitGPUCommandBuffer(commandBuffer);
+  for (auto&& execute : gContext->postSwapExecutors) {
+    if (execute) {
+      execute();
+    }
+  }
 }
 
 static void Render2DFrame(ImDrawData* drawData) {
@@ -651,7 +661,17 @@ static void Render2DFrame(ImDrawData* drawData) {
                               gContext->clearColor.z, gContext->clearColor.w);
   SDL_RenderClear(gRendererContext.sdlRenderer);
   ImGui_ImplSDLRenderer3_RenderDrawData(drawData, gRendererContext.sdlRenderer);
+  for (auto&& execute : gContext->preSwapExecutors) {
+    if (execute) {
+      execute();
+    }
+  }
   SDL_RenderPresent(gRendererContext.sdlRenderer);
+  for (auto&& execute : gContext->postSwapExecutors) {
+    if (execute) {
+      execute();
+    }
+  }
 }
 
 static bool InitRenderer(SDL_WindowFlags windowFlags,
@@ -886,21 +906,51 @@ ImFont* Context::FontMaker::GetFont() const {
   return font;
 }
 
+static bool SetDefaultFontByName(const std::string& name) {
+  for (auto&& makeFont : gContext->makeFonts) {
+    if (makeFont.GetName() == name) {
+      ImGui::GetIO().FontDefault = makeFont.GetFont();
+      gContext->defaultFontName = makeFont.GetName();
+      return true;
+    }
+  }
+  return false;
+}
+
+static void LoadDefaultFont() {
+  if (!SetDefaultFontByName(gContext->defaultFontName) &&
+      !gContext->makeFonts.empty()) {
+    auto& makeFont = gContext->makeFonts.front();
+    ImGui::GetIO().FontDefault = makeFont.GetFont();
+    gContext->defaultFontName = makeFont.GetName();
+  }
+}
+
 static void UpdateFontScale() {
-  // Scale based on OS window content scaling
+  // Content scale only. ImGui lays out in points and applies the window's
+  // pixel density itself through DisplayFramebufferScale, so folding the
+  // density in here as well would scale fonts twice.
   float windowScale = 1.0;
   if (gContext->window) {
-    windowScale = SDL_GetWindowDisplayScale(gContext->window);
+    windowScale =
+        SDL_GetDisplayContentScale(SDL_GetDisplayForWindow(gContext->window));
     if (windowScale <= 0.0f) {
       windowScale = 1.0f;
     }
   }
-  float fontScale = gContext->userScale / 100.0 * windowScale;
-  if (fontScale < 0.5) {
-    fontScale = 0.5;
+  float uiScale = gContext->userScale / 100.0 * windowScale;
+  if (uiScale < 0.5) {
+    uiScale = 0.5;
   }
-  ImGui::GetStyle().FontSizeBase = 10;
-  ImGui::GetStyle().FontScaleDpi = fontScale;
+  ImGui::GetStyle().FontSizeBase = 13;
+  ImGui::GetStyle().FontScaleDpi = uiScale;
+
+  // ImGui never scales style metrics itself, so rebuild them on a zoom
+  // change; otherwise the text grows inside boxes that stay put.
+  if (uiScale != gContext->styleScale) {
+    gContext->styleScale = uiScale;
+    SetStyle(static_cast<Style>(gContext->style));
+  }
 }
 
 static void ShutdownGuiSystem(bool deleteSettingsFile) {
@@ -1050,9 +1100,9 @@ bool gui::Initialize(const char* title, int width, int height,
   if (!gContext->loadedWidthHeight) {
     // force user scale if window scale is smaller
     if (windowScale <= 0.5) {
-      gContext->userScale = 0;
+      gContext->userScale = 50;
     } else if (windowScale <= 0.75) {
-      gContext->userScale = 1;
+      gContext->userScale = 75;
     }
     if (windowScale != 1.0) {
       for (auto&& func : gContext->windowScalers) {
@@ -1064,6 +1114,13 @@ bool gui::Initialize(const char* title, int width, int height,
   if (!InitRenderer(windowFlags, rendererPreference)) {
     CleanupFailedInitialize();
     return false;
+  }
+
+  for (auto&& makeFont : gContext->makeFonts) {
+    if (makeFont.GetName() == gContext->defaultFontName) {
+      io.FontDefault = makeFont.GetFont();
+      break;
+    }
   }
 
   // Update window settings
@@ -1130,6 +1187,7 @@ bool gui::Initialize(const char* title, int width, int height,
 
   // Load Fonts
   UpdateFontScale();
+  LoadDefaultFont();
 
   return true;
 }
@@ -1469,6 +1527,18 @@ void gui::AddLateExecute(std::function<void()> execute) {
   }
 }
 
+void gui::AddPreSwap(std::function<void()> execute) {
+  if (execute) {
+    gContext->preSwapExecutors.emplace_back(std::move(execute));
+  }
+}
+
+void gui::AddPostSwap(std::function<void()> execute) {
+  if (execute) {
+    gContext->postSwapExecutors.emplace_back(std::move(execute));
+  }
+}
+
 void gui::AddEventHandler(std::function<void(SDL_Event& event)> handler) {
   if (handler) {
     gContext->eventHandlers.emplace_back(std::move(handler));
@@ -1614,8 +1684,301 @@ static void StyleColorsDeepDark() {
   style.TabRounding = 4;
 }
 
+static void ApplyCommonStyle(Style selectedStyle) {
+  ImGuiStyle& style = ImGui::GetStyle();
+  ImVec4* colors = style.Colors;
+
+  struct Palette {
+    ImVec4 text;
+    ImVec4 textDisabled;
+    ImVec4 canvas;
+    ImVec4 window;
+    ImVec4 surface;
+    ImVec4 control;
+    ImVec4 border;
+    ImVec4 accent;
+    ImVec4 accentStrong;
+  } palette;
+
+  switch (selectedStyle) {
+    case Style::CLASSIC:
+      palette = {ImVec4(0.96f, 0.97f, 0.98f, 1.00f),
+                 ImVec4(0.66f, 0.69f, 0.73f, 1.00f),
+                 ImVec4(0.075f, 0.085f, 0.10f, 1.00f),
+                 ImVec4(0.16f, 0.17f, 0.19f, 1.00f),
+                 ImVec4(0.21f, 0.23f, 0.26f, 1.00f),
+                 ImVec4(0.27f, 0.29f, 0.33f, 1.00f),
+                 ImVec4(0.48f, 0.52f, 0.58f, 0.72f),
+                 ImVec4(0.20f, 0.68f, 0.82f, 1.00f),
+                 ImVec4(0.12f, 0.78f, 0.94f, 1.00f)};
+      break;
+    case Style::DARK:
+      palette = {ImVec4(0.93f, 0.96f, 1.00f, 1.00f),
+                 ImVec4(0.60f, 0.68f, 0.78f, 1.00f),
+                 ImVec4(0.012f, 0.025f, 0.055f, 1.00f),
+                 ImVec4(0.045f, 0.075f, 0.125f, 1.00f),
+                 ImVec4(0.065f, 0.105f, 0.17f, 1.00f),
+                 ImVec4(0.095f, 0.15f, 0.235f, 1.00f),
+                 ImVec4(0.29f, 0.39f, 0.54f, 0.68f),
+                 ImVec4(0.31f, 0.64f, 0.98f, 1.00f),
+                 ImVec4(0.52f, 0.78f, 1.00f, 1.00f)};
+      break;
+    case Style::LIGHT:
+      palette = {ImVec4(0.12f, 0.12f, 0.12f, 1.00f),
+                 ImVec4(0.42f, 0.42f, 0.42f, 1.00f),
+                 ImVec4(0.92f, 0.92f, 0.92f, 1.00f),
+                 ImVec4(1.00f, 1.00f, 1.00f, 1.00f),
+                 ImVec4(0.98f, 0.98f, 0.98f, 1.00f),
+                 ImVec4(0.90f, 0.90f, 0.90f, 1.00f),
+                 ImVec4(0.62f, 0.62f, 0.62f, 1.00f),
+                 ImVec4(0.20f, 0.47f, 0.82f, 1.00f),
+                 ImVec4(0.10f, 0.35f, 0.70f, 1.00f)};
+      break;
+    case Style::DEEP_DARK:
+      palette = {ImVec4(0.96f, 0.97f, 0.99f, 1.00f),
+                 ImVec4(0.62f, 0.65f, 0.70f, 1.00f),
+                 ImVec4(0.005f, 0.007f, 0.012f, 1.00f),
+                 ImVec4(0.025f, 0.028f, 0.035f, 1.00f),
+                 ImVec4(0.055f, 0.06f, 0.075f, 1.00f),
+                 ImVec4(0.09f, 0.10f, 0.125f, 1.00f),
+                 ImVec4(0.34f, 0.37f, 0.43f, 0.68f),
+                 ImVec4(0.35f, 0.72f, 0.90f, 1.00f),
+                 ImVec4(0.55f, 0.86f, 1.00f, 1.00f)};
+      break;
+  }
+
+  auto withAlpha = [](ImVec4 color, float alpha) {
+    color.w = alpha;
+    return color;
+  };
+  colors[ImGuiCol_Text] = palette.text;
+  colors[ImGuiCol_TextDisabled] = palette.textDisabled;
+  colors[ImGuiCol_WindowBg] = palette.window;
+  colors[ImGuiCol_ChildBg] = palette.surface;
+  colors[ImGuiCol_PopupBg] = palette.surface;
+  colors[ImGuiCol_Border] = palette.border;
+  colors[ImGuiCol_BorderShadow] = withAlpha(palette.canvas, 0.35f);
+  colors[ImGuiCol_FrameBg] = palette.control;
+  colors[ImGuiCol_FrameBgHovered] = withAlpha(palette.accent, 0.35f);
+  colors[ImGuiCol_FrameBgActive] = withAlpha(palette.accent, 0.55f);
+  colors[ImGuiCol_TitleBg] = palette.window;
+  colors[ImGuiCol_TitleBgActive] = palette.surface;
+  colors[ImGuiCol_MenuBarBg] = palette.surface;
+  colors[ImGuiCol_ScrollbarBg] = palette.canvas;
+  colors[ImGuiCol_ScrollbarGrab] = withAlpha(palette.border, 0.80f);
+  colors[ImGuiCol_ScrollbarGrabHovered] = palette.accent;
+  colors[ImGuiCol_ScrollbarGrabActive] = palette.accentStrong;
+  colors[ImGuiCol_CheckMark] = palette.accentStrong;
+  colors[ImGuiCol_SliderGrab] = palette.accent;
+  colors[ImGuiCol_SliderGrabActive] = palette.accentStrong;
+  colors[ImGuiCol_Button] = palette.control;
+  colors[ImGuiCol_ButtonHovered] = withAlpha(palette.accent, 0.55f);
+  colors[ImGuiCol_ButtonActive] = withAlpha(palette.accentStrong, 0.78f);
+  colors[ImGuiCol_Header] = withAlpha(palette.control, 0.92f);
+  colors[ImGuiCol_HeaderHovered] = withAlpha(palette.accent, 0.48f);
+  colors[ImGuiCol_HeaderActive] = withAlpha(palette.accent, 0.68f);
+  colors[ImGuiCol_Separator] = palette.border;
+  colors[ImGuiCol_SeparatorHovered] = palette.accent;
+  colors[ImGuiCol_SeparatorActive] = palette.accentStrong;
+  colors[ImGuiCol_ResizeGrip] = withAlpha(palette.border, 0.65f);
+  colors[ImGuiCol_ResizeGripHovered] = palette.accent;
+  colors[ImGuiCol_ResizeGripActive] = palette.accentStrong;
+  colors[ImGuiCol_InputTextCursor] = palette.accentStrong;
+  colors[ImGuiCol_Tab] = palette.control;
+  colors[ImGuiCol_TabHovered] = withAlpha(palette.accent, 0.62f);
+  colors[ImGuiCol_TabActive] = withAlpha(palette.accent, 0.42f);
+  colors[ImGuiCol_TabUnfocused] = palette.window;
+  colors[ImGuiCol_TabUnfocusedActive] = palette.surface;
+  colors[ImGuiCol_DockingPreview] = withAlpha(palette.accent, 0.70f);
+  colors[ImGuiCol_DockingEmptyBg] = palette.canvas;
+  colors[ImGuiCol_PlotLines] = palette.accent;
+  colors[ImGuiCol_PlotLinesHovered] = palette.accentStrong;
+  colors[ImGuiCol_PlotHistogram] = palette.accent;
+  colors[ImGuiCol_PlotHistogramHovered] = palette.accentStrong;
+  colors[ImGuiCol_TableHeaderBg] = palette.control;
+  colors[ImGuiCol_TableBorderStrong] = palette.border;
+  colors[ImGuiCol_TableBorderLight] = withAlpha(palette.border, 0.45f);
+  colors[ImGuiCol_TextLink] = palette.accentStrong;
+  colors[ImGuiCol_TextSelectedBg] = withAlpha(palette.accent, 0.42f);
+  colors[ImGuiCol_DragDropTarget] = palette.accentStrong;
+  colors[ImGuiCol_NavHighlight] = palette.accentStrong;
+  colors[ImGuiCol_NavWindowingHighlight] = palette.accentStrong;
+  colors[ImGuiCol_NavWindowingDimBg] = withAlpha(palette.canvas, 0.55f);
+  colors[ImGuiCol_ModalWindowDimBg] = withAlpha(palette.canvas, 0.55f);
+  style.WindowPadding = ImVec2(8.0f, 7.0f);
+  style.FramePadding = ImVec2(6.0f, 4.0f);
+  style.CellPadding = ImVec2(6.0f, 4.0f);
+  style.ItemSpacing = ImVec2(6.0f, 5.0f);
+  style.ItemInnerSpacing = ImVec2(5.0f, 4.0f);
+  style.TouchExtraPadding = ImVec2(1.0f, 1.0f);
+  style.IndentSpacing = 16.0f;
+  style.ScrollbarSize = 14.0f;
+  style.GrabMinSize = 13.0f;
+  style.WindowBorderSize = 1.0f;
+  style.ChildBorderSize = 1.0f;
+  style.PopupBorderSize = 1.0f;
+  style.FrameBorderSize = 1.0f;
+  style.TabBorderSize = 0.0f;
+  style.WindowRounding = 4.0f;
+  style.ChildRounding = 3.0f;
+  style.FrameRounding = 2.0f;
+  style.PopupRounding = 4.0f;
+  style.ScrollbarRounding = 5.0f;
+  style.GrabRounding = 2.0f;
+  style.TabRounding = 3.0f;
+  style.LogSliderDeadzone = 4.0f;
+  style.WindowBorderHoverPadding = 4.0f;
+  style.ScrollbarPadding = 2.0f;
+  style.ImageRounding = 4.0f;
+  style.ImageBorderSize = 0.0f;
+  style.TabMinWidthBase = 64.0f;
+  style.TabMinWidthShrink = 48.0f;
+  style.TabBarBorderSize = 1.0f;
+  style.TabBarOverlineSize = 0.0f;
+  style.TreeLinesFlags = ImGuiTreeNodeFlags_DrawLinesNone;
+  style.DragDropTargetRounding = 4.0f;
+  style.DragDropTargetBorderSize = 2.0f;
+  style.DragDropTargetPadding = 2.0f;
+  style.SeparatorSize = 1.0f;
+  style.SeparatorTextBorderSize = 0.0f;
+  style.SeparatorTextAlign = ImVec2(0.0f, 0.5f);
+  style.SeparatorTextPadding = ImVec2(0.0f, 8.0f);
+  style.DockingSeparatorSize = 4.0f;
+  style.HoverStationaryDelay = 0.15f;
+  style.HoverDelayShort = 0.35f;
+  style.HoverDelayNormal = 0.60f;
+  style.HoverFlagsForTooltipMouse = ImGuiHoveredFlags_Stationary |
+                                    ImGuiHoveredFlags_DelayShort |
+                                    ImGuiHoveredFlags_AllowWhenDisabled;
+  style.HoverFlagsForTooltipNav = ImGuiHoveredFlags_NoSharedDelay |
+                                  ImGuiHoveredFlags_DelayNormal |
+                                  ImGuiHoveredFlags_AllowWhenDisabled;
+
+  ImPlotStyle& plotStyle = ImPlot::GetStyle();
+  plotStyle.Colors[ImPlotCol_FrameBg] = palette.control;
+  plotStyle.Colors[ImPlotCol_PlotBg] = palette.window;
+  plotStyle.Colors[ImPlotCol_PlotBorder] = palette.border;
+  plotStyle.Colors[ImPlotCol_LegendBg] = palette.surface;
+  plotStyle.Colors[ImPlotCol_LegendBorder] = palette.border;
+  plotStyle.Colors[ImPlotCol_LegendText] = palette.text;
+  plotStyle.Colors[ImPlotCol_TitleText] = palette.text;
+  plotStyle.Colors[ImPlotCol_InlayText] = palette.text;
+  plotStyle.Colors[ImPlotCol_AxisText] = palette.textDisabled;
+  plotStyle.Colors[ImPlotCol_AxisGrid] = withAlpha(palette.border, 0.60f);
+  plotStyle.Colors[ImPlotCol_AxisTick] = palette.border;
+  plotStyle.Colors[ImPlotCol_AxisBgHovered] = withAlpha(palette.accent, 0.35f);
+  plotStyle.Colors[ImPlotCol_AxisBgActive] = withAlpha(palette.accent, 0.55f);
+  plotStyle.Colors[ImPlotCol_Selection] = withAlpha(palette.accent, 0.45f);
+  plotStyle.Colors[ImPlotCol_Crosshairs] = palette.accentStrong;
+  plotStyle.PlotDefaultSize = ImVec2(400.0f, 300.0f);
+  plotStyle.PlotMinSize = ImVec2(200.0f, 150.0f);
+  plotStyle.PlotBorderSize = 1.0f;
+  plotStyle.MinorAlpha = 0.18f;
+  plotStyle.MajorTickLen = ImVec2(6.0f, 6.0f);
+  plotStyle.MinorTickLen = ImVec2(3.0f, 3.0f);
+  plotStyle.MajorTickSize = ImVec2(1.0f, 1.0f);
+  plotStyle.MinorTickSize = ImVec2(1.0f, 1.0f);
+  plotStyle.MajorGridSize = ImVec2(1.0f, 1.0f);
+  plotStyle.MinorGridSize = ImVec2(1.0f, 1.0f);
+  plotStyle.DigitalPadding = 20.0f;
+  plotStyle.DigitalSpacing = 4.0f;
+  plotStyle.PlotPadding = ImVec2(12.0f, 12.0f);
+  plotStyle.LabelPadding = ImVec2(8.0f, 6.0f);
+  plotStyle.LegendPadding = ImVec2(10.0f, 10.0f);
+  plotStyle.LegendInnerPadding = ImVec2(8.0f, 6.0f);
+  plotStyle.LegendSpacing = ImVec2(8.0f, 4.0f);
+  plotStyle.MousePosPadding = ImVec2(10.0f, 8.0f);
+  plotStyle.AnnotationPadding = ImVec2(6.0f, 4.0f);
+  plotStyle.Colormap = ImPlotColormap_Paired;
+
+  gContext->clearColor = palette.canvas;
+}
+
+static void ScaleStyle(float scale) {
+  ImGuiStyle& style = ImGui::GetStyle();
+  const ImGuiStyle& unscaled = *gContext->unscaledStyle;
+  style.ScaleAllSizes(scale);
+
+  // ScaleAllSizes truncates, so a metric of 1 rounds away to nothing below
+  // 100%. Keep the ones that were non-zero non-zero.
+  auto keepHairline = [](float scaled, float base) {
+    return (base > 0.0f && scaled < 1.0f) ? 1.0f : scaled;
+  };
+  style.WindowBorderSize =
+      keepHairline(style.WindowBorderSize, unscaled.WindowBorderSize);
+  style.ChildBorderSize =
+      keepHairline(style.ChildBorderSize, unscaled.ChildBorderSize);
+  style.PopupBorderSize =
+      keepHairline(style.PopupBorderSize, unscaled.PopupBorderSize);
+  style.FrameBorderSize =
+      keepHairline(style.FrameBorderSize, unscaled.FrameBorderSize);
+  style.TabBorderSize =
+      keepHairline(style.TabBorderSize, unscaled.TabBorderSize);
+  style.TabBarBorderSize =
+      keepHairline(style.TabBarBorderSize, unscaled.TabBarBorderSize);
+  style.SeparatorSize =
+      keepHairline(style.SeparatorSize, unscaled.SeparatorSize);
+  style.TreeLinesSize =
+      keepHairline(style.TreeLinesSize, unscaled.TreeLinesSize);
+  // Zero would draw no software cursor, and ImGui also multiplies the
+  // tooltip offset by it.
+  style.MouseCursorScale =
+      keepHairline(style.MouseCursorScale, unscaled.MouseCursorScale);
+
+  // ImPlot has no ScaleAllSizes of its own, and ApplyCommonStyle rewrites
+  // every one of these from constants on the call above, so the values read
+  // here are unscaled and scaling them cannot compound.
+  ImPlotStyle& plotStyle = ImPlot::GetStyle();
+  const ImPlotStyle plotBase = plotStyle;
+  auto keepHairlineVec = [&keepHairline](ImVec2 scaled, ImVec2 base) {
+    return ImVec2{keepHairline(scaled.x, base.x),
+                  keepHairline(scaled.y, base.y)};
+  };
+  plotStyle.PlotBorderSize = keepHairline(
+      ImTrunc(plotStyle.PlotBorderSize * scale), plotBase.PlotBorderSize);
+  plotStyle.MajorTickSize = keepHairlineVec(
+      ImTrunc(plotStyle.MajorTickSize * scale), plotBase.MajorTickSize);
+  plotStyle.MinorTickSize = keepHairlineVec(
+      ImTrunc(plotStyle.MinorTickSize * scale), plotBase.MinorTickSize);
+  plotStyle.MajorGridSize = keepHairlineVec(
+      ImTrunc(plotStyle.MajorGridSize * scale), plotBase.MajorGridSize);
+  plotStyle.MinorGridSize = keepHairlineVec(
+      ImTrunc(plotStyle.MinorGridSize * scale), plotBase.MinorGridSize);
+  plotStyle.PlotDefaultSize = ImTrunc(plotStyle.PlotDefaultSize * scale);
+  plotStyle.PlotMinSize = ImTrunc(plotStyle.PlotMinSize * scale);
+  plotStyle.DigitalPadding = ImTrunc(plotStyle.DigitalPadding * scale);
+  plotStyle.DigitalSpacing = ImTrunc(plotStyle.DigitalSpacing * scale);
+  plotStyle.MajorTickLen = ImTrunc(plotStyle.MajorTickLen * scale);
+  plotStyle.MinorTickLen = ImTrunc(plotStyle.MinorTickLen * scale);
+  plotStyle.PlotPadding = ImTrunc(plotStyle.PlotPadding * scale);
+  plotStyle.LabelPadding = ImTrunc(plotStyle.LabelPadding * scale);
+  plotStyle.LegendPadding = ImTrunc(plotStyle.LegendPadding * scale);
+  plotStyle.LegendInnerPadding = ImTrunc(plotStyle.LegendInnerPadding * scale);
+  plotStyle.LegendSpacing = ImTrunc(plotStyle.LegendSpacing * scale);
+  plotStyle.MousePosPadding = ImTrunc(plotStyle.MousePosPadding * scale);
+  plotStyle.AnnotationPadding = ImTrunc(plotStyle.AnnotationPadding * scale);
+}
+
 void gui::SetStyle(Style style) {
   gContext->style = static_cast<int>(style);
+  if (!ImGui::GetCurrentContext()) {
+    return;
+  }
+  // From the unscaled baseline each time: ScaleAllSizes multiplies in place,
+  // and ApplyCommonStyle rewrites only some of what it scales, so the rest
+  // would compound across zoom changes. The font fields belong to
+  // UpdateFontScale, which runs before this.
+  ImGuiStyle& current = ImGui::GetStyle();
+  const float fontSizeBase = current.FontSizeBase;
+  const float fontScaleMain = current.FontScaleMain;
+  const float fontScaleDpi = current.FontScaleDpi;
+  if (gContext->unscaledStyle) {
+    current = *gContext->unscaledStyle;
+  }
+  current.FontSizeBase = fontSizeBase;
+  current.FontScaleMain = fontScaleMain;
+  current.FontScaleDpi = fontScaleDpi;
+
   switch (style) {
     case Style::CLASSIC:
       ImGui::StyleColorsClassic();
@@ -1629,15 +1992,21 @@ void gui::SetStyle(Style style) {
     case Style::DEEP_DARK:
       StyleColorsDeepDark();
       break;
+    default:
+      style = Style::CLASSIC;
+      ImGui::StyleColorsClassic();
+      break;
   }
+  ApplyCommonStyle(style);
+
+  // Captured before scaling, so the next call rebuilds from it. Anything the
+  // application set on the style rides along rather than being reset.
+  gContext->unscaledStyle = current;
+  ScaleStyle(gContext->styleScale);
 }
 
 void gui::SetFPS(int fps) {
   SetFPSInternal(fps);
-}
-
-void gui::SetClearColor(ImVec4 color) {
-  gContext->clearColor = color;
 }
 
 std::string gui::GetPlatformSaveFileDir() {
@@ -1716,8 +2085,7 @@ void gui::EmitViewMenu() {
         auto& name = makeFont.GetName();
         bool selected = gContext->defaultFontName == name;
         if (ImGui::MenuItem(name.c_str(), nullptr, &selected)) {
-          ImGui::GetIO().FontDefault = makeFont.GetFont();
-          gContext->defaultFontName = name;
+          SetDefaultFontByName(name);
         }
       }
       ImGui::EndMenu();

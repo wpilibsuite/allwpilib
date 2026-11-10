@@ -39,6 +39,8 @@ class DataLogTelemetryBackendTest {
     std::string type;
     std::string metadata;
     std::vector<std::vector<uint8_t>> records;
+    std::vector<int64_t> startTimestamps;
+    std::vector<int64_t> timestamps;
   };
 
   struct LogSnapshot {
@@ -75,6 +77,7 @@ class DataLogTelemetryBackendTest {
         auto& entry = snapshot.entries[std::string{start.name}];
         entry.type = start.type;
         entry.metadata = start.metadata;
+        entry.startTimestamps.emplace_back(record.GetTimestamp());
       } else if (record.IsSetMetadata()) {
         wpi::log::MetadataRecordData metadata;
         CHECK(record.GetSetMetadataData(&metadata));
@@ -88,6 +91,8 @@ class DataLogTelemetryBackendTest {
           auto raw = record.GetRaw();
           snapshot.entries[it->second].records.emplace_back(raw.begin(),
                                                             raw.end());
+          snapshot.entries[it->second].timestamps.emplace_back(
+              record.GetTimestamp());
         }
       }
     }
@@ -102,6 +107,13 @@ class DataLogTelemetryBackendTest {
   static const std::vector<uint8_t>& Last(const EntryData& entry) {
     REQUIRE_FALSE(entry.records.empty());
     return entry.records.back();
+  }
+
+  static void CheckStartAndLastTimestamp(const EntryData& entry,
+                                         int64_t timestamp) {
+    CHECK((std::vector<int64_t>{timestamp}) == entry.startTimestamps);
+    REQUIRE_FALSE(entry.timestamps.empty());
+    CHECK(timestamp == entry.timestamps.back());
   }
 
   static bool HasEntryWithType(const LogSnapshot& snapshot,
@@ -263,6 +275,26 @@ TEST_CASE_METHOD(DataLogTelemetryBackendTest,
 }
 
 TEST_CASE_METHOD(DataLogTelemetryBackendTest,
+                 "DataLogTelemetryBackendTest LogsExplicitTimestamp",
+                 "[wpilibc][telemetry]") {
+  constexpr int64_t timestamp = 123456000;
+  const uint8_t rawValue[] = {1, 2, 3};
+
+  backend->GetEntry("/timestamped")->LogDouble(2.5, timestamp);
+  backend->GetEntry("/timestampedRaw")
+      ->LogRaw(std::span<const uint8_t>{rawValue}, "custom", timestamp);
+
+  auto snapshot = ReadSnapshot();
+  const auto& timestamped = Entry(snapshot, "timestamped");
+  CheckStartAndLastTimestamp(timestamped, timestamp);
+  CHECK(2.5 == DecodeDouble(Last(timestamped)));
+
+  const auto& timestampedRaw = Entry(snapshot, "timestampedRaw");
+  CheckStartAndLastTimestamp(timestampedRaw, timestamp);
+  CHECK((std::vector<uint8_t>{1, 2, 3}) == Last(timestampedRaw));
+}
+
+TEST_CASE_METHOD(DataLogTelemetryBackendTest,
                  "DataLogTelemetryBackendTest LogsArrayAndRawDataTypes",
                  "[wpilibc][telemetry]") {
   const bool boolValues[] = {true, false};
@@ -400,8 +432,8 @@ TEST_CASE_METHOD(DataLogTelemetryBackendTest,
   auto staleEntry = backend->GetEntry("/stale");
   backend->RemoveEntry("/stale");
 
-  staleEntry->LogDouble(1.25);
-  backend->GetEntry("/stale")->LogDouble(2.5);
+  staleEntry->LogDouble(1.25, 0);
+  backend->GetEntry("/stale")->LogDouble(2.5, 0);
 
   auto snapshot = ReadSnapshot();
   const auto& stale = Entry(snapshot, "stale");

@@ -168,9 +168,10 @@ class NetworkOutgoingQueue {
             // double-check handle, and only replace if timestamp newer
             if (elem.id == id) {
               if (m->value.time() == 0 || value.time() >= m->value.time()) {
+                size_t oldSize = m->value.size();
+                size_t newSize = value.size();
                 m->value = value;
-                m_totalSize += static_cast<int64_t>(value.size()) -
-                               static_cast<int64_t>(m->value.size());
+                AdjustValueSize(oldSize, newSize);
               }
               return;
             }
@@ -258,9 +259,9 @@ class NetworkOutgoingQueue {
       int delta = it - msgs.begin() - unsent;
       for (auto&& msg : std::span{msgs}.subspan(0, delta)) {
         if (auto m = std::get_if<ValueMsg>(&msg.msg.contents)) {
-          m_totalSize -= sizeof(Message) + m->value.size();
+          DecreaseTotalSize(sizeof(Message) + m->value.size());
         } else {
-          m_totalSize -= sizeof(Message);
+          DecreaseTotalSize(sizeof(Message));
         }
       }
       msgs.erase(msgs.begin(), it - unsent);
@@ -287,8 +288,8 @@ class NetworkOutgoingQueue {
     m_lastSendMs = curTimeMs;
   }
 
-  void SetTimeOffset(int64_t offsetUs) { m_timeOffsetUs = offsetUs; }
-  int64_t GetTimeOffset() const { return m_timeOffsetUs; }
+  void SetTimeOffset(int64_t offsetNs) { m_timeOffsetNs = offsetNs; }
+  int64_t GetTimeOffset() const { return m_timeOffsetNs; }
 
  public:
   WireConnection& m_wire;
@@ -296,11 +297,27 @@ class NetworkOutgoingQueue {
  private:
   using ValueMsg = typename MessageType::ValueMsg;
 
+  void DecreaseTotalSize(size_t size) {
+    if (size >= m_totalSize) {
+      m_totalSize = 0;
+    } else {
+      m_totalSize -= size;
+    }
+  }
+
+  void AdjustValueSize(size_t oldSize, size_t newSize) {
+    if (newSize >= oldSize) {
+      m_totalSize += newSize - oldSize;
+    } else {
+      DecreaseTotalSize(oldSize - newSize);
+    }
+  }
+
   void EncodeValue(wpi::util::raw_ostream& os, int id, const Value& value) {
     int64_t time = value.time();
     if constexpr (std::same_as<ValueMsg, ClientValueMsg>) {
       if (time != 0) {
-        time += m_timeOffsetUs;
+        time += m_timeOffsetNs;
         // make sure resultant time isn't exactly 0
         if (time == 0) {
           time = 1;
@@ -339,7 +356,7 @@ class NetworkOutgoingQueue {
   wpi::util::DenseMap<int, HandleInfo> m_idMap;
   size_t m_totalSize{0};
   uint64_t m_lastSendMs{0};
-  int64_t m_timeOffsetUs{0};
+  int64_t m_timeOffsetNs{0};
   unsigned int m_lastSetPeriodQueueIndex = 0;
   unsigned int m_lastSetPeriod = 100;
   bool m_local;

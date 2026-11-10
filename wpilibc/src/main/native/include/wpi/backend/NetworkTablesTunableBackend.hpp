@@ -84,6 +84,7 @@ class NetworkTablesTunableBackend : public wpi::tunables::TunableBackend {
   wpi::nt::NetworkTableInstance m_inst;
   std::string m_prefix;
   wpi::nt::NetworkTableListenerPoller m_poller;
+  std::vector<wpi::nt::Event> m_pendingTuneEvents;
   wpi::util::mutex m_mutex;
   wpi::util::StringMap<std::shared_ptr<Entry>> m_entries;
   wpi::util::DenseMap<uint32_t, std::vector<std::string>> m_uids;

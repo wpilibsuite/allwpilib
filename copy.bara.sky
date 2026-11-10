@@ -220,14 +220,13 @@ def define_mostrobotpy_to_allwpilib():
     # Examples aren't as complicated
     origin_files += glob([
         "examples/robot/**",
-    ], exclude = EXCLUDES)
-    destination_files += glob(["robotpyExamples/**"], exclude = ["robotpyExamples/define_examples.bzl", "robotpyExamples/example_projects.bzl", "robotpyExamples/generate_bazel_files.py", "robotpyExamples/BUILD.bazel"])
-    transformations.append(core.move("examples/robot/", "robotpyExamples/examples"))
-
-    origin_files += glob([
         "snippets/robot/**",
     ], exclude = EXCLUDES)
-    destination_files += glob(["robotpyExamples/**"], exclude = ["robotpyExamples/define_examples.bzl", "robotpyExamples/example_projects.bzl", "robotpyExamples/generate_bazel_files.py", "robotpyExamples/BUILD.bazel"])
+    destination_files += glob([
+        "robotpyExamples/examples/**",
+        "robotpyExamples/snippets/**",
+    ], exclude = ["robotpyExamples/**/BUILD.bazel"])
+    transformations.append(core.move("examples/robot/", "robotpyExamples/examples"))
     transformations.append(core.move("snippets/robot/", "robotpyExamples/snippets"))
 
     # Some tests seem to fail in mostrobotpy, but don't in allwpilib
@@ -285,10 +284,13 @@ def define_allwpilib_to_mostrobotpy():
         transformations.append(core.move(allwpilib_path, mostrobotpy_path))
 
     origin_files += glob([
-        "robotpyExamples/**",
-    ], exclude = ["robotpyExamples/BUILD.bazel", "robotpyExamples/define_examples.bzl", "robotpyExamples/example_projects.bzl", "robotpyExamples/generate_bazel_files.py"])
-    destination_files += glob(["examples/robot/**"], exclude = ["examples/robot/.gitignore"])
-    destination_files += glob(["examples/snippets/**"], exclude = ["examples/snippets/.gitignore"])
+        "robotpyExamples/examples/**",
+        "robotpyExamples/snippets/**",
+    ], exclude = ["robotpyExamples/**/BUILD.bazel"])
+    destination_files += glob([
+        "examples/robot/**",
+        "examples/snippets/**",
+    ], exclude = ["examples/*/.gitignore"])
     transformations.append(core.move("robotpyExamples/examples", "examples/robot/"))
     transformations.append(core.move("robotpyExamples/snippets", "snippets/robot/"))
 

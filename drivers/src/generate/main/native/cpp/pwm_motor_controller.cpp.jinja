@@ -6,7 +6,7 @@
 
 #include "wpi/drivers/motor/{{ name }}.hpp"
 
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -15,5 +15,5 @@ using namespace wpi;
   m_pwm.SetOutputPeriod({{ OutputPeriod | default("5", true)}}_ms);
   SetThrottle(0.0);
 
-  HAL_ReportUsage("IO", GetChannel(), "{{ ResourceName }}");
+  wpi::util::ReportUsage("IO", GetChannel(), "{{ ResourceName }}");
 }

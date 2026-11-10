@@ -12,10 +12,10 @@ import org.wpilib.driverstation.GenericHID.SupportedOutput;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from Gamepad controllers connected to the Driver Station.
@@ -185,7 +185,7 @@ public class Gamepad implements HIDDevice, TelemetryLoggable {
    */
   public Gamepad(final GenericHID hid) {
     m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
-    HAL.reportUsage("HID", hid.getPort(), "Gamepad");
+    UsageReporting.reportUsage("HID", hid.getPort(), "Gamepad");
   }
 
   /**
@@ -1556,12 +1556,12 @@ public class Gamepad implements HIDDevice, TelemetryLoggable {
 
   @Override
   public void logTo(TelemetryTable table) {
-    table.log("LeftTriggerAxis", getAxisForTelemetry(Axis.LEFT_TRIGGER));
-    table.log("RightTriggerAxis", getAxisForTelemetry(Axis.RIGHT_TRIGGER));
-    table.log("LeftXAxis", getAxisForTelemetry(Axis.LEFT_X));
-    table.log("LeftYAxis", getAxisForTelemetry(Axis.LEFT_Y));
-    table.log("RightXAxis", getAxisForTelemetry(Axis.RIGHT_X));
-    table.log("RightYAxis", getAxisForTelemetry(Axis.RIGHT_Y));
+    table.log("LeftTrigger", getAxisForTelemetry(Axis.LEFT_TRIGGER));
+    table.log("RightTrigger", getAxisForTelemetry(Axis.RIGHT_TRIGGER));
+    table.log("LeftX", getAxisForTelemetry(Axis.LEFT_X));
+    table.log("LeftY", getAxisForTelemetry(Axis.LEFT_Y));
+    table.log("RightX", getAxisForTelemetry(Axis.RIGHT_X));
+    table.log("RightY", getAxisForTelemetry(Axis.RIGHT_Y));
 
     long buttons = DriverStationBackend.getStickButtons(m_hid.getPort());
     table.log("FaceDown", (buttons & (1L << Button.FACE_DOWN.value)) != 0);

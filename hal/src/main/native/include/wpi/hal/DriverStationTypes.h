@@ -23,6 +23,10 @@
 #define HAL_CONTROLWORD_FMS_ATTACHED_MASK 0x1000000000000000LL
 #define HAL_CONTROLWORD_DS_ATTACHED_MASK 0x2000000000000000LL
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct HAL_ControlWord {
   int64_t value;
 };
@@ -97,26 +101,25 @@ struct HAL_JoystickAxes {
 };
 typedef struct HAL_JoystickAxes HAL_JoystickAxes;
 
-HAL_ENUM_WITH_UNDERLYING_TYPE(HAL_JoystickPOV, uint8_t){
-    /** Centered */
-    HAL_JOYSTICK_POV_CENTERED = 0x00u,
-    /** Up */
-    HAL_JOYSTICK_POV_UP = 0x01u,
-    /** Right */
-    HAL_JOYSTICK_POV_RIGHT = 0x02u,
-    /** Down */
-    HAL_JOYSTICK_POV_DOWN = 0x04u,
-    /** Left */
-    HAL_JOYSTICK_POV_LEFT = 0x08u,
-    /** Right-Up */
-    HAL_JOYSTICK_POV_RIGHT_UP = HAL_JOYSTICK_POV_RIGHT | HAL_JOYSTICK_POV_UP,
-    /** Right-Down */
-    HAL_JOYSTICK_POV_RIGHT_DOWN = HAL_JOYSTICK_POV_RIGHT |
-                                  HAL_JOYSTICK_POV_DOWN,
-    /** Left-Up */
-    HAL_JOYSTICK_POV_LEFT_UP = HAL_JOYSTICK_POV_LEFT | HAL_JOYSTICK_POV_UP,
-    /** Left-Down */
-    HAL_JOYSTICK_POV_LEFT_DOWN = HAL_JOYSTICK_POV_LEFT | HAL_JOYSTICK_POV_DOWN,
+HAL_ENUM_WITH_UNDERLYING_TYPE(HAL_JoystickPOV, uint8_t) {
+  /** Centered */
+  HAL_JOYSTICK_POV_CENTERED = 0x00u,
+  /** Up */
+  HAL_JOYSTICK_POV_UP = 0x01u,
+  /** Right */
+  HAL_JOYSTICK_POV_RIGHT = 0x02u,
+  /** Down */
+  HAL_JOYSTICK_POV_DOWN = 0x04u,
+  /** Left */
+  HAL_JOYSTICK_POV_LEFT = 0x08u,
+  /** Right-Up */
+  HAL_JOYSTICK_POV_RIGHT_UP = HAL_JOYSTICK_POV_RIGHT | HAL_JOYSTICK_POV_UP,
+  /** Right-Down */
+  HAL_JOYSTICK_POV_RIGHT_DOWN = HAL_JOYSTICK_POV_RIGHT | HAL_JOYSTICK_POV_DOWN,
+  /** Left-Up */
+  HAL_JOYSTICK_POV_LEFT_UP = HAL_JOYSTICK_POV_LEFT | HAL_JOYSTICK_POV_UP,
+  /** Left-Down */
+  HAL_JOYSTICK_POV_LEFT_DOWN = HAL_JOYSTICK_POV_LEFT | HAL_JOYSTICK_POV_DOWN,
 };
 
 struct HAL_JoystickPOVs {
@@ -151,7 +154,7 @@ struct HAL_JoystickTouchpads {
 typedef struct HAL_JoystickTouchpads HAL_JoystickTouchpads;
 
 struct HAL_GameData {
-  char gameData[9];
+  char gameData[65];
 };
 typedef struct HAL_GameData HAL_GameData;
 
@@ -184,10 +187,6 @@ struct HAL_OpModeOption {
   int32_t backgroundColor;  // 0x00RRGGBB or -1 for default
 };
 typedef struct HAL_OpModeOption HAL_OpModeOption;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 inline HAL_ControlWord HAL_MakeControlWord(int64_t opModeHash,
                                            HAL_RobotMode robotMode,

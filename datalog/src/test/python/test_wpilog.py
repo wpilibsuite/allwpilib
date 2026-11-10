@@ -2,6 +2,7 @@ import dataclasses
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
+from time import monotonic, sleep
 
 import pytest
 import wpilog
@@ -40,6 +41,92 @@ def test_datalog_writer_context_manager_stops_writer(tmp_path: Path):
         assert path.stat().st_size == 0
 
     assert path.stat().st_size == 54
+
+
+def test_background_overflow_reported_once_until_drain(tmp_path: Path, capfd):
+    path = tmp_path / "overflow.wpilog"
+    payload = b"\x5a" * (2 * 1024 * 1024 - 1) + b"\xa5"
+    log = wpilog.DataLogBackgroundWriter(str(tmp_path), path.name, 30.0)
+    try:
+        entry = log.start("raw", "raw", "", 1000)
+        for i in range(1, 3):
+            log.append_raw(entry, payload, i * 1000)
+            assert (
+                capfd.readouterr().err.count("outgoing buffers exceeded threshold") == 1
+            )
+            log.flush()
+
+            # Wait for output so the next append starts a new overflow episode.
+            deadline = monotonic() + 2.0
+            while not path.exists() or path.stat().st_size < i * len(payload):
+                assert monotonic() < deadline, "background writer did not drain"
+                sleep(0.01)
+    finally:
+        del log
+
+    reader = wpilog.DataLogReader(str(path))
+    assert reader.is_valid()
+    records = [
+        (record.get_timestamp(), record.get_raw())
+        for record in reader
+        if record.get_entry() == entry
+    ]
+    assert records == [(1000, payload), (2000, payload)]
+
+
+def test_background_transfer_preserves_records(tmp_path: Path):
+    source = tmp_path / "source"
+    dest = tmp_path / "dest"
+    source.mkdir()
+    dest.mkdir()
+    log = wpilog.DataLogBackgroundWriter(str(source), "test.wpilog", 30.0, "extra")
+    try:
+        entry = log.start("integer", "int64", "metadata", 1)
+        log.append_integer(entry, 42, 2000)
+        log.set_dir(str(dest), 100000)
+        deadline = monotonic() + 2
+        while log.get_dir() != str(dest):
+            assert monotonic() < deadline, "background transfer did not complete"
+            sleep(0.01)
+        assert not (source / "test.wpilog").exists()
+        log.append_integer(entry, 43, 3000)
+        log.set_filename("renamed.wpilog")
+    finally:
+        del log
+    reader = wpilog.DataLogReader(str(dest / "renamed.wpilog"))
+    assert reader.is_valid()
+    assert reader.get_extra_header() == "extra"
+    assert [
+        (record.get_timestamp(), record.get_integer())
+        for record in reader
+        if record.get_entry() == entry
+    ] == [(2000, 42), (3000, 43)]
+
+
+@pytest.mark.parametrize("failure", ["size", "missing", "collision"])
+def test_background_transfer_failure(tmp_path: Path, failure: str):
+    dest = tmp_path / "dest"
+    if failure != "missing":
+        dest.mkdir()
+    if failure == "collision":
+        (dest / "test.wpilog").write_bytes(b"preserve me")
+    log = wpilog.DataLogBackgroundWriter(str(tmp_path), "test.wpilog", 30.0)
+    try:
+        entry = log.start("integer", "int64", "", 1)
+        log.append_integer(entry, 42, 2)
+        log.set_dir(str(dest), 12 if failure == "size" else 100000)
+        log.append_integer(entry, 43, 3)
+    finally:
+        del log
+    reader = wpilog.DataLogReader(str(tmp_path / "test.wpilog"))
+    assert reader.is_valid()
+    assert [
+        record.get_integer() for record in reader if record.get_entry() == entry
+    ] == [42, 43]
+    if failure == "collision":
+        assert (dest / "test.wpilog").read_bytes() == b"preserve me"
+    else:
+        assert not (dest / "test.wpilog").exists()
 
 
 def test_simple_int(tmp_path: Path):

@@ -1,5 +1,4 @@
 import pytest
-import math
 
 from wpimath import Pose2d, Translation2d, Ellipse2d, Rotation2d
 

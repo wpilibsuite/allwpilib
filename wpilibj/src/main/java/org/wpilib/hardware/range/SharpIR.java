@@ -5,7 +5,6 @@
 package org.wpilib.hardware.range;
 
 import org.wpilib.hardware.discrete.AnalogInput;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
@@ -13,6 +12,7 @@ import org.wpilib.internal.UnitTelemetry;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.units.Units;
+import org.wpilib.util.UsageReporting;
 
 /**
  * SharpIR analog distance sensor class. These distance measuring sensors output an analog voltage
@@ -91,7 +91,7 @@ public class SharpIR implements TelemetryLoggable, AutoCloseable {
     m_min = min;
     m_max = max;
 
-    HAL.reportUsage("IO", channel, "SharpIR");
+    UsageReporting.reportUsage("IO", channel, "SharpIR");
 
     m_simDevice = SimDevice.create("SharpIR", m_sensor.getChannel());
     if (m_simDevice != null) {

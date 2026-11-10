@@ -18,8 +18,8 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -27,9 +27,8 @@ GoBildaPinpoint::GoBildaPinpoint(I2C::Port port, int deviceAddress)
     : m_i2c{port, ValidateAddress(deviceAddress)},
       m_bulkReadScope{DEFAULT_BULK_READ_SCOPE.begin(),
                       DEFAULT_BULK_READ_SCOPE.end()} {
-  HAL_ReportUsage(
-      std::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress),
-      "GoBildaPinpoint");
+  wpi::util::ReportUsage(std::format("I2C[{}]", static_cast<int>(port)),
+                         deviceAddress, "GoBildaPinpoint");
 }
 
 I2C::Port GoBildaPinpoint::GetPort() const {

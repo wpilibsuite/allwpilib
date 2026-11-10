@@ -12,6 +12,7 @@ import org.wpilib.tunable.ComplexTunable;
 import org.wpilib.tunable.TunableConfig;
 import org.wpilib.tunable.TunableOption;
 import org.wpilib.tunable.TunableTable;
+import org.wpilib.util.UsageReporting;
 
 /** Implements a PID control loop. */
 public class PIDController implements TelemetryLoggable, ComplexTunable {
@@ -111,7 +112,7 @@ public class PIDController implements TelemetryLoggable, ComplexTunable {
     m_period = period;
 
     instances++;
-    MathSharedStore.reportUsage("PIDController", String.valueOf(instances));
+    UsageReporting.reportUsage("PIDController", String.valueOf(instances));
   }
 
   /**

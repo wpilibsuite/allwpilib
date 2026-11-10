@@ -15,14 +15,6 @@ public interface MathShared {
   void reportError(String error, StackTraceElement[] stackTrace);
 
   /**
-   * Report usage.
-   *
-   * @param resource the resource name
-   * @param data arbitrary string data
-   */
-  void reportUsage(String resource, String data);
-
-  /**
    * Get the current time.
    *
    * @return Time in seconds

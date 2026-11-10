@@ -5,7 +5,6 @@
 package org.wpilib.math.controller;
 
 import org.wpilib.math.trajectory.TrapezoidProfile;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
@@ -13,6 +12,7 @@ import org.wpilib.tunable.ComplexTunable;
 import org.wpilib.tunable.TunableConfig;
 import org.wpilib.tunable.TunableOption;
 import org.wpilib.tunable.TunableTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Implements a PID control loop whose setpoint is constrained by a trapezoid profile. Users should
@@ -67,7 +67,7 @@ public class ProfiledPIDController implements TelemetryLoggable, ComplexTunable 
     m_profile = new TrapezoidProfile(m_constraints);
     instances++;
 
-    MathSharedStore.reportUsage("ProfiledPIDController", String.valueOf(instances));
+    UsageReporting.reportUsage("ProfiledPIDController", String.valueOf(instances));
   }
 
   /**

@@ -7,9 +7,9 @@
 #include <format>
 
 #include "wpi/hal/Encoder.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -133,19 +133,18 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
   m_type = encodingType;
   WPILIB_CheckErrorStatus(status, "InitEncoder");
 
-  const char* type = "Encoder";
-  switch (encodingType) {
-    case EncodingType::X1:
-      type = "Encoder:1x";
-      break;
-    case EncodingType::X2:
-      type = "Encoder:2x";
-      break;
-    case EncodingType::X4:
-      type = "Encoder:4x";
-      break;
-  }
-  HAL_ReportUsage(std::format("IO[{},{}]", aChannel, bChannel), type);
+  const char* type = [&] {
+    switch (encodingType) {
+      case EncodingType::X1:
+        return "Encoder:1x";
+      case EncodingType::X2:
+        return "Encoder:2x";
+      case EncodingType::X4:
+        return "Encoder:4x";
+    }
+    return "Encoder";
+  }();
+  wpi::util::ReportUsage(std::format("IO[{},{}]", aChannel, bChannel), type);
 }
 
 double Encoder::DecodingScaleFactor() const {

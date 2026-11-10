@@ -10,9 +10,9 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -26,7 +26,7 @@ static double ClampDeadband(double deadband) {
 Gamepad::Gamepad(int port) : Gamepad{DriverStation::GetGenericHID(port)} {}
 
 Gamepad::Gamepad(GenericHID& hid) : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "Gamepad");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "Gamepad");
 }
 
 GenericHID& Gamepad::GetHID() {
@@ -604,12 +604,12 @@ double Gamepad::GetAxisForTelemetry(Axis axis) const {
 }
 
 void Gamepad::LogTo(wpi::telemetry::TelemetryTable& table) const {
-  table.Log("LeftTriggerAxis", GetAxisForTelemetry(Axis::LEFT_TRIGGER));
-  table.Log("RightTriggerAxis", GetAxisForTelemetry(Axis::RIGHT_TRIGGER));
-  table.Log("LeftXAxis", GetAxisForTelemetry(Axis::LEFT_X));
-  table.Log("LeftYAxis", GetAxisForTelemetry(Axis::LEFT_Y));
-  table.Log("RightXAxis", GetAxisForTelemetry(Axis::RIGHT_X));
-  table.Log("RightYAxis", GetAxisForTelemetry(Axis::RIGHT_Y));
+  table.Log("LeftTrigger", GetAxisForTelemetry(Axis::LEFT_TRIGGER));
+  table.Log("RightTrigger", GetAxisForTelemetry(Axis::RIGHT_TRIGGER));
+  table.Log("LeftX", GetAxisForTelemetry(Axis::LEFT_X));
+  table.Log("LeftY", GetAxisForTelemetry(Axis::LEFT_Y));
+  table.Log("RightX", GetAxisForTelemetry(Axis::RIGHT_X));
+  table.Log("RightY", GetAxisForTelemetry(Axis::RIGHT_Y));
 
   uint64_t buttons =
       wpi::internal::DriverStationBackend::GetStickButtons(m_hid->GetPort());

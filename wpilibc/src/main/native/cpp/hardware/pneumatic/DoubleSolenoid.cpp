@@ -15,7 +15,7 @@
 
 using namespace wpi;
 
-DoubleSolenoid::DoubleSolenoid(CANBus busId, int module,
+DoubleSolenoid::DoubleSolenoid(CANPort busId, int module,
                                PneumaticsModuleType moduleType,
                                int forwardChannel, int reverseChannel)
     : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
@@ -54,7 +54,7 @@ DoubleSolenoid::DoubleSolenoid(CANBus busId, int module,
       "DoubleSolenoid");
 }
 
-DoubleSolenoid::DoubleSolenoid(CANBus busId, PneumaticsModuleType moduleType,
+DoubleSolenoid::DoubleSolenoid(CANPort busId, PneumaticsModuleType moduleType,
                                int forwardChannel, int reverseChannel)
     : DoubleSolenoid{busId, PneumaticsBase::GetDefaultForType(moduleType),
                      moduleType, forwardChannel, reverseChannel} {}

@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.framework.RobotBase;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.BooleanEntry;
 import org.wpilib.networktables.BooleanPublisher;
 import org.wpilib.networktables.IntegerEntry;
@@ -25,6 +24,7 @@ import org.wpilib.networktables.StringArrayTopic;
 import org.wpilib.networktables.StringEntry;
 import org.wpilib.networktables.StringPublisher;
 import org.wpilib.util.PixelFormat;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.vision.camera.CameraServerJNI;
 import org.wpilib.vision.camera.CvSink;
 import org.wpilib.vision.camera.CvSource;
@@ -541,11 +541,6 @@ public final class CameraServer {
     CameraServerShared shared =
         new CameraServerShared() {
           @Override
-          public void reportUsage(String resource, String data) {
-            HAL.reportUsage(resource, data);
-          }
-
-          @Override
           public void reportDriverStationError(String error) {
             DriverStationErrors.reportError(error, true);
           }
@@ -592,7 +587,7 @@ public final class CameraServer {
   public static UsbCamera startAutomaticCapture(int dev) {
     UsbCamera camera = new UsbCamera("USB Camera " + dev, dev);
     startAutomaticCapture(camera);
-    CameraServerSharedStore.reportUsage("UsbCamera[" + dev + "]", "auto");
+    UsageReporting.reportUsage("UsbCamera", dev, "auto");
     return camera;
   }
 
@@ -606,7 +601,7 @@ public final class CameraServer {
   public static UsbCamera startAutomaticCapture(String name, int dev) {
     UsbCamera camera = new UsbCamera(name, dev);
     startAutomaticCapture(camera);
-    CameraServerSharedStore.reportUsage("UsbCamera[" + dev + "]", "name");
+    UsageReporting.reportUsage("UsbCamera", dev, "name");
     return camera;
   }
 
@@ -620,7 +615,7 @@ public final class CameraServer {
   public static UsbCamera startAutomaticCapture(String name, String path) {
     UsbCamera camera = new UsbCamera(name, path);
     startAutomaticCapture(camera);
-    CameraServerSharedStore.reportUsage("UsbCamera[" + path + "]", "path");
+    UsageReporting.reportUsage("UsbCamera[" + path + "]", "path");
     return camera;
   }
 

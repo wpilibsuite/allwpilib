@@ -3,12 +3,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Optional
-from typing_extensions import Self
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
     from .command import Command
-    from .commandscheduler import CommandScheduler
 
 from telemetry import TelemetryLoggable, TelemetryTable
 
@@ -79,7 +78,7 @@ class Subsystem(TelemetryLoggable):
 
         CommandScheduler.get_instance().remove_default_command(self)
 
-    def get_default_command(self) -> Optional[Command]:
+    def get_default_command(self) -> Command | None:
         """
         Gets the default command for this subsystem. Returns None if no default command is currently
         associated with the subsystem.
@@ -90,7 +89,7 @@ class Subsystem(TelemetryLoggable):
 
         return CommandScheduler.get_instance().get_default_command(self)
 
-    def get_current_command(self) -> Optional[Command]:
+    def get_current_command(self) -> Command | None:
         """
         Returns the command currently running on this subsystem. Returns None if no command is
         currently scheduled that requires this subsystem.
@@ -197,34 +196,6 @@ class Subsystem(TelemetryLoggable):
         Set the name of this Subsystem.
         """
         self._name = name
-
-    def get_subsystem(self) -> str:
-        """
-        Gets the subsystem name of this Subsystem.
-
-        :returns: Subsystem name
-        """
-        return self._subsystem
-
-    def set_subsystem(self, subsystem: str):
-        """
-        Sets the subsystem name of this Subsystem.
-
-        :param subsystem: subsystem name
-        """
-        self._subsystem = subsystem
-
-    def add_child(self, name: str, child: Any) -> None:
-        """
-        Associates a named child with this Subsystem when the child exposes naming methods.
-
-        :param name:  name to give child
-        :param child: sendable
-        """
-        if hasattr(child, "set_name"):
-            child.set_name(name)
-        if hasattr(child, "set_subsystem"):
-            child.set_subsystem(self.get_subsystem())
 
     def log_to(self, table: TelemetryTable) -> None:
         default = self.get_default_command()

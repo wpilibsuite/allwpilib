@@ -12,6 +12,7 @@
 #include "wpi/units/base.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 namespace wpi::math {
 
@@ -47,7 +48,7 @@ class TrapezoidProfileConstraints {
                                         Acceleration_t maxAcceleration)
       : maxVelocity{maxVelocity}, maxAcceleration{maxAcceleration} {
     if !consteval {
-      wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
+      wpi::util::ReportUsage("TrapezoidProfile", "");
     }
 
     if (maxVelocity <= Velocity_t{0} || maxAcceleration <= Acceleration_t{0}) {

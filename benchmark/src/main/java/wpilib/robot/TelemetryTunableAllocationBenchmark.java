@@ -431,93 +431,93 @@ public class TelemetryTunableAllocationBenchmark {
     }
 
     @Override
-    public <T> void logStruct(T value, Struct<? super T> struct) {
+    public <T> void logStruct(T value, Struct<? super T> struct, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += struct.getSize();
     }
 
     @Override
-    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto) {
+    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += proto.getTypeString().length();
     }
 
     @Override
-    public <T> void logStructArray(T[] value, Struct<? super T> struct) {
+    public <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += value.length + struct.getSize();
     }
 
     @Override
-    public void logBoolean(boolean value) {
+    public void logBoolean(boolean value, long timestamp) {
       m_backend.m_sink += value ? 1 : 0;
     }
 
     @Override
-    public void logLong(long value) {
+    public void logLong(long value, long timestamp) {
       m_backend.m_sink += value;
     }
 
     @Override
-    public void logFloat(float value) {
+    public void logFloat(float value, long timestamp) {
       m_backend.m_sink += Float.floatToRawIntBits(value);
     }
 
     @Override
-    public void logDouble(double value) {
+    public void logDouble(double value, long timestamp) {
       m_backend.m_sink += Double.doubleToRawLongBits(value);
     }
 
     @Override
-    public void logString(String value, String typeString) {
+    public void logString(String value, String typeString, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += value.length() + typeString.length();
     }
 
     @Override
-    public void logBooleanArray(boolean[] value) {
+    public void logBooleanArray(boolean[] value, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += value.length;
     }
 
     @Override
-    public void logShortArray(short[] value) {
+    public void logShortArray(short[] value, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += value.length;
     }
 
     @Override
-    public void logIntArray(int[] value) {
+    public void logIntArray(int[] value, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += value.length;
     }
 
     @Override
-    public void logLongArray(long[] value) {
+    public void logLongArray(long[] value, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += value.length;
     }
 
     @Override
-    public void logFloatArray(float[] value) {
+    public void logFloatArray(float[] value, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += value.length;
     }
 
     @Override
-    public void logDoubleArray(double[] value) {
+    public void logDoubleArray(double[] value, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += value.length;
     }
 
     @Override
-    public void logStringArray(String[] value) {
+    public void logStringArray(String[] value, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += value.length;
     }
 
     @Override
-    public void logRaw(byte[] value, String typeString) {
+    public void logRaw(byte[] value, String typeString, long timestamp) {
       m_backend.m_objectSink = value;
       m_backend.m_sink += value.length + typeString.length();
     }

@@ -5,9 +5,9 @@
 package org.wpilib.hardware.counter;
 
 import org.wpilib.hardware.hal.CounterJNI;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /** Counts rising or falling edges on a single digital input. */
 public class EdgeCounter implements TelemetryLoggable, AutoCloseable {
@@ -24,7 +24,7 @@ public class EdgeCounter implements TelemetryLoggable, AutoCloseable {
 
     reset();
 
-    HAL.reportUsage("IO", channel, "EdgeCounter");
+    UsageReporting.reportUsage("IO", channel, "EdgeCounter");
   }
 
   @Override

@@ -6,12 +6,12 @@
 
 #include <utility>
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/NullDeleter.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -69,7 +69,7 @@ void AnalogEncoder::Init(double fullRange, double expectedZero) {
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
 
-  HAL_ReportUsage("IO", m_analogInput->GetChannel(), "AnalogEncoder");
+  wpi::util::ReportUsage("IO", m_analogInput->GetChannel(), "AnalogEncoder");
 }
 
 double AnalogEncoder::Get() const {

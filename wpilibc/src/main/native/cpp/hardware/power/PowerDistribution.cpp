@@ -7,11 +7,11 @@
 #include <vector>
 
 #include "wpi/hal/PowerDistribution.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StackTrace.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
                   wpi::PowerDistribution::ModuleType::CTRE) ==
@@ -24,7 +24,7 @@ static_assert(wpi::PowerDistribution::DEFAULT_MODULE ==
 
 using namespace wpi;
 
-PowerDistribution::PowerDistribution(CANBus busId) {
+PowerDistribution::PowerDistribution(CANPort busId) {
   auto stack = wpi::util::GetStackTrace(1);
 
   int32_t status = 0;
@@ -38,13 +38,13 @@ PowerDistribution::PowerDistribution(CANBus busId) {
 
   if (HAL_GetPowerDistributionType(m_handle, &status) ==
       HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
-    HAL_ReportUsage("PDP", m_module, "");
+    wpi::util::ReportUsage("PDP", m_module, "");
   } else {
-    HAL_ReportUsage("PDH", m_module, "");
+    wpi::util::ReportUsage("PDH", m_module, "");
   }
 }
 
-PowerDistribution::PowerDistribution(CANBus busId, int module,
+PowerDistribution::PowerDistribution(CANPort busId, int module,
                                      ModuleType moduleType) {
   auto stack = wpi::util::GetStackTrace(1);
 
@@ -58,9 +58,9 @@ PowerDistribution::PowerDistribution(CANBus busId, int module,
   WPILIB_ReportError(status, "Module {}", module);
 
   if (moduleType == ModuleType::CTRE) {
-    HAL_ReportUsage("PDP_CTRE", m_module, "");
+    wpi::util::ReportUsage("PDP_CTRE", m_module, "");
   } else {
-    HAL_ReportUsage("PDH_REV", m_module, "");
+    wpi::util::ReportUsage("PDH_REV", m_module, "");
   }
 }
 

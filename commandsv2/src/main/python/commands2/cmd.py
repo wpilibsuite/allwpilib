@@ -1,5 +1,6 @@
 # validated: 2024-01-20 DS 8aeee0362672 Commands.java
-from typing import Any, Callable, Dict, Hashable
+from collections.abc import Callable, Hashable
+from typing import Any
 
 from wpimath import units
 
@@ -156,7 +157,7 @@ def either(
 
 
 def select(
-    commands: Dict[Hashable, Command], selector: Callable[[], Hashable]
+    commands: dict[Hashable, Command], selector: Callable[[], Hashable]
 ) -> Command:
     """
     Runs one of several commands, based on the selector function.

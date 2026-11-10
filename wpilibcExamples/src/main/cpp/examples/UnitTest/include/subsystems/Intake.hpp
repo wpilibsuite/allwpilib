@@ -18,6 +18,6 @@ class Intake {
  private:
   wpi::PWMSparkMax motor{IntakeConstants::MOTOR_PORT};
   wpi::DoubleSolenoid piston{
-      wpi::CANBus::CAN_S0, wpi::PneumaticsModuleType::CTRE_PCM,
+      wpi::CANPort::CAN_S0, wpi::PneumaticsModuleType::CTRE_PCM,
       IntakeConstants::PISTON_FWD_CHANNEL, IntakeConstants::PISTON_REV_CHANNEL};
 };

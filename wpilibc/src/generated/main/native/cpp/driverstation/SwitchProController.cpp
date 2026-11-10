@@ -10,7 +10,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 
@@ -28,7 +28,7 @@ SwitchProController::SwitchProController(int port)
 
 SwitchProController::SwitchProController(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "SwitchProController");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "SwitchProController");
 }
 
 GenericHID& SwitchProController::GetHID() {
@@ -410,20 +410,20 @@ void SwitchProController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("RightY", GetRightY());
   table.Log("ZL", GetZL());
   table.Log("ZR", GetZR());
-  table.Log("BButton", GetBButton());
-  table.Log("AButton", GetAButton());
-  table.Log("YButton", GetYButton());
-  table.Log("XButton", GetXButton());
-  table.Log("MinusButton", GetMinusButton());
-  table.Log("HomeButton", GetHomeButton());
-  table.Log("PlusButton", GetPlusButton());
-  table.Log("LeftStickButton", GetLeftStickButton());
-  table.Log("RightStickButton", GetRightStickButton());
-  table.Log("LButton", GetLButton());
-  table.Log("RButton", GetRButton());
-  table.Log("DpadUpButton", GetDpadUpButton());
-  table.Log("DpadDownButton", GetDpadDownButton());
-  table.Log("DpadLeftButton", GetDpadLeftButton());
-  table.Log("DpadRightButton", GetDpadRightButton());
-  table.Log("CaptureButton", GetCaptureButton());
+  table.Log("B", GetBButton());
+  table.Log("A", GetAButton());
+  table.Log("Y", GetYButton());
+  table.Log("X", GetXButton());
+  table.Log("Minus", GetMinusButton());
+  table.Log("Home", GetHomeButton());
+  table.Log("Plus", GetPlusButton());
+  table.Log("LeftStick", GetLeftStickButton());
+  table.Log("RightStick", GetRightStickButton());
+  table.Log("L", GetLButton());
+  table.Log("R", GetRButton());
+  table.Log("DpadUp", GetDpadUpButton());
+  table.Log("DpadDown", GetDpadDownButton());
+  table.Log("DpadLeft", GetDpadLeftButton());
+  table.Log("DpadRight", GetDpadRightButton());
+  table.Log("Capture", GetCaptureButton());
 }

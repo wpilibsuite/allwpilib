@@ -13,6 +13,7 @@ base = [
   "ElevatorSimulation",
   "ElevatorTrapezoidProfile",
   "Encoder",
+  "ExpansionHubSample",
   "GettingStarted",
   "Gyro",
   "DSGamepadChooser",

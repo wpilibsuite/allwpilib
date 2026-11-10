@@ -8,8 +8,8 @@ classes:
     methods:
       PneumaticsControlModule:
         overloads:
-          CANBus:
-          CANBus, int:
+          CANPort:
+          CANPort, int:
       GetCompressor:
       DisableCompressor:
       EnableCompressorDigital:
@@ -44,3 +44,6 @@ classes:
       MakeDoubleSolenoid:
       MakeCompressor:
       ReportUsage:
+        overloads:
+          std::string_view, std::string_view:
+          std::string_view, int, std::string_view:

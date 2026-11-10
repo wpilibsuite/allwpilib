@@ -9,7 +9,7 @@
 
 using namespace wpi;
 
-Compressor::Compressor(CANBus busId, int module,
+Compressor::Compressor(CANPort busId, int module,
                        PneumaticsModuleType moduleType)
     : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
       m_moduleType{moduleType} {
@@ -22,7 +22,7 @@ Compressor::Compressor(CANBus busId, int module,
   m_module->ReportUsage("Compressor", "");
 }
 
-Compressor::Compressor(CANBus busId, PneumaticsModuleType moduleType)
+Compressor::Compressor(CANPort busId, PneumaticsModuleType moduleType)
     : Compressor{busId, PneumaticsBase::GetDefaultForType(moduleType),
                  moduleType} {}
 

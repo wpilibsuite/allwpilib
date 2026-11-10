@@ -229,13 +229,15 @@ class BlockingTelemetryBackend : public wpi::telemetry::TelemetryBackend {
       (void)value;
     }
 
-    void LogBoolean(bool value) override { (void)value; }
+    void LogBoolean(bool value, int64_t) override { (void)value; }
 
-    void LogInt64(int64_t value) override { (void)value; }
+    void LogInt64(int64_t value, int64_t) override { (void)value; }
 
-    void LogFloat(float value) override { LogDouble(value); }
+    void LogFloat(float value, int64_t timestamp) override {
+      LogDouble(value, timestamp);
+    }
 
-    void LogDouble(double value) override {
+    void LogDouble(double value, int64_t) override {
       (void)value;
       ++m_state.logs;
       if (!m_state.block.load()) {
@@ -247,36 +249,51 @@ class BlockingTelemetryBackend : public wpi::telemetry::TelemetryBackend {
       m_state.releaseFuture.wait();
     }
 
-    void LogString(std::string_view value,
-                   std::string_view typeString) override {
+    void LogString(std::string_view value, std::string_view typeString,
+                   int64_t) override {
       (void)value;
       (void)typeString;
     }
 
-    void LogBooleanArray(std::span<const bool> value) override { (void)value; }
-
-    void LogBooleanArray(std::span<const int> value) override { (void)value; }
-
-    void LogInt16Array(std::span<const int16_t> value) override { (void)value; }
-
-    void LogInt32Array(std::span<const int32_t> value) override { (void)value; }
-
-    void LogInt64Array(std::span<const int64_t> value) override { (void)value; }
-
-    void LogFloatArray(std::span<const float> value) override { (void)value; }
-
-    void LogDoubleArray(std::span<const double> value) override { (void)value; }
-
-    void LogStringArray(std::span<const std::string> value) override {
+    void LogBooleanArray(std::span<const bool> value, int64_t) override {
       (void)value;
     }
 
-    void LogStringArray(std::span<const std::string_view> value) override {
+    void LogBooleanArray(std::span<const int> value, int64_t) override {
       (void)value;
     }
 
-    void LogRaw(std::span<const uint8_t> value,
-                std::string_view typeString) override {
+    void LogInt16Array(std::span<const int16_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogInt32Array(std::span<const int32_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogInt64Array(std::span<const int64_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogFloatArray(std::span<const float> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogDoubleArray(std::span<const double> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogStringArray(std::span<const std::string> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogStringArray(std::span<const std::string_view> value,
+                        int64_t) override {
+      (void)value;
+    }
+
+    void LogRaw(std::span<const uint8_t> value, std::string_view typeString,
+                int64_t) override {
       (void)value;
       (void)typeString;
     }
@@ -345,44 +362,59 @@ class BlockingIsDiscardBackend : public wpi::telemetry::TelemetryBackend {
       (void)value;
     }
 
-    void LogBoolean(bool value) override { (void)value; }
+    void LogBoolean(bool value, int64_t) override { (void)value; }
 
-    void LogInt64(int64_t value) override { (void)value; }
+    void LogInt64(int64_t value, int64_t) override { (void)value; }
 
-    void LogFloat(float value) override { (void)value; }
+    void LogFloat(float value, int64_t) override { (void)value; }
 
-    void LogDouble(double value) override { (void)value; }
+    void LogDouble(double value, int64_t) override { (void)value; }
 
-    void LogString(std::string_view value,
-                   std::string_view typeString) override {
+    void LogString(std::string_view value, std::string_view typeString,
+                   int64_t) override {
       (void)value;
       (void)typeString;
     }
 
-    void LogBooleanArray(std::span<const bool> value) override { (void)value; }
-
-    void LogBooleanArray(std::span<const int> value) override { (void)value; }
-
-    void LogInt16Array(std::span<const int16_t> value) override { (void)value; }
-
-    void LogInt32Array(std::span<const int32_t> value) override { (void)value; }
-
-    void LogInt64Array(std::span<const int64_t> value) override { (void)value; }
-
-    void LogFloatArray(std::span<const float> value) override { (void)value; }
-
-    void LogDoubleArray(std::span<const double> value) override { (void)value; }
-
-    void LogStringArray(std::span<const std::string> value) override {
+    void LogBooleanArray(std::span<const bool> value, int64_t) override {
       (void)value;
     }
 
-    void LogStringArray(std::span<const std::string_view> value) override {
+    void LogBooleanArray(std::span<const int> value, int64_t) override {
       (void)value;
     }
 
-    void LogRaw(std::span<const uint8_t> value,
-                std::string_view typeString) override {
+    void LogInt16Array(std::span<const int16_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogInt32Array(std::span<const int32_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogInt64Array(std::span<const int64_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogFloatArray(std::span<const float> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogDoubleArray(std::span<const double> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogStringArray(std::span<const std::string> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogStringArray(std::span<const std::string_view> value,
+                        int64_t) override {
+      (void)value;
+    }
+
+    void LogRaw(std::span<const uint8_t> value, std::string_view typeString,
+                int64_t) override {
       (void)value;
       (void)typeString;
     }
@@ -452,47 +484,62 @@ class GenerationTelemetryBackend : public wpi::telemetry::TelemetryBackend {
       (void)value;
     }
 
-    void LogBoolean(bool value) override { (void)value; }
+    void LogBoolean(bool value, int64_t) override { (void)value; }
 
-    void LogInt64(int64_t value) override { (void)value; }
+    void LogInt64(int64_t value, int64_t) override { (void)value; }
 
-    void LogFloat(float value) override { (void)value; }
+    void LogFloat(float value, int64_t) override { (void)value; }
 
-    void LogDouble(double value) override {
+    void LogDouble(double value, int64_t) override {
       (void)value;
       m_backend.m_logGenerations.emplace_back(m_generation);
     }
 
-    void LogString(std::string_view value,
-                   std::string_view typeString) override {
+    void LogString(std::string_view value, std::string_view typeString,
+                   int64_t) override {
       (void)value;
       (void)typeString;
     }
 
-    void LogBooleanArray(std::span<const bool> value) override { (void)value; }
-
-    void LogBooleanArray(std::span<const int> value) override { (void)value; }
-
-    void LogInt16Array(std::span<const int16_t> value) override { (void)value; }
-
-    void LogInt32Array(std::span<const int32_t> value) override { (void)value; }
-
-    void LogInt64Array(std::span<const int64_t> value) override { (void)value; }
-
-    void LogFloatArray(std::span<const float> value) override { (void)value; }
-
-    void LogDoubleArray(std::span<const double> value) override { (void)value; }
-
-    void LogStringArray(std::span<const std::string> value) override {
+    void LogBooleanArray(std::span<const bool> value, int64_t) override {
       (void)value;
     }
 
-    void LogStringArray(std::span<const std::string_view> value) override {
+    void LogBooleanArray(std::span<const int> value, int64_t) override {
       (void)value;
     }
 
-    void LogRaw(std::span<const uint8_t> value,
-                std::string_view typeString) override {
+    void LogInt16Array(std::span<const int16_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogInt32Array(std::span<const int32_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogInt64Array(std::span<const int64_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogFloatArray(std::span<const float> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogDoubleArray(std::span<const double> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogStringArray(std::span<const std::string> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogStringArray(std::span<const std::string_view> value,
+                        int64_t) override {
+      (void)value;
+    }
+
+    void LogRaw(std::span<const uint8_t> value, std::string_view typeString,
+                int64_t) override {
       (void)value;
       (void)typeString;
     }
@@ -569,49 +616,66 @@ class ClosingTelemetryBackend : public wpi::telemetry::TelemetryBackend {
       (void)value;
     }
 
-    void LogBoolean(bool value) override { (void)value; }
+    void LogBoolean(bool value, int64_t) override { (void)value; }
 
-    void LogInt64(int64_t value) override { (void)value; }
+    void LogInt64(int64_t value, int64_t) override { (void)value; }
 
-    void LogFloat(float value) override { LogDouble(value); }
+    void LogFloat(float value, int64_t timestamp) override {
+      LogDouble(value, timestamp);
+    }
 
-    void LogDouble(double value) override {
+    void LogDouble(double value, int64_t) override {
       (void)value;
       if (!m_removed.load()) {
         ++m_backend.m_logs;
       }
     }
 
-    void LogString(std::string_view value,
-                   std::string_view typeString) override {
+    void LogString(std::string_view value, std::string_view typeString,
+                   int64_t) override {
       (void)value;
       (void)typeString;
     }
 
-    void LogBooleanArray(std::span<const bool> value) override { (void)value; }
-
-    void LogBooleanArray(std::span<const int> value) override { (void)value; }
-
-    void LogInt16Array(std::span<const int16_t> value) override { (void)value; }
-
-    void LogInt32Array(std::span<const int32_t> value) override { (void)value; }
-
-    void LogInt64Array(std::span<const int64_t> value) override { (void)value; }
-
-    void LogFloatArray(std::span<const float> value) override { (void)value; }
-
-    void LogDoubleArray(std::span<const double> value) override { (void)value; }
-
-    void LogStringArray(std::span<const std::string> value) override {
+    void LogBooleanArray(std::span<const bool> value, int64_t) override {
       (void)value;
     }
 
-    void LogStringArray(std::span<const std::string_view> value) override {
+    void LogBooleanArray(std::span<const int> value, int64_t) override {
       (void)value;
     }
 
-    void LogRaw(std::span<const uint8_t> value,
-                std::string_view typeString) override {
+    void LogInt16Array(std::span<const int16_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogInt32Array(std::span<const int32_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogInt64Array(std::span<const int64_t> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogFloatArray(std::span<const float> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogDoubleArray(std::span<const double> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogStringArray(std::span<const std::string> value, int64_t) override {
+      (void)value;
+    }
+
+    void LogStringArray(std::span<const std::string_view> value,
+                        int64_t) override {
+      (void)value;
+    }
+
+    void LogRaw(std::span<const uint8_t> value, std::string_view typeString,
+                int64_t) override {
       (void)value;
       (void)typeString;
     }
@@ -759,7 +823,7 @@ TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest MockBackendNormalizesPaths",
                  "[telemetry]") {
   auto entry = mock->GetEntry("drive//speed");
-  entry->LogDouble(1.0);
+  entry->LogDouble(1.0, 0);
 
   REQUIRE_FALSE(entry->IsDiscard());
   REQUIRE(mock->GetLastValue<double>("/drive/speed") == 1.0);
@@ -771,7 +835,7 @@ TEST_CASE_METHOD(TelemetryTableTest,
   REQUIRE(entry->IsDiscard());
   REQUIRE_FALSE(mock->GetLastAction("/drive/speed"));
 
-  entry->LogDouble(2.0);
+  entry->LogDouble(2.0, 0);
 
   REQUIRE_FALSE(mock->GetLastAction("/drive/speed"));
 
@@ -779,7 +843,7 @@ TEST_CASE_METHOD(TelemetryTableTest,
   REQUIRE(newEntry != entry);
   REQUIRE_FALSE(newEntry->IsDiscard());
 
-  newEntry->LogDouble(3.0);
+  newEntry->LogDouble(3.0, 0);
 
   REQUIRE(mock->GetLastValue<double>("/drive/speed") == 3.0);
 }
@@ -1470,8 +1534,8 @@ TEST_CASE_METHOD(
   auto staleEntry = multi->GetEntry("/stale");
 
   multi->RemoveEntry("/stale");
-  staleEntry->LogDouble(1.0);
-  multi->GetEntry("/stale")->LogDouble(2.0);
+  staleEntry->LogDouble(1.0, 0);
+  multi->GetEntry("/stale")->LogDouble(2.0, 0);
 
   std::vector<int> expected{2};
   REQUIRE(child->GetLogGenerations() == expected);
@@ -1580,7 +1644,7 @@ TEST_CASE_METHOD(
   wpi::telemetry::TelemetryRegistry::RegisterBackend("", oldBackend);
 
   auto entry = wpi::telemetry::TelemetryRegistry::GetEntry("direct");
-  entry->LogDouble(1.0);
+  entry->LogDouble(1.0, 0);
   REQUIRE(state->logs.load() == 1);
 
   oldBackend.reset();
@@ -1588,7 +1652,7 @@ TEST_CASE_METHOD(
       "", std::make_shared<wpi::telemetry::MockTelemetryBackend>());
 
   CHECK_FALSE(state->destroyed.load());
-  entry->LogDouble(2.0);
+  entry->LogDouble(2.0, 0);
   CHECK(state->logs.load() == 2);
 
   entry.reset();
@@ -1602,13 +1666,13 @@ TEST_CASE_METHOD(TelemetryTableTest,
   wpi::telemetry::TelemetryRegistry::RegisterBackend("", backend);
 
   auto entry = wpi::telemetry::TelemetryRegistry::GetEntry("direct");
-  entry->LogDouble(1.0);
+  entry->LogDouble(1.0, 0);
   REQUIRE(backend->GetLogs() == 1);
 
   wpi::telemetry::TelemetryRegistry::Reset();
 
   CHECK(backend->GetRemoves() == 1);
-  entry->LogDouble(2.0);
+  entry->LogDouble(2.0, 0);
   CHECK(backend->GetLogs() == 1);
 }
 

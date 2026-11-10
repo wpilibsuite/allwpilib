@@ -6,8 +6,8 @@
 
 package org.wpilib.drivers.motor;
 
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.PWMMotorController;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Cross the Road Electronics (CTRE) Talon SRX Motor Controller.
@@ -40,6 +40,6 @@ public class PWMTalonSRX extends PWMMotorController {
     m_pwm.setOutputPeriod(5);
     setThrottle(0.0);
 
-    HAL.reportUsage("IO", getChannel(), "PWMTalonSRX");
+    UsageReporting.reportUsage("IO", getChannel(), "PWMTalonSRX");
   }
 }

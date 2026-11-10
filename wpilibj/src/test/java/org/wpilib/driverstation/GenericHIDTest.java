@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.driverstation.GenericHID.RumbleType;
+import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.GenericHIDSim;
 
 class GenericHIDTest {
@@ -32,6 +33,29 @@ class GenericHIDTest {
       hid.setRumble(RumbleType.RIGHT_TRIGGER_RUMBLE, rumbleValue);
       assertEquals(rumbleValue, sim.getRumble(RumbleType.RIGHT_TRIGGER_RUMBLE), EPSILON);
     }
+  }
+
+  @Test
+  void testRawRumbleRange() {
+    GenericHID hid = new GenericHID(0);
+
+    hid.setRawRumble(RumbleType.LEFT_RUMBLE, 0x1234);
+    assertEquals(0x1234, DriverStationSim.getJoystickRumble(0, 0));
+
+    hid.setRawRumble(RumbleType.RIGHT_RUMBLE, 0x5678);
+    assertEquals(0x5678, DriverStationSim.getJoystickRumble(0, 1));
+
+    hid.setRawRumble(RumbleType.LEFT_TRIGGER_RUMBLE, 0x9ABC);
+    assertEquals(0x9ABC, DriverStationSim.getJoystickRumble(0, 2));
+
+    hid.setRawRumble(RumbleType.RIGHT_TRIGGER_RUMBLE, 0xDEF0);
+    assertEquals(0xDEF0, DriverStationSim.getJoystickRumble(0, 3));
+
+    hid.setRawRumble(RumbleType.LEFT_RUMBLE, -1);
+    assertEquals(0, DriverStationSim.getJoystickRumble(0, 0));
+
+    hid.setRawRumble(RumbleType.LEFT_RUMBLE, 65536);
+    assertEquals(65535, DriverStationSim.getJoystickRumble(0, 0));
   }
 
   @Test

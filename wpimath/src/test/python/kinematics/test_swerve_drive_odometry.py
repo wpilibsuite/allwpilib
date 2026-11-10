@@ -1,5 +1,4 @@
 import pytest
-import math
 import random
 
 from wpimath import (
@@ -9,7 +8,6 @@ from wpimath import (
     Rotation2d,
     SwerveDrive4Kinematics,
     SwerveDrive4Odometry,
-    SwerveModuleVelocity,
     SwerveModulePosition,
     TrajectoryConfig,
     Translation2d,

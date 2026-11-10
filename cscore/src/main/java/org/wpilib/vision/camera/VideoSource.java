@@ -170,7 +170,7 @@ public class VideoSource implements AutoCloseable {
   /**
    * Get the last time a frame was captured.
    *
-   * @return Time in 1 us increments.
+   * @return Time in 1 ns increments.
    */
   public long getLastFrameTime() {
     return CameraServerJNI.getSourceLastFrameTime(m_handle);

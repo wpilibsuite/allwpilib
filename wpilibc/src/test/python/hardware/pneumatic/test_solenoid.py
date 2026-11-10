@@ -1,8 +1,8 @@
 import pytest
 
-from wpilib import CANBus, DoubleSolenoid, PneumaticsModuleType, Solenoid
+from wpilib import CANPort, DoubleSolenoid, PneumaticsModuleType, Solenoid
 
-BUS = CANBus.CAN_S0
+BUS = CANPort.CAN_S0
 
 
 def test_valid_initialization_ctre(wpilib_state):

@@ -17,6 +17,7 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 
 /**
  * This class wraps {@link Odometry} to fuse latency-compensated vision measurements with encoder
@@ -76,7 +77,7 @@ public class PoseEstimator<T> {
       m_q[i] = stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0);
     }
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
-    MathSharedStore.getMathShared().reportUsage("PoseEstimator", "");
+    UsageReporting.reportUsage("PoseEstimator", "");
   }
 
   /**

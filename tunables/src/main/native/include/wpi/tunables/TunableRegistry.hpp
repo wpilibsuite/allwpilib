@@ -4,11 +4,13 @@
 
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
 #include <string_view>
 
+#include "wpi/tunables/CustomTunable.hpp"
 #include "wpi/tunables/detail/TunableTypeValue.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -16,6 +18,8 @@ namespace wpi::tunables {
 
 class ComplexTunable;
 class TunableBackend;
+template <typename T, typename... I>
+class Tunable;
 struct TunableConfig;
 
 namespace detail {
@@ -128,6 +132,72 @@ class TunableRegistry final {
   static void NotifyChanged(uint32_t uid);
 
   /**
+   * Records that a backend successfully applied one tuning input to a tunable.
+   *
+   * TunableBackend implementations should call this exactly once after each
+   * accepted remote tuning input has been applied to the tunable value, before
+   * scheduling any corresponding onTune callback. Rejected inputs and writes
+   * ignored due to immutability should not call this method.
+   *
+   * @param uid tunable uid
+   */
+  static void RecordTuneApplied(uint32_t uid);
+
+  /**
+   * Returns a tunable's current tuning revision token.
+   *
+   * The token starts at zero and changes once for each tuning input that a
+   * backend successfully applies to this tunable or one of its descendant
+   * tunables. Direct local Set() calls, assignment, in-place mutation, and
+   * getter refreshes do not change it. Reading the token does not consume or
+   * reset it, so independent observers can each store a previous token and
+   * compare it to the current value with !=.
+   *
+   * Treat this as a 64-bit equality token. Do not rely on ordering or sign.
+   * This getter follows the same threading model as the rest of the tunable API
+   * and does not make tunable access thread-safe.
+   *
+   * The revision is stored in the registry record for registered tunables. Unit
+   * tests that call TunableRegistry::Reset() while a tunable is still alive
+   * discard that record; such stale objects report zero until they are
+   * re-created or otherwise re-registered.
+   *
+   * @param tunable tunable
+   * @return current tuning revision token
+   */
+  static uint64_t GetTuneRevision(const detail::TunableBase& tunable);
+
+  /**
+   * Returns a complex tunable's current tuning revision token.
+   *
+   * This is the same token returned for the underlying registry record, and it
+   * also advances when a backend successfully applies tuning input to a
+   * descendant child tunable.
+   *
+   * @param tunable complex tunable
+   * @return current tuning revision token
+   */
+  static uint64_t GetTuneRevision(const ComplexTunable& tunable);
+
+  /**
+   * Returns a custom tunable adapter's current tuning revision token.
+   *
+   * This forwards through GetInnerTunable(), so custom and units-backed
+   * adapters share the same revision history as the native tunable they
+   * publish.
+   *
+   * @param tunable custom tunable adapter
+   * @return current tuning revision token
+   */
+  template <typename T>
+    requires requires(const T& tunable) {
+      { tunable.GetInnerTunable() } -> detail::IsTunableBaseReference;
+    }
+  static uint64_t GetTuneRevision(const T& tunable) {
+    return GetTuneRevision(tunable.GetInnerTunable());
+  }
+
+  /**
    * Resets a tunable's changed flag after the current update cycle finishes.
    *
    * Backends should call this after publishing a changed tunable so every alias
@@ -172,6 +242,10 @@ class TunableRegistry final {
   /**
    * Clear all registered backends. Should typically only be used by unit test
    * code.
+   *
+   * This also clears registry-stored tune revision records. Tunables that stay
+   * alive across Reset() have stale registration identities and report a zero
+   * revision until they are re-created or otherwise re-registered.
    */
   static void Reset();
 

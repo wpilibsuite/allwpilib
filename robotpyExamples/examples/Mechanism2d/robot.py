@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import telemetry
 import wpilib
 import wpilib_drivers
@@ -47,6 +49,7 @@ class MyRobot(wpilib.TimedRobot):
             "wrist", 0.5, 90, 6, wpiutil.Color8Bit(wpiutil.Color.PURPLE)
         )
 
+    @override
     def robot_periodic(self):
         # update the dashboard mechanism's state
         self.elevator.set_length(
@@ -57,6 +60,7 @@ class MyRobot(wpilib.TimedRobot):
         # post the mechanism to the dashboard
         telemetry.log("Mech2d", self.mech)
 
+    @override
     def teleop_periodic(self):
         self.elevator_motor.set_throttle(self.joystick.get_raw_axis(0))
         self.wrist_motor.set_throttle(self.joystick.get_raw_axis(1))

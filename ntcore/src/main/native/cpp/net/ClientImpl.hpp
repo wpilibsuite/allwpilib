@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <functional>
+#include <limits>
 #include <memory>
 #include <span>
 #include <string_view>
@@ -97,7 +98,7 @@ class ClientImpl final : private ServerMessageHandler {
   static constexpr uint32_t RTT_INTERVAL_MS = 3000;
   uint64_t m_nextPingTimeMs{0};
   uint64_t m_pongTimeMs{0};
-  uint32_t m_rtt2Us{UINT32_MAX};
+  int64_t m_rtt2Ns{(std::numeric_limits<int64_t>::max)()};
   bool m_haveTimeOffset{false};
 
   // periodic sweep handling

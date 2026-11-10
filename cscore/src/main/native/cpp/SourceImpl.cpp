@@ -66,7 +66,7 @@ void SourceImpl::SetConnected(bool connected) {
   }
 }
 
-uint64_t SourceImpl::GetCurFrameTime() {
+int64_t SourceImpl::GetCurFrameTime() {
   std::unique_lock lock{m_frameMutex};
   return m_frame.GetTime();
 }

@@ -7,12 +7,12 @@ package org.wpilib.hardware.accelerometer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import org.wpilib.hardware.bus.I2C;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDouble;
 import org.wpilib.hardware.hal.SimEnum;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.struct.Struct;
 import org.wpilib.util.struct.StructSerializable;
 
@@ -163,7 +163,7 @@ public class ADXL345_I2C implements TelemetryLoggable, AutoCloseable {
 
     setRange(range);
 
-    HAL.reportUsage("I2C[" + port.value + "][" + deviceAddress + "]", "ADXL345");
+    UsageReporting.reportUsage("I2C[" + port.value + "]", deviceAddress, "ADXL345");
   }
 
   /**

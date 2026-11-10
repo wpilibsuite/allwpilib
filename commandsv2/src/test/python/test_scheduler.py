@@ -6,10 +6,9 @@ from util import *  # type: ignore
 if TYPE_CHECKING:
     from .util import *
 
-import pytest
 import telemetry
+import telemetry.mock_backend as mock_backend
 import tunables
-import wpilib
 
 
 def test_scheduler_lambda_test_no_interrupt(scheduler: commands2.CommandScheduler):
@@ -147,9 +146,13 @@ def test_scheduler_logs_names_and_ids(scheduler: commands2.CommandScheduler):
         scheduler.schedule(command)
         scheduler.log_to(telemetry.get_table())
 
-        assert backend.get_last_action("/Names")["kind"] == "string[]"
+        assert backend.get_last_action("/Names") == mock_backend.Action(
+            "/Names", ["WaitForIt"]
+        )
         assert backend.get_last_value("/Names") == ["WaitForIt"]
-        assert backend.get_last_action("/Ids")["kind"] == "integer[]"
+        assert backend.get_last_action("/Ids") == mock_backend.Action(
+            "/Ids", [id(command)]
+        )
         assert backend.get_last_value("/Ids") == [id(command)]
     finally:
         telemetry.TelemetryRegistry.reset()

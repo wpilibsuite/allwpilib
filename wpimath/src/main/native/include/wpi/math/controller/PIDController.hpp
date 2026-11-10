@@ -18,6 +18,7 @@
 #include "wpi/tunables/Tunable.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 namespace wpi::math {
 
@@ -73,8 +74,7 @@ class WPILIB_DLLEXPORT PIDController : public wpi::telemetry::TelemetryLoggable,
     if !consteval {
       ++instances;
 
-      wpi::math::MathSharedStore::ReportUsage("PIDController",
-                                              std::to_string(instances));
+      wpi::util::ReportUsage("PIDController", std::to_string(instances));
     }
   }
 

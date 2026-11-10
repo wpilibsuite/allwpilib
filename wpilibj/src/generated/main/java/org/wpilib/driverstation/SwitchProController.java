@@ -10,10 +10,10 @@ import java.util.EnumSet;
 import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from SwitchPro controllers connected to the Driver Station.
@@ -153,7 +153,7 @@ public class SwitchProController implements HIDDevice, TelemetryLoggable {
    */
   public SwitchProController(final GenericHID hid) {
     m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
-    HAL.reportUsage("HID", hid.getPort(), "SwitchProController");
+    UsageReporting.reportUsage("HID", hid.getPort(), "SwitchProController");
   }
 
   /**
@@ -1050,21 +1050,21 @@ public class SwitchProController implements HIDDevice, TelemetryLoggable {
     table.log("RightY", getRightY());
     table.log("ZL", getZL());
     table.log("ZR", getZR());
-    table.log("BButton", getBButton());
-    table.log("AButton", getAButton());
-    table.log("YButton", getYButton());
-    table.log("XButton", getXButton());
-    table.log("MinusButton", getMinusButton());
-    table.log("HomeButton", getHomeButton());
-    table.log("PlusButton", getPlusButton());
-    table.log("LeftStickButton", getLeftStickButton());
-    table.log("RightStickButton", getRightStickButton());
-    table.log("LButton", getLButton());
-    table.log("RButton", getRButton());
-    table.log("DpadUpButton", getDpadUpButton());
-    table.log("DpadDownButton", getDpadDownButton());
-    table.log("DpadLeftButton", getDpadLeftButton());
-    table.log("DpadRightButton", getDpadRightButton());
-    table.log("CaptureButton", getCaptureButton());
+    table.log("B", getBButton());
+    table.log("A", getAButton());
+    table.log("Y", getYButton());
+    table.log("X", getXButton());
+    table.log("Minus", getMinusButton());
+    table.log("Home", getHomeButton());
+    table.log("Plus", getPlusButton());
+    table.log("LeftStick", getLeftStickButton());
+    table.log("RightStick", getRightStickButton());
+    table.log("L", getLButton());
+    table.log("R", getRButton());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
+    table.log("Capture", getCaptureButton());
   }
 }

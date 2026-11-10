@@ -1,0 +1,21 @@
+load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_library")
+
+wpilib_java_library(
+    name = "wpiunits-java",
+    srcs = ["//wpiunits:generated_java"] + glob(["**/*.java"]),
+    generated_java_srcs = ["//wpiunits:generated_java"],
+    javacopts = patch_module(
+        "wpilib.units",
+        ["wpiunits/src/generated/main/java"],
+    ),
+    maven_artifact_name = "wpiunits-java",
+    maven_group_id = "org.wpilib.wpiunits",
+    visibility = ["//visibility:public"],
+    deps = [],
+)
+
+alias(
+    name = "java",
+    actual = ":wpiunits-java",
+    visibility = ["//visibility:public"],
+)

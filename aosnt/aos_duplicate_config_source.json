@@ -1,0 +1,36 @@
+{
+  "channel_storage_duration": 10000000000,
+  "channels": [
+    {
+      "name": "/aos",
+      "type": "aos.timing.Report",
+      "frequency": 60,
+      "num_senders": 60,
+      "max_size": 42000
+    },
+    {
+      "name": "/aos",
+      "type": "aos.logging.LogMessageFbs",
+      "frequency": 200,
+      "num_senders": 70
+    },
+    {
+      "name": "/aos",
+      "type": "aos.logging.DynamicLogCommand",
+      "frequency": 10,
+      "num_senders": 40
+    },
+    {
+      "name": "/bridge",
+      "type": "aos.examples.Ping",
+      "frequency": 200,
+      "tags": ["nt:publish"]
+    },
+    {
+      "name": "/bridge",
+      "type": "aos.examples.Pong",
+      "frequency": 200,
+      "tags": ["nt:publish"]
+    }
+  ]
+}

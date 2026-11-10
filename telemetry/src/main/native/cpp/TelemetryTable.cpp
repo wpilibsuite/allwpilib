@@ -47,7 +47,7 @@ bool TelemetryTable::SetType(std::string_view typeString) {
       }
     }
     if (!entry->IsDiscard()) {
-      entry->LogString(typeString, "string");
+      entry->LogString(typeString, "string", 0);
     }
     return true;
   }
@@ -137,7 +137,7 @@ void TelemetryTable::Log(std::string_view name, bool value) {
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogBoolean(value);
+  entry->LogBoolean(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name, int8_t value) {
@@ -145,7 +145,7 @@ void TelemetryTable::Log(std::string_view name, int8_t value) {
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogInt8(value);
+  entry->LogInt8(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name, int16_t value) {
@@ -153,7 +153,7 @@ void TelemetryTable::Log(std::string_view name, int16_t value) {
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogInt16(value);
+  entry->LogInt16(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name, int32_t value) {
@@ -161,7 +161,7 @@ void TelemetryTable::Log(std::string_view name, int32_t value) {
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogInt32(value);
+  entry->LogInt32(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name, int64_t value) {
@@ -169,7 +169,7 @@ void TelemetryTable::Log(std::string_view name, int64_t value) {
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogInt64(value);
+  entry->LogInt64(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name, float value) {
@@ -177,7 +177,7 @@ void TelemetryTable::Log(std::string_view name, float value) {
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogFloat(value);
+  entry->LogFloat(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name, double value) {
@@ -185,7 +185,7 @@ void TelemetryTable::Log(std::string_view name, double value) {
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogDouble(value);
+  entry->LogDouble(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name, std::string_view value) {
@@ -193,7 +193,7 @@ void TelemetryTable::Log(std::string_view name, std::string_view value) {
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogString(value, "string");
+  entry->LogString(value, "string", 0);
 }
 
 void TelemetryTable::Log(std::string_view name, std::string_view value,
@@ -202,7 +202,7 @@ void TelemetryTable::Log(std::string_view name, std::string_view value,
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogString(value, typeString);
+  entry->LogString(value, typeString, 0);
 }
 
 void TelemetryTable::Log(std::string_view name, std::span<const bool> value) {
@@ -210,7 +210,7 @@ void TelemetryTable::Log(std::string_view name, std::span<const bool> value) {
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogBooleanArray(value);
+  entry->LogBooleanArray(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name,
@@ -219,7 +219,7 @@ void TelemetryTable::Log(std::string_view name,
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogInt16Array(value);
+  entry->LogInt16Array(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name,
@@ -228,7 +228,7 @@ void TelemetryTable::Log(std::string_view name,
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogInt32Array(value);
+  entry->LogInt32Array(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name,
@@ -237,7 +237,7 @@ void TelemetryTable::Log(std::string_view name,
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogInt64Array(value);
+  entry->LogInt64Array(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name, std::span<const float> value) {
@@ -245,7 +245,7 @@ void TelemetryTable::Log(std::string_view name, std::span<const float> value) {
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogFloatArray(value);
+  entry->LogFloatArray(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name, std::span<const double> value) {
@@ -253,7 +253,7 @@ void TelemetryTable::Log(std::string_view name, std::span<const double> value) {
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogDoubleArray(value);
+  entry->LogDoubleArray(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name,
@@ -262,7 +262,7 @@ void TelemetryTable::Log(std::string_view name,
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogStringArray(value);
+  entry->LogStringArray(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name,
@@ -271,7 +271,7 @@ void TelemetryTable::Log(std::string_view name,
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogStringArray(value);
+  entry->LogStringArray(value, 0);
 }
 
 void TelemetryTable::Log(std::string_view name,
@@ -280,7 +280,7 @@ void TelemetryTable::Log(std::string_view name,
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogRaw(value, "raw");
+  entry->LogRaw(value, "raw", 0);
 }
 
 void TelemetryTable::Log(std::string_view name, std::span<const uint8_t> value,
@@ -289,7 +289,7 @@ void TelemetryTable::Log(std::string_view name, std::span<const uint8_t> value,
   if (entry->IsDiscard()) {
     return;
   }
-  entry->LogRaw(value, typeString);
+  entry->LogRaw(value, typeString, 0);
 }
 
 TelemetryTable::EntryHandle TelemetryTable::GetEntry(std::string_view name) {

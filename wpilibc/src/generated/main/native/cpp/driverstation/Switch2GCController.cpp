@@ -10,7 +10,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 
@@ -28,7 +28,7 @@ Switch2GCController::Switch2GCController(int port)
 
 Switch2GCController::Switch2GCController(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "Switch2GCController");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "Switch2GCController");
 }
 
 GenericHID& Switch2GCController::GetHID() {
@@ -410,20 +410,20 @@ void Switch2GCController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("CStickY", GetCStickY());
   table.Log("LTrigger", GetLTrigger());
   table.Log("RTrigger", GetRTrigger());
-  table.Log("AButton", GetAButton());
-  table.Log("XButton", GetXButton());
-  table.Log("BButton", GetBButton());
-  table.Log("YButton", GetYButton());
-  table.Log("HomeButton", GetHomeButton());
-  table.Log("StartButton", GetStartButton());
-  table.Log("ZLButton", GetZLButton());
-  table.Log("ZButton", GetZButton());
-  table.Log("DpadUpButton", GetDpadUpButton());
-  table.Log("DpadDownButton", GetDpadDownButton());
-  table.Log("DpadLeftButton", GetDpadLeftButton());
-  table.Log("DpadRightButton", GetDpadRightButton());
-  table.Log("CaptureButton", GetCaptureButton());
-  table.Log("CButton", GetCButton());
-  table.Log("LButton", GetLButton());
-  table.Log("RButton", GetRButton());
+  table.Log("A", GetAButton());
+  table.Log("X", GetXButton());
+  table.Log("B", GetBButton());
+  table.Log("Y", GetYButton());
+  table.Log("Home", GetHomeButton());
+  table.Log("Start", GetStartButton());
+  table.Log("ZL", GetZLButton());
+  table.Log("Z", GetZButton());
+  table.Log("DpadUp", GetDpadUpButton());
+  table.Log("DpadDown", GetDpadDownButton());
+  table.Log("DpadLeft", GetDpadLeftButton());
+  table.Log("DpadRight", GetDpadRightButton());
+  table.Log("Capture", GetCaptureButton());
+  table.Log("C", GetCButton());
+  table.Log("L", GetLButton());
+  table.Log("R", GetRButton());
 }

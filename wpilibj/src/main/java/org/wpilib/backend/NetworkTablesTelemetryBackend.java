@@ -299,7 +299,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public <T> void logStruct(T value, Struct<? super T> struct) {
+    public <T> void logStruct(T value, Struct<? super T> struct, long timestamp) {
       boolean typeMismatch = false;
       try {
         synchronized (this) {
@@ -308,7 +308,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
             @SuppressWarnings("unchecked")
             StructBuffer<T> buffer = (StructBuffer<T>) m_structBuffer;
             var bb = buffer.write(value);
-            pub.set(bb, 0, bb.position());
+            pub.set(bb, 0, bb.position(), timestamp);
           } else if (!m_closed) {
             typeMismatch = true;
           }
@@ -348,7 +348,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto) {
+    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp) {
       boolean typeMismatch = false;
       try {
         synchronized (this) {
@@ -357,7 +357,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
             @SuppressWarnings("unchecked")
             ProtobufBuffer<T, ?> buffer = (ProtobufBuffer<T, ?>) m_protoBuffer;
             var bb = buffer.write(value);
-            pub.set(bb, 0, bb.position());
+            pub.set(bb, 0, bb.position(), timestamp);
           } else if (!m_closed) {
             typeMismatch = true;
           }
@@ -372,7 +372,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public <T> void logStructArray(T[] value, Struct<? super T> struct) {
+    public <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp) {
       boolean typeMismatch = false;
       try {
         synchronized (this) {
@@ -381,7 +381,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
             @SuppressWarnings("unchecked")
             StructBuffer<T> buffer = (StructBuffer<T>) m_structBuffer;
             var bb = buffer.writeArray(value);
-            pub.set(bb, 0, bb.position());
+            pub.set(bb, 0, bb.position(), timestamp);
           } else if (!m_closed) {
             typeMismatch = true;
           }
@@ -402,7 +402,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logBoolean(boolean value) {
+    public void logBoolean(boolean value, long timestamp) {
       Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
@@ -425,13 +425,13 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
 
       switch (pub) {
-        case BooleanPublisher e -> e.set(value);
+        case BooleanPublisher e -> e.set(value, timestamp);
         default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
     @Override
-    public void logLong(long value) {
+    public void logLong(long value, long timestamp) {
       Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
@@ -454,13 +454,13 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
 
       switch (pub) {
-        case IntegerPublisher e -> e.set(value);
+        case IntegerPublisher e -> e.set(value, timestamp);
         default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
     @Override
-    public void logFloat(float value) {
+    public void logFloat(float value, long timestamp) {
       Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
@@ -483,13 +483,13 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
 
       switch (pub) {
-        case FloatPublisher e -> e.set(value);
+        case FloatPublisher e -> e.set(value, timestamp);
         default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
     @Override
-    public void logDouble(double value) {
+    public void logDouble(double value, long timestamp) {
       Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
@@ -512,13 +512,13 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
 
       switch (pub) {
-        case DoublePublisher e -> e.set(value);
+        case DoublePublisher e -> e.set(value, timestamp);
         default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
     @Override
-    public void logString(String value, String typeString) {
+    public void logString(String value, String typeString, long timestamp) {
       Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
@@ -544,13 +544,13 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       String curTypeString = m_typeString;
 
       switch (pub) {
-        case StringPublisher e when curTypeString.equals(typeString) -> e.set(value);
+        case StringPublisher e when curTypeString.equals(typeString) -> e.set(value, timestamp);
         default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
     @Override
-    public void logBooleanArray(boolean[] value) {
+    public void logBooleanArray(boolean[] value, long timestamp) {
       Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
@@ -573,31 +573,31 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
 
       switch (pub) {
-        case BooleanArrayPublisher e -> e.set(value);
+        case BooleanArrayPublisher e -> e.set(value, timestamp);
         default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
     @Override
-    public void logShortArray(short[] value) {
+    public void logShortArray(short[] value, long timestamp) {
       long[] arr = new long[value.length];
       for (int i = 0; i < value.length; i++) {
         arr[i] = value[i];
       }
-      logLongArray(arr);
+      logLongArray(arr, timestamp);
     }
 
     @Override
-    public void logIntArray(int[] value) {
+    public void logIntArray(int[] value, long timestamp) {
       long[] arr = new long[value.length];
       for (int i = 0; i < value.length; i++) {
         arr[i] = value[i];
       }
-      logLongArray(arr);
+      logLongArray(arr, timestamp);
     }
 
     @Override
-    public void logLongArray(long[] value) {
+    public void logLongArray(long[] value, long timestamp) {
       Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
@@ -620,13 +620,13 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
 
       switch (pub) {
-        case IntegerArrayPublisher e -> e.set(value);
+        case IntegerArrayPublisher e -> e.set(value, timestamp);
         default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
     @Override
-    public void logFloatArray(float[] value) {
+    public void logFloatArray(float[] value, long timestamp) {
       Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
@@ -649,13 +649,13 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
 
       switch (pub) {
-        case FloatArrayPublisher e -> e.set(value);
+        case FloatArrayPublisher e -> e.set(value, timestamp);
         default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
     @Override
-    public void logDoubleArray(double[] value) {
+    public void logDoubleArray(double[] value, long timestamp) {
       Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
@@ -678,13 +678,13 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
 
       switch (pub) {
-        case DoubleArrayPublisher e -> e.set(value);
+        case DoubleArrayPublisher e -> e.set(value, timestamp);
         default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
     @Override
-    public void logStringArray(String[] value) {
+    public void logStringArray(String[] value, long timestamp) {
       Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
@@ -707,13 +707,13 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       }
 
       switch (pub) {
-        case StringArrayPublisher e -> e.set(value);
+        case StringArrayPublisher e -> e.set(value, timestamp);
         default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }
 
     @Override
-    public void logRaw(byte[] value, String typeString) {
+    public void logRaw(byte[] value, String typeString, long timestamp) {
       Publisher pub = m_pub;
       if (pub == null) {
         synchronized (this) {
@@ -739,7 +739,7 @@ public class NetworkTablesTelemetryBackend implements TelemetryBackend {
       String curTypeString = m_typeString;
 
       switch (pub) {
-        case RawPublisher e when curTypeString.equals(typeString) -> e.set(value);
+        case RawPublisher e when curTypeString.equals(typeString) -> e.set(value, timestamp);
         default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
       }
     }

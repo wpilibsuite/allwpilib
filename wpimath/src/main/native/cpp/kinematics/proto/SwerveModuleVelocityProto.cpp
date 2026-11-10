@@ -4,8 +4,8 @@
 
 #include "wpi/math/kinematics/proto/SwerveModuleVelocityProto.hpp"
 
+#include "wpi/math/protobuf/kinematics.npb.h"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/kinematics.npb.h"
 
 std::optional<wpi::math::SwerveModuleVelocity> wpi::util::Protobuf<
     wpi::math::SwerveModuleVelocity>::Unpack(InputStream& stream) {

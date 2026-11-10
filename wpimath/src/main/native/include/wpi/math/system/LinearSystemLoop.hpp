@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <utility>
 
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
@@ -15,6 +16,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 namespace wpi::math {
 
@@ -129,10 +131,10 @@ class LinearSystemLoop {
       : m_controller(&controller),
         m_feedforward(feedforward),
         m_observer(&observer),
-        m_clampFunc(clampFunction) {
+        m_clampFunc(std::move(clampFunction)) {
     m_nextR.setZero();
     Reset(m_nextR);
-    wpi::math::MathSharedStore::ReportUsage("LinearSystemLoop", "");
+    wpi::util::ReportUsage("LinearSystemLoop", "");
   }
 
   LinearSystemLoop(LinearSystemLoop&&) = default;

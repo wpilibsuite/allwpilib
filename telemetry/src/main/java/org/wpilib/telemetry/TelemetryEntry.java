@@ -46,8 +46,10 @@ public interface TelemetryEntry {
    * @param <T> data type
    * @param value the value
    * @param struct struct serializer for the value type or one of its supertypes
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  <T> void logStruct(T value, Struct<? super T> struct);
+  <T> void logStruct(T value, Struct<? super T> struct, long timestamp);
 
   /**
    * Logs an object with protobuf serialization.
@@ -55,8 +57,10 @@ public interface TelemetryEntry {
    * @param <T> data type
    * @param value the value
    * @param proto protobuf serializer for the value type or one of its supertypes
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  <T> void logProtobuf(T value, Protobuf<? super T, ?> proto);
+  <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp);
 
   /**
    * Logs an array of objects with struct serialization.
@@ -64,126 +68,160 @@ public interface TelemetryEntry {
    * @param <T> data type
    * @param value the value
    * @param struct struct serializer for the value type or one of its supertypes
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  <T> void logStructArray(T[] value, Struct<? super T> struct);
+  <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp);
 
   /**
    * Logs a boolean.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logBoolean(boolean value);
+  void logBoolean(boolean value, long timestamp);
 
   /**
    * Logs a byte.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  default void logByte(byte value) {
-    logLong(value);
+  default void logByte(byte value, long timestamp) {
+    logLong(value, timestamp);
   }
 
   /**
    * Logs a short.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  default void logShort(short value) {
-    logLong(value);
+  default void logShort(short value, long timestamp) {
+    logLong(value, timestamp);
   }
 
   /**
    * Logs an int.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  default void logInt(int value) {
-    logLong(value);
+  default void logInt(int value, long timestamp) {
+    logLong(value, timestamp);
   }
 
   /**
    * Logs a long.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logLong(long value);
+  void logLong(long value, long timestamp);
 
   /**
    * Logs a float.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logFloat(float value);
+  void logFloat(float value, long timestamp);
 
   /**
    * Logs a double.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logDouble(double value);
+  void logDouble(double value, long timestamp);
 
   /**
    * Logs a String.
    *
    * @param value the value
    * @param typeString the type string
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logString(String value, String typeString);
+  void logString(String value, String typeString, long timestamp);
 
   /**
    * Logs a boolean array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logBooleanArray(boolean[] value);
+  void logBooleanArray(boolean[] value, long timestamp);
 
   /**
    * Logs a short array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logShortArray(short[] value);
+  void logShortArray(short[] value, long timestamp);
 
   /**
    * Logs an int array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logIntArray(int[] value);
+  void logIntArray(int[] value, long timestamp);
 
   /**
    * Logs a long array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logLongArray(long[] value);
+  void logLongArray(long[] value, long timestamp);
 
   /**
    * Logs a float array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logFloatArray(float[] value);
+  void logFloatArray(float[] value, long timestamp);
 
   /**
    * Logs a double array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logDoubleArray(double[] value);
+  void logDoubleArray(double[] value, long timestamp);
 
   /**
    * Logs a String array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logStringArray(String[] value);
+  void logStringArray(String[] value, long timestamp);
 
   /**
    * Logs a byte array (raw value).
    *
    * @param value the value
    * @param typeString the type string
+   * @param timestamp timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  void logRaw(byte[] value, String typeString);
+  void logRaw(byte[] value, String typeString, long timestamp);
 }

@@ -168,15 +168,11 @@ void HAL_GetSerialNumber(struct WPI_String* serialNumber) {
   HALSIM_GetRoboRioSerialNumber(serialNumber);
 }
 
-void HAL_GetComments(struct WPI_String* comments) {
-  HALSIM_GetRoboRioComments(comments);
-}
-
 int32_t HAL_GetTeamNumber(void) {
   return HALSIM_GetRoboRioTeamNumber();
 }
 
-uint64_t HAL_GetMonotonicTime(void) {
+int64_t HAL_GetMonotonicTime(void) {
   return wpi::hal::GetMonotonicTime();
 }
 

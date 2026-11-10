@@ -82,7 +82,7 @@ public class CvSink extends ImageSink {
    * @param image Where to store the image.
    * @param timeout Retrieval timeout in seconds.
    * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
-   *     is in 1 us increments.
+   *     is in 1 ns increments.
    */
   public long grabFrame(Mat image, double timeout) {
     long rv = grabFrameDirect(timeout);
@@ -99,7 +99,7 @@ public class CvSink extends ImageSink {
    *
    * @param image Where to store the image.
    * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
-   *     is in 1 us increments.
+   *     is in 1 ns increments.
    */
   public long grabFrameNoTimeout(Mat image) {
     long rv = grabFrameNoTimeoutDirect();
@@ -140,7 +140,7 @@ public class CvSink extends ImageSink {
    *
    * @param timeout Retrieval timeout in seconds.
    * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
-   *     is in 1 us increments.
+   *     is in 1 ns increments.
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public long grabFrameDirect(double timeout) {
@@ -184,7 +184,7 @@ public class CvSink extends ImageSink {
    * the pixelFormat this class was constructed with. Use getDirectMat() to grab the image.
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error message); the frame time
-   *     is in 1 us increments.
+   *     is in 1 ns increments.
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public long grabFrameNoTimeoutDirect() {
@@ -225,7 +225,7 @@ public class CvSink extends ImageSink {
   /**
    * Get the last time a frame was grabbed. This uses the same time base as wpi::Now().
    *
-   * @return Time in 1 us increments.
+   * @return Time in 1 ns increments.
    */
   public long getLastFrameTime() {
     return m_frame.getTimestamp();

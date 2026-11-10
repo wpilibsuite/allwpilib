@@ -6,7 +6,7 @@ package org.wpilib.examples.unittest.subsystems;
 
 import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.examples.unittest.Constants.IntakeConstants;
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 
@@ -18,7 +18,7 @@ public class Intake implements AutoCloseable {
     motor = new PWMSparkMax(IntakeConstants.MOTOR_PORT);
     piston =
         new DoubleSolenoid(
-            CANBus.CAN_S0,
+            CANPort.CAN_S0,
             PneumaticsModuleType.CTRE_PCM,
             IntakeConstants.PISTON_FWD_CHANNEL,
             IntakeConstants.PISTON_REV_CHANNEL);

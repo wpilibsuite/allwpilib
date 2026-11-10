@@ -5,10 +5,10 @@
 package org.wpilib.hardware.discrete;
 
 import org.wpilib.hardware.hal.DIOJNI;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class to read a digital input. This class will read digital inputs and return the current value
@@ -30,7 +30,7 @@ public class DigitalInput implements AutoCloseable, TelemetryLoggable {
 
     m_handle = DIOJNI.initializeDIOPort(channel, true);
 
-    HAL.reportUsage("IO", channel, "DigitalInput");
+    UsageReporting.reportUsage("IO", channel, "DigitalInput");
   }
 
   @Override

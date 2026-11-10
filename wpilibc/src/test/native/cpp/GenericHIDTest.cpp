@@ -8,6 +8,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/GenericHIDSim.hpp"
 
 using namespace wpi;
@@ -39,6 +40,28 @@ TEST_CASE("GenericHIDTest RumbleRange", "[wpilibc]") {
                Catch::Matchers::WithinAbs(
                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), EPSILON));
   }
+}
+
+TEST_CASE("GenericHIDTest RawRumbleRange", "[wpilibc]") {
+  GenericHID hid = internal::DriverStationBackend::ConstructGenericHID(0);
+
+  hid.SetRawRumble(RumbleType::LEFT_RUMBLE, 0x1234);
+  CHECK(sim::DriverStationSim::GetJoystickRumble(0, 0) == 0x1234);
+
+  hid.SetRawRumble(RumbleType::RIGHT_RUMBLE, 0x5678);
+  CHECK(sim::DriverStationSim::GetJoystickRumble(0, 1) == 0x5678);
+
+  hid.SetRawRumble(RumbleType::LEFT_TRIGGER_RUMBLE, 0x9ABC);
+  CHECK(sim::DriverStationSim::GetJoystickRumble(0, 2) == 0x9ABC);
+
+  hid.SetRawRumble(RumbleType::RIGHT_TRIGGER_RUMBLE, 0xDEF0);
+  CHECK(sim::DriverStationSim::GetJoystickRumble(0, 3) == 0xDEF0);
+
+  hid.SetRawRumble(RumbleType::LEFT_RUMBLE, -1);
+  CHECK(sim::DriverStationSim::GetJoystickRumble(0, 0) == 0);
+
+  hid.SetRawRumble(RumbleType::LEFT_RUMBLE, 65536);
+  CHECK(sim::DriverStationSim::GetJoystickRumble(0, 0) == 65535);
 }
 
 TEST_CASE("GenericHIDTest RumbleTypes", "[wpilibc]") {

@@ -10,7 +10,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 
@@ -28,7 +28,7 @@ DualSenseController::DualSenseController(int port)
 
 DualSenseController::DualSenseController(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "DualSenseController");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "DualSenseController");
 }
 
 GenericHID& DualSenseController::GetHID() {
@@ -434,21 +434,21 @@ void DualSenseController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("RightY", GetRightY());
   table.Log("L2", GetL2());
   table.Log("R2", GetR2());
-  table.Log("CrossButton", GetCrossButton());
-  table.Log("CircleButton", GetCircleButton());
-  table.Log("SquareButton", GetSquareButton());
-  table.Log("TriangleButton", GetTriangleButton());
-  table.Log("CreateButton", GetCreateButton());
-  table.Log("PSButton", GetPSButton());
-  table.Log("OptionsButton", GetOptionsButton());
-  table.Log("L3Button", GetL3Button());
-  table.Log("R3Button", GetR3Button());
-  table.Log("L1Button", GetL1Button());
-  table.Log("R1Button", GetR1Button());
-  table.Log("DpadUpButton", GetDpadUpButton());
-  table.Log("DpadDownButton", GetDpadDownButton());
-  table.Log("DpadLeftButton", GetDpadLeftButton());
-  table.Log("DpadRightButton", GetDpadRightButton());
-  table.Log("MicrophoneButton", GetMicrophoneButton());
-  table.Log("TouchpadButton", GetTouchpadButton());
+  table.Log("Cross", GetCrossButton());
+  table.Log("Circle", GetCircleButton());
+  table.Log("Square", GetSquareButton());
+  table.Log("Triangle", GetTriangleButton());
+  table.Log("Create", GetCreateButton());
+  table.Log("PS", GetPSButton());
+  table.Log("Options", GetOptionsButton());
+  table.Log("L3", GetL3Button());
+  table.Log("R3", GetR3Button());
+  table.Log("L1", GetL1Button());
+  table.Log("R1", GetR1Button());
+  table.Log("DpadUp", GetDpadUpButton());
+  table.Log("DpadDown", GetDpadDownButton());
+  table.Log("DpadLeft", GetDpadLeftButton());
+  table.Log("DpadRight", GetDpadRightButton());
+  table.Log("Microphone", GetMicrophoneButton());
+  table.Log("Touchpad", GetTouchpadButton());
 }

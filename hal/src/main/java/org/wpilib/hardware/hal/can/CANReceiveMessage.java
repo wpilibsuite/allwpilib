@@ -15,7 +15,7 @@ public class CANReceiveMessage {
   /** The flags of the message. */
   public int flags;
 
-  /** Timestamp message was received, in microseconds (wpi time). */
+  /** Timestamp message was received, in nanoseconds (wpi time). */
   public long timestamp;
 
   /** Default constructor. */
@@ -26,7 +26,7 @@ public class CANReceiveMessage {
    *
    * @param length Length of packet in bytes.
    * @param flags Message flags.
-   * @param timestamp CAN frame timestamp in microseconds.
+   * @param timestamp CAN frame timestamp in nanoseconds.
    * @return Buffer containing CAN frame.
    */
   @SuppressWarnings("PMD.MethodReturnsInternalArray")

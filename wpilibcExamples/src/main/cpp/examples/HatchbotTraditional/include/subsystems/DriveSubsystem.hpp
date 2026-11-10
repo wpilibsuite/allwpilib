@@ -57,9 +57,7 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
 
   // The motor controllers
   wpi::PWMSparkMax left1;
-  wpi::PWMSparkMax left2;
   wpi::PWMSparkMax right1;
-  wpi::PWMSparkMax right2;
 
   // The robot's drive
   wpi::DifferentialDrive drive{

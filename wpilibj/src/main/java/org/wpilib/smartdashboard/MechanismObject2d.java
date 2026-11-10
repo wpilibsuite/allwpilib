@@ -18,7 +18,7 @@ import org.wpilib.telemetry.TelemetryTable;
  *
  * @see Mechanism2d
  */
-public abstract class MechanismObject2d implements TelemetryLoggable, AutoCloseable {
+public abstract class MechanismObject2d implements TelemetryLoggable {
   /** Relative to parent. */
   private final String m_name;
 
@@ -31,13 +31,6 @@ public abstract class MechanismObject2d implements TelemetryLoggable, AutoClosea
    */
   protected MechanismObject2d(String name) {
     m_name = name;
-  }
-
-  @Override
-  public synchronized void close() {
-    for (MechanismObject2d obj : m_objects.values()) {
-      obj.close();
-    }
   }
 
   /**

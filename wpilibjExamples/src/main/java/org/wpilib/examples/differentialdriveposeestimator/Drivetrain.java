@@ -4,6 +4,8 @@
 
 package org.wpilib.examples.differentialdriveposeestimator;
 
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
+
 import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.fields.Field;
 import org.wpilib.fields.Fields;
@@ -27,7 +29,6 @@ import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.Models;
 import org.wpilib.math.util.ComputerVisionUtil;
-import org.wpilib.math.util.Units;
 import org.wpilib.networktables.DoubleArrayEntry;
 import org.wpilib.networktables.DoubleArrayTopic;
 import org.wpilib.simulation.DifferentialDrivetrainSim;
@@ -82,9 +83,9 @@ public class Drivetrain {
           imu.getRotation2d(),
           leftEncoder.getDistance(),
           rightEncoder.getDistance(),
-          Pose2d.ZERO,
-          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+          Pose2d.ZERO, // Field center, facing the blue alliance wall.
+          VecBuilder.fill(0.05, 0.05, degreesToRadians(5)),
+          VecBuilder.fill(0.5, 0.5, degreesToRadians(30)));
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(1, 3);
@@ -124,6 +125,7 @@ public class Drivetrain {
 
     cameraToObjectEntry = cameraToObjectTopic.getEntry(defaultVal);
 
+    // Built-in tag poses use the same centered field frame as the pose estimator.
     objectInField = Field.loadField(Fields.FRC_2024_CRESCENDO).getTagPose(1).get();
   }
 

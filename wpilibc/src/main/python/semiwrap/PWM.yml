@@ -18,7 +18,7 @@ classes:
 inline_code: |
   cls_PWM
     .def("__repr__", [](py::handle self) {
-      py::object type_name = self.get_type().attr("__qualname__");
+      py::object type_name = py::type::handle_of(self).attr("__qualname__");
       int channel = self.cast<PWM&>().GetChannel();
       return py::str("<{} {}>").format(type_name, channel);
     });

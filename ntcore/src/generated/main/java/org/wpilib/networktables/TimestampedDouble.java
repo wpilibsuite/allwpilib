@@ -11,8 +11,8 @@ public final class TimestampedDouble {
   /**
    * Create a timestamped value.
    *
-   * @param timestamp timestamp in local time base
-   * @param serverTime timestamp in server time base
+   * @param timestamp timestamp in local time base, in nanoseconds
+   * @param serverTime timestamp in server time base, in nanoseconds
    * @param value value
    */
   public TimestampedDouble(long timestamp, long serverTime, double value) {
@@ -22,12 +22,12 @@ public final class TimestampedDouble {
   }
 
   /**
-   * Timestamp in local time base.
+   * Timestamp in local time base, in nanoseconds.
    */
   public final long timestamp;
 
   /**
-   * Timestamp in server time base.  May be 0 or 1 for locally set values.
+   * Timestamp in server time base, in nanoseconds.  May be 0 or 1 for locally set values.
    */
   public final long serverTime;
 

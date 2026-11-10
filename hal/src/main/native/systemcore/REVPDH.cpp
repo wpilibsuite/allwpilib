@@ -704,7 +704,7 @@ HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
     PDH_status_0_t statusFrame0;
     PDH_status_0_unpack(&statusFrame0, messages[i].message.message.data,
                         PDH_STATUS_0_LENGTH);
-    uint32_t timestamp = messages[i].message.timeStamp;
+    int64_t timestamp = messages[i].message.timeStamp;
 
     retData[*count].current =
         PDH_status_0_channel_0_current_decode(statusFrame0.channel_0_current);
@@ -749,7 +749,7 @@ HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
     PDH_status_1_t statusFrame1;
     PDH_status_1_unpack(&statusFrame1, messages[i].message.message.data,
                         PDH_STATUS_1_LENGTH);
-    uint32_t timestamp = messages[i].message.timeStamp;
+    int64_t timestamp = messages[i].message.timeStamp;
 
     retData[*count].current =
         PDH_status_1_channel_6_current_decode(statusFrame1.channel_6_current);
@@ -794,7 +794,7 @@ HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
     PDH_status_2_t statusFrame2;
     PDH_status_2_unpack(&statusFrame2, messages[i].message.message.data,
                         PDH_STATUS_2_LENGTH);
-    uint32_t timestamp = messages[i].message.timeStamp;
+    int64_t timestamp = messages[i].message.timeStamp;
 
     retData[*count].current =
         PDH_status_2_channel_12_current_decode(statusFrame2.channel_12_current);
@@ -839,7 +839,7 @@ HAL_PowerDistributionChannelData* HAL_GetREVPDHStreamData(
     PDH_status_3_t statusFrame3;
     PDH_status_3_unpack(&statusFrame3, messages[i].message.message.data,
                         PDH_STATUS_3_LENGTH);
-    uint32_t timestamp = messages[i].message.timeStamp;
+    int64_t timestamp = messages[i].message.timeStamp;
 
     retData[*count].current =
         PDH_status_3_channel_18_current_decode(statusFrame3.channel_18_current);

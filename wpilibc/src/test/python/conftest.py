@@ -26,6 +26,8 @@ def wpilib_state():
 @pytest.fixture(scope="function")
 def nt(cfg_logging, wpilib_state):
     instance = ntcore.NetworkTableInstance.get_default()
+    # Earlier robot tests may leave a server running, preventing local mode.
+    instance._reset()
     instance.start_local()
     telemetry.TelemetryRegistry.reset()
     telemetry.TelemetryRegistry.register_backend(

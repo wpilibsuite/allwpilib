@@ -6,8 +6,8 @@
 
 package org.wpilib.drivers.motor;
 
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.PWMMotorController;
+import org.wpilib.util.UsageReporting;
 
 /**
  * AndyMark Koors40 Motor Controller.
@@ -40,6 +40,6 @@ public class Koors40 extends PWMMotorController {
     m_pwm.setOutputPeriod(20);
     setThrottle(0.0);
 
-    HAL.reportUsage("IO", getChannel(), "Koors40");
+    UsageReporting.reportUsage("IO", getChannel(), "Koors40");
   }
 }

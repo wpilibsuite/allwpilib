@@ -8,11 +8,11 @@
 #include <string>
 #include <utility>
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -39,7 +39,7 @@ void MecanumDrive::DriveCartesian(double xVelocity, double yVelocity,
                                   double zRotation,
                                   wpi::math::Rotation2d gyroAngle) {
   if (!reported) {
-    HAL_ReportUsage("RobotDrive", "MecanumCartesian");
+    wpi::util::ReportUsage("RobotDrive", "MecanumCartesian");
     reported = true;
   }
 
@@ -65,7 +65,7 @@ void MecanumDrive::DriveCartesian(double xVelocity, double yVelocity,
 void MecanumDrive::DrivePolar(double magnitude, wpi::math::Rotation2d angle,
                               double zRotation) {
   if (!reported) {
-    HAL_ReportUsage("RobotDrive", "MecanumPolar");
+    wpi::util::ReportUsage("RobotDrive", "MecanumPolar");
     reported = true;
   }
 

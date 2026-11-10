@@ -11,6 +11,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.wpilib.command2.Command.InterruptionBehavior;
 import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.simulation.DriverStationSim;
 
 /** Basic setup for all {@link Command tests}. */
@@ -25,6 +26,7 @@ public class CommandTestBase {
     CommandScheduler.getInstance().clearComposedCommands();
     CommandScheduler.getInstance().unregisterAllSubsystems();
 
+    DriverStationBackend.clearUserProgramStarted();
     setDSEnabled(true);
   }
 

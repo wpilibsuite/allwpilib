@@ -21,37 +21,46 @@ class Entry : public TelemetryEntry {
 
   void SetProperty(std::string_view key, std::string_view value) override {}
 
-  void LogBoolean(bool value) override {}
+  void LogBoolean(bool value, int64_t timestamp) override {}
 
-  void LogInt64(int64_t value) override {}
+  void LogInt64(int64_t value, int64_t timestamp) override {}
 
-  void LogFloat(float value) override {}
+  void LogFloat(float value, int64_t timestamp) override {}
 
-  void LogDouble(double value) override {}
+  void LogDouble(double value, int64_t timestamp) override {}
 
-  void LogString(std::string_view value, std::string_view typeString) override {
+  void LogString(std::string_view value, std::string_view typeString,
+                 int64_t timestamp) override {}
+
+  void LogBooleanArray(std::span<const bool> value,
+                       int64_t timestamp) override {}
+
+  void LogBooleanArray(std::span<const int> value, int64_t timestamp) override {
   }
 
-  void LogBooleanArray(std::span<const bool> value) override {}
+  void LogInt16Array(std::span<const int16_t> value,
+                     int64_t timestamp) override {}
 
-  void LogBooleanArray(std::span<const int> value) override {}
+  void LogInt32Array(std::span<const int32_t> value,
+                     int64_t timestamp) override {}
 
-  void LogInt16Array(std::span<const int16_t> value) override {}
+  void LogInt64Array(std::span<const int64_t> value,
+                     int64_t timestamp) override {}
 
-  void LogInt32Array(std::span<const int32_t> value) override {}
+  void LogFloatArray(std::span<const float> value, int64_t timestamp) override {
+  }
 
-  void LogInt64Array(std::span<const int64_t> value) override {}
+  void LogDoubleArray(std::span<const double> value,
+                      int64_t timestamp) override {}
 
-  void LogFloatArray(std::span<const float> value) override {}
+  void LogStringArray(std::span<const std::string> value,
+                      int64_t timestamp) override {}
 
-  void LogDoubleArray(std::span<const double> value) override {}
+  void LogStringArray(std::span<const std::string_view> value,
+                      int64_t timestamp) override {}
 
-  void LogStringArray(std::span<const std::string> value) override {}
-
-  void LogStringArray(std::span<const std::string_view> value) override {}
-
-  void LogRaw(std::span<const uint8_t> value,
-              std::string_view typeString) override {}
+  void LogRaw(std::span<const uint8_t> value, std::string_view typeString,
+              int64_t timestamp) override {}
 };
 }  // namespace
 

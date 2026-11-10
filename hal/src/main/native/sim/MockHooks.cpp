@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <limits>
 #include <thread>
 
 #include "MockHooksInternal.hpp"
@@ -52,16 +53,16 @@ bool IsTimingPaused() {
   return programPauseTime != 0;
 }
 
-void StepTiming(uint64_t delta) {
+void StepTiming(int64_t delta) {
   programOffsetTime += delta;
 }
 
-uint64_t GetMonotonicTime() {
+int64_t GetMonotonicTime() {
   int64_t curTime = programPauseTime;
   if (curTime == 0) {
     curTime = wpi::util::NowDefault();
   }
-  return static_cast<uint64_t>(curTime + programOffsetTime);
+  return curTime + programOffsetTime;
 }
 
 void SetProgramStarted(bool started) {
@@ -91,7 +92,8 @@ void HALSIM_WaitForProgramStart(HAL_Bool waitForFirstNotifier) {
   // cannot satisfy this check.
   while (waitForFirstNotifier &&
          (GetNotifierAlarmSetCount() == programStartNotifierAlarmCount ||
-          HALSIM_GetNextNotifierTimeout() == UINT64_MAX)) {
+          HALSIM_GetNextNotifierTimeout() ==
+              std::numeric_limits<int64_t>::max())) {
     count++;
     if (count % 10 == 0) {
       wpi::util::print("Waiting for first notifier alarm: {}\n", count);
@@ -134,15 +136,15 @@ HAL_Bool HALSIM_IsTimingPaused(void) {
   return IsTimingPaused();
 }
 
-void HALSIM_StepTiming(uint64_t delta) {
+void HALSIM_StepTiming(int64_t delta) {
   WaitNotifiers();
 
   while (delta > 0) {
-    uint64_t curTime = HAL_GetMonotonicTime();
-    uint64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
+    int64_t curTime = HAL_GetMonotonicTime();
+    int64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
     // If a notifier is already due, process it at the current simulated time
     // instead of underflowing nextTimeout - curTime.
-    uint64_t step =
+    int64_t step =
         nextTimeout <= curTime ? 0 : (std::min)(delta, nextTimeout - curTime);
 
     StepTiming(step);
@@ -157,7 +159,7 @@ void HALSIM_StepTiming(uint64_t delta) {
   }
 }
 
-void HALSIM_StepTimingAsync(uint64_t delta) {
+void HALSIM_StepTimingAsync(int64_t delta) {
   StepTiming(delta);
   WakeupNotifiers();
 }

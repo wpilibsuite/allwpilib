@@ -4,6 +4,8 @@
 
 package org.wpilib.math.geometry;
 
+import static org.wpilib.math.util.UnitConversions.radiansToRotations;
+import static org.wpilib.math.util.UnitConversions.rotationsToRadians;
 import static org.wpilib.units.Units.Radians;
 
 import io.avaje.jsonb.Json;
@@ -16,7 +18,6 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Units;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
@@ -182,7 +183,7 @@ public final class Rotation2d
    * @return The rotation object with the desired angle value.
    */
   public static Rotation2d fromRotations(double rotations) {
-    return new Rotation2d(Units.rotationsToRadians(rotations));
+    return new Rotation2d(rotationsToRadians(rotations));
   }
 
   /**
@@ -316,7 +317,7 @@ public final class Rotation2d
    * @return The number of rotations of the Rotation2d.
    */
   public double getRotations() {
-    return Units.radiansToRotations(getRadians());
+    return radiansToRotations(getRadians());
   }
 
   /**

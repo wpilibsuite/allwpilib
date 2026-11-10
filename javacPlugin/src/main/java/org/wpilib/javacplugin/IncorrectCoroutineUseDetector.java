@@ -12,12 +12,10 @@ import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
 import java.util.ArrayList;
 import java.util.List;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.tools.Diagnostic;
 
 /**
  * Detects usage of an incorrect coroutine object. For example, nesting commands with multiple
@@ -40,8 +38,8 @@ import javax.tools.Diagnostic;
  * }</pre>
  */
 public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
-  public static final String CAPTURE_SUPPRESSION_KEY = "CoroutineCapture";
-  public static final String SCOPE_SUPPRESSION_KEY = "CoroutineMayNotBeInScope";
+  public static final String CAPTURE_SUPPRESSION_KEY = "WPILib.CoroutineCapture";
+  public static final String SCOPE_SUPPRESSION_KEY = "WPILib.CoroutineMayNotBeInScope";
 
   public IncorrectCoroutineUseDetector(JavacTask task) {
     super(task);
@@ -78,13 +76,9 @@ public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
     }
   }
 
-  private final class Scanner extends TreeScanner<State, State> {
-    private final CompilationUnitTree m_root;
-    private final Trees m_trees;
-
+  private final class Scanner extends WPILibTreeScanner<State, State> {
     Scanner(CompilationUnitTree compilationUnit) {
-      m_root = compilationUnit;
-      m_trees = Trees.instance(m_task);
+      super(compilationUnit, IncorrectCoroutineUseDetector.this.m_task);
     }
 
     @Override
@@ -144,8 +138,7 @@ public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
         if (el instanceof VariableElement ve
             && ve.asType().equals(m_coroutineType)
             && !state.isLocalCoroutine(ve)) {
-          m_trees.printMessage(
-              Diagnostic.Kind.ERROR, nonlocalCoroutineUsageMessage(ve, state), id, m_root);
+          printError(nonlocalCoroutineUsageMessage(ve, state), id, SCOPE_SUPPRESSION_KEY);
         }
       }
 
@@ -156,11 +149,8 @@ public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
         if (el instanceof VariableElement ve
             && ve.asType().equals(m_coroutineType)
             && !state.isLocalCoroutine(ve)) {
-          m_trees.printMessage(
-              Diagnostic.Kind.ERROR,
-              nonlocalCoroutineUsageMessage(ve, state),
-              argPath.getLeaf(),
-              m_root);
+          printError(
+              nonlocalCoroutineUsageMessage(ve, state), argPath.getLeaf(), SCOPE_SUPPRESSION_KEY);
         }
       }
 
@@ -193,7 +183,7 @@ public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
         }
       }
 
-      return "Coroutine `%s` may not be in scope. Consider using %s"
+      return "Coroutine `%s` may not be in scope. Consider using %s."
           .formatted(ve.getSimpleName(), optionsBuilder);
     }
 
@@ -222,11 +212,8 @@ public class IncorrectCoroutineUseDetector extends CoroutineBasedDetector {
         var expressionPath = m_trees.getPath(m_root, expression);
         var expressionElement = m_trees.getElement(expressionPath);
         if (expressionElement instanceof VariableElement ve2 && state.isCapturedCoroutine(ve2)) {
-          m_trees.printMessage(
-              Diagnostic.Kind.ERROR,
-              "Captured coroutines may not be stored in fields",
-              node,
-              m_root);
+          printError(
+              "Captured coroutines may not be stored in fields.", node, CAPTURE_SUPPRESSION_KEY);
         }
       }
 

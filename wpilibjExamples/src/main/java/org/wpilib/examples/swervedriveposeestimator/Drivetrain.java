@@ -4,6 +4,8 @@
 
 package org.wpilib.examples.swervedriveposeestimator;
 
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
+
 import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
 import org.wpilib.math.geometry.Pose2d;
@@ -12,7 +14,6 @@ import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.math.kinematics.SwerveModulePosition;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.util.Units;
 import org.wpilib.system.Timer;
 
 /** Represents a swerve drive style drivetrain. */
@@ -48,9 +49,9 @@ public class Drivetrain {
             backLeft.getPosition(),
             backRight.getPosition()
           },
-          Pose2d.ZERO,
-          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+          Pose2d.ZERO, // Field center, facing the blue alliance wall.
+          VecBuilder.fill(0.05, 0.05, degreesToRadians(5)),
+          VecBuilder.fill(0.5, 0.5, degreesToRadians(30)));
 
   public Drivetrain() {
     imu.resetYaw();

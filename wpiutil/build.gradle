@@ -214,13 +214,13 @@ model {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/generated/test/native/cpp'
+                        srcDirs 'src/generated/test/native/include'
                     }
                 }
             }
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/test/native/include', 'src/generated/test/native/cpp'
+                    srcDirs 'src/test/native/include', 'src/generated/test/native/include'
                 }
             }
         }

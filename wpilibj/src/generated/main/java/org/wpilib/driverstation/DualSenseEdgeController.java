@@ -10,10 +10,10 @@ import java.util.EnumSet;
 import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from DualSenseEdge controllers connected to the Driver Station.
@@ -163,7 +163,7 @@ public class DualSenseEdgeController implements HIDDevice, TelemetryLoggable {
    */
   public DualSenseEdgeController(final GenericHID hid) {
     m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
-    HAL.reportUsage("HID", hid.getPort(), "DualSenseEdgeController");
+    UsageReporting.reportUsage("HID", hid.getPort(), "DualSenseEdgeController");
   }
 
   /**
@@ -1271,26 +1271,26 @@ public class DualSenseEdgeController implements HIDDevice, TelemetryLoggable {
     table.log("RightY", getRightY());
     table.log("L2", getL2());
     table.log("R2", getR2());
-    table.log("CrossButton", getCrossButton());
-    table.log("CircleButton", getCircleButton());
-    table.log("SquareButton", getSquareButton());
-    table.log("TriangleButton", getTriangleButton());
-    table.log("CreateButton", getCreateButton());
-    table.log("PSButton", getPSButton());
-    table.log("OptionsButton", getOptionsButton());
-    table.log("L3Button", getL3Button());
-    table.log("R3Button", getR3Button());
-    table.log("L1Button", getL1Button());
-    table.log("R1Button", getR1Button());
-    table.log("DpadUpButton", getDpadUpButton());
-    table.log("DpadDownButton", getDpadDownButton());
-    table.log("DpadLeftButton", getDpadLeftButton());
-    table.log("DpadRightButton", getDpadRightButton());
-    table.log("MicrophoneButton", getMicrophoneButton());
-    table.log("RightPaddle1Button", getRightPaddle1Button());
-    table.log("LeftPaddle1Button", getLeftPaddle1Button());
-    table.log("TouchpadButton", getTouchpadButton());
-    table.log("LeftFunctionButton", getLeftFunctionButton());
-    table.log("RightFunctionButton", getRightFunctionButton());
+    table.log("Cross", getCrossButton());
+    table.log("Circle", getCircleButton());
+    table.log("Square", getSquareButton());
+    table.log("Triangle", getTriangleButton());
+    table.log("Create", getCreateButton());
+    table.log("PS", getPSButton());
+    table.log("Options", getOptionsButton());
+    table.log("L3", getL3Button());
+    table.log("R3", getR3Button());
+    table.log("L1", getL1Button());
+    table.log("R1", getR1Button());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
+    table.log("Microphone", getMicrophoneButton());
+    table.log("RightPaddle1", getRightPaddle1Button());
+    table.log("LeftPaddle1", getLeftPaddle1Button());
+    table.log("Touchpad", getTouchpadButton());
+    table.log("LeftFunction", getLeftFunctionButton());
+    table.log("RightFunction", getRightFunctionButton());
   }
 }

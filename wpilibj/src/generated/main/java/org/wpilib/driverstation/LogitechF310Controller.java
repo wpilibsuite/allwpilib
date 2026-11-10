@@ -10,10 +10,10 @@ import java.util.EnumSet;
 import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from LogitechF310 controllers connected to the Driver Station.
@@ -151,7 +151,7 @@ public class LogitechF310Controller implements HIDDevice, TelemetryLoggable {
    */
   public LogitechF310Controller(final GenericHID hid) {
     m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
-    HAL.reportUsage("HID", hid.getPort(), "LogitechF310Controller");
+    UsageReporting.reportUsage("HID", hid.getPort(), "LogitechF310Controller");
   }
 
   /**
@@ -1007,20 +1007,20 @@ public class LogitechF310Controller implements HIDDevice, TelemetryLoggable {
     table.log("RightY", getRightY());
     table.log("LeftTrigger", getLeftTrigger());
     table.log("RightTrigger", getRightTrigger());
-    table.log("AButton", getAButton());
-    table.log("BButton", getBButton());
-    table.log("XButton", getXButton());
-    table.log("YButton", getYButton());
-    table.log("BackButton", getBackButton());
-    table.log("LogitechButton", getLogitechButton());
-    table.log("StartButton", getStartButton());
-    table.log("LeftStickButton", getLeftStickButton());
-    table.log("RightStickButton", getRightStickButton());
-    table.log("LeftBumperButton", getLeftBumperButton());
-    table.log("RightBumperButton", getRightBumperButton());
-    table.log("DpadUpButton", getDpadUpButton());
-    table.log("DpadDownButton", getDpadDownButton());
-    table.log("DpadLeftButton", getDpadLeftButton());
-    table.log("DpadRightButton", getDpadRightButton());
+    table.log("A", getAButton());
+    table.log("B", getBButton());
+    table.log("X", getXButton());
+    table.log("Y", getYButton());
+    table.log("Back", getBackButton());
+    table.log("Logitech", getLogitechButton());
+    table.log("Start", getStartButton());
+    table.log("LeftStick", getLeftStickButton());
+    table.log("RightStick", getRightStickButton());
+    table.log("LeftBumper", getLeftBumperButton());
+    table.log("RightBumper", getRightBumperButton());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
   }
 }

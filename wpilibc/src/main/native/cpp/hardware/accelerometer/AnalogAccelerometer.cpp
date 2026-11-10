@@ -4,10 +4,10 @@
 
 #include "wpi/hardware/accelerometer/AnalogAccelerometer.hpp"
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/NullDeleter.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -51,5 +51,5 @@ std::string_view AnalogAccelerometer::GetTelemetryType() const {
 }
 
 void AnalogAccelerometer::InitAccelerometer() {
-  HAL_ReportUsage("IO", m_analogInput->GetChannel(), "Accelerometer");
+  wpi::util::ReportUsage("IO", m_analogInput->GetChannel(), "Accelerometer");
 }

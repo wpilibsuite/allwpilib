@@ -11,7 +11,7 @@ import org.wpilib.command2.SubsystemBase;
 import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rapidreactcommandbot.Constants.IntakeConstants;
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 
@@ -22,7 +22,7 @@ public class Intake extends SubsystemBase {
   // Double solenoid connected to two channels of a PCM with the default CAN ID
   private final DoubleSolenoid pistons =
       new DoubleSolenoid(
-          CANBus.CAN_S0,
+          CANPort.CAN_S0,
           PneumaticsModuleType.CTRE_PCM,
           IntakeConstants.SOLENOID_PORTS[0],
           IntakeConstants.SOLENOID_PORTS[1]);

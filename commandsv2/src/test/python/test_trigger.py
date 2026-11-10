@@ -25,6 +25,51 @@ def test_on_true(scheduler: commands2.CommandScheduler):
     assert not command1.is_scheduled()
 
 
+def test_if_true_schedules_on_every_true_poll(scheduler: commands2.CommandScheduler):
+    counter = OOInteger(0)
+
+    button = InternalButton()
+    button.set_pressed(False)
+    button.if_true(commands2.cmd.run_once(counter.increment_and_get))
+    scheduler.run()
+    assert counter == 0
+    button.set_pressed(True)
+    scheduler.run()
+    assert counter == 1
+    scheduler.run()
+    assert counter == 2
+    button.set_pressed(False)
+    scheduler.run()
+    assert counter == 2
+
+
+def test_if_true_does_not_restart_or_cancel(scheduler: commands2.CommandScheduler):
+    starts = OOInteger(0)
+    ends = OOInteger(0)
+    command = commands2.FunctionalCommand(
+        starts.increment_and_get,
+        lambda: None,
+        lambda _: ends.increment_and_get(),
+        lambda: False,
+    )
+
+    button = InternalButton()
+    button.set_pressed(False)
+    button.if_true(command)
+    button.set_pressed(True)
+    scheduler.run()
+    assert starts == 1
+    assert command.is_scheduled()
+    scheduler.run()
+    assert starts == 1
+    assert command.is_scheduled()
+    button.set_pressed(False)
+    scheduler.run()
+    assert starts == 1
+    assert ends == 0
+    assert command.is_scheduled()
+
+
 def test_on_false(scheduler: commands2.CommandScheduler):
     finished = OOBoolean(False)
     command1 = commands2.WaitUntilCommand(finished)

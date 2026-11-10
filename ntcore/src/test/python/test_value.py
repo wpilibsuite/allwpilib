@@ -4,20 +4,20 @@ import pytest
 
 def test_value_bool():
     v = ntcore.Value.make_boolean(True)
-    assert v.get_boolean() == True
-    assert v.value() == True
+    assert v.get_boolean() is True
+    assert v.value() is True
 
 
 def test_mkvalue_bool():
     v = ntcore.Value.make_value(True)
-    assert v.get_boolean() == True
-    assert v.value() == True
+    assert v.get_boolean() is True
+    assert v.value() is True
 
 
 def test_bool_factory():
     f = ntcore.Value.get_factory_by_type(ntcore.NetworkTableType.BOOLEAN)
     v = f(True)
-    assert v.get_boolean() == True
+    assert v.get_boolean() is True
 
 
 def test_value_int():

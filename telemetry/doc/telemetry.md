@@ -104,7 +104,7 @@ The Java frontend API is centered on `Telemetry` and `TelemetryTable`.
 
 `Telemetry` is a static facade over the root telemetry table (`/`). `Telemetry.getTable()` returns the root table, and `Telemetry.getTable(String name)` returns a child table. The logging methods on `Telemetry` delegate to the root table.
 
-`TelemetryTable` represents a path in a hierarchical namespace and caches child tables and entries. Table paths are normalized to start with `/` and end with `/`; for example, `TelemetryRegistry.getTable("drive")` has path `/drive/`. Entries under a table append the entry name to the table path, so `Telemetry.getTable("drive").log("speed", 1.0)` logs `/drive/speed`.
+`TelemetryTable` represents a path in a hierarchical namespace and caches child tables and entries. Table paths are normalized to start with `/` and end with `/`; for example, `TelemetryRegistry.getTable("drive")` has path `/drive/`. Entries under a table append the entry name to the table path, so `Telemetry.getTable("drive").log("velocity", 1.0)` logs `/drive/velocity`.
 
 The frontend supports logging the following value categories:
 
@@ -316,9 +316,9 @@ public final class Shooter {
   private final TelemetryTable telemetry = Telemetry.getTable("Shooter");
 
   public void periodic() {
-    telemetry.log("wheelSpeedRps", m_encoder.getRate());
+    telemetry.log("wheelVelocity", m_encoder.getRate());
     telemetry.log("commandedVoltage", m_lastVoltage);
-    telemetry.log("ready", atSpeed());
+    telemetry.log("ready", atVelocity());
   }
 }
 ```
@@ -340,7 +340,7 @@ Publishing arrays and collections with explicit element types:
 TelemetryTable drive = Telemetry.getTable("Drive");
 
 drive.log(
-    "moduleSpeedsMetersPerSecond",
+    "moduleVelocities",
     new double[] {
       frontLeft.getDriveVelocity(),
       frontRight.getDriveVelocity(),
@@ -382,13 +382,13 @@ Publishing a subsystem snapshot:
 
 ```java
 public final class DriveSnapshot implements TelemetryLoggable {
-  private final DifferentialDriveWheelSpeeds m_wheelSpeeds;
+  private final DifferentialDriveWheelVelocities m_wheelVelocities;
   private final Pose2d m_pose;
   private final boolean m_closedLoop;
 
   public DriveSnapshot(
-      DifferentialDriveWheelSpeeds wheelSpeeds, Pose2d pose, boolean closedLoop) {
-    m_wheelSpeeds = wheelSpeeds;
+      DifferentialDriveWheelVelocities wheelVelocities, Pose2d pose, boolean closedLoop) {
+    m_wheelVelocities = wheelVelocities;
     m_pose = pose;
     m_closedLoop = closedLoop;
   }
@@ -400,8 +400,8 @@ public final class DriveSnapshot implements TelemetryLoggable {
 
   @Override
   public void logTo(TelemetryTable table) {
-    table.log("leftMetersPerSecond", m_wheelSpeeds.leftMetersPerSecond);
-    table.log("rightMetersPerSecond", m_wheelSpeeds.rightMetersPerSecond);
+    table.log("left", m_wheelVelocities.left);
+    table.log("right", m_wheelVelocities.right);
     table.log("pose", m_pose);
     table.log("closedLoop", m_closedLoop);
   }
@@ -413,7 +413,7 @@ Logging it from robot code:
 ```java
 Telemetry.log(
     "drive",
-    new DriveSnapshot(m_drive.getWheelSpeeds(), m_drive.getPose(), m_drive.isClosedLoop()));
+    new DriveSnapshot(m_drive.getWheelVelocities(), m_drive.getPose(), m_drive.isClosedLoop()));
 ```
 
 That call creates or reuses the `/drive/` table and populates entries under it.
@@ -422,20 +422,20 @@ Using `TelemetryRegistry.registerTypeHandler()` for a third-party type:
 
 ```java
 TelemetryRegistry.registerTypeHandler(
-    ChassisSpeeds.class,
-    (table, name, speeds) -> {
+    ChassisVelocities.class,
+    (table, name, velocities) -> {
       TelemetryTable subtable = table.getTable(name);
-      subtable.setType("ChassisSpeeds");
-      subtable.log("vxMetersPerSecond", speeds.vxMetersPerSecond);
-      subtable.log("vyMetersPerSecond", speeds.vyMetersPerSecond);
-      subtable.log("omegaRadiansPerSecond", speeds.omegaRadiansPerSecond);
+      subtable.setType("ChassisVelocities");
+      subtable.log("vx", velocities.vx);
+      subtable.log("vy", velocities.vy);
+      subtable.log("omega", velocities.omega);
     });
 ```
 
 After registration, callers can write:
 
 ```java
-Telemetry.log("commandedSpeeds", chassisSpeeds);
+Telemetry.log("commandedVelocities", chassisVelocities);
 ```
 
 Type handlers can also log a value directly to the provided entry name instead of creating a subtable. This is how `RobotBase` registers unit `Measure` telemetry:
@@ -512,27 +512,27 @@ public interface TelemetryEntry {
   void keepDuplicates();
   void setProperty(String key, String value);
 
-  <T> void logStruct(T value, Struct<? super T> struct);
-  <T> void logProtobuf(T value, Protobuf<? super T, ?> proto);
-  <T> void logStructArray(T[] value, Struct<? super T> struct);
+  <T> void logStruct(T value, Struct<? super T> struct, long timestamp);
+  <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp);
+  <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp);
 
-  void logBoolean(boolean value);
-  default void logByte(byte value) {...}
-  default void logShort(short value) {...}
-  default void logInt(int value) {...}
-  void logLong(long value);
-  void logFloat(float value);
-  void logDouble(double value);
-  void logString(String value, String typeString);
+  void logBoolean(boolean value, long timestamp);
+  default void logByte(byte value, long timestamp) {...}
+  default void logShort(short value, long timestamp) {...}
+  default void logInt(int value, long timestamp) {...}
+  void logLong(long value, long timestamp);
+  void logFloat(float value, long timestamp);
+  void logDouble(double value, long timestamp);
+  void logString(String value, String typeString, long timestamp);
 
-  void logBooleanArray(boolean[] value);
-  void logShortArray(short[] value);
-  void logIntArray(int[] value);
-  void logLongArray(long[] value);
-  void logFloatArray(float[] value);
-  void logDoubleArray(double[] value);
-  void logStringArray(String[] value);
-  void logRaw(byte[] value, String typeString);
+  void logBooleanArray(boolean[] value, long timestamp);
+  void logShortArray(short[] value, long timestamp);
+  void logIntArray(int[] value, long timestamp);
+  void logLongArray(long[] value, long timestamp);
+  void logFloatArray(float[] value, long timestamp);
+  void logDoubleArray(double[] value, long timestamp);
+  void logStringArray(String[] value, long timestamp);
+  void logRaw(byte[] value, String typeString, long timestamp);
 }
 ```
 
@@ -544,7 +544,7 @@ Key behavior:
 
 - `logByte`, `logShort`, and `logInt` default to widening into `logLong`, so a backend can implement integer handling with a single required path.
 
-- Backends are responsible for storing, transporting, deduplicating, or timestamping values as appropriate for that transport.
+- Backends are responsible for storing, transporting, deduplicating, and applying timestamps as appropriate for that transport. The `timestamp` parameter is in nanoseconds in the same time base as `WPIUtilJNI.now()`, or `0` to use the current time.
 
 - Metadata (`setProperty`) and duplicate-preservation (`keepDuplicates`) are handled at the entry level rather than the table level.
 
@@ -564,68 +564,68 @@ public final class ConsoleTelemetryBackend implements TelemetryBackend {
       public void setProperty(String key, String value) {}
 
       @Override
-      public <T> void logStruct(T value, Struct<? super T> struct) {
+      public <T> void logStruct(T value, Struct<? super T> struct, long timestamp) {
         System.out.println(path + " = " + value + " [struct=" + struct.getTypeName() + "]");
       }
 
       @Override
-      public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto) {
+      public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp) {
         System.out.println(path + " = " + value + " [proto=" + proto.getTypeString() + "]");
       }
 
       @Override
-      public <T> void logStructArray(T[] value, Struct<? super T> struct) {
+      public <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp) {
         System.out.println(path + " = struct array length " + value.length);
       }
 
       @Override
-      public void logBoolean(boolean value) {
+      public void logBoolean(boolean value, long timestamp) {
         System.out.println(path + " = " + value);
       }
 
       @Override
-      public void logLong(long value) {
+      public void logLong(long value, long timestamp) {
         System.out.println(path + " = " + value);
       }
 
       @Override
-      public void logFloat(float value) {
+      public void logFloat(float value, long timestamp) {
         System.out.println(path + " = " + value);
       }
 
       @Override
-      public void logDouble(double value) {
+      public void logDouble(double value, long timestamp) {
         System.out.println(path + " = " + value);
       }
 
       @Override
-      public void logString(String value, String typeString) {
+      public void logString(String value, String typeString, long timestamp) {
         System.out.println(path + " = " + value + " [type=" + typeString + "]");
       }
 
       @Override
-      public void logBooleanArray(boolean[] value) {}
+      public void logBooleanArray(boolean[] value, long timestamp) {}
 
       @Override
-      public void logShortArray(short[] value) {}
+      public void logShortArray(short[] value, long timestamp) {}
 
       @Override
-      public void logIntArray(int[] value) {}
+      public void logIntArray(int[] value, long timestamp) {}
 
       @Override
-      public void logLongArray(long[] value) {}
+      public void logLongArray(long[] value, long timestamp) {}
 
       @Override
-      public void logFloatArray(float[] value) {}
+      public void logFloatArray(float[] value, long timestamp) {}
 
       @Override
-      public void logDoubleArray(double[] value) {}
+      public void logDoubleArray(double[] value, long timestamp) {}
 
       @Override
-      public void logStringArray(String[] value) {}
+      public void logStringArray(String[] value, long timestamp) {}
 
       @Override
-      public void logRaw(byte[] value, String typeString) {}
+      public void logRaw(byte[] value, String typeString, long timestamp) {}
     };
   }
 
@@ -765,7 +765,7 @@ public void robotPeriodic() {
       "Drive/leftVelocity", m_leftEncoder.getRate());
   SmartDashboard.putNumber(
       "Drive/rightVelocity", m_rightEncoder.getRate());
-  SmartDashboard.putBoolean("Drive/ready", atSpeed());
+  SmartDashboard.putBoolean("Drive/ready", atVelocity());
 }
 ```
 
@@ -778,7 +778,7 @@ private final TelemetryTable m_driveTelemetry =
 public void robotPeriodic() {
   m_driveTelemetry.log("leftVelocity", m_leftEncoder.getRate());
   m_driveTelemetry.log("rightVelocity", m_rightEncoder.getRate());
-  m_driveTelemetry.log("ready", atSpeed());
+  m_driveTelemetry.log("ready", atVelocity());
 }
 ```
 
@@ -858,11 +858,11 @@ public void robotPeriodic() {
 **Is (Tunable):**
 
 ```java
-private final TunableDouble m_intakeSpeed =
-    Tunables.addDouble("Intake/speed", 0.65);
+private final TunableDouble m_intakeThrottle =
+    Tunables.addDouble("Intake/throttle", 0.65);
 
 public void robotPeriodic() {
-  m_intakeMotor.set(m_intakeSpeed.get());
+  m_intakeMotor.set(m_intakeThrottle.get());
 }
 ```
 

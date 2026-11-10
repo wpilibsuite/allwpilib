@@ -137,7 +137,7 @@ void ServerClient4Base::ClientSubscribe(int subuid,
   m_storage.ForEachTopic([&](ServerTopic* topic) {
     auto tcdIt = topic->clients.find(this);
     bool removed = tcdIt != topic->clients.end() && replace &&
-                   tcdIt->second.subscribers.erase(sub.get());
+                   tcdIt->second.RemoveSubscriber(sub.get());
 
     // is client already subscribed?
     bool wasSubscribed =
@@ -191,7 +191,7 @@ void ServerClient4Base::ClientUnsubscribe(int subuid) {
   m_storage.ForEachTopic([&](ServerTopic* topic) {
     auto tcdIt = topic->clients.find(this);
     if (tcdIt != topic->clients.end()) {
-      if (tcdIt->second.subscribers.erase(sub)) {
+      if (tcdIt->second.RemoveSubscriber(sub)) {
         UpdatePeriod(tcdIt->second, topic);
         m_storage.UpdateMetaTopicSub(topic);
       }

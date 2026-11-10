@@ -84,7 +84,7 @@ public class ExpansionHubMotor implements AutoCloseable {
       throw new AllocationException("ExpansionHub Motor already allocated");
     }
 
-    m_hub.reportUsage("ExHubMotor[" + channel + "]", "ExHubMotor");
+    m_hub.reportUsage("ExHubMotor", channel, "ExHubMotor");
 
     NetworkTableInstance systemServer = SystemServer.getSystemServer();
 

@@ -72,12 +72,12 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
 wpi::cmd::CommandPtr DriveSubsystem::ProfiledDriveDistance(
     wpi::units::meter_t distance) {
   return StartRun(
-             [&] {
+             [this] {
                // Restart timer so profile setpoints start at the beginning
                timer.Restart();
                ResetEncoders();
              },
-             [&] {
+             [this, distance] {
                // Current state never changes, so we need to use a timer to get
                // the setpoints we need to be at
                auto currentTime = timer.Get();
@@ -88,20 +88,20 @@ wpi::cmd::CommandPtr DriveSubsystem::ProfiledDriveDistance(
                SetDriveStates(currentSetpoint, currentSetpoint, nextSetpoint,
                               nextSetpoint);
              })
-      .Until([&] { return profile.IsFinished(0_s); });
+      .Until([this] { return profile.IsFinished(0_s); });
 }
 
 wpi::cmd::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
     wpi::units::meter_t distance) {
   return StartRun(
-             [&] {
+             [this] {
                // Restart timer so profile setpoints start at the beginning
                timer.Restart();
                // Store distance so we know the target distance for each encoder
                initialLeftDistance = GetLeftEncoderDistance();
                initialRightDistance = GetRightEncoderDistance();
              },
-             [&] {
+             [this, distance] {
                // Current state never changes for the duration of the command,
                // so we need to use a timer to get the setpoints we need to be
                // at
@@ -123,5 +123,5 @@ wpi::cmd::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
                SetDriveStates(currentLeftSetpoint, currentRightSetpoint,
                               nextLeftSetpoint, nextRightSetpoint);
              })
-      .Until([&] { return profile.IsFinished(0_s); });
+      .Until([this] { return profile.IsFinished(0_s); });
 }

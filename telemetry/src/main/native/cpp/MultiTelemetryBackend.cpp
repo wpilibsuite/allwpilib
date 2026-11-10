@@ -60,79 +60,107 @@ class MultiTelemetryBackend::Entry : public TelemetryEntry {
     ForEachEntry([&](TelemetryEntry& entry) { entry.SetProperty(key, value); });
   }
 
-  void LogBoolean(bool value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogBoolean(value); });
-  }
-
-  void LogInt8(int8_t value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogInt8(value); });
-  }
-
-  void LogInt16(int16_t value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogInt16(value); });
-  }
-
-  void LogInt32(int32_t value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogInt32(value); });
-  }
-
-  void LogInt64(int64_t value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogInt64(value); });
-  }
-
-  void LogFloat(float value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogFloat(value); });
-  }
-
-  void LogDouble(double value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogDouble(value); });
-  }
-
-  void LogString(std::string_view value, std::string_view typeString) override {
+  void LogBoolean(bool value, int64_t timestamp) override {
     ForEachEntry(
-        [=](TelemetryEntry& entry) { entry.LogString(value, typeString); });
+        [=](TelemetryEntry& entry) { entry.LogBoolean(value, timestamp); });
   }
 
-  void LogBooleanArray(std::span<const bool> value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogBooleanArray(value); });
-  }
-
-  void LogBooleanArray(std::span<const int> value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogBooleanArray(value); });
-  }
-
-  void LogInt16Array(std::span<const int16_t> value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogInt16Array(value); });
-  }
-
-  void LogInt32Array(std::span<const int32_t> value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogInt32Array(value); });
-  }
-
-  void LogInt64Array(std::span<const int64_t> value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogInt64Array(value); });
-  }
-
-  void LogFloatArray(std::span<const float> value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogFloatArray(value); });
-  }
-
-  void LogDoubleArray(std::span<const double> value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogDoubleArray(value); });
-  }
-
-  void LogStringArray(std::span<const std::string> value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogStringArray(value); });
-  }
-
-  void LogStringArray(std::span<const std::string_view> value) override {
-    ForEachEntry([=](TelemetryEntry& entry) { entry.LogStringArray(value); });
-  }
-
-  void LogRaw(std::span<const uint8_t> value,
-              std::string_view typeString) override {
+  void LogInt8(int8_t value, int64_t timestamp) override {
     ForEachEntry(
-        [=](TelemetryEntry& entry) { entry.LogRaw(value, typeString); });
+        [=](TelemetryEntry& entry) { entry.LogInt8(value, timestamp); });
+  }
+
+  void LogInt16(int16_t value, int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogInt16(value, timestamp); });
+  }
+
+  void LogInt32(int32_t value, int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogInt32(value, timestamp); });
+  }
+
+  void LogInt64(int64_t value, int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogInt64(value, timestamp); });
+  }
+
+  void LogFloat(float value, int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogFloat(value, timestamp); });
+  }
+
+  void LogDouble(double value, int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogDouble(value, timestamp); });
+  }
+
+  void LogString(std::string_view value, std::string_view typeString,
+                 int64_t timestamp) override {
+    ForEachEntry([=](TelemetryEntry& entry) {
+      entry.LogString(value, typeString, timestamp);
+    });
+  }
+
+  void LogBooleanArray(std::span<const bool> value,
+                       int64_t timestamp) override {
+    ForEachEntry([=](TelemetryEntry& entry) {
+      entry.LogBooleanArray(value, timestamp);
+    });
+  }
+
+  void LogBooleanArray(std::span<const int> value, int64_t timestamp) override {
+    ForEachEntry([=](TelemetryEntry& entry) {
+      entry.LogBooleanArray(value, timestamp);
+    });
+  }
+
+  void LogInt16Array(std::span<const int16_t> value,
+                     int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogInt16Array(value, timestamp); });
+  }
+
+  void LogInt32Array(std::span<const int32_t> value,
+                     int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogInt32Array(value, timestamp); });
+  }
+
+  void LogInt64Array(std::span<const int64_t> value,
+                     int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogInt64Array(value, timestamp); });
+  }
+
+  void LogFloatArray(std::span<const float> value, int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogFloatArray(value, timestamp); });
+  }
+
+  void LogDoubleArray(std::span<const double> value,
+                      int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogDoubleArray(value, timestamp); });
+  }
+
+  void LogStringArray(std::span<const std::string> value,
+                      int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogStringArray(value, timestamp); });
+  }
+
+  void LogStringArray(std::span<const std::string_view> value,
+                      int64_t timestamp) override {
+    ForEachEntry(
+        [=](TelemetryEntry& entry) { entry.LogStringArray(value, timestamp); });
+  }
+
+  void LogRaw(std::span<const uint8_t> value, std::string_view typeString,
+              int64_t timestamp) override {
+    ForEachEntry([=](TelemetryEntry& entry) {
+      entry.LogRaw(value, typeString, timestamp);
+    });
   }
 
  private:

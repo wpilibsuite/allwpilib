@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "wpi/hardware/bus/CANBus.hpp"
+#include "wpi/hardware/bus/CANPort.hpp"
 #include "wpi/hardware/pneumatic/CompressorConfigType.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
@@ -37,7 +37,7 @@ class Compressor : public wpi::telemetry::TelemetryLoggable {
    * @param module The module ID to use.
    * @param moduleType The module type to use.
    */
-  Compressor(CANBus busId, int module, PneumaticsModuleType moduleType);
+  Compressor(CANPort busId, int module, PneumaticsModuleType moduleType);
 
   /**
    * Constructs a compressor for a default module and specified type.
@@ -45,7 +45,7 @@ class Compressor : public wpi::telemetry::TelemetryLoggable {
    * @param busId The bus ID.
    * @param moduleType The module type to use.
    */
-  Compressor(CANBus busId, PneumaticsModuleType moduleType);
+  Compressor(CANPort busId, PneumaticsModuleType moduleType);
 
   ~Compressor() override;
 

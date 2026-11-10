@@ -20,9 +20,11 @@ def main():
     parser.add_argument("--project_cfg")
     parser.add_argument("--output_file")
     parser.add_argument("--third_party_dirs", nargs="+")
+    parser.add_argument("--module_include_targets", nargs="+")
     parser.add_argument("--native_srcs_root")
     parser.add_argument("--generated_include_target", default=None)
     parser.add_argument("--generated_include_root")
+    parser.add_argument("--extra_include_root_files", nargs="+", default=[])
     parser.add_argument("--package_name", required=True)
     args = parser.parse_args()
 
@@ -85,6 +87,15 @@ def main():
         "maven_lib_download"
     ]
 
+    # label=strip_prefix pairs for header trees that live in a Bazel module
+    # rather than under thirdparty/, e.g. @libuv//:include_files=include.
+    module_include_targets = []
+    module_include_repos = set()
+    for entry in args.module_include_targets or []:
+        label = entry.partition("=")[0]
+        module_include_targets.append(label)
+        module_include_repos.add("*" + label.removeprefix("@").split("//")[0] + "*")
+
     third_party_dirs = args.third_party_dirs or []
     replace_prefix_keys = []
     if args.native_srcs_root:
@@ -103,6 +114,8 @@ def main():
 
     if args.generated_include_target:
         replace_prefix_keys.append(root_package + "/" + args.generated_include_root)
+    for entry in args.module_include_targets or []:
+        replace_prefix_keys.append(entry.partition("=")[2])
     replace_prefix_keys.sort()
 
     with open(args.output_file, "w", newline="\n") as f:
@@ -116,9 +129,12 @@ def main():
                 pc_files=pc_files,
                 requires=requires,
                 project_name=project_name,
+                extra_include_root_files=args.extra_include_root_files,
                 generated_include_target=args.generated_include_target,
                 native_srcs_root=args.native_srcs_root,
                 replace_prefix_keys=replace_prefix_keys,
+                module_include_targets=module_include_targets,
+                module_include_repos=sorted(module_include_repos),
             )
         )
 
@@ -135,8 +151,19 @@ def define_native_wrapper(name, pyproject_toml = None):
         {%- for dir in third_party_dirs %}
             "{{native_srcs_root}}thirdparty/{{dir}}/include/**",
         {%- endfor %}
-        ]){%- endif %},
+        ]){%- endif %}{% if module_include_targets %} + [
+        {%- for target in module_include_targets %}
+            "{{target}}",
+        {%- endfor %}
+        ]{%- endif %}{% if extra_include_root_files %} + [
+        {%- for f in extra_include_root_files %}
+            "{{f}}",
+        {%- endfor %}
+        ]{%- endif %},
         out = "native/{{project_name}}/include",
+        {%- if module_include_repos %}
+        include_external_repositories = {{module_include_repos | double_quotes}},
+        {%- endif %}
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
         {%- for key in replace_prefix_keys %}

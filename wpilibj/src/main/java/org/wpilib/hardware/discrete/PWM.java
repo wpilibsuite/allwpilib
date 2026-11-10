@@ -4,13 +4,13 @@
 
 package org.wpilib.hardware.discrete;
 
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PWMJNI;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.internal.UnitTelemetry;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.units.Units;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -39,7 +39,7 @@ public class PWM implements TelemetryLoggable, AutoCloseable {
 
     setDisabled();
 
-    HAL.reportUsage("IO", channel, "PWM");
+    UsageReporting.reportUsage("IO", channel, "PWM");
   }
 
   /** Free the resource associated with the PWM channel and set the value to 0. */

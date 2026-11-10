@@ -7,11 +7,11 @@
 #include <string>
 
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -23,7 +23,7 @@ DigitalInput::DigitalInput(int channel) {
   m_handle = HAL_InitializeDIOPort(channel, true, stackTrace.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_ReportUsage("IO", channel, "DigitalInput");
+  wpi::util::ReportUsage("IO", channel, "DigitalInput");
 }
 
 bool DigitalInput::Get() const {

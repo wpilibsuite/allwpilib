@@ -6,7 +6,7 @@
 
 #include "wpi/drivers/motor/Koors40.hpp"
 
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -15,5 +15,5 @@ Koors40::Koors40(int channel) : PWMMotorController(channel) {
   m_pwm.SetOutputPeriod(20_ms);
   SetThrottle(0.0);
 
-  HAL_ReportUsage("IO", GetChannel(), "Koors40");
+  wpi::util::ReportUsage("IO", GetChannel(), "Koors40");
 }

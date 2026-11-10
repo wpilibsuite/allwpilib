@@ -6,7 +6,6 @@ from wpimath import (
     ChassisVelocities,
     MecanumDriveWheelVelocities,
     MecanumDriveWheelPositions,
-    Rotation2d,
     Translation2d,
 )
 

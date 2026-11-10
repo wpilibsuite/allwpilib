@@ -25,6 +25,7 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/mutex.hpp"
 
 using namespace wpi;
@@ -479,8 +480,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
   ::GetInstance();
   cs::UsbCamera camera{std::format("USB Camera {}", dev), dev};
   StartAutomaticCapture(camera);
-  auto csShared = GetCameraServerShared();
-  csShared->ReportUsage(std::format("UsbCamera[{}]", dev), "auto");
+  wpi::util::ReportUsage("UsbCamera", dev, "auto");
   return camera;
 }
 
@@ -489,8 +489,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   ::GetInstance();
   cs::UsbCamera camera{name, dev};
   StartAutomaticCapture(camera);
-  auto csShared = GetCameraServerShared();
-  csShared->ReportUsage(std::format("UsbCamera[{}]", dev), "name");
+  wpi::util::ReportUsage("UsbCamera", dev, "name");
   return camera;
 }
 
@@ -499,8 +498,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   ::GetInstance();
   cs::UsbCamera camera{name, path};
   StartAutomaticCapture(camera);
-  auto csShared = GetCameraServerShared();
-  csShared->ReportUsage(std::format("UsbCamera[{}]", path), "path");
+  wpi::util::ReportUsage(std::format("UsbCamera[{}]", path), "path");
   return camera;
 }
 

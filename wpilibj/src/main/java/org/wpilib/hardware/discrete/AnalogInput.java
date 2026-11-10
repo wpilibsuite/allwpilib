@@ -5,10 +5,10 @@
 package org.wpilib.hardware.discrete;
 
 import org.wpilib.hardware.hal.AnalogInputJNI;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Analog channel class.
@@ -30,7 +30,7 @@ public class AnalogInput implements TelemetryLoggable, AutoCloseable {
 
     m_port = AnalogInputJNI.initializeAnalogInputPort(channel);
 
-    HAL.reportUsage("IO", channel, "AnalogInput");
+    UsageReporting.reportUsage("IO", channel, "AnalogInput");
   }
 
   @Override

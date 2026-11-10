@@ -1,0 +1,45 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "I2CCommunication_lib",
+    hdrs = glob(["include/**/*.hpp"]),
+    linkstatic = True,
+    strip_include_prefix = "include",
+    visibility = [
+        "//wpilibcExamples/src/test/cpp/snippets/I2CCommunication:__pkg__",
+    ],
+    deps = [
+        "//wpilibc",
+    ],
+)
+
+cc_binary(
+    name = "I2CCommunication",
+    srcs = ["cpp/Robot.cpp"],
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        ":I2CCommunication_lib",
+    ],
+)
+
+exports_files(
+    ["cpp/Robot.cpp"],
+    visibility = [
+        "//wpilibcExamples/src/test/cpp/snippets/I2CCommunication:__pkg__",
+    ],
+)
+
+# For allwpilib packaging
+filegroup(
+    name = "sources",
+    srcs = glob([
+        "cpp/**/*.cpp",
+        "include/**/*.hpp",
+    ]),
+    visibility = [
+        "//wpilibcExamples/src/main/cpp/snippets:__pkg__",
+    ],
+)

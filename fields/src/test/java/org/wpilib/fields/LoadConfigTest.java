@@ -52,6 +52,11 @@ class LoadConfigTest {
       Assertions.assertEquals(fieldData.getImageResource(), resourceField.getImageResource());
     }
 
+    Assertions.assertEquals(field.getTags(), resourceField.getTags());
+    Assertions.assertEquals(org.wpilib.math.geometry.Pose3d.ZERO, field.getOrigin());
+    for (FieldTag tag : field.getTags()) {
+      Assertions.assertEquals(tag.getPose(), field.getTagPose(tag.getID()).orElseThrow());
+    }
     Assertions.assertEquals(fieldData.hasTags, field.hasTags());
     Assertions.assertEquals(fieldData.length, field.getFieldLength(), 1e-9);
     Assertions.assertEquals(fieldData.width, field.getFieldWidth(), 1e-9);

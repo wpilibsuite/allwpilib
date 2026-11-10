@@ -1,0 +1,43 @@
+load("@rules_jvm_external//:defs.bzl", "java_plugin_artifact")
+load("//shared/bazel/rules:java_rules.bzl", "patch_module")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_java_library")
+
+wpilib_jni_java_library(
+    name = "wpimath-java",
+    srcs = ["//wpimath:generated_java"] + glob(["**/*.java"]),
+    exported_plugins = ["//javacPlugin:plugin"],
+    generated_java_srcs = ["//wpimath:generated_java"],
+    javacopts = [
+        "-Xep:UnicodeInCode:OFF",
+    ] + patch_module(
+        "wpilib.math",
+        ["wpimath/src/generated/main/java"],
+    ),
+    maven_artifact_name = "wpimath-java",
+    maven_group_id = "org.wpilib.wpimath",
+    native_libs = ["//wpimath:shared/wpimathjni"],
+    plugins = [
+        java_plugin_artifact("io.avaje:avaje-jsonb-generator", "io.avaje.jsonb.generator.JsonbProcessor"),
+    ],
+    proto_srcs = ["//wpimath:proto_resources"],
+    resource_strip_prefix = "wpimath/src/main/proto",
+    resources = ["//wpimath:proto_resources"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//telemetry/src/main/java",
+        "//tunables/src/main/java",
+        "//wpiannotations/src/main/java",
+        "//wpiunits/src/main/java",
+        "//wpiutil/src/main/java",
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
+        "@maven//:org_ejml_ejml_java9module",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":wpimath-java",
+    visibility = ["//visibility:public"],
+)

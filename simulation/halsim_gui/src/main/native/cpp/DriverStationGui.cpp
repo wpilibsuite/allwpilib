@@ -1526,7 +1526,7 @@ void DSSimModel::Update() {
 
   double matchTime = HALSIM_GetDriverStationMatchTime();
   if (!IsDSDisabled() && enabled) {
-    double curTime = HAL_GetMonotonicTime() * 1.0e-6;
+    double curTime = HAL_GetMonotonicTime() * 1.0e-9;
     if (m_startMatchTime == -1.0) {
       m_startMatchTime = matchTime + curTime;
     }

@@ -4,7 +4,7 @@
 
 package org.wpilib.hardware.pneumatic;
 
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.util.AllocationException;
 import org.wpilib.internal.UnitTelemetry;
 import org.wpilib.telemetry.TelemetryLoggable;
@@ -33,7 +33,7 @@ public class Compressor implements TelemetryLoggable, AutoCloseable {
    * @param module The module ID to use.
    * @param moduleType The module type to use.
    */
-  public Compressor(CANBus busId, int module, PneumaticsModuleType moduleType) {
+  public Compressor(CANPort busId, int module, PneumaticsModuleType moduleType) {
     m_module = PneumaticsBase.getForType(busId, module, moduleType);
     m_moduleType = moduleType;
 
@@ -53,7 +53,7 @@ public class Compressor implements TelemetryLoggable, AutoCloseable {
    * @param busId The bus ID
    * @param moduleType The module type to use.
    */
-  public Compressor(CANBus busId, PneumaticsModuleType moduleType) {
+  public Compressor(CANPort busId, PneumaticsModuleType moduleType) {
     this(busId, PneumaticsBase.getDefaultForType(moduleType), moduleType);
   }
 

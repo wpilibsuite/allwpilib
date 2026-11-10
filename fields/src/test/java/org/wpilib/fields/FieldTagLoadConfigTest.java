@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
@@ -16,7 +17,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
-import org.wpilib.math.util.Units;
 
 class FieldTagLoadConfigTest {
   @ParameterizedTest
@@ -35,10 +35,10 @@ class FieldTagLoadConfigTest {
     // Blue Hangar Truss - Hub
     Pose3d expectedPose =
         new Pose3d(
-            Units.inchesToMeters(127.272),
-            Units.inchesToMeters(216.01),
-            Units.inchesToMeters(67.932),
-            Rotation3d.ZERO);
+            inchesToMeters(196.728),
+            inchesToMeters(-54.01),
+            inchesToMeters(67.932),
+            new Rotation3d(0, 0, Math.PI));
     Optional<Pose3d> maybePose = field.getTagPose(1);
     assertTrue(maybePose.isPresent());
     assertEquals(expectedPose, maybePose.get());
@@ -46,10 +46,10 @@ class FieldTagLoadConfigTest {
     // Blue Terminal Near Station
     expectedPose =
         new Pose3d(
-            Units.inchesToMeters(4.768),
-            Units.inchesToMeters(67.631),
-            Units.inchesToMeters(35.063),
-            new Rotation3d(0, 0, Math.toRadians(46.25)));
+            inchesToMeters(319.232),
+            inchesToMeters(94.369),
+            inchesToMeters(35.063),
+            new Rotation3d(0, 0, Math.toRadians(226.25)));
     maybePose = field.getTagPose(5);
     assertTrue(maybePose.isPresent());
     assertEquals(expectedPose, maybePose.get());
@@ -57,10 +57,10 @@ class FieldTagLoadConfigTest {
     // Upper Hub Blue-Near
     expectedPose =
         new Pose3d(
-            Units.inchesToMeters(332.321),
-            Units.inchesToMeters(183.676),
-            Units.inchesToMeters(95.186),
-            new Rotation3d(0, Math.toRadians(26.75), Math.toRadians(69)));
+            inchesToMeters(-8.321),
+            inchesToMeters(-21.676),
+            inchesToMeters(95.186),
+            new Rotation3d(0, Math.toRadians(26.75), Math.toRadians(249)));
     maybePose = field.getTagPose(53);
     assertTrue(maybePose.isPresent());
     assertEquals(expectedPose, maybePose.get());

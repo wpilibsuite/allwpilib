@@ -121,6 +121,25 @@ def test_builtin_field_metadata(field_id):
     )
     assert parsed_json["field-dimensions"]["width"] == pytest.approx(field.get_width())
 
+    assert_pose_close(field.get_origin(), Pose3d())
+    for tag in parsed_json.get("field-tags", []):
+        pose = field.get_tag_pose(tag["ID"])
+        translation = tag["pose"]["translation"]
+        assert pose.x == pytest.approx(translation["x"])
+        assert pose.y == pytest.approx(translation["y"])
+        assert pose.z == pytest.approx(translation["z"])
+        quaternion = pose.rotation().get_quaternion()
+        expected = tag["pose"]["rotation"]["quaternion"]
+        assert abs(
+            sum(
+                a * expected[k]
+                for a, k in zip(
+                    [quaternion.w, quaternion.x, quaternion.y, quaternion.z],
+                    "WXYZ",
+                )
+            )
+        ) == pytest.approx(1)
+
     image = field.get_image()
     assert field.has_image() == (image is not None)
     if image is None:
@@ -167,28 +186,28 @@ def test_2022_rapid_react_tag_poses():
 
     # Blue Hangar Truss - Hub
     expected_pose = Pose3d(
-        inches_to_meters(127.272),
-        inches_to_meters(216.01),
+        inches_to_meters(196.728),
+        inches_to_meters(-54.01),
         inches_to_meters(67.932),
-        Rotation3d(),
+        Rotation3d(0, 0, math.pi),
     )
     assert_pose_close(field.get_tag_pose(1), expected_pose)
 
     # Blue Terminal Near Station
     expected_pose = Pose3d(
-        inches_to_meters(4.768),
-        inches_to_meters(67.631),
+        inches_to_meters(319.232),
+        inches_to_meters(94.369),
         inches_to_meters(35.063),
-        Rotation3d(0, 0, math.radians(46.25)),
+        Rotation3d(0, 0, math.radians(226.25)),
     )
     assert_pose_close(field.get_tag_pose(5), expected_pose)
 
     # Upper Hub Blue-Near
     expected_pose = Pose3d(
-        inches_to_meters(332.321),
-        inches_to_meters(183.676),
+        inches_to_meters(-8.321),
+        inches_to_meters(-21.676),
         inches_to_meters(95.186),
-        Rotation3d(0, math.radians(26.75), math.radians(69)),
+        Rotation3d(0, math.radians(26.75), math.radians(249)),
     )
     assert_pose_close(field.get_tag_pose(53), expected_pose)
 
@@ -197,24 +216,45 @@ def test_2022_rapid_react_tag_poses():
 
 def test_set_origin_transformation_matches():
     field = make_test_field()
+    assert_pose_close(field.get_origin(), Pose3d())
+    assert_pose_close(field.get_tag_pose(1), Pose3d())
 
     field.set_origin(robotpy_fields.Field.OriginPosition.RED_ALLIANCE_WALL_RIGHT_SIDE)
-
-    expected_pose = Pose3d(
-        feet_to_meters(54),
-        feet_to_meters(27),
-        0,
-        Rotation3d(0, 0, math.radians(180)),
+    assert_pose_close(
+        field.get_tag_pose(1),
+        Pose3d(feet_to_meters(27), feet_to_meters(13.5), 0, Rotation3d()),
     )
-    assert_pose_close(field.get_tag_pose(1), expected_pose)
-
-    expected_pose = Pose3d(
-        feet_to_meters(50),
-        feet_to_meters(23),
-        feet_to_meters(4),
-        Rotation3d(),
+    assert_pose_close(
+        field.get_tag_pose(2),
+        Pose3d(
+            feet_to_meters(31),
+            feet_to_meters(17.5),
+            feet_to_meters(4),
+            Rotation3d(0, 0, math.pi),
+        ),
     )
-    assert_pose_close(field.get_tag_pose(2), expected_pose)
+
+    field.set_origin(robotpy_fields.Field.OriginPosition.BLUE_ALLIANCE_WALL_RIGHT_SIDE)
+    assert_pose_close(
+        field.get_tag_pose(1),
+        Pose3d(feet_to_meters(27), feet_to_meters(13.5), 0, Rotation3d(0, 0, math.pi)),
+    )
+    assert_pose_close(
+        field.get_tag_pose(2),
+        Pose3d(
+            feet_to_meters(23), feet_to_meters(9.5), feet_to_meters(4), Rotation3d()
+        ),
+    )
+
+    origin = Pose3d(-2, 1, 0.5, Rotation3d(0.1, 0.2, 0.3))
+    field.set_origin(origin)
+    assert_pose_close(
+        field.get_tag_pose(2), field.get_tags()[1].pose.relative_to(origin)
+    )
+
+    field.set_origin(robotpy_fields.Field.OriginPosition.FIELD_CENTER)
+    assert_pose_close(field.get_origin(), Pose3d())
+    assert_pose_close(field.get_tag_pose(2), field.get_tags()[1].pose)
 
 
 def test_deserialize_round_trip(tmp_path):

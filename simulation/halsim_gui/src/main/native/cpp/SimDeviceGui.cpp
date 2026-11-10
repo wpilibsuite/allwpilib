@@ -6,10 +6,16 @@
 
 #include <stdint.h>
 
+#include <algorithm>
 #include <format>
 #include <memory>
+#include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
 
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
 #include "wpi/glass/other/DeviceTree.hpp"
 #include "wpi/hal/SimDevice.hpp"
 #include "wpi/hal/simulation/SimDeviceData.h"
@@ -92,6 +98,21 @@ class SimDevicesModel : public wpi::glass::Model {
   wpi::util::DenseMap<HAL_SimValueHandle,
                       std::unique_ptr<wpi::glass::DataSource>>
       m_sources;
+};
+
+struct SimDeviceTreeDevice {
+  std::string id;
+  HAL_SimDeviceHandle handle;
+};
+
+struct SimDeviceTreeNode {
+  SimDeviceTreeNode(std::string_view name, std::string_view id)
+      : name{name}, id{id} {}
+
+  std::string name;
+  std::string id;
+  std::vector<SimDeviceTreeDevice> devices;
+  std::vector<SimDeviceTreeNode> children;
 };
 }  // namespace
 
@@ -193,8 +214,7 @@ static void DisplaySimValue(const char* name, void* data,
   }
 }
 
-static void DisplaySimDevice(const char* name, void* data,
-                             HAL_SimDeviceHandle handle) {
+static std::string GetDisplaySimDeviceId(const char* name) {
   std::string_view id{name};
   if (!gSimDevicesShowPrefix) {
     // only show "Foo" portion of "Accel:Foo"
@@ -204,9 +224,114 @@ static void DisplaySimDevice(const char* name, void* data,
       id = type;
     }
   }
-  if (wpi::glass::BeginDevice(id.data())) {
-    HALSIM_EnumerateSimValues(handle, data, DisplaySimValue);
+
+  return std::string{id};
+}
+
+static SimDeviceTreeNode& GetOrAddChild(SimDeviceTreeNode& node,
+                                        std::string_view name) {
+  auto childIt =
+      std::find_if(node.children.begin(), node.children.end(),
+                   [&](const auto& child) { return child.name == name; });
+  if (childIt == node.children.end()) {
+    std::string id = node.id;
+    if (!id.empty()) {
+      id += '/';
+    }
+    id += name;
+    node.children.emplace_back(name, id);
+    return node.children.back();
+  }
+  return *childIt;
+}
+
+static void AddSimDevice(SimDeviceTreeNode& root, std::string id,
+                         HAL_SimDeviceHandle handle) {
+  if (wpi::glass::IsDeviceHidden(id)) {
+    return;
+  }
+
+  SimDeviceTreeNode* node = &root;
+  wpi::util::split(id, '/', -1, false, [&](std::string_view segment) {
+    node = &GetOrAddChild(*node, segment);
+  });
+  if (node == &root) {
+    node = &GetOrAddChild(root, id);
+  }
+  node->devices.push_back({std::move(id), handle});
+}
+
+static void SortSimDeviceTree(SimDeviceTreeNode& node) {
+  std::sort(
+      node.children.begin(), node.children.end(),
+      [](const auto& lhs, const auto& rhs) { return lhs.name < rhs.name; });
+
+  for (auto&& child : node.children) {
+    SortSimDeviceTree(child);
+  }
+}
+
+static bool BeginSimDeviceTreeNode(const SimDeviceTreeNode& node) {
+  auto flags = ImGuiTreeNodeFlags_DefaultOpen;
+  bool& open = wpi::glass::GetStorage()
+                   .GetChild("deviceTree")
+                   .GetChild(node.id)
+                   .GetBool("open", true);
+  ImGui::SetNextItemOpen(open);
+
+  std::string label = std::format("{}###{}", node.name, node.id);
+  open = ImGui::CollapsingHeader(label.c_str(), flags);
+  if (open) {
+    ImGui::Indent();
+  }
+  return open;
+}
+
+static void EndSimDeviceTreeNode() {
+  ImGui::Unindent();
+}
+
+static void DisplaySimDevice(SimDevicesModel* model,
+                             const SimDeviceTreeDevice& device,
+                             std::string_view label) {
+  if (wpi::glass::BeginDevice(device.id, label)) {
+    HALSIM_EnumerateSimValues(device.handle, model, DisplaySimValue);
     wpi::glass::EndDevice();
+  }
+}
+
+static void DisplaySimDeviceTree(SimDevicesModel* model,
+                                 const SimDeviceTreeNode& node) {
+  if (node.children.empty()) {
+    for (auto&& device : node.devices) {
+      DisplaySimDevice(model, device, node.name);
+    }
+    return;
+  }
+
+  if (BeginSimDeviceTreeNode(node)) {
+    for (auto&& device : node.devices) {
+      DisplaySimDevice(model, device, node.name);
+    }
+    for (auto&& child : node.children) {
+      DisplaySimDeviceTree(model, child);
+    }
+    EndSimDeviceTreeNode();
+  }
+}
+
+static void DisplaySimDevices(SimDevicesModel* model) {
+  SimDeviceTreeNode root{"", ""};
+  HALSIM_EnumerateSimDevices(
+      "", &root, [](const char* name, void* data, HAL_SimDeviceHandle handle) {
+        AddSimDevice(*static_cast<SimDeviceTreeNode*>(data),
+                     GetDisplaySimDeviceId(name), handle);
+      });
+
+  SortSimDeviceTree(root);
+
+  for (auto&& child : root.children) {
+    DisplaySimDeviceTree(model, child);
   }
 }
 
@@ -231,8 +356,7 @@ void SimDeviceGui::Initialize() {
   auto model = std::make_unique<SimDevicesModel>();
   gSimDevicesModel = model.get();
   GetDeviceTree().Add(std::move(model), [](wpi::glass::Model* model) {
-    HALSIM_EnumerateSimDevices("", static_cast<SimDevicesModel*>(model),
-                               DisplaySimDevice);
+    DisplaySimDevices(static_cast<SimDevicesModel*>(model));
   });
 }
 

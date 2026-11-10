@@ -5,12 +5,13 @@
 #
 
 import math
+from typing import override
 
 import commands2
+import romi
 import telemetry
 import wpilib
 import wpilib_drivers
-import romi
 
 
 class Drivetrain(commands2.Subsystem):
@@ -103,6 +104,7 @@ class Drivetrain(commands2.Subsystem):
         """Reset the gyro"""
         self.gyro.reset()
 
+    @override
     def log_to(self, table: telemetry.TelemetryTable) -> None:
         super().log_to(table)
         table.log("drive", self.drive)

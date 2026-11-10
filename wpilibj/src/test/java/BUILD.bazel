@@ -1,0 +1,20 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+
+wpilib_java_junit5_test(
+    name = "java",
+    srcs = glob(["**/*.java"]) + ["//wpilibj:generated-test-java-srcs"],
+    resource_strip_prefix = "wpilibj/src/test/resources",
+    resources = ["//wpilibj:test-resources"],
+    deps = [
+        "//datalog/src/main/java",
+        "//hal/src/main/java",
+        "//ntcore/src/main/java",
+        "//telemetry/src/main/java",
+        "//tunables/src/main/java",
+        "//wpilibj/src/main/java",
+        "//wpimath/src/main/java",
+        "//wpiunits/src/main/java",
+        "//wpiutil/src/main/java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)

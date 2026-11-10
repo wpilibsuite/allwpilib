@@ -10,10 +10,10 @@ import java.util.EnumSet;
 import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from Xbox controllers connected to the Driver Station.
@@ -151,7 +151,7 @@ public class XboxController implements HIDDevice, TelemetryLoggable {
    */
   public XboxController(final GenericHID hid) {
     m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
-    HAL.reportUsage("HID", hid.getPort(), "XboxController");
+    UsageReporting.reportUsage("HID", hid.getPort(), "XboxController");
   }
 
   /**
@@ -1010,20 +1010,20 @@ public class XboxController implements HIDDevice, TelemetryLoggable {
     table.log("RightY", getRightY());
     table.log("LeftTrigger", getLeftTrigger());
     table.log("RightTrigger", getRightTrigger());
-    table.log("AButton", getAButton());
-    table.log("BButton", getBButton());
-    table.log("XButton", getXButton());
-    table.log("YButton", getYButton());
-    table.log("ViewButton", getViewButton());
-    table.log("XboxButton", getXboxButton());
-    table.log("MenuButton", getMenuButton());
-    table.log("LeftStickButton", getLeftStickButton());
-    table.log("RightStickButton", getRightStickButton());
-    table.log("LeftBumperButton", getLeftBumperButton());
-    table.log("RightBumperButton", getRightBumperButton());
-    table.log("DpadUpButton", getDpadUpButton());
-    table.log("DpadDownButton", getDpadDownButton());
-    table.log("DpadLeftButton", getDpadLeftButton());
-    table.log("DpadRightButton", getDpadRightButton());
+    table.log("A", getAButton());
+    table.log("B", getBButton());
+    table.log("X", getXButton());
+    table.log("Y", getYButton());
+    table.log("View", getViewButton());
+    table.log("Xbox", getXboxButton());
+    table.log("Menu", getMenuButton());
+    table.log("LeftStick", getLeftStickButton());
+    table.log("RightStick", getRightStickButton());
+    table.log("LeftBumper", getLeftBumperButton());
+    table.log("RightBumper", getRightBumperButton());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
   }
 }

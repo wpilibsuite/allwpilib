@@ -37,7 +37,7 @@ functions:
           ((SimValueCB*)param)->m_fn(name, handle, (HAL_SimValueDirection)direction, *value);
         }, initialNotify);
         cb->SetUID(uid);
-        return std::move(cb);
+        return cb;
       }
   HALSIM_CancelSimValueCreatedCallback:
     ignore: true
@@ -58,7 +58,7 @@ functions:
           ((SimValueCB*)param)->m_fn(name, handle, (HAL_SimValueDirection)direction, *value);
         }, initialNotify);
         cb->SetUID(uid);
-        return std::move(cb);
+        return cb;
       }
   HALSIM_CancelSimValueChangedCallback:
     ignore: true
@@ -79,7 +79,7 @@ functions:
           ((SimValueCB*)param)->m_fn(name, handle, (HAL_SimValueDirection)direction, *value);
         }, initialNotify);
         cb->SetUID(uid);
-        return std::move(cb);
+        return cb;
       }
   HALSIM_CancelSimValueResetCallback:
     ignore: true

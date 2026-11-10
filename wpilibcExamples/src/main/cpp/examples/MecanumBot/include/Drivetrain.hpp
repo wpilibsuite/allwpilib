@@ -22,6 +22,7 @@
 class Drivetrain {
  public:
   Drivetrain() {
+    // Start facing the blue alliance wall so yaw zero aligns with field +X.
     imu.ResetYaw();
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's

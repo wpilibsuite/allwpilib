@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import telemetry
 import wpilib
 
@@ -34,7 +36,7 @@ class MyRobot(wpilib.TimedRobot):
         # Solenoid corresponds to a single solenoid.
         # In this case, it's connected to channel 0 of a PH with the default CAN ID.
         self.solenoid = wpilib.Solenoid(
-            bus_id=wpilib.CANBus.CAN_S0,
+            bus_id=wpilib.CANPort.CAN_S0,
             module_type=wpilib.PneumaticsModuleType.REV_PH,
             channel=0,
         )
@@ -42,7 +44,7 @@ class MyRobot(wpilib.TimedRobot):
         # DoubleSolenoid corresponds to a double solenoid.
         # In this case, it's connected to channels 1 and 2 of a PH with the default CAN ID.
         self.double_solenoid = wpilib.DoubleSolenoid(
-            bus_id=wpilib.CANBus.CAN_S0,
+            bus_id=wpilib.CANPort.CAN_S0,
             module_type=wpilib.PneumaticsModuleType.REV_PH,
             forward_channel=1,
             reverse_channel=2,
@@ -50,10 +52,11 @@ class MyRobot(wpilib.TimedRobot):
 
         # Compressor connected to a PH with a default CAN ID (1)
         self.compressor = wpilib.Compressor(
-            bus_id=wpilib.CANBus.CAN_S0,
+            bus_id=wpilib.CANPort.CAN_S0,
             module_type=wpilib.PneumaticsModuleType.REV_PH,
         )
 
+    @override
     def teleop_periodic(self) -> None:
         # Publish some raw data
         # Get the pressure (in PSI) from the analog sensor connected to the PH.

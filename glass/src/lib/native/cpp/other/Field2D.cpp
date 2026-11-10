@@ -22,6 +22,7 @@
 #include "wpi/fields/fields.hpp"
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
+#include "wpi/glass/detail/Field2DView.hpp"
 #include "wpi/glass/support/ColorSetting.hpp"
 #include "wpi/glass/support/EnumSetting.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
@@ -50,27 +51,7 @@ constexpr const char* NT_POSE2D_ARRAY_DRAG_DROP_TYPE = "NT:struct:Pose2d[]";
 constexpr std::string_view POSE2D_TYPE = "struct:Pose2d";
 constexpr std::string_view POSE2D_ARRAY_TYPE = "struct:Pose2d[]";
 
-// Per-frame field data (not persistent)
-struct FieldFrameData {
-  wpi::math::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
-    return {wpi::units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) /
-                                scale},
-            wpi::units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) /
-                                scale}};
-  }
-  ImVec2 GetScreenFromPos(const wpi::math::Translation2d& pos) const {
-    return {min.x + scale * pos.X().to<float>(),
-            max.y - scale * pos.Y().to<float>()};
-  }
-
-  // in screen coordinates
-  ImVec2 imageMin;
-  ImVec2 imageMax;
-  ImVec2 min;
-  ImVec2 max;
-
-  float scale;  // scaling from meters to screen units
-};
+using detail::FieldFrameData;
 
 // Pose drag target info
 struct SelectedTargetInfo {
@@ -388,7 +369,7 @@ static bool InputPose(wpi::math::Pose2d* pose) {
 
 FieldInfo::FieldInfo(Storage& storage)
     : m_builtin{storage.GetString("builtin", "Custom")},
-      m_filename{storage.GetString("image")},
+      m_filename{storage.GetPath("image")},
       m_width{storage.GetFloat("width", DEFAULT_WIDTH.to<float>())},
       m_height{storage.GetFloat("height", DEFAULT_HEIGHT.to<float>())},
       m_top{storage.GetInt("top", 0)},
@@ -653,7 +634,7 @@ ObjectInfo::ObjectInfo(Storage& storage)
           "arrowColor", DisplayOptions::DEFAULT_ARROW_COLOR_FLOAT)},
       m_selectable{
           storage.GetBool("selectable", DisplayOptions::DEFAULT_SELECTABLE)},
-      m_filename{storage.GetString("image")} {}
+      m_filename{storage.GetPath("image")} {}
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
   DisplayOptions rv{m_texture};
@@ -807,15 +788,14 @@ void PoseFrameData::SetRotation(wpi::units::radian_t rot) {
 }
 
 void PoseFrameData::UpdateFrameData() {
-  // (0,0) origin is bottom left
+  // Field center is (0, 0); +X points right and +Y points up on the image.
   ImVec2 center = m_ffd.GetScreenFromPos(m_pose.Translation());
 
   // build rotated points around center
   float length2 = m_length2;
   float width2 = m_width2;
   auto& rot = GetRotation();
-  float cos_a = rot.Cos();
-  float sin_a = -rot.Sin();
+  auto [cos_a, sin_a] = m_ffd.GetScreenRotation(rot);
 
   m_corners[0] = center + ImRotate(ImVec2(-length2, -width2), cos_a, sin_a);
   m_corners[1] = center + ImRotate(ImVec2(length2, -width2), cos_a, sin_a);

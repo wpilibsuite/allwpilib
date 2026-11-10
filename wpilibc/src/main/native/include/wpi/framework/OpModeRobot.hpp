@@ -147,16 +147,16 @@ class OpModeRobotBase : public RobotBase {
   void AddPeriodic(std::function<void()> callback, wpi::units::second_t period);
 
   /**
-   * Return the system clock time in microseconds for the start of the current
+   * Return the system clock time in nanoseconds for the start of the current
    * periodic loop. This is in the same time base as
    * Timer.getMonotonicTimeStamp(), but is stable through a loop. It is updated
    * at the beginning of every periodic callback (including the normal periodic
    * loop).
    *
-   * @return Robot running time in microseconds, as of the start of the current
+   * @return Robot running time in nanoseconds, as of the start of the current
    * periodic function.
    */
-  wpi::units::microsecond_t GetLoopStartTime() const {
+  wpi::units::nanosecond_t GetLoopStartTime() const {
     return m_callbacks.GetLoopStartTime();
   }
 
@@ -256,7 +256,7 @@ class OpModeRobotBase : public RobotBase {
   wpi::internal::PeriodicPriorityQueue m_callbacks;
   HAL_NotifierHandle m_notifier;
   wpi::units::second_t m_period;
-  std::chrono::microseconds m_startTime;
+  std::chrono::nanoseconds m_startTime;
   wpi::util::Alert m_loopOverrunAlert;
   Watchdog m_watchdog;
 

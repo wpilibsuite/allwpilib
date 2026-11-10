@@ -9,11 +9,13 @@ from ._wpiutil import (
     TimestampSource,
     get_program_start_time,
     get_stack_trace,
-    set_now_impl,
     get_stack_trace_default,
     get_system_time,
     now,
     now_default,
+    report_usage,
+    set_now_impl,
+    set_report_usage_impl,
 )
 
 __all__ = [
@@ -24,17 +26,17 @@ __all__ = [
     "TimestampSource",
     "get_program_start_time",
     "get_stack_trace",
-    "set_now_impl",
     "get_stack_trace_default",
     "get_system_time",
     "now",
     "now_default",
+    "report_usage",
+    "set_now_impl",
+    "set_report_usage_impl",
 ]
 
 # Imported for side effects only
-from . import _stacktrace
+from . import _stacktrace  # noqa: F401
 
 # Type alias
-import typing
-
-json = typing.Union[None, bool, int, float, str, typing.List, typing.Dict]
+type json = bool | int | float | str | list | dict | None

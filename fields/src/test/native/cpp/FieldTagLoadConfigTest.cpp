@@ -5,6 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/fields/fields.hpp"
+#include "wpi/util/json.hpp"
 
 namespace wpi::fields {
 
@@ -34,24 +35,24 @@ TEST_CASE("FieldsTagTest TestLoad2022RapidReact", "[field-tag][field-layout]") {
 
   // Blue Hangar Truss - Hub
   auto expectedPose =
-      wpi::math::Pose3d{127.272_in, 216.01_in, 67.932_in,
-                        wpi::math::Rotation3d{0_deg, 0_deg, 0_deg}};
+      wpi::math::Pose3d{196.728_in, -54.01_in, 67.932_in,
+                        wpi::math::Rotation3d{0_deg, 0_deg, 180_deg}};
   auto maybePose = field.GetTagPose(1);
   REQUIRE(maybePose);
   CHECK(expectedPose == *maybePose);
 
   // Blue Terminal Near Station
   expectedPose =
-      wpi::math::Pose3d{4.768_in, 67.631_in, 35.063_in,
-                        wpi::math::Rotation3d{0_deg, 0_deg, 46.25_deg}};
+      wpi::math::Pose3d{319.232_in, 94.369_in, 35.063_in,
+                        wpi::math::Rotation3d{0_deg, 0_deg, 226.25_deg}};
   maybePose = field.GetTagPose(5);
   REQUIRE(maybePose);
   CHECK(expectedPose == *maybePose);
 
   // Upper Hub Blue-Near
   expectedPose =
-      wpi::math::Pose3d{332.321_in, 183.676_in, 95.186_in,
-                        wpi::math::Rotation3d{0_deg, 26.75_deg, 69_deg}};
+      wpi::math::Pose3d{-8.321_in, -21.676_in, 95.186_in,
+                        wpi::math::Rotation3d{0_deg, 26.75_deg, 249_deg}};
   maybePose = field.GetTagPose(53);
   REQUIRE(maybePose);
   CHECK(expectedPose == *maybePose);
@@ -72,6 +73,13 @@ TEST_CASE("FieldsTagTest CheckEntireEnum", "[field-tag][field-layout]") {
     CHECK(fieldData.GetLength().value() > 0.0);
     CHECK(fieldData.GetWidth().value() > 0.0);
     CHECK_FALSE(fieldData.GetTags().empty());
+    CHECK(fieldData.GetOrigin() == wpi::math::Pose3d{});
+    auto jsonField =
+        wpi::util::json::parse(fieldData.GetJson()).value().get<Field>();
+    CHECK(fieldData.GetTags() == jsonField.GetTags());
+    for (const auto& tag : fieldData.GetTags()) {
+      CHECK(*fieldData.GetTagPose(tag.ID) == tag.pose);
+    }
   }
 }
 

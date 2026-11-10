@@ -5,11 +5,11 @@
 package org.wpilib.hardware.counter;
 
 import org.wpilib.hardware.hal.CounterJNI;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.internal.UnitTelemetry;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.units.Units;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Tachometer.
@@ -32,7 +32,7 @@ public class Tachometer implements TelemetryLoggable, AutoCloseable {
   public Tachometer(int channel, EdgeConfiguration configuration) {
     m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
 
-    HAL.reportUsage("IO", channel, "Tachometer");
+    UsageReporting.reportUsage("IO", channel, "Tachometer");
   }
 
   @Override
