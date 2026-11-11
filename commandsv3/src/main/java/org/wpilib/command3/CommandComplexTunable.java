@@ -15,37 +15,48 @@ import org.wpilib.tunable.TunableTable;
  * A wrapper that allows a command to be published with the {@link ComplexTunable} interface.
  */
 final class CommandComplexTunable implements ComplexTunable {
-  private final Scheduler m_scheduler;
+
   private final Command m_command;
 
   /**
    * Creates a new CommandComplexTunable
    * 
-   * @param scheduler The scheduler responsible of running the command
-   * @param command The command to be published
+   * @param command The command to be publishable
    */
-  CommandComplexTunable(Scheduler scheduler, Command command) {
-    requireNonNullParam(scheduler, "scheduler", "CommandComplexTunable");
+  CommandComplexTunable(Command command) {
     requireNonNullParam(command, "command", "CommandComplexTunable");
-    m_scheduler = scheduler;
     m_command = command;
+  }
+
+  /**
+   * Finds the scheduler that owns the command requirements. If the command doesn't have any, gets
+   * the default scheduler.
+   * @return A scheduler object
+   */
+  private Scheduler scheduler() {
+    for (Mechanism mechanism : m_command.requirements()) {
+      return mechanism.getRegisteredScheduler();
+    }
+    return Scheduler.getDefault();
   }
 
   @Override
   public void publishTunable(TunableTable table) {
-    // Borrows the logic of command V2
+    // Borrows the publish logic of command V2
+    Scheduler scheduler = scheduler();
+
     table.publishValue("name", m_command::name, null, String.class,
         TunableConfig.of(TunableOption.IMMUTABLE, TunableOption.GET_ON_CHANGE));
 
-    table.publishBoolean("running", () -> m_scheduler.isScheduledOrRunning(m_command), value -> {
-      boolean isScheduled = m_scheduler.isScheduledOrRunning(m_command);
+    table.publishBoolean("running", () -> scheduler.isScheduledOrRunning(m_command), value -> {
+      boolean isScheduled = scheduler.isScheduledOrRunning(m_command);
       if (value) {
         if (!isScheduled) {
-          m_scheduler.schedule(m_command);
+          scheduler.schedule(m_command);
         }
       } else {
         if (isScheduled) {
-          m_scheduler.cancel(m_command);
+          scheduler.cancel(m_command);
         }
       }
     }, TunableConfig.of(TunableOption.ALWAYS_GET));
