@@ -19,7 +19,6 @@
 #include "wpi/math/geometry/Transform3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
-#include "wpi/math/kinematics/Odometry3d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
@@ -48,13 +47,13 @@ namespace wpi::math {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  *
- * @tparam Kinematics Kinematics type.
+ * @tparam Odometry Odometry type.
  * @tparam WheelPositions Wheel positions type.
  * @tparam WheelVelocities Wheel velocities type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename Kinematics, typename WheelPositions,
-          typename WheelVelocities, typename WheelAccelerations>
+template <typename Odometry, typename WheelPositions, typename WheelVelocities,
+          typename WheelAccelerations>
 class WPILIB_DLLEXPORT PoseEstimator3d {
  public:
   /**
@@ -72,8 +71,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    * in meters, and angle in radians). Increase these numbers to trust the
    * vision pose measurement less.
    */
-  PoseEstimator3d(Odometry3d<Kinematics, WheelPositions, WheelVelocities,
-                             WheelAccelerations>& odometry,
+  PoseEstimator3d(const Odometry& odometry,
                   const wpi::util::array<double, 4>& stateStdDevs,
                   const wpi::util::array<double, 4>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
@@ -479,8 +477,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
 
   static constexpr wpi::units::second_t BUFFER_DURATION = 1.5_s;
 
-  Odometry3d<Kinematics, WheelPositions, WheelVelocities, WheelAccelerations>&
-      m_odometry;
+  Odometry m_odometry;
 
   // Diagonal of process noise covariance matrix Q
   wpi::util::array<double, 4> m_q{wpi::util::empty_array};
