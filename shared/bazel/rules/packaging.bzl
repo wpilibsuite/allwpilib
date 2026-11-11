@@ -420,7 +420,7 @@ def package_binary_cc_project(
     This assumes that static libraries exist for the project, and that they
     are compatible with the relevant architectures.  This triggers the
     transitions, packages them up, and deploys them for the native platforms,
-    and for the SystemCore too if `systemcore` is set.
+    and for the Systemcore too if `systemcore` is set.
 
     `extra_binaries` ship beside `name` in the same directory, for tools that
     are only useful next to the binary they are packaged with.
@@ -430,7 +430,7 @@ def package_binary_cc_project(
     }
 
     # wpilib_maven_export keeps linux_artifacts only on a Linux host, and the
-    # SystemCore is cross compiled from every host.
+    # Systemcore is cross compiled from every host.
     classifier_artifacts = {}
     if systemcore:
         classifier_artifacts["linuxsystemcore"] = ":{}_zip-opt-systemcore".format(name)
