@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import org.wpilib.annotation.NoDiscard;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.TunableTable;
 import org.wpilib.units.measure.Time;
 
 /**
@@ -95,7 +97,7 @@ import org.wpilib.units.measure.Time;
  * }</pre>
  */
 @NoDiscard("Commands must be used! Did you mean to fork it or bind it to a trigger?")
-public interface Command {
+public interface Command extends ComplexTunable {
   /** The default command priority. */
   int DEFAULT_PRIORITY = 0;
 
@@ -424,5 +426,16 @@ public interface Command {
    */
   default ParallelGroupBuilder raceWith(Command... parallel) {
     return new ParallelGroupBuilder().optional(this).optional(parallel);
+  }
+
+  
+  @Override
+  default void publishTunable(TunableTable table) {
+    new CommandComplexTunable(this).publishTunable(table);
+  }
+
+  @Override
+  default String getTunableType() {
+    return "Command";
   }
 }
