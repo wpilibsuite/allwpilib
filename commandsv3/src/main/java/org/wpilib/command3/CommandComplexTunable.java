@@ -13,7 +13,6 @@ import org.wpilib.tunable.TunableTable;
 
 /** A wrapper that allows a command to be published with the {@link ComplexTunable} interface. */
 final class CommandComplexTunable implements ComplexTunable {
-
   private final Command m_command;
 
   /**
