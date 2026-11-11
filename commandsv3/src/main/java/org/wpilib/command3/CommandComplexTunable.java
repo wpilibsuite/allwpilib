@@ -17,7 +17,7 @@ final class CommandComplexTunable implements ComplexTunable {
   private final Command m_command;
 
   /**
-   * Creates a new CommandComplexTunable
+   * Creates a new CommandComplexTunable.
    *
    * @param command The command to be publishable
    */
@@ -33,10 +33,10 @@ final class CommandComplexTunable implements ComplexTunable {
    * @return A scheduler object
    */
   private Scheduler scheduler() {
-    for (Mechanism mechanism : m_command.requirements()) {
-      return mechanism.getRegisteredScheduler();
-    }
-    return Scheduler.getDefault();
+    return m_command.requirements().stream()
+        .findFirst()
+        .map(Mechanism::getRegisteredScheduler)
+        .orElseGet(Scheduler::getDefault);
   }
 
   @Override
