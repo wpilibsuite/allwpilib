@@ -322,6 +322,18 @@
     "commandversion": 2
   },
   {
+    "name": "Parametrized OpModes",
+    "description": "Add multiple OpModes of the same class with different constructor parameters",
+    "tags": [
+      "OpMode",
+      "Trajectory"
+    ],
+    "foldername": "parametrizedopmodes",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
     "name": "Driver Station Display Lines",
     "description": "Display lines on the Driver Station display and update them every robot loop.",
     "tags": [
