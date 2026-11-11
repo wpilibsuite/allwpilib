@@ -66,7 +66,9 @@ cmake -S . -B build \
 
 `AosConfig.cmake` finds the archive in `linux/systemcore/static/` from
 `CMAKE_SYSTEM_NAME` and `CMAKE_SYSTEM_PROCESSOR`, and the tools in
-`linux/x86-64/` from the host. Set `AOS_PLATFORM` or `AOS_HOST_PLATFORM` to
+`linux/x86-64/` from the host. An arm64 Linux target is the SystemCore when
+cross-compiling and a generic Debian trixie machine, `linux/arm64/`, otherwise;
+an arm64 Linux host is always `linux/arm64/`. Set `AOS_PLATFORM` or `AOS_HOST_PLATFORM` to
 override either one. Use `Aos_DIR` rather than `CMAKE_PREFIX_PATH`, because the
 SystemCore toolchain file confines `find_package` to its sysroot.
 
@@ -87,6 +89,16 @@ platform's config, `--config=systemcore` or `--config=windows_arm`:
 ```sh
 bazel build -c opt --config=systemcore \
     //aos_sdk:aos-sdk_static_zip-opt-arch-systemcore
+```
+
+On an arm64 Linux host, Bazel builds for that machine on its own, as a generic
+Debian trixie one rather than a SystemCore. That build is not published, so
+build it locally:
+
+```sh
+bazel build -c opt //aos_sdk:aos-sdk-hdrs-zip \
+    //aos_sdk:aos-sdk_static_zip-opt-arch-linux-arm64 \
+    //aos_sdk:aos-tools_zip-opt-arch-linux-arm64
 ```
 
 ## Linking whole archives

@@ -95,6 +95,7 @@ def zip_java_srcs(name, extra_pkgs = [], java_srcs_root = "", generated_java_src
     )
 
 _platform_mapping = {
+    "linux-arm64": "linuxarm64",
     "linux-x86-64": "linuxx86-64",
     "osxuniversal": "osxuniversal",
     "systemcore": "linuxsystemcore",

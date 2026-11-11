@@ -87,6 +87,7 @@ def architectures_pkg_zip(
         **kwargs):
     if architectures == None:
         architectures = {
+            "@allwpilib//shared/bazel:linux_arm64_trixie": "linux-arm64",
             "@allwpilib//shared/bazel:linux_x86_64": "linux-x86-64",
             "@allwpilib//shared/bazel:osx": "osxuniversal",
             "@allwpilib//shared/bazel:systemcore": "systemcore",
@@ -95,6 +96,7 @@ def architectures_pkg_zip(
         }
 
     architectures_target_compatible_with = {
+        "linux-arm64": ["@platforms//os:linux"],
         "linux-x86-64": ["@platforms//os:linux"],
         "osxuniversal": ["@platforms//os:osx"],
         "systemcore": None,
