@@ -13,6 +13,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import org.wpilib.annotation.NoDiscard;
 import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.TunableConfig;
+import org.wpilib.tunable.TunableOption;
 import org.wpilib.tunable.TunableTable;
 import org.wpilib.units.measure.Time;
 
@@ -430,7 +432,38 @@ public interface Command extends ComplexTunable {
 
   @Override
   default void publishTunable(TunableTable table) {
-    new CommandComplexTunable(this).publishTunable(table);
+    // Finds the scheduler that owns the command requirements. If the command doesn't have any, gets
+    // the default scheduler.
+    Scheduler scheduler =
+        requirements().stream()
+            .findFirst()
+            .map(Mechanism::getRegisteredScheduler)
+            .orElseGet(Scheduler::getDefault);
+
+    // Borrows the publish logic of command V2
+    table.publishValue(
+        "name",
+        this::name,
+        null,
+        String.class,
+        TunableConfig.of(TunableOption.IMMUTABLE, TunableOption.GET_ON_CHANGE));
+
+    table.publishBoolean(
+        "running",
+        () -> scheduler.isScheduledOrRunning(this),
+        value -> {
+          boolean isScheduled = scheduler.isScheduledOrRunning(this);
+          if (value) {
+            if (!isScheduled) {
+              scheduler.schedule(this);
+            }
+          } else {
+            if (isScheduled) {
+              scheduler.cancel(this);
+            }
+          }
+        },
+        TunableConfig.of(TunableOption.ALWAYS_GET));
   }
 
   @Override
