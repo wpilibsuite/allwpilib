@@ -13,7 +13,7 @@ wpilib_imgui_cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "imgui",
-    actual = ":outlineviewer_imgui_tests",
+    tests = [":outlineviewer_imgui_tests"],
 )

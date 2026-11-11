@@ -20,7 +20,7 @@ cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "native",
-    actual = ":wpical_tests",
+    tests = [":wpical_tests"],
 )

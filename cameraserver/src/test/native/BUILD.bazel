@@ -9,7 +9,7 @@ cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "native",
-    actual = ":cameraserver_tests",
+    tests = [":cameraserver_tests"],
 )

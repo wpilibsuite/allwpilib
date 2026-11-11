@@ -15,7 +15,7 @@ cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "native",
-    actual = ":datalog_tests",
+    tests = [":datalog_tests"],
 )
