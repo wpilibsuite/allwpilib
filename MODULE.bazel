@@ -180,7 +180,16 @@ archive_override(
     urls = ["https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-3.bcr1/bzlmodRio-opencv-2027.4.13.0-3.bcr1.tar.gz"],
 )
 
-bazel_dep(name = "protobuf", version = "34.0.bcr.1")
+bazel_dep(name = "protobuf", version = "35.1")
+
+# protobuf's crate extension has no lockfile, which rules_rust 0.71 (from AOS)
+# rejects in a non-root module. Fixed in protobuf 37.
+single_version_override(
+    module_name = "protobuf",
+    patch_strip = 1,
+    patches = ["shared/bazel/patches/protobuf/0001-Make-the-crate-extension-a-dev-dependency.patch"],
+    version = "35.1",
+)
 
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
