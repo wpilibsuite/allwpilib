@@ -36,6 +36,18 @@ jobs:
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
             container: wpilib/debian-base:trixie
             action: "test"
+          - name: "Linux ARM64"
+            compilation_mode: opt
+            classifier: "headers,sources"
+            os: ubuntu-24.04-arm
+            container: wpilib/debian-base:arm64-trixie
+            action: "test"
+          - name: "Linux ARM64"
+            compilation_mode: dbg
+            classifier: "headers,sources"
+            os: ubuntu-24.04-arm
+            container: wpilib/debian-base:arm64-trixie
+            action: "test"
           - name: "macOS"
             compilation_mode: opt
             classifier: "osxuniversal,headers,sources,osxuniversalstatic,linuxsystemcore,linuxsystemcorestatic"
