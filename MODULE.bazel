@@ -26,6 +26,17 @@ bazel_dep(name = "platforms", version = "1.1.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
 bazel_dep(name = "rules_java", version = "9.9.0")
 bazel_dep(name = "rules_python", version = "2.4.6")
+
+# rules_python 2.x symlinks each py_binary's venv into place when it runs, which
+# fails on Windows without Developer Mode or admin rights:
+# https://github.com/bazel-contrib/rules_python/issues/3792
+single_version_override(
+    module_name = "rules_python",
+    patch_strip = 1,
+    patches = ["shared/bazel/patches/rules_python/0001-Fall-back-when-Windows-denies-symlinks.patch"],
+    version = "2.4.6",
+)
+
 bazel_dep(name = "rules_pycross", version = "2.0.0")
 bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 single_version_override(
