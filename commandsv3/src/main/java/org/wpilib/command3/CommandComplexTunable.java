@@ -11,16 +11,14 @@ import org.wpilib.tunable.TunableConfig;
 import org.wpilib.tunable.TunableOption;
 import org.wpilib.tunable.TunableTable;
 
-/**
- * A wrapper that allows a command to be published with the {@link ComplexTunable} interface.
- */
+/** A wrapper that allows a command to be published with the {@link ComplexTunable} interface. */
 final class CommandComplexTunable implements ComplexTunable {
 
   private final Command m_command;
 
   /**
    * Creates a new CommandComplexTunable
-   * 
+   *
    * @param command The command to be publishable
    */
   CommandComplexTunable(Command command) {
@@ -31,6 +29,7 @@ final class CommandComplexTunable implements ComplexTunable {
   /**
    * Finds the scheduler that owns the command requirements. If the command doesn't have any, gets
    * the default scheduler.
+   *
    * @return A scheduler object
    */
   private Scheduler scheduler() {
@@ -45,21 +44,29 @@ final class CommandComplexTunable implements ComplexTunable {
     // Borrows the publish logic of command V2
     Scheduler scheduler = scheduler();
 
-    table.publishValue("name", m_command::name, null, String.class,
+    table.publishValue(
+        "name",
+        m_command::name,
+        null,
+        String.class,
         TunableConfig.of(TunableOption.IMMUTABLE, TunableOption.GET_ON_CHANGE));
 
-    table.publishBoolean("running", () -> scheduler.isScheduledOrRunning(m_command), value -> {
-      boolean isScheduled = scheduler.isScheduledOrRunning(m_command);
-      if (value) {
-        if (!isScheduled) {
-          scheduler.schedule(m_command);
-        }
-      } else {
-        if (isScheduled) {
-          scheduler.cancel(m_command);
-        }
-      }
-    }, TunableConfig.of(TunableOption.ALWAYS_GET));
+    table.publishBoolean(
+        "running",
+        () -> scheduler.isScheduledOrRunning(m_command),
+        value -> {
+          boolean isScheduled = scheduler.isScheduledOrRunning(m_command);
+          if (value) {
+            if (!isScheduled) {
+              scheduler.schedule(m_command);
+            }
+          } else {
+            if (isScheduled) {
+              scheduler.cancel(m_command);
+            }
+          }
+        },
+        TunableConfig.of(TunableOption.ALWAYS_GET));
   }
 
   @Override

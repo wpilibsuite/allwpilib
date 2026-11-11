@@ -428,7 +428,6 @@ public interface Command extends ComplexTunable {
     return new ParallelGroupBuilder().optional(this).optional(parallel);
   }
 
-  
   @Override
   default void publishTunable(TunableTable table) {
     new CommandComplexTunable(this).publishTunable(table);
