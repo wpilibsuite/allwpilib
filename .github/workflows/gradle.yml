@@ -78,8 +78,6 @@ jobs:
         run: df -h
 
   build-host:
-    env:
-      MACOSX_DEPLOYMENT_TARGET: 13.3
     strategy:
       fail-fast: false
       matrix:

@@ -62,6 +62,7 @@ scan_headers_ignore = [
     "wpi/math/estimator/KalmanFilterLatencyCompensator.hpp",
     "wpi/math/estimator/MerweScaledSigmaPoints.hpp",
     "wpi/math/estimator/MerweUKF.hpp",
+    "wpi/math/estimator/ParticleFilter.hpp",
     "wpi/math/estimator/S3SigmaPoints.hpp",
     "wpi/math/estimator/S3UKF.hpp",
     "wpi/math/estimator/SigmaPoints.hpp",
