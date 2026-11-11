@@ -17,14 +17,13 @@ import org.wpilib.tunable.Tunables;
 
 class CommandComplexTunableTest extends CommandTestBase {
   private MockTunableBackend m_dashboard;
-  private DummyMechanism m_mech;
   private Command m_cmd;
 
   @BeforeEach
   void initTunables() {
     m_dashboard = new MockTunableBackend();
-    m_mech = new DummyMechanism("Mech", m_scheduler);
-    m_cmd = Command.requiring(m_mech).executing(Coroutine::park).named("Command");
+    var mech = new DummyMechanism("Mech", m_scheduler);
+    m_cmd = Command.requiring(mech).executing(Coroutine::park).named("Command");
 
     TunableRegistry.reset();
     TunableRegistry.registerBackend("", m_dashboard);
