@@ -92,8 +92,9 @@ native_test(
 alias(
     name = "quickbuf_protoc",
     actual = select({
-        "@platforms//os:linux": "@quickbuffer_protoc_linux//file",
         "@platforms//os:windows": "@quickbuffer_protoc_windows//file",
+        "@wpilib_toolchains//conditions:linux_arm64": "@quickbuffer_protoc_linux_aarch64//file",
+        "@wpilib_toolchains//conditions:linux_x86_64": "@quickbuffer_protoc_linux_x86-64//file",
         "@wpilib_toolchains//conditions:osx_aarch64": "@quickbuffer_protoc_osx_aarch64//file",
         "@wpilib_toolchains//conditions:osx_x86_64": "@quickbuffer_protoc_osx_x86-64//file",
     }),
