@@ -220,10 +220,7 @@ if(NOT TARGET aos::aos)
 
     set_target_properties(aos::aos PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${AOS_INCLUDE_DIR}")
 
-    target_link_libraries(
-        aos::aos
-        INTERFACE ${_aos_alwayslink} aos::archive ${AOS_LINK_OPTIONS}
-    )
+    target_link_libraries(aos::aos INTERFACE ${_aos_alwayslink} aos::archive ${AOS_LINK_OPTIONS})
 
     # Not optional, and not only about aos/macros.h hard-erroring without
     # AOS_OS_NONE: FLATBUFFERS_MAX_ALIGNMENT and the lockless-queue defines
