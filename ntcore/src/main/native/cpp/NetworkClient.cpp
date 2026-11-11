@@ -161,16 +161,16 @@ void NetworkClientBase::StartResolvers() {
 
   if (m_serverResolver->kind == ServerResolver::Kind::SYSTEMCORE) {
     if (m_serverResolver->team) {
-      m_systemCoreResolver = wpi::net::SystemCoreResolverClient::Create(
+      m_systemCoreResolver = wpi::net::SystemcoreResolverClient::Create(
           m_loop, m_logger, *m_serverResolver->team, m_serverResolver->port);
     } else {
-      m_systemCoreResolver = wpi::net::SystemCoreResolverClient::Create(
+      m_systemCoreResolver = wpi::net::SystemcoreResolverClient::Create(
           m_loop, m_logger, m_serverResolver->port);
     }
     if (m_systemCoreResolver) {
       m_systemCoreResolver->serverResolved.connect(
-          [this](wpi::net::SystemCoreResolverClient::ServerData data) {
-            ProcessSystemCoreData(std::move(data));
+          [this](wpi::net::SystemcoreResolverClient::ServerData data) {
+            ProcessSystemcoreData(std::move(data));
           });
     }
   } else {
@@ -220,14 +220,14 @@ void NetworkClientBase::ProcessResolverData(
   UpdateConnectorServers();
 }
 
-void NetworkClientBase::ProcessSystemCoreData(
-    wpi::net::SystemCoreResolverClient::ServerData data) {
+void NetworkClientBase::ProcessSystemcoreData(
+    wpi::net::SystemcoreResolverClient::ServerData data) {
   std::pair<std::string, unsigned int> server{std::move(data.host), data.port};
   if (!AddResolvedServer(server)) {
     return;
   }
 
-  INFO("SystemCore resolved service '{}' to {} port {}", data.serviceName,
+  INFO("Systemcore resolved service '{}' to {} port {}", data.serviceName,
        server.first, server.second);
   UpdateConnectorServers();
 }

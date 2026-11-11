@@ -52,7 +52,7 @@ them. A config can name them without listing a schema.
 
 The archive comes from the platform you build for, and the tools come from the
 platform CMake runs on. Cross-compiling means unzipping two platforms side by
-side. For a SystemCore, built on x86-64 Linux:
+side. For a Systemcore, built on x86-64 Linux:
 
 ```sh
 mkdir aos
@@ -68,7 +68,7 @@ cmake -S . -B build \
 `CMAKE_SYSTEM_NAME` and `CMAKE_SYSTEM_PROCESSOR`, and the tools in
 `linux/x86-64/` from the host. Set `AOS_PLATFORM` or `AOS_HOST_PLATFORM` to
 override either one. Use `Aos_DIR` rather than `CMAKE_PREFIX_PATH`, because the
-SystemCore toolchain file confines `find_package` to its sysroot.
+Systemcore toolchain file confines `find_package` to its sysroot.
 
 ## Building it locally
 
