@@ -28,9 +28,4 @@ public class MockMotorController implements MotorController {
   public boolean getInverted() {
     return m_isInverted;
   }
-
-  @Override
-  public void disable() {
-    m_throttle = 0;
-  }
 }

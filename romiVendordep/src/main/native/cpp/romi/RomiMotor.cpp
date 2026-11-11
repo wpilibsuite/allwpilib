@@ -46,10 +46,6 @@ bool RomiMotor::GetInverted() const {
   return m_inverted;
 }
 
-void RomiMotor::Disable() {
-  SetThrottle(0.0);
-}
-
 void RomiMotor::StopMotor() {
   SetThrottle(0.0);
 }

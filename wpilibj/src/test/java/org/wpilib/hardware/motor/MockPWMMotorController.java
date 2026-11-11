@@ -23,12 +23,4 @@ public class MockPWMMotorController {
   public boolean getInverted() {
     return m_isInverted;
   }
-
-  public void disable() {
-    m_throttle = 0;
-  }
-
-  public void stopMotor() {
-    disable();
-  }
 }

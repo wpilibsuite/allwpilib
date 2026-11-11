@@ -12,8 +12,6 @@ class MockPWMMotorController {
   double GetThrottle() const;
   void SetInverted(bool isInverted);
   bool GetInverted() const;
-  void Disable();
-  void StopMotor();
 
  private:
   double m_throttle = 0.0;

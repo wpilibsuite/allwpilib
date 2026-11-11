@@ -74,10 +74,6 @@ class ExampleSmartMotorController {
 
   bool GetInverted() const { return false; }
 
-  void Disable() {}
-
-  void StopMotor() {}
-
  private:
   double value = 0.0;
 };

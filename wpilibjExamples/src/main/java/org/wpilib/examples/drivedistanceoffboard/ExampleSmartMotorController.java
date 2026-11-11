@@ -84,8 +84,4 @@ public class ExampleSmartMotorController {
   public boolean getInverted() {
     return false;
   }
-
-  public void disable() {}
-
-  public void stopMotor() {}
 }

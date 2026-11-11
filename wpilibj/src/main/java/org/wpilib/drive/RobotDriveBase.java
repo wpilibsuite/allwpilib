@@ -90,10 +90,10 @@ public abstract class RobotDriveBase extends MotorSafety {
   }
 
   @Override
-  public abstract void stopMotor();
+  protected abstract void stopMotor();
 
   @Override
-  public abstract String getDescription();
+  protected abstract String getDescription();
 
   /**
    * Normalize all wheel velocities if the magnitude of any wheel is greater than 1.0.
