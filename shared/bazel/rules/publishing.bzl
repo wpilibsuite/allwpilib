@@ -17,6 +17,15 @@ def _get_host_os():
 
 HOST_OS = _get_host_os()
 
+# The x86-64 Linux artifacts and the cross-compiled SystemCore ones need a
+# toolchain that runs on x86-64 Linux. On an arm64 Linux host, the x86-64 ones
+# have no compiler at all, and the SystemCore ones would resolve to the host's
+# compiler and sysroot rather than the SystemCore's.
+_LINUX_ARM64_HOST = HOST_OS == "linux" and (
+    "@platforms//cpu:aarch64" in _host_constraints or
+    "@platforms//cpu:arm64" in _host_constraints
+)
+
 def _publish_all_impl(ctx):
     # This is a rule, not a macro, to allow the `targets` attribute to be
     # configurable with `select()`. Macros are expanded during the loading phase,
@@ -146,7 +155,13 @@ def _wpilib_maven_export_impl(
     all_artifacts = {}
     all_artifacts.update(classifier_artifacts)
 
-    if HOST_OS == "linux":
+    if _LINUX_ARM64_HOST:
+        all_artifacts = {
+            key: value
+            for key, value in all_artifacts.items()
+            if not key.startswith("linuxsystemcore")
+        }
+    elif HOST_OS == "linux":
         all_artifacts.update(linux_artifacts)
     elif HOST_OS == "osx":
         all_artifacts.update(osx_artifacts)
