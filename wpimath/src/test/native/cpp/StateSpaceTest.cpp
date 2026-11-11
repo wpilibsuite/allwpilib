@@ -38,7 +38,8 @@ class StateSpaceTest {
     // Gear ratio
     constexpr double G = 40.0 / 40.0;
 
-    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+    return wpi::math::Models::LinearPositionFromPhysicalConstants(motors, m, r,
+                                                                  G)
         .Slice(0);
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, DT};

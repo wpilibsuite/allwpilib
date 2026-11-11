@@ -18,7 +18,7 @@
 
 TEST_CASE("DCMotorSimTest VoltageSteadyState", "[wpilibc][simulation]") {
   wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
-  auto plant = wpi::math::Models::SingleJointedArmFromPhysicalConstants(
+  auto plant = wpi::math::Models::AngularPositionFromPhysicalConstants(
       wpi::math::DCMotor::NEO(1), wpi::units::kilogram_square_meter_t{0.0005},
       1.0);
   wpi::sim::DCMotorSim sim{plant, gearbox};
@@ -66,7 +66,7 @@ TEST_CASE("DCMotorSimTest VoltageSteadyState", "[wpilibc][simulation]") {
 
 TEST_CASE("DCMotorSimTest PositionFeedbackControl", "[wpilibc][simulation]") {
   wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
-  auto plant = wpi::math::Models::SingleJointedArmFromPhysicalConstants(
+  auto plant = wpi::math::Models::AngularPositionFromPhysicalConstants(
       wpi::math::DCMotor::NEO(1), wpi::units::kilogram_square_meter_t{0.0005},
       1.0);
   wpi::sim::DCMotorSim sim{plant, gearbox};
