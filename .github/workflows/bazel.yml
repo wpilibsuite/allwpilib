@@ -38,13 +38,13 @@ jobs:
             action: "test"
           - name: "Linux ARM64"
             compilation_mode: opt
-            classifier: ""
+            classifier: "headers,sources"
             os: ubuntu-24.04-arm
             container: wpilib/debian-base:arm64-trixie
             action: "test"
           - name: "Linux ARM64"
             compilation_mode: dbg
-            classifier: ""
+            classifier: "headers,sources"
             os: ubuntu-24.04-arm
             container: wpilib/debian-base:arm64-trixie
             action: "test"
