@@ -33,7 +33,6 @@ cc_library(
         "@aos//aos:init",
         "@aos//aos:json_to_flatbuffer",
         "@aos//aos:realtime",
-        "@aos//aos/events:aio_uv",
         "@aos//aos/events:event_loop",
         "@aos//aos/events:shm_event_loop",
         "@aos//aos/events:simulated_event_loop",
@@ -43,14 +42,12 @@ cc_library(
     ],
 )
 
-# libuv's objects are already in wpinet's archive, which a libuv application
-# links, and the alwayslink objects ship in their own archive. A second copy of
-# either would put two definitions of the same symbols in one link.
+# The alwayslink objects ship in their own archive. A second copy would put two
+# definitions of the same symbols in one link.
 wpilib_cc_static_library(
     name = "static/aos",
     static_deps = [
         ":static/alwayslink/aos_alwayslink",
-        "//wpinet:static/wpinet",
     ],
     deps = [":aos_runtime"],
 )
@@ -101,15 +98,13 @@ architectures_pkg_zip(
     ],
 )
 
-# wpinet's headers zip already ships libuv's. liburing is an implementation
-# detail of the Linux io_uring backend that no AOS header includes, and its
-# private headers would unpack to src/lib.h, src/setup.h and config-host.h at
-# the root of the consumer's include path.
+# liburing is an implementation detail of the Linux io_uring backend that no AOS
+# header includes, and its private headers would unpack to src/lib.h,
+# src/setup.h and config-host.h at the root of the consumer's include path.
 aos_sdk_headers(
     name = "headers",
     exclude = [
         "@liburing",
-        "@libuv",
     ],
     deps = [":aos_runtime"],
 )

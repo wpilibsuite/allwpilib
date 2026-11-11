@@ -193,9 +193,9 @@ http_jar(
 bazel_dep(name = "aos")
 archive_override(
     module_name = "aos",
-    integrity = "sha256-xc4s+K3WMYXWsQM4A5UdxiQ1yBBwA8gdws1pVWLW7yg=",
-    strip_prefix = "aos-86726cddc274d56d3d1d1dc33527a552f16f3897",
-    urls = ["https://github.com/AustinSchuh/aos/archive/86726cddc274d56d3d1d1dc33527a552f16f3897.tar.gz"],
+    integrity = "sha256-4xtiaA43eKSj4PXtpOCQoqLxFQFfPivPUF+cW8ufxIE=",
+    strip_prefix = "aos-1.0.0",
+    urls = ["https://github.com/RealtimeRoboticsGroup/aos/releases/download/v1.0.0/aos-1.0.0.tar.zst"],
 )
 
 # The flatbuffers AOS is built against, which aosnt reads reflection schemas

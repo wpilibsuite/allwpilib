@@ -220,18 +220,9 @@ if(NOT TARGET aos::aos)
 
     set_target_properties(aos::aos PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${AOS_INCLUDE_DIR}")
 
-    # libuv is wpinet's: its objects are in libwpinet.a and its headers ship
-    # with wpinet's, so aos::aos links wpinet rather than carrying a second
-    # copy of either. A project that builds allwpilib alongside has the target
-    # already; one on an installed wpilib gets it from wpinet's package config.
-    if(NOT TARGET wpinet)
-        include(CMakeFindDependencyMacro)
-        find_dependency(wpinet)
-    endif()
-
     target_link_libraries(
         aos::aos
-        INTERFACE ${_aos_alwayslink} aos::archive wpinet ${AOS_LINK_OPTIONS}
+        INTERFACE ${_aos_alwayslink} aos::archive ${AOS_LINK_OPTIONS}
     )
 
     # Not optional, and not only about aos/macros.h hard-erroring without
