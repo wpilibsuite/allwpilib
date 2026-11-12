@@ -1,0 +1,33 @@
+name: Check RLIs
+on: [pull_request]
+
+jobs:
+  check-rlis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout frc-docs
+        uses: actions/checkout@v4
+        with:
+          repository: wpilibsuite/frc-docs
+
+      # Replace with current version
+      - name: Use PR version
+        run: |
+          # Filter source entries, setting the latest version
+          cat '.github/workflows/inspector.json' \
+            | jq '.sources |= map(select (.baseUrl | test("wpilibsuite/allwpilib")) | .latestVersion |= "${{ github.event.pull_request.head.sha }}")' \
+            | tee '.github/workflows/inspector.json'
+
+      # Run Inspector
+      - name: Inspect RLIs
+        uses: docker://ghcr.io/starlight220/inspector:v1.9
+        id: inspector
+        with:
+          root: ${{ github.workspace }}
+        env:
+          INSPECTOR_CONFIG: '.github/workflows/inspector.json'
+
+      # Error if RLIs can't be automatically updated
+      - name: Set exit code
+        if: ${{ steps.inspector.outputs.needs-manual == 'true' }}
+        run: exit 1
