@@ -637,8 +637,8 @@ public abstract class OpModeRobot extends RobotBase {
    * Function called periodically every loop, regardless of enabled state or OpMode selection.
    *
    * <p>Runs after {@link #disabledPeriodic()}, the opmode's {@code disabledPeriodic()}, {@link
-   * #nonePeriodic()}, and {@link #enabledPeriodic()}, and before {@link #simulationPeriodic()}. When
-   * an opmode is enabled, this runs before its {@code periodic()} in the same period.
+   * #nonePeriodic()}, and {@link #enabledPeriodic()}, and before {@link #simulationPeriodic()}. 
+   * When an opmode is enabled, this runs before its {@code periodic()} in the same period.
    */
   public void robotPeriodic() {}
 
