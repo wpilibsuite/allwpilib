@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "server/Functions.hpp"
+#include "server/RestApi.hpp"
 #include "server/ServerClient.hpp"
 #include "server/ServerStorage.hpp"
 
@@ -71,6 +72,24 @@ class ServerImpl final {
   bool PersistentChanged() { return m_storage.PersistentChanged(); }
 
   std::string DumpPersistent();
+
+  /**
+   * Handle a REST request on the server's event loop.
+   *
+   * @param method HTTP method
+   * @param target HTTP request target
+   * @param body request body
+   * @param contentType request Content-Type header
+   * @param accept request Accept header
+   * @return encoded response, media type, and HTTP status
+   */
+  RestResponse HandleRestRequest(std::string_view method,
+                                 std::string_view target, std::string_view body,
+                                 std::string_view contentType,
+                                 std::string_view accept) {
+    return server::HandleRestRequest(m_storage, method, target, body,
+                                     contentType, accept);
+  }
   // returns newline-separated errors
   std::string LoadPersistent(std::string_view in) {
     return m_storage.LoadPersistent(in);
