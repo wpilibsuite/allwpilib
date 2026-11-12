@@ -35,8 +35,6 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
 
   if (origChannel < NUM_PWM_HEADERS) {
     channel += NUM_DIGITAL_CHANNELS;  // remap Headers to end of allocations
-  } else {
-    channel = remapMXPPWMChannel(channel) + 10;  // remap MXP to proper channel
   }
 
   auto resource =

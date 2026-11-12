@@ -5,13 +5,6 @@ classes:
       Set:
       Get:
       GetChannel:
-      Pulse:
-      IsPulsing:
-      SetPWMRate:
-      EnablePPS:
-      EnablePWM:
-      DisablePWM:
-      UpdateDutyCycle:
       SetSimDevice:
       LogTo:
       GetTelemetryType:

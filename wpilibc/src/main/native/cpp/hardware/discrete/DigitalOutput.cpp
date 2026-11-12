@@ -16,7 +16,6 @@
 using namespace wpi;
 
 DigitalOutput::DigitalOutput(int channel) {
-  m_pwmGenerator = HAL_INVALID_HANDLE;
   m_channel = channel;
 
   int32_t status = 0;
@@ -27,16 +26,7 @@ DigitalOutput::DigitalOutput(int channel) {
   wpi::util::ReportUsage("IO", channel, "DigitalOutput");
 }
 
-DigitalOutput::~DigitalOutput() {
-  if (m_handle != HAL_INVALID_HANDLE) {
-    // Disable the PWM in case it was running.
-    try {
-      DisablePWM();
-    } catch (const RuntimeError& e) {
-      e.Report();
-    }
-  }
-}
+DigitalOutput::~DigitalOutput() {}
 
 void DigitalOutput::Set(bool value) {
   int32_t status = 0;
@@ -53,79 +43,6 @@ bool DigitalOutput::Get() const {
 
 int DigitalOutput::GetChannel() const {
   return m_channel;
-}
-
-void DigitalOutput::Pulse(wpi::units::second_t pulseLength) {
-  int32_t status = 0;
-  HAL_Pulse(m_handle, pulseLength.value(), &status);
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-}
-
-bool DigitalOutput::IsPulsing() const {
-  int32_t status = 0;
-  bool value = HAL_IsPulsing(m_handle, &status);
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-  return value;
-}
-
-void DigitalOutput::SetPWMRate(double rate) {
-  int32_t status = 0;
-  HAL_SetDigitalPWMRate(rate, &status);
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-}
-
-void DigitalOutput::EnablePPS(double dutyCycle) {
-  if (m_pwmGenerator != HAL_INVALID_HANDLE) {
-    return;
-  }
-
-  int32_t status = 0;
-
-  m_pwmGenerator = HAL_AllocateDigitalPWM(&status);
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-
-  HAL_SetDigitalPWMPPS(m_pwmGenerator, dutyCycle, &status);
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-
-  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, m_channel, &status);
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-}
-
-void DigitalOutput::EnablePWM(double initialDutyCycle) {
-  if (m_pwmGenerator != HAL_INVALID_HANDLE) {
-    return;
-  }
-
-  int32_t status = 0;
-
-  m_pwmGenerator = HAL_AllocateDigitalPWM(&status);
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-
-  HAL_SetDigitalPWMDutyCycle(m_pwmGenerator, initialDutyCycle, &status);
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-
-  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, m_channel, &status);
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-}
-
-void DigitalOutput::DisablePWM() {
-  if (m_pwmGenerator == HAL_INVALID_HANDLE) {
-    return;
-  }
-
-  int32_t status = 0;
-
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-
-  HAL_FreeDigitalPWM(m_pwmGenerator);
-
-  m_pwmGenerator = HAL_INVALID_HANDLE;
-}
-
-void DigitalOutput::UpdateDutyCycle(double dutyCycle) {
-  int32_t status = 0;
-  HAL_SetDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle, &status);
-  WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
 void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {

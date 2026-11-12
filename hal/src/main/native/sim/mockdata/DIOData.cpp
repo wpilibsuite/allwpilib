@@ -19,9 +19,7 @@ void DIOData::ResetData() {
   initialized.Reset(false);
   simDevice = 0;
   value.Reset(true);
-  pulseLength.Reset(0.0);
   isInput.Reset(true);
-  filterIndex.Reset(-1);
 }
 
 extern "C" {
@@ -39,9 +37,7 @@ HAL_SimDeviceHandle HALSIM_GetDIOSimDevice(int32_t index) {
 
 DEFINE_CAPI(HAL_Bool, Initialized, initialized)
 DEFINE_CAPI(HAL_Bool, Value, value)
-DEFINE_CAPI(double, PulseLength, pulseLength)
 DEFINE_CAPI(HAL_Bool, IsInput, isInput)
-DEFINE_CAPI(int32_t, FilterIndex, filterIndex)
 
 #define REGISTER(NAME) \
   SimDIOData[index].NAME.RegisterCallback(callback, param, initialNotify)
@@ -50,8 +46,6 @@ void HALSIM_RegisterDIOAllCallbacks(int32_t index, HAL_NotifyCallback callback,
                                     void* param, HAL_Bool initialNotify) {
   REGISTER(initialized);
   REGISTER(value);
-  REGISTER(pulseLength);
   REGISTER(isInput);
-  REGISTER(filterIndex);
 }
 }  // extern "C"
