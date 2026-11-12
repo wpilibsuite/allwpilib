@@ -26,7 +26,7 @@ class Config {
   ramp_rate_t rampRate{1_V / 1_s};
 
   /// The step voltage output used for dynamic test routines.
-  wpi::units::volt_t stepVoltage{7_V};
+  wpi::units::volt_t stepVoltage{4_V};
 
   /// Safety timeout for the test routine commands.
   wpi::units::second_t timeout{10_s};
@@ -41,7 +41,7 @@ class Config {
    * @param rampRate The voltage ramp rate used for quasistatic test routines.
    *   Defaults to 1 volt per second if left null.
    * @param stepVoltage The step voltage output used for dynamic test routines.
-   *   Defaults to 7 volts if left null.
+   *   Defaults to 4 volts if left null.
    * @param timeout Safety timeout for the test routine commands. Defaults to 10
    *   seconds if left null.
    * @param recordState Optional handle for recording test state in a
