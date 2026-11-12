@@ -7,6 +7,7 @@
 #include <string>
 
 #include "Log.hpp"
+#include "ProtocolVersions.hpp"
 #include "net/WireDecoder.hpp"
 #include "server/ServerStorage.hpp"
 #include "server/ServerTopic.hpp"
@@ -60,7 +61,8 @@ bool ServerClient4::ProcessIncomingBinary(std::span<const uint8_t> data) {
     int pubuid;
     Value value;
     std::string error;
-    if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
+    if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0,
+                               m_wire.GetVersion())) {
       m_wire.Disconnect(std::format("binary decode error: {}", error));
       break;
     }
@@ -69,8 +71,9 @@ bool ServerClient4::ProcessIncomingBinary(std::span<const uint8_t> data) {
     if (pubuid == -1) {
       auto now = wpi::util::Now();
       DEBUG4("RTT ping from {}, responding with time={}", m_id, now);
-      m_wire.SendBinary(
-          [&](auto& os) { net::WireEncodeBinary(os, -1, now, value); });
+      m_wire.SendBinary([&](auto& os) {
+        net::WireEncodeBinary(os, -1, now, value, m_wire.GetVersion());
+      });
       continue;
     }
 
@@ -117,7 +120,7 @@ void ServerClient4::SendAnnounce(ServerTopic* topic,
       return;
     }
   }
-  m_outgoing.SendMessage(
+  m_outgoing.SendMessageToServer(
       topic->id, net::AnnounceMsg{topic->name, static_cast<int>(topic->id),
                                   topic->typeStr, pubuid, topic->properties});
 }
@@ -140,7 +143,7 @@ void ServerClient4::SendUnannounce(ServerTopic* topic) {
       return;
     }
   }
-  m_outgoing.SendMessage(
+  m_outgoing.SendMessageToServer(
       topic->id, net::UnannounceMsg{topic->name, static_cast<int>(topic->id)});
   m_outgoing.EraseId(topic->id);
 }
@@ -163,12 +166,12 @@ void ServerClient4::SendPropertiesUpdate(ServerTopic* topic,
       return;
     }
   }
-  m_outgoing.SendMessage(topic->id,
-                         net::PropertiesUpdateMsg{topic->name, update, ack});
+  m_outgoing.SendMessageToServer(
+      topic->id, net::PropertiesUpdateMsg{topic->name, update, ack});
 }
 
 void ServerClient4::SendOutgoing(uint64_t curTimeMs, bool flush) {
-  if (m_wire.GetVersion() >= 0x0401) {
+  if (m_wire.GetVersion() >= NT_4_1) {
     if (!m_ping.Send(curTimeMs)) {
       return;
     }

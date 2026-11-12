@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Sat, 03 Oct 2026 11:07:26 -0700
+Subject: [PATCH] Allow assertion flag combinations in clang-tidy
+
+The flags intentionally form bitmasks, so combinations need not be named
+enumerators. Suppress only the enum-cast diagnostic on the combining cast.
+
+---
+diff --git a/src/catch2/internal/catch_result_type.hpp b/src/catch2/internal/catch_result_type.hpp
+index 69a6ef1413..a0da2681dd 100644
+--- a/src/catch2/internal/catch_result_type.hpp
++++ b/src/catch2/internal/catch_result_type.hpp
+@@ -50,6 +50,8 @@ namespace Catch {
+ 
+     constexpr ResultDisposition::Flags operator|( ResultDisposition::Flags lhs,
+                                         ResultDisposition::Flags rhs ) {
++        // Bitwise combinations are valid values for this flag enum.
++        // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
+         return static_cast<ResultDisposition::Flags>( static_cast<int>( lhs ) |
+                                                       static_cast<int>( rhs ) );
+     }

@@ -14,6 +14,7 @@
 
 #include "Log.hpp"
 #include "Message.hpp"
+#include "ProtocolVersions.hpp"
 #include "WireConnection.hpp"
 #include "WireEncoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
@@ -25,8 +26,8 @@ using namespace wpi::nt;
 using namespace wpi::nt::net;
 
 ClientImpl::ClientImpl(
-    uint64_t curTimeMs, WireConnection& wire, bool local,
-    wpi::util::Logger& logger,
+    uint64_t curTimeMs, wpi::net::EventLoopRunner& loop, WireConnection& wire,
+    ConnectionInfo connInfo, bool local, wpi::util::Logger& logger,
     std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
         timeSyncUpdated,
     std::function<void(uint32_t repeatMs)> setPeriodic)
@@ -35,15 +36,39 @@ ClientImpl::ClientImpl(
       m_timeSyncUpdated{std::move(timeSyncUpdated)},
       m_setPeriodic{std::move(setPeriodic)},
       m_ping{wire},
-      m_nextPingTimeMs{curTimeMs + (wire.GetVersion() >= 0x0401
+      m_nextPingTimeMs{curTimeMs + (wire.GetVersion() >= NT_4_1
                                         ? NetworkPing::PING_INTERVAL_MS
                                         : RTT_INTERVAL_MS)},
       m_outgoing{wire, local} {
-  // immediately send RTT ping
-  auto now = wpi::util::Now();
-  DEBUG4("Sending initial RTT ping {}", now);
-  m_wire.SendBinary(
-      [&](auto& os) { WireEncodeBinary(os, -1, 0, Value::MakeInteger(now)); });
+  if (m_wire.GetVersion() >= NT_4_2) {
+    DEBUG4("Creating UDP-based time sync client");
+    using namespace std::chrono_literals;
+    m_timeSyncAsync =
+        wpi::net::uv::Async<tsp::TimeSyncClient::Metadata>::Create(
+            *loop.GetLoop());
+    m_timeSyncAsync->wakeup.connect([this](tsp::TimeSyncClient::Metadata meta) {
+      // TSP measurements use nanoseconds; NT reports half the full TSP RTT.
+      m_rtt2Ns = meta.rtt2 / 2;
+      DEBUG3("Time offset: {}", meta.offset);
+      m_outgoing.SetTimeOffset(meta.offset);
+      m_haveTimeOffset = true;
+      m_timeSyncUpdated(meta.offset, m_rtt2Ns, true);
+    });
+    m_tspClient = std::make_unique<tsp::TimeSyncClient>(
+        logger, connInfo.remote_ip, connInfo.remote_port, 1s,
+        [async = m_timeSyncAsync](tsp::TimeSyncClient::Metadata meta) {
+          // Never wait on the NT loop: it may be joining this client's thread.
+          async->Send(meta);
+        });
+  } else {
+    // immediately send RTT ping
+    auto now = wpi::util::Now();
+    DEBUG4("Sending initial RTT ping {}", now);
+    m_wire.SendBinary([&](auto& os) {
+      WireEncodeBinary(os, -1, 0, Value::MakeInteger(now), m_wire.GetVersion());
+    });
+  }
+
   m_setPeriodic(m_periodMs);
 }
 
@@ -64,7 +89,8 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
       ERR("time offset is out of range");
       break;
     }
-    if (!WireDecodeBinary(&data, &id, &value, &error, localTimeOffset)) {
+    if (!WireDecodeBinary(&data, &id, &value, &error, localTimeOffset,
+                          m_wire.GetVersion())) {
       ERR("binary decode error: {}", error);
       break;  // FIXME
     }
@@ -72,6 +98,11 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
 
     // handle RTT ping response (only use first one)
     if (id == -1) {
+      if (m_wire.GetVersion() == NT_4_2) {
+        WARN("RTT protocol triggered but wire is version 4.2?");
+        continue;
+      }
+
       if (!m_haveTimeOffset) {
         if (!value.IsInteger()) {
           WARN("RTT ping response with non-integer type {}",
@@ -80,7 +111,7 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
         }
         DEBUG4("RTT ping response time {} value {}", value.time(),
                value.GetInteger());
-        if (m_wire.GetVersion() < 0x0401) {
+        if (m_wire.GetVersion() < NT_4_1) {
           m_pongTimeMs = curTimeMs;
         }
         int64_t now = wpi::util::Now();
@@ -97,7 +128,7 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
                                      serverTimeAtResponse) ||
               wpi::util::SubOverflow(serverTimeAtResponse, now,
                                      serverTimeOffsetNs) ||
-              serverTimeOffsetNs == std::numeric_limits<int64_t>::min()) {
+              serverTimeOffsetNs == (std::numeric_limits<int64_t>::min)()) {
             WARN("RTT ping response has invalid timestamp values");
             continue;
           }
@@ -125,11 +156,11 @@ void ClientImpl::HandleLocal(std::span<ClientMessage> msgs) {
     } else if (auto msg = std::get_if<PublishMsg>(&elem.contents)) {
       Publish(msg->pubuid, msg->name, msg->typeStr, msg->properties,
               msg->options);
-      m_outgoing.SendMessage(msg->pubuid, std::move(elem));
+      m_outgoing.SendMessageToServer(msg->pubuid, std::move(elem));
     } else if (auto msg = std::get_if<UnpublishMsg>(&elem.contents)) {
       Unpublish(msg->pubuid, std::move(elem));
     } else {
-      m_outgoing.SendMessage(0, std::move(elem));
+      m_outgoing.SendMessageToServer(0, std::move(elem));
     }
   }
 }
@@ -137,7 +168,7 @@ void ClientImpl::HandleLocal(std::span<ClientMessage> msgs) {
 void ClientImpl::SendOutgoing(uint64_t curTimeMs, bool flush) {
   DEBUG4("SendOutgoing({}, {})", curTimeMs, flush);
 
-  if (m_wire.GetVersion() >= 0x0401) {
+  if (m_wire.GetVersion() >= NT_4_1) {
     // Use WS pings
     if (!m_ping.Send(curTimeMs)) {
       return;
@@ -155,7 +186,8 @@ void ClientImpl::SendOutgoing(uint64_t curTimeMs, bool flush) {
       auto now = wpi::util::Now();
       DEBUG4("Sending RTT ping {}", now);
       m_wire.SendBinary([&](auto& os) {
-        WireEncodeBinary(os, -1, 0, Value::MakeInteger(now));
+        WireEncodeBinary(os, -1, 0, Value::MakeInteger(now),
+                         m_wire.GetVersion());
       });
       // drift isn't critical here, so just go from current time
       m_nextPingTimeMs = curTimeMs + RTT_INTERVAL_MS;
@@ -219,7 +251,7 @@ void ClientImpl::Unpublish(int32_t pubuid, ClientMessage&& msg) {
   }
   UpdatePeriodic();
 
-  m_outgoing.SendMessage(pubuid, std::move(msg));
+  m_outgoing.SendMessageToServer(pubuid, std::move(msg));
 
   // remove from outgoing handle map
   m_outgoing.EraseId(pubuid);
@@ -275,6 +307,14 @@ void ClientImpl::ServerSetValue(int topicId, const Value& value) {
   // pass along to local handler
   if (m_local) {
     m_local->ServerSetValue(topicIt->second, value);
+  }
+}
+
+ClientImpl::~ClientImpl() {
+  m_tspClient.reset();
+  if (m_timeSyncAsync) {
+    m_timeSyncAsync->wakeup.disconnect_all();
+    m_timeSyncAsync->Close();
   }
 }
 
