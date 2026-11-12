@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cctype>
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -178,6 +179,24 @@ static void Update2DRendererVSync() {
 static void SetFPSInternal(int fps) {
   gContext->fps = fps;
   Update2DRendererVSync();
+}
+
+static double GetFrameRateLimit() {
+  if (gContext->fps != 0 || gRendererContext.backend != RendererBackend::GPU ||
+      gRendererContext.presentMode != SDL_GPU_PRESENTMODE_MAILBOX) {
+    return gContext->fps;
+  }
+
+  // Mailbox can render faster than the display refreshes. Query each frame to
+  // follow changes to the window's display and its refresh rate.
+  SDL_DisplayID display = SDL_GetDisplayForWindow(gContext->window);
+  const SDL_DisplayMode* mode =
+      display ? SDL_GetCurrentDisplayMode(display) : nullptr;
+  if (mode && mode->refresh_rate > 0.0f && std::isfinite(mode->refresh_rate)) {
+    return mode->refresh_rate;
+  }
+
+  return 60.0;  // fallback
 }
 
 static SDL_GPUTextureFormat SDLGPUTextureFormat(PixelFormat format) {
@@ -1439,9 +1458,9 @@ void gui::Main() {
 
     if (windowMinimized) {
       SDL_Delay(10);
-    } else if (gContext->fps != 0) {
-      // if FPS limiting, sleep until next frame time
-      double sleepTime = (1.0 / gContext->fps) - (GetTime() - startTime);
+    } else if (double fps = GetFrameRateLimit(); fps > 0.0) {
+      // Sleep before the next frame's acquisition and input polling.
+      double sleepTime = (1.0 / fps) - (GetTime() - startTime);
       if (sleepTime > 1e-6) {
         std::this_thread::sleep_for(
             std::chrono::microseconds(static_cast<int64_t>(sleepTime * 1e6)));
