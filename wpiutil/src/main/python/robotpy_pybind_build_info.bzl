@@ -320,7 +320,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         summary = "Binary wrapper for WPILib utilities library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = ["robotpy-native-wpiutil==0.0.0", "protobuf>=5.28.1,<6"],
+        requires = ["robotpy-native-wpiutil==0.0.0", "protobuf>=7.36.2,<8"],
         python_requires = ">=3.12",
         entry_points = {
             "pkg_config": ["wpiutil-casters = wpiutil", "wpiutil = wpiutil"],

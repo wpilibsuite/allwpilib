@@ -46,10 +46,8 @@ def main(argv):
         args.proto_directory,
     )
     if args.python_output_directory.name != "__none__":
-        # Use grpcio-tools' protoc rather than args.protoc: the generated code must match
-        # the pinned protobuf runtime, which args.protoc (used for C++/Java) does not.
         generate_python_protobuf(
-            [sys.executable, "-m", "grpc_tools.protoc"],
+            [str(args.protoc)],
             args.python_output_directory,
             args.proto_directory,
         )

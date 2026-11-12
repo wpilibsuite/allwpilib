@@ -19,7 +19,7 @@ authors = [
 license = "BSD-3-Clause"
 dependencies = [
     "robotpy-native-wpiutil==0.0.0",
-    "protobuf>=5.28.1,<6",
+    "protobuf>=7.36.2,<8",
 ]
 
 [project.urls]

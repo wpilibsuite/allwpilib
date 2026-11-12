@@ -21,9 +21,9 @@ classifiers = [
 dev = [
     "black==26.10.1",
     "cxxheaderparser>=2.1.0",
-    "grpcio-tools==1.68.0",
+    "grpcio-tools==1.85.1",
     "jinja2==3.1.6",
-    "protobuf==5.28.3",
+    "protobuf==7.36.2",
     "pytest-order",
     "semiwrap==0.8.1",
 ]

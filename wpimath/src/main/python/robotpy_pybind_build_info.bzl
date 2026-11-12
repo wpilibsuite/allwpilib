@@ -1505,7 +1505,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         summary = "Binary wrapper for WPILib Math library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-telemetry==0.0.0", "robotpy-tunables==0.0.0", "robotpy-wpiutil==0.0.0", "protobuf>=5.28.1,<6"],
+        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-telemetry==0.0.0", "robotpy-tunables==0.0.0", "robotpy-wpiutil==0.0.0", "protobuf>=7.36.2,<8"],
         python_requires = ">=3.12",
         entry_points = {
             "pkg_config": ["wpimath-casters = wpimath", "wpimath = wpimath"],
