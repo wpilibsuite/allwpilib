@@ -55,6 +55,13 @@ void XRPMotor::SetThrottle(double throttle) {
 
     m_simThrottle.Set(invert ? -throttle : throttle);
   }
+
+  for (auto& follower : m_nonowningFollowers) {
+    follower->SetThrottle(throttle);
+  }
+  for (auto& follower : m_owningFollowers) {
+    follower->SetThrottle(throttle);
+  }
 }
 
 double XRPMotor::GetThrottle() const {
@@ -85,6 +92,10 @@ void XRPMotor::Disable() {
 
 void XRPMotor::StopMotor() {
   SetThrottle(0.0);
+}
+
+void XRPMotor::AddFollower(XRPMotor& follower) {
+  m_nonowningFollowers.emplace_back(&follower);
 }
 
 std::string XRPMotor::GetDescription() const {
