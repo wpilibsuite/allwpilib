@@ -492,12 +492,10 @@ static bool TryInitGPURenderer() {
     return false;
   }
 
-  // Limit queued frames to reduce input-to-display latency.
+  // Try to limit queued frames to reduce input-to-display latency.
   if (!SDL_SetGPUAllowedFramesInFlight(gContext->gpuDevice, 1)) {
     std::fprintf(stderr, "SDL_SetGPUAllowedFramesInFlight failed: %s\n",
                  SDL_GetError());
-    ShutdownGPURenderer();
-    return false;
   }
 
   if (!SDL_ClaimWindowForGPUDevice(gContext->gpuDevice, gContext->window)) {
@@ -509,20 +507,23 @@ static bool TryInitGPURenderer() {
   gRendererContext.gpuWindowClaimed = true;
 
   // Mailbox presents the newest frame without queuing older frames for display.
+  // Claiming the window already creates an SDR VSync swapchain.
   SDL_GPUPresentMode presentMode = SDL_GPU_PRESENTMODE_VSYNC;
   if (SDL_WindowSupportsGPUPresentMode(gContext->gpuDevice, gContext->window,
-                                       SDL_GPU_PRESENTMODE_MAILBOX) &&
-      SDL_SetGPUSwapchainParameters(gContext->gpuDevice, gContext->window,
-                                    SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
-                                    SDL_GPU_PRESENTMODE_MAILBOX)) {
-    presentMode = SDL_GPU_PRESENTMODE_MAILBOX;
-  } else if (!SDL_SetGPUSwapchainParameters(
-                 gContext->gpuDevice, gContext->window,
-                 SDL_GPU_SWAPCHAINCOMPOSITION_SDR, SDL_GPU_PRESENTMODE_VSYNC)) {
-    std::fprintf(stderr, "SDL_SetGPUSwapchainParameters failed: %s\n",
-                 SDL_GetError());
-    ShutdownGPURenderer();
-    return false;
+                                       SDL_GPU_PRESENTMODE_MAILBOX)) {
+    if (SDL_SetGPUSwapchainParameters(gContext->gpuDevice, gContext->window,
+                                      SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
+                                      SDL_GPU_PRESENTMODE_MAILBOX)) {
+      presentMode = SDL_GPU_PRESENTMODE_MAILBOX;
+    } else if (!SDL_SetGPUSwapchainParameters(gContext->gpuDevice,
+                                              gContext->window,
+                                              SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
+                                              SDL_GPU_PRESENTMODE_VSYNC)) {
+      std::fprintf(stderr, "SDL_SetGPUSwapchainParameters failed: %s\n",
+                   SDL_GetError());
+      ShutdownGPURenderer();
+      return false;
+    }
   }
 
   if (!ImGui_ImplSDL3_InitForSDLGPU(gContext->window)) {
