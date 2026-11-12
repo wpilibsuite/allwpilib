@@ -7,6 +7,7 @@
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/system/Watchdog.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Alert.hpp"
 
 namespace wpi {
 
@@ -42,6 +43,19 @@ namespace wpi {
  * \li AutonomousPeriodic()
  * \li TeleopPeriodic()
  * \li UtilityPeriodic()
+ *
+ * Order within one loop iteration:
+ *
+ * 1. DriverStationConnected(), once, the first time the DS is connected
+ * 2. The exit function of the previous mode and the init function of the new
+ *    mode, only on a mode change
+ * 3. The periodic function for the current mode (DisabledPeriodic(),
+ *    AutonomousPeriodic(), TeleopPeriodic(), or UtilityPeriodic())
+ * 4. RobotPeriodic()
+ * 5. SimulationPeriodic(), only in simulation
+ *
+ * The mode-specific periodic function runs before RobotPeriodic(). Exactly one
+ * mode-specific periodic function runs per iteration.
  *
  * Exit() functions -- each of the following functions is called once when the
  * appropriate mode is exited:
@@ -109,6 +123,10 @@ class IterativeRobotBase : public RobotBase {
    *
    * This function is called each time a new packet is received from the driver
    * station.
+   *
+   * Runs after the current mode's periodic function (DisabledPeriodic(),
+   * AutonomousPeriodic(), TeleopPeriodic(), or UtilityPeriodic()) and before
+   * SimulationPeriodic().
    */
   virtual void RobotPeriodic();
 
@@ -116,6 +134,8 @@ class IterativeRobotBase : public RobotBase {
    * Periodic simulation code should go here.
    *
    * This function is called in a simulated robot after user code executes.
+   * Within a loop iteration it runs last, after the current mode's periodic
+   * function and RobotPeriodic().
    */
   virtual void SimulationPeriodic();
 
@@ -125,6 +145,9 @@ class IterativeRobotBase : public RobotBase {
    * Users should override this method for code which will be called each time a
    * new packet is received from the driver station and the robot is in disabled
    * mode.
+   *
+   * Runs before RobotPeriodic() and SimulationPeriodic(). Never runs in the
+   * same iteration as another mode's periodic function.
    */
   virtual void DisabledPeriodic();
 
@@ -134,6 +157,8 @@ class IterativeRobotBase : public RobotBase {
    * Users should override this method for code which will be called each time a
    * new packet is received from the driver station and the robot is in
    * autonomous mode.
+   *
+   * Runs before RobotPeriodic() and SimulationPeriodic().
    */
   virtual void AutonomousPeriodic();
 
@@ -143,6 +168,8 @@ class IterativeRobotBase : public RobotBase {
    * Users should override this method for code which will be called each time a
    * new packet is received from the driver station and the robot is in teleop
    * mode.
+   *
+   * Runs before RobotPeriodic() and SimulationPeriodic().
    */
   virtual void TeleopPeriodic();
 
@@ -152,6 +179,8 @@ class IterativeRobotBase : public RobotBase {
    * Users should override this method for code which will be called each time a
    * new packet is received from the driver station and the robot is in utility
    * mode.
+   *
+   * Runs before RobotPeriodic() and SimulationPeriodic().
    */
   virtual void UtilityPeriodic();
 
@@ -218,10 +247,9 @@ class IterativeRobotBase : public RobotBase {
  private:
   int m_lastMode = -1;
   wpi::units::second_t m_period;
+  wpi::util::Alert m_loopOverrunAlert;
   Watchdog m_watchdog;
   bool m_calledDsConnected = false;
-
-  void PrintLoopOverrunMessage();
 };
 
 }  // namespace wpi

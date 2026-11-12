@@ -21,11 +21,18 @@ cmake_minimum_required(VERSION 3.21)
 
 get_filename_component(AOS_SDK_ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
-# Maps a CMake system name and processor to wpilib's platform directory.
-function(_aos_platform_dir system processor out)
+# Maps a CMake system name and processor to wpilib's platform directory. Two
+# platforms run Linux on arm64: the SystemCore, which is only ever
+# cross-compiled for, and a generic Debian trixie machine. CROSS says which one
+# an arm64 Linux processor means.
+function(_aos_platform_dir system processor cross out)
     string(TOLOWER "${processor}" processor)
     if(system STREQUAL "Linux" AND processor MATCHES "^(aarch64|arm64)$")
-        set(dir "linux/systemcore")
+        if(cross)
+            set(dir "linux/systemcore")
+        else()
+            set(dir "linux/arm64")
+        endif()
     elseif(system STREQUAL "Linux")
         set(dir "linux/x86-64")
     elseif(system STREQUAL "Darwin")
@@ -52,11 +59,21 @@ if(NOT DEFINED AOS_PLATFORM)
     if(MSVC AND CMAKE_CXX_COMPILER_ARCHITECTURE_ID)
         set(_aos_target_processor "${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}")
     endif()
-    _aos_platform_dir("${CMAKE_SYSTEM_NAME}" "${_aos_target_processor}" _aos_platform)
+    _aos_platform_dir(
+        "${CMAKE_SYSTEM_NAME}"
+        "${_aos_target_processor}"
+        "${CMAKE_CROSSCOMPILING}"
+        _aos_platform
+    )
     set(AOS_PLATFORM "${_aos_platform}" CACHE STRING "Platform directory of the AOS archive")
 endif()
 if(NOT DEFINED AOS_HOST_PLATFORM)
-    _aos_platform_dir("${CMAKE_HOST_SYSTEM_NAME}" "${CMAKE_HOST_SYSTEM_PROCESSOR}" _aos_host_platform)
+    _aos_platform_dir(
+        "${CMAKE_HOST_SYSTEM_NAME}"
+        "${CMAKE_HOST_SYSTEM_PROCESSOR}"
+        FALSE
+        _aos_host_platform
+    )
     set(AOS_HOST_PLATFORM
         "${_aos_host_platform}"
         CACHE STRING

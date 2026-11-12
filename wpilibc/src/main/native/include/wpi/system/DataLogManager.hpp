@@ -44,7 +44,7 @@ namespace wpi {
  * rotated segments are not deleted. An alert is active while less than 400 MB
  * is available, checked every 5 seconds. An
  * informational alert indicates when automatic directory selection falls back
- * to SystemCore internal storage.
+ * to Systemcore internal storage.
  *
  * By default, all NetworkTables value changes are stored to the data log.
  */

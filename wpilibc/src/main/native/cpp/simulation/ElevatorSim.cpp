@@ -33,7 +33,7 @@ ElevatorSim::ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
                          wpi::units::meter_t maxHeight, bool simulateGravity,
                          wpi::units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
-    : ElevatorSim(wpi::math::Models::ElevatorFromPhysicalConstants(
+    : ElevatorSim(wpi::math::Models::LinearPositionFromPhysicalConstants(
                       gearbox, carriageMass, drumRadius, gearing),
                   gearbox, minHeight, maxHeight, simulateGravity,
                   startingHeight, measurementStdDevs) {}
@@ -48,7 +48,7 @@ ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
                          wpi::units::meter_t maxHeight, bool simulateGravity,
                          wpi::units::meter_t startingHeight,
                          const std::array<double, 2>& measurementStdDevs)
-    : ElevatorSim(wpi::math::Models::ElevatorFromSysId(kV, kA), gearbox,
+    : ElevatorSim(wpi::math::Models::LinearPositionFromSysId(kV, kA), gearbox,
                   minHeight, maxHeight, simulateGravity, startingHeight,
                   measurementStdDevs) {}
 

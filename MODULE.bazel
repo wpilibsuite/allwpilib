@@ -26,6 +26,17 @@ bazel_dep(name = "platforms", version = "1.1.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
 bazel_dep(name = "rules_java", version = "9.9.0")
 bazel_dep(name = "rules_python", version = "2.4.6")
+
+# rules_python 2.x symlinks each py_binary's venv into place when it runs, which
+# fails on Windows without Developer Mode or admin rights:
+# https://github.com/bazel-contrib/rules_python/issues/3792
+single_version_override(
+    module_name = "rules_python",
+    patch_strip = 1,
+    patches = ["shared/bazel/patches/rules_python/0001-Fall-back-when-Windows-denies-symlinks.patch"],
+    version = "2.4.6",
+)
+
 bazel_dep(name = "rules_pycross", version = "2.0.0")
 bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 single_version_override(
@@ -64,7 +75,7 @@ pip.parse(
 )
 use_repo(pip, "allwpilib_pip_deps")
 
-bazel_dep(name = "rules_jvm_external", version = "6.8")
+bazel_dep(name = "rules_jvm_external", version = "6.10")
 
 register_toolchains("//:java_toolchain_definition")
 
@@ -121,10 +132,17 @@ bazel_dep(name = "rules_license", version = "1.0.0")
 http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 http_file(
-    name = "quickbuffer_protoc_linux",
+    name = "quickbuffer_protoc_linux_x86-64",
     executable = True,
     sha256 = "641f66130f048571ae44b7afb7756a46a69fa6d5c64c26bc39ce0cb385c2e8f8",
     urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.4/protoc-gen-quickbuf-1.4-linux-x86_64.exe"],
+)
+
+http_file(
+    name = "quickbuffer_protoc_linux_aarch64",
+    executable = True,
+    sha256 = "77dfb9a0e2b0350a5dd0059f0506712de1931e4ee52ccb3ad4b0524507e7b7cc",
+    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.4/protoc-gen-quickbuf-1.4-linux-aarch_64.exe"],
 )
 
 http_file(
