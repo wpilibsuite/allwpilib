@@ -36,7 +36,7 @@ std::normal_distribution<double> distribution{0.0, 1.0};
 
 TEST_CASE("LinearSystemLoopTest StateSpaceEnabled", "[wpimath]") {
   wpi::math::LinearSystem<2, 1, 2> plant{
-      wpi::math::Models::ElevatorFromPhysicalConstants(
+      wpi::math::Models::LinearPositionFromPhysicalConstants(
           wpi::math::DCMotor::Vex775Pro(2), 5_kg, 0.0181864_m, 1.0)};
 
   wpi::math::LinearSystem<2, 1, 1> slicedPlant{plant.Slice(0)};
@@ -86,7 +86,7 @@ TEST_CASE("LinearSystemLoopTest StateSpaceEnabled", "[wpimath]") {
 
 TEST_CASE("LinearSystemLoopTest FlywheelEnabled", "[wpimath]") {
   wpi::math::LinearSystem<1, 1, 1> plant{
-      wpi::math::Models::FlywheelFromPhysicalConstants(
+      wpi::math::Models::AngularVelocityFromPhysicalConstants(
           wpi::math::DCMotor::NEO(2), 0.00289_kg_sq_m, 1.0)};
 
   wpi::math::KalmanFilter<1, 1, 1> observer{
@@ -127,7 +127,7 @@ TEST_CASE("LinearSystemLoopTest FlywheelEnabled", "[wpimath]") {
 
 TEST_CASE("LinearSystemLoopTest AtReference", "[wpimath]") {
   wpi::math::LinearSystem<2, 1, 2> plant{
-      wpi::math::Models::ElevatorFromPhysicalConstants(
+      wpi::math::Models::LinearPositionFromPhysicalConstants(
           wpi::math::DCMotor::Vex775Pro(2), 5_kg, 0.0181864_m, 1.0)};
 
   wpi::math::LinearSystem<2, 1, 1> slicedPlant{plant.Slice(0)};
