@@ -1,0 +1,323 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Ye <ethan.w.ye@gmail.com>
+Date: Thu, 1 Oct 2026 14:53:54 -0700
+Subject: [PATCH 34/34] Remove LLVM helpers from SetVector and DenseSet
+
+---
+ llvm/include/llvm/ADT/SetVector.h    | 23 +++++----
+ llvm/unittests/ADT/DenseSetTest.cpp  | 70 ++++++++++++++--------------
+ llvm/unittests/ADT/SetVectorTest.cpp | 30 ++++++++++--
+ 3 files changed, 75 insertions(+), 48 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/SetVector.h b/llvm/include/llvm/ADT/SetVector.h
+index 4d0a20f4f95f7e1f68d8afe146589be33e3ad402..de71203490e463d1bec2b7c85d667130e1d4e8a7 100644
+--- a/llvm/include/llvm/ADT/SetVector.h
++++ b/llvm/include/llvm/ADT/SetVector.h
+@@ -21,13 +21,13 @@
+ #define LLVM_ADT_SETVECTOR_H
+ 
+ #include "llvm/ADT/ADL.h"
+-#include "llvm/ADT/ArrayRef.h"
+ #include "llvm/ADT/DenseSet.h"
+-#include "llvm/ADT/STLExtras.h"
+ #include "llvm/ADT/STLForwardCompat.h"
+ #include "llvm/ADT/SmallVector.h"
+ #include "llvm/Support/Compiler.h"
++#include <algorithm>
+ #include <cassert>
++#include <span>
+ 
+ namespace llvm {
+ 
+@@ -88,7 +88,7 @@ public:
+   SetVector(llvm::from_range_t, Range &&R)
+       : SetVector(adl_begin(R), adl_end(R)) {}
+ 
+-  [[nodiscard]] ArrayRef<value_type> getArrayRef() const { return vector_; }
++  [[nodiscard]] span<const value_type> getArrayRef() const { return vector_; }
+ 
+   /// Clear the SetVector and return the underlying vector.
+   [[nodiscard]] Vector takeVector() {
+@@ -151,7 +151,7 @@ public:
+   bool insert(const value_type &X) {
+     if constexpr (canBeSmall())
+       if (isSmall()) {
+-        if (!llvm::is_contained(vector_, X)) {
++        if (std::find(vector_.begin(), vector_.end(), X) == vector_.end()) {
+           vector_.push_back(X);
+           if (vector_.size() > N)
+             makeBig();
+@@ -181,7 +181,8 @@ public:
+   bool remove(const value_type& X) {
+     if constexpr (canBeSmall())
+       if (isSmall()) {
+-        typename vector_type::iterator I = find(vector_, X);
++        typename vector_type::iterator I =
++            std::find(vector_.begin(), vector_.end(), X);
+         if (I != vector_.end()) {
+           vector_.erase(I);
+           return true;
+@@ -190,7 +191,8 @@ public:
+       }
+ 
+     if (set_.erase(X)) {
+-      typename vector_type::iterator I = find(vector_, X);
++      typename vector_type::iterator I =
++          std::find(vector_.begin(), vector_.end(), X);
+       assert(I != vector_.end() && "Corrupted SetVector instances!");
+       vector_.erase(I);
+       return true;
+@@ -231,9 +233,10 @@ public:
+     typename vector_type::iterator I = [this, P] {
+       if constexpr (canBeSmall())
+         if (isSmall())
+-          return llvm::remove_if(vector_, P);
++          return std::remove_if(vector_.begin(), vector_.end(), P);
+ 
+-      return llvm::remove_if(vector_, [&](const value_type &V) {
++      return std::remove_if(vector_.begin(), vector_.end(),
++                            [&](const value_type &V) {
+         if (P(V)) {
+           set_.erase(V);
+           return true;
+@@ -252,9 +255,9 @@ public:
+   [[nodiscard]] bool contains(const_arg_type key) const {
+     if constexpr (canBeSmall())
+       if (isSmall())
+-        return is_contained(vector_, key);
++        return std::find(vector_.begin(), vector_.end(), key) != vector_.end();
+ 
+-    return is_contained(set_, key);
++    return set_.contains(key);
+   }
+ 
+   /// Count the number of elements of a given key in the SetVector.
+diff --git a/llvm/unittests/ADT/DenseSetTest.cpp b/llvm/unittests/ADT/DenseSetTest.cpp
+index 11500e835b23da0ac0805c5f350c88b6459c6157..0d7adf9dede02bdbc8b68de2450ebe1198b4445c 100644
+--- a/llvm/unittests/ADT/DenseSetTest.cpp
++++ b/llvm/unittests/ADT/DenseSetTest.cpp
+@@ -10,6 +10,7 @@
+ #include "gmock/gmock.h"
+ #include "gtest/gtest.h"
+ #include <type_traits>
++#include <vector>
+ 
+ using namespace llvm;
+ 
+@@ -36,33 +37,33 @@ TEST(DenseSetTest, DoubleEntrySetTest) {
+ TEST(DenseSetTest, CtorRange) {
+   constexpr unsigned Args[] = {3, 1, 2};
+   llvm::DenseSet<unsigned> set(llvm::from_range, Args);
+-  EXPECT_THAT(set, ::testing::UnorderedElementsAre(1, 2, 3));
++  CHECK_THAT(set, Catch::Matchers::UnorderedRangeEquals(std::vector<unsigned>{1, 2, 3}));
+ }
+ 
+ TEST(DenseSetTest, CtorRangeImplicitConversion) {
+   constexpr char Args[] = {3, 1, 2};
+   llvm::DenseSet<unsigned> set(llvm::from_range, Args);
+-  EXPECT_THAT(set, ::testing::UnorderedElementsAre(1, 2, 3));
++  CHECK_THAT(set, Catch::Matchers::UnorderedRangeEquals(std::vector<unsigned>{1, 2, 3}));
+ }
+ 
+ TEST(SmallDenseSetTest, CtorRange) {
+   constexpr unsigned Args[] = {9, 7, 8};
+   llvm::SmallDenseSet<unsigned> set(llvm::from_range, Args);
+-  EXPECT_THAT(set, ::testing::UnorderedElementsAre(7, 8, 9));
++  CHECK_THAT(set, Catch::Matchers::UnorderedRangeEquals(std::vector<unsigned>{7, 8, 9}));
+ }
+ 
+ TEST(DenseSetTest, InsertRange) {
+   llvm::DenseSet<unsigned> set;
+   constexpr unsigned Args[] = {3, 1, 2};
+   set.insert_range(Args);
+-  EXPECT_THAT(set, ::testing::UnorderedElementsAre(1, 2, 3));
++  CHECK_THAT(set, Catch::Matchers::UnorderedRangeEquals(std::vector<unsigned>{1, 2, 3}));
+ }
+ 
+ TEST(SmallDenseSetTest, InsertRange) {
+   llvm::SmallDenseSet<unsigned> set;
+   constexpr unsigned Args[] = {9, 7, 8};
+   set.insert_range(Args);
+-  EXPECT_THAT(set, ::testing::UnorderedElementsAre(7, 8, 9));
++  CHECK_THAT(set, Catch::Matchers::UnorderedRangeEquals(std::vector<unsigned>{7, 8, 9}));
+ }
+ 
+ TEST(DenseSetTest, RemoveIf) {
+@@ -73,7 +74,7 @@ TEST(DenseSetTest, RemoveIf) {
+   EXPECT_TRUE(set.remove_if([](unsigned V) { return V % 2 == 0; }));
+   EXPECT_EQ(set.size(), 50u);
+   for (unsigned I = 0; I < 100; ++I)
+-    EXPECT_EQ(set.contains(I), I % 2 == 1);
++    EXPECT_EQ(set.contains(I), (I % 2 == 1));
+ 
+   EXPECT_FALSE(set.remove_if([](unsigned) { return false; }));
+   EXPECT_EQ(set.size(), 50u);
+@@ -95,7 +96,7 @@ struct TestDenseSetInfo {
+ };
+ 
+ // Test fixture
+-template <typename T> class DenseSetTest : public testing::Test {
++template <typename T> class DenseSetTest {
+ protected:
+   T Set = GetTestSet();
+ 
+@@ -110,26 +111,25 @@ private:
+ };
+ 
+ // Register these types for testing.
+-using DenseSetTestTypes =
+-    ::testing::Types<DenseSet<unsigned, TestDenseSetInfo>,
+-                     const DenseSet<unsigned, TestDenseSetInfo>,
+-                     SmallDenseSet<unsigned, 1, TestDenseSetInfo>,
+-                     SmallDenseSet<unsigned, 4, TestDenseSetInfo>,
+-                     const SmallDenseSet<unsigned, 4, TestDenseSetInfo>,
+-                     SmallDenseSet<unsigned, 64, TestDenseSetInfo>>;
+-TYPED_TEST_SUITE(DenseSetTest, DenseSetTestTypes, );
+-
+-TYPED_TEST(DenseSetTest, Constructor) {
++#define WPIUTIL_TEST_TYPES_DenseSetTest \
++  (DenseSet<unsigned, TestDenseSetInfo>), \
++  (const DenseSet<unsigned, TestDenseSetInfo>), \
++  (SmallDenseSet<unsigned, 1, TestDenseSetInfo>), \
++  (SmallDenseSet<unsigned, 4, TestDenseSetInfo>), \
++  (const SmallDenseSet<unsigned, 4, TestDenseSetInfo>), \
++  (SmallDenseSet<unsigned, 64, TestDenseSetInfo>)
++
++TEMPLATE_TEST_CASE_METHOD(DenseSetTest, "DenseSetTest Constructor", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseSetTest) {
+   constexpr unsigned a[] = {1, 2, 4};
+-  TypeParam set(std::begin(a), std::end(a));
++  TestType set(std::begin(a), std::end(a));
+   EXPECT_EQ(3u, set.size());
+   EXPECT_EQ(1u, set.count(1));
+   EXPECT_EQ(1u, set.count(2));
+   EXPECT_EQ(1u, set.count(4));
+ }
+ 
+-TYPED_TEST(DenseSetTest, InitializerList) {
+-  TypeParam set({1, 2, 1, 4});
++TEMPLATE_TEST_CASE_METHOD(DenseSetTest, "DenseSetTest InitializerList", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseSetTest) {
++  TestType set({1, 2, 1, 4});
+   EXPECT_EQ(3u, set.size());
+   EXPECT_EQ(1u, set.count(1));
+   EXPECT_EQ(1u, set.count(2));
+@@ -137,37 +137,37 @@ TYPED_TEST(DenseSetTest, InitializerList) {
+   EXPECT_EQ(0u, set.count(3));
+ }
+ 
+-TYPED_TEST(DenseSetTest, InitializerListWithNonPowerOfTwoLength) {
+-  TypeParam set({1, 2, 3});
++TEMPLATE_TEST_CASE_METHOD(DenseSetTest, "DenseSetTest InitializerListWithNonPowerOfTwoLength", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseSetTest) {
++  TestType set({1, 2, 3});
+   EXPECT_EQ(3u, set.size());
+   EXPECT_EQ(1u, set.count(1));
+   EXPECT_EQ(1u, set.count(2));
+   EXPECT_EQ(1u, set.count(3));
+ }
+ 
+-TYPED_TEST(DenseSetTest, ConstIteratorComparison) {
+-  TypeParam set({1});
+-  const TypeParam &cset = set;
++TEMPLATE_TEST_CASE_METHOD(DenseSetTest, "DenseSetTest ConstIteratorComparison", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseSetTest) {
++  TestType set({1});
++  const TestType &cset = set;
+   EXPECT_EQ(set.begin(), cset.begin());
+   EXPECT_EQ(set.end(), cset.end());
+   EXPECT_NE(set.end(), cset.begin());
+   EXPECT_NE(set.begin(), cset.end());
+ }
+ 
+-TYPED_TEST(DenseSetTest, DefaultConstruction) {
+-  typename TypeParam::iterator I, J;
+-  typename TypeParam::const_iterator CI, CJ;
++TEMPLATE_TEST_CASE_METHOD(DenseSetTest, "DenseSetTest DefaultConstruction", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseSetTest) {
++  typename TestType::iterator I, J;
++  typename TestType::const_iterator CI, CJ;
+   EXPECT_EQ(I, J);
+   EXPECT_EQ(CI, CJ);
+ }
+ 
+-TYPED_TEST(DenseSetTest, EmptyInitializerList) {
+-  TypeParam set({});
++TEMPLATE_TEST_CASE_METHOD(DenseSetTest, "DenseSetTest EmptyInitializerList", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseSetTest) {
++  TestType set({});
+   EXPECT_EQ(0u, set.size());
+   EXPECT_EQ(0u, set.count(0));
+ }
+ 
+-TYPED_TEST(DenseSetTest, FindAsTest) {
++TEMPLATE_TEST_CASE_METHOD(DenseSetTest, "DenseSetTest FindAsTest", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseSetTest) {
+   auto &set = this->Set;
+   // Size tests
+   EXPECT_EQ(3u, set.size());
+@@ -186,10 +186,10 @@ TYPED_TEST(DenseSetTest, FindAsTest) {
+   EXPECT_TRUE(set.find_as("d") == set.end());
+ }
+ 
+-TYPED_TEST(DenseSetTest, EqualityComparisonTest) {
+-  TypeParam set1({1, 2, 3, 4});
+-  TypeParam set2({4, 3, 2, 1});
+-  TypeParam set3({2, 3, 4, 5});
++TEMPLATE_TEST_CASE_METHOD(DenseSetTest, "DenseSetTest EqualityComparisonTest", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_DenseSetTest) {
++  TestType set1({1, 2, 3, 4});
++  TestType set2({4, 3, 2, 1});
++  TestType set3({2, 3, 4, 5});
+ 
+   EXPECT_EQ(set1, set2);
+   EXPECT_NE(set1, set3);
+diff --git a/llvm/unittests/ADT/SetVectorTest.cpp b/llvm/unittests/ADT/SetVectorTest.cpp
+index 6230472553c3818db3c2396110705df3383ff5a5..fbf5effbe5bb42843ecc8030a6d81d25166dbbd3 100644
+--- a/llvm/unittests/ADT/SetVectorTest.cpp
++++ b/llvm/unittests/ADT/SetVectorTest.cpp
+@@ -14,6 +14,8 @@
+ #include "llvm/ADT/SmallPtrSet.h"
+ #include "gmock/gmock.h"
+ #include "gtest/gtest.h"
++#include <algorithm>
++#include <vector>
+ 
+ using namespace llvm;
+ 
+@@ -91,18 +93,40 @@ TEST(SetVector, ConstPtrKeyTest) {
+ TEST(SetVector, CtorRange) {
+   constexpr unsigned Args[] = {3, 1, 2};
+   SetVector<unsigned> Set(llvm::from_range, Args);
+-  EXPECT_THAT(Set, ::testing::ElementsAre(3, 1, 2));
++  CHECK_THAT(Set, Catch::Matchers::RangeEquals(std::vector<unsigned>{3, 1, 2}));
+ }
+ 
+ TEST(SetVector, InsertRange) {
+   SetVector<unsigned> Set;
+   constexpr unsigned Args[] = {3, 1, 2};
+   Set.insert_range(Args);
+-  EXPECT_THAT(Set, ::testing::ElementsAre(3, 1, 2));
++  CHECK_THAT(Set, Catch::Matchers::RangeEquals(std::vector<unsigned>{3, 1, 2}));
+ }
+ 
+ TEST(SmallSetVector, CtorRange) {
+   constexpr unsigned Args[] = {3, 1, 2};
+   SmallSetVector<unsigned, 4> Set(llvm::from_range, Args);
+-  EXPECT_THAT(Set, ::testing::ElementsAre(3, 1, 2));
++  CHECK_THAT(Set, Catch::Matchers::RangeEquals(std::vector<unsigned>{3, 1, 2}));
++}
++
++TEST(SmallSetVector, InsertionOrderAfterRemovalAndReinsertion) {
++  for (int Size : {3, 32}) {
++    SmallSetVector<int, 4> Set;
++    std::vector<int> Expected;
++    for (int I = 0; I < Size; ++I) {
++      EXPECT_TRUE(Set.insert(I));
++      EXPECT_FALSE(Set.insert(I));
++      Expected.push_back(I);
++    }
++    CHECK_THAT(Set, Catch::Matchers::RangeEquals(Expected));
++    EXPECT_EQ(Set.size(), Expected.size());
++    EXPECT_TRUE(Set.remove(1));
++    EXPECT_FALSE(Set.remove(1));
++    EXPECT_FALSE(Set.contains(1));
++    std::erase(Expected, 1);
++    CHECK_THAT(Set, Catch::Matchers::RangeEquals(Expected));
++    EXPECT_TRUE(Set.insert(1));
++    Expected.push_back(1);
++    CHECK_THAT(Set, Catch::Matchers::RangeEquals(Expected));
++  }
+ }
