@@ -234,8 +234,9 @@ void SetStyle(Style style);
 /**
  * Sets the FPS limit.  Using this function makes this setting persistent.
  *
- * With mailbox presentation, vsync uses software pacing at the display's
- * refresh rate, or 60 FPS if the refresh rate is unavailable.
+ * With mailbox presentation, vsync uses software pacing 5% above the display's
+ * refresh rate to allow for timer jitter, or 60 FPS if the refresh rate is
+ * unavailable.
  *
  * @param fps FPS (0=vsync)
  */

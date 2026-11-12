@@ -193,7 +193,8 @@ static double GetFrameRateLimit() {
   const SDL_DisplayMode* mode =
       display ? SDL_GetCurrentDisplayMode(display) : nullptr;
   if (mode && mode->refresh_rate > 0.0f && std::isfinite(mode->refresh_rate)) {
-    return mode->refresh_rate;
+    // Leave some headroom for timer jitter when pacing independently of vblank.
+    return mode->refresh_rate * 1.05;
   }
 
   return 60.0;  // fallback
@@ -1400,6 +1401,8 @@ static void ProcessImGuiSDLEvent(const SDL_Event& event) {
 void gui::Main() {
   // Main loop
   double previousStartTime = 0.0;
+  double nextFrameTime = 0.0;
+  double previousFps = 0.0;
   while (!gContext->exit) {
     double startTime = GetTime();
     double framePeriod = previousStartTime > 0.0
@@ -1457,14 +1460,28 @@ void gui::Main() {
     }
 
     if (windowMinimized) {
+      previousFps = 0.0;
       SDL_Delay(10);
     } else if (double fps = GetFrameRateLimit(); fps > 0.0) {
+      if (fps != previousFps) {
+        nextFrameTime = startTime;
+        previousFps = fps;
+      }
+      // Advance the deadline so sleep overshoot doesn't accumulate.
+      nextFrameTime += 1.0 / fps;
+      double now = GetTime();
+      if (nextFrameTime < now) {
+        // Drop overdue deadlines to avoid a burst of catch-up frames.
+        nextFrameTime = now;
+      }
       // Sleep before the next frame's acquisition and input polling.
-      double sleepTime = (1.0 / fps) - (GetTime() - startTime);
+      double sleepTime = nextFrameTime - now;
       if (sleepTime > 1e-6) {
         std::this_thread::sleep_for(
             std::chrono::microseconds(static_cast<int64_t>(sleepTime * 1e6)));
       }
+    } else {
+      previousFps = 0.0;
     }
   }
 
