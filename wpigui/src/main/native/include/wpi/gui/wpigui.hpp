@@ -262,8 +262,8 @@ void ConfigurePlatformSaveFile(const std::string& name);
 void EmitViewMenu();
 
 /**
- * Emits renderer information, including the SDL renderer backend when using
- * the 2D renderer.
+ * Emits renderer information, including the SDL renderer backend and the
+ * selected presentation mode when using the GPU renderer.
  */
 void EmitRendererInfo();
 
