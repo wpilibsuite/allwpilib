@@ -18,6 +18,10 @@ class MyTeleop(wpilib.PeriodicOpMode):
         self.robot = robot
 
     @override
+    def disabled_periodic(self) -> None:
+        """Called periodically (set time interval) while the robot is disabled."""
+
+    @override
     def start(self) -> None:
         """Called once when the robot is first enabled."""
 
@@ -28,3 +32,7 @@ class MyTeleop(wpilib.PeriodicOpMode):
     @override
     def end(self) -> None:
         """Called when the robot is disabled (after previously being enabled)."""
+
+    @override
+    def close(self) -> None:
+        """Called when the opmode is de-selected / no additional methods will be called."""

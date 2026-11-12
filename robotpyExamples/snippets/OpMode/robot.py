@@ -19,6 +19,25 @@ class Robot(wpilib.OpModeRobot):
         """This function is called exactly once when the DS first connects."""
 
     @override
+    def robot_periodic(self) -> None:
+        """
+        This function is called periodically every loop, regardless of enabled
+        state or opmode.
+        """
+
+    @override
+    def disabled_init(self) -> None:
+        """This function is called once when the robot becomes disabled."""
+
+    @override
+    def disabled_periodic(self) -> None:
+        """This function is called periodically while the robot is disabled."""
+
+    @override
+    def disabled_exit(self) -> None:
+        """This function is called once when the robot exits the disabled state."""
+
+    @override
     def none_periodic(self) -> None:
         """
         This function is called periodically anytime when no opmode is selected,
