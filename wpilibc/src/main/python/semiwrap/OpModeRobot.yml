@@ -12,6 +12,7 @@ classes:
           "":
       DriverStationConnected:
       NonePeriodic:
+      EnabledPeriodic:
       AddOpModeFactory:
         overloads:
           RobotMode, std::string_view, OpModeFactory:
