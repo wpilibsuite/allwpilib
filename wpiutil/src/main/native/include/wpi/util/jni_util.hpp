@@ -70,7 +70,7 @@ class JClass {
 
   explicit operator bool() const { return m_cls; }
 
-  operator jclass() const { return m_cls; }
+  operator jclass() const { return m_cls; }  // NOLINT
 
  protected:
   jclass m_cls = nullptr;

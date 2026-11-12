@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
   This elevator is driven by two NEO motors.
    */
   private final LinearSystem<N2, N1, N2> elevatorPlant =
-      Models.elevatorFromPhysicalConstants(
+      Models.linearPositionFromPhysicalConstants(
           DCMotor.getNEO(2), CARRIAGE_MASS, DRUM_RADIUS, ELEVATOR_GEARING);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.

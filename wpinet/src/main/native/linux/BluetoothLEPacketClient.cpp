@@ -111,7 +111,7 @@ bool ParseBluetoothAddress(std::string_view address, bdaddr_t* out) {
 
   bdaddr_t parsed{};
   for (int i = 0; i < 6; ++i) {
-    size_t pos = static_cast<size_t>(i * 3);
+    size_t pos = static_cast<size_t>(i) * 3;
     if (i < 5 && address[pos + 2] != ':') {
       return false;
     }
@@ -1094,6 +1094,9 @@ class BluetoothLEPacketClient::Impl
     uint64_t generation = m_connectGeneration;
     std::vector<uint8_t> packet(m_config.maxPacketSize);
     while (generation == m_connectGeneration && m_socket >= 0) {
+      // The analyzer mistakes std::weak_ptr::lock() in the poll callback for
+      // a mutex lock. The socket is also non-blocking.
+      // NOLINTNEXTLINE(clang-analyzer-unix.BlockInCriticalSection)
       ssize_t received = ::recv(m_socket, packet.data(), packet.size(), 0);
       if (received > 0) {
         TraceTraffic(true, received);
@@ -1567,6 +1570,9 @@ class BluetoothLEPacketClient::Impl
     std::vector<uint8_t> pdu(
         std::max<size_t>(m_gattMtu, m_config.maxPacketSize + 3));
     while (generation == m_connectGeneration && m_socket >= 0) {
+      // The analyzer mistakes std::weak_ptr::lock() in the poll callback for
+      // a mutex lock. The socket is also non-blocking.
+      // NOLINTNEXTLINE(clang-analyzer-unix.BlockInCriticalSection)
       ssize_t received = ::recv(m_socket, pdu.data(), pdu.size(), 0);
       if (received > 0) {
         HandleGattPdu({pdu.data(), static_cast<size_t>(received)});

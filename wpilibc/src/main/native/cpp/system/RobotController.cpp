@@ -27,14 +27,6 @@ std::string RobotController::GetSerialNumber() {
   return ret;
 }
 
-std::string RobotController::GetComments() {
-  WPI_String comments;
-  HAL_GetComments(&comments);
-  std::string ret{wpi::util::to_string_view(&comments)};
-  WPI_FreeString(&comments);
-  return ret;
-}
-
 int32_t RobotController::GetTeamNumber() {
   return HAL_GetTeamNumber();
 }

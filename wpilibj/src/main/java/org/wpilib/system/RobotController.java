@@ -39,18 +39,6 @@ public final class RobotController {
   }
 
   /**
-   * Return the comments from the roboRIO web interface.
-   *
-   * <p>The comments string is cached after the first call to this function on the RoboRIO - restart
-   * the robot code to reload the comments string after changing it in the web interface.
-   *
-   * @return the comments from the roboRIO web interface.
-   */
-  public static String getComments() {
-    return HALUtil.getComments();
-  }
-
-  /**
    * Returns the team number configured for the robot controller.
    *
    * @return team number, or 0 if not found.

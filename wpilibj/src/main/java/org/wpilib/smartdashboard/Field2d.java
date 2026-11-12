@@ -32,6 +32,10 @@ import org.wpilib.units.measure.Distance;
  * <p>This class provides methods to set the robot pose, but other objects can also be shown by
  * using the getObject() function. Other objects can also have multiple poses (which will show the
  * object at multiple locations).
+ *
+ * <p>Field poses use the center of the field as the origin, with +X toward the blue alliance wall
+ * and +Y to the left when facing +X. Zero rotation faces +X, and positive rotation is
+ * counterclockwise.
  */
 public class Field2d implements TelemetryLoggable, ComplexTunable, AutoCloseable {
   /** Constructor. */

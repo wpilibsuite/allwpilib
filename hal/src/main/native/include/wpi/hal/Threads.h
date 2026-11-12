@@ -14,11 +14,11 @@
  * @{
  */
 
-typedef const void* NativeThreadHandle;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef const void* NativeThreadHandle;
 
 /**
  * Gets the specified thread's priority.

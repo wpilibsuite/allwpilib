@@ -36,6 +36,10 @@ namespace wpi {
  * This class provides methods to set the robot pose, but other objects can
  * also be shown by using the GetObject() function.  Other objects can
  * also have multiple poses (which will show the object at multiple locations).
+ *
+ * Field poses use the center of the field as the origin, with +X toward the
+ * blue alliance wall and +Y to the left when facing +X. Zero rotation faces
+ * +X, and positive rotation is counterclockwise.
  */
 class Field2d : public wpi::telemetry::TelemetryLoggable,
                 public wpi::tunables::ComplexTunable {

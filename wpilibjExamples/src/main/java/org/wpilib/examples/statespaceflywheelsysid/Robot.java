@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
   //
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
   private final LinearSystem<N1, N1, N1> flywheelPlant =
-      Models.flywheelFromSysId(FLYWHEEL_KV, FLYWHEEL_KA);
+      Models.angularVelocityFromSysId(FLYWHEEL_KV, FLYWHEEL_KA);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   private final KalmanFilter<N1, N1, N1> observer =

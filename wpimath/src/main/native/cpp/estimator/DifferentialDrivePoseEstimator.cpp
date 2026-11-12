@@ -7,7 +7,7 @@
 #include "wpi/math/estimator/PoseEstimator.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/array.hpp"
 
@@ -25,7 +25,8 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     wpi::units::meter_t rightDistance, const Pose2d& initialPose,
     const wpi::util::array<double, 3>& stateStdDevs,
     const wpi::util::array<double, 3>& visionMeasurementStdDevs)
-    : PoseEstimator(m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
-      m_odometryImpl{gyroAngle, leftDistance, rightDistance, initialPose} {
+    : PoseEstimator(DifferentialDriveOdometry{gyroAngle, leftDistance,
+                                              rightDistance, initialPose},
+                    stateStdDevs, visionMeasurementStdDevs) {
   ResetPose(initialPose);
 }

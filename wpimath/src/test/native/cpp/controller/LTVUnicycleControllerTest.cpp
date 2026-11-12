@@ -56,3 +56,23 @@ TEST_CASE("LTVUnicycleControllerTest ReachesReference", "[wpimath]") {
                                            robotPose.Rotation().Radians()),
                    0_rad, ANGULAR_TOLERANCE);
 }
+
+TEST_CASE("LTVUnicycleControllerTest NoTurnFromLateralErrorAtStandstill",
+          "[wpimath]") {
+  constexpr wpi::units::second_t DT = 20_ms;
+
+  wpi::math::LTVUnicycleController controller{
+      {0.0625, 0.125, 2.5}, {4.0, 4.0}, DT};
+
+  // Lateral error can't be corrected while stopped, so the controller
+  // shouldn't turn in place in response to it
+  for (auto velocity : {-1e-6_mps, 0_mps, 1e-6_mps}) {
+    auto [vx, vy, omega] = controller.Calculate(
+        wpi::math::Pose2d{0_m, 0_m, 0_rad},
+        wpi::math::Pose2d{0_m, 0.1_m, 0_rad}, velocity, 0_rad_per_s);
+
+    CHECK_NEAR_UNITS(vx, velocity, 1e-3_mps);
+    CHECK(vy == 0_mps);
+    CHECK_NEAR_UNITS(omega, 0_rad_per_s, 1e-3_rad_per_s);
+  }
+}

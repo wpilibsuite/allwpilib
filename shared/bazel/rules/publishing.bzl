@@ -17,6 +17,15 @@ def _get_host_os():
 
 HOST_OS = _get_host_os()
 
+# The x86-64 Linux artifacts and the cross-compiled SystemCore ones need a
+# toolchain that runs on x86-64 Linux. On an arm64 Linux host, the x86-64 ones
+# have no compiler at all, and the SystemCore ones would resolve to the host's
+# compiler and sysroot rather than the SystemCore's.
+_LINUX_ARM64_HOST = HOST_OS == "linux" and (
+    "@platforms//cpu:aarch64" in _host_constraints or
+    "@platforms//cpu:arm64" in _host_constraints
+)
+
 def _publish_all_impl(ctx):
     # This is a rule, not a macro, to allow the `targets` attribute to be
     # configurable with `select()`. Macros are expanded during the loading phase,
@@ -87,6 +96,7 @@ def architectures_pkg_zip(
         **kwargs):
     if architectures == None:
         architectures = {
+            "@allwpilib//shared/bazel:linux_arm64_trixie": "linux-arm64",
             "@allwpilib//shared/bazel:linux_x86_64": "linux-x86-64",
             "@allwpilib//shared/bazel:osx": "osxuniversal",
             "@allwpilib//shared/bazel:systemcore": "systemcore",
@@ -95,6 +105,7 @@ def architectures_pkg_zip(
         }
 
     architectures_target_compatible_with = {
+        "linux-arm64": ["@platforms//os:linux"],
         "linux-x86-64": ["@platforms//os:linux"],
         "osxuniversal": ["@platforms//os:osx"],
         "systemcore": None,
@@ -127,6 +138,7 @@ def platform_prefix(t):
         "@wpilib_toolchains//conditions:windows_arm64": "windows/arm64/" + t,
         "@wpilib_toolchains//conditions:windows_x86_64": "windows/x86-64/" + t,
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": "linux/systemcore/" + t,
+        "@wpilib_toolchains//constraints/is_trixie64:trixie64": "linux/arm64/" + t,
     })
 
 def _wpilib_maven_export_impl(
@@ -143,7 +155,13 @@ def _wpilib_maven_export_impl(
     all_artifacts = {}
     all_artifacts.update(classifier_artifacts)
 
-    if HOST_OS == "linux":
+    if _LINUX_ARM64_HOST:
+        all_artifacts = {
+            key: value
+            for key, value in all_artifacts.items()
+            if not key.startswith("linuxsystemcore")
+        }
+    elif HOST_OS == "linux":
         all_artifacts.update(linux_artifacts)
     elif HOST_OS == "osx":
         all_artifacts.update(osx_artifacts)

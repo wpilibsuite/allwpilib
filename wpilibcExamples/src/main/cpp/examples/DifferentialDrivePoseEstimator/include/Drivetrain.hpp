@@ -130,6 +130,7 @@ class Drivetrain {
 
   wpi::fields::Field field{
       wpi::fields::GetField(wpi::fields::FieldId::FRC_2024_CRESCENDO)};
+  // Built-in tag poses use the same centered field frame as the pose estimator.
   wpi::math::Pose3d objectInField{field.GetTagPose(1).value()};
 
   wpi::PWMSparkMax leftLeader{1};
@@ -153,7 +154,7 @@ class Drivetrain {
       imu.GetRotation2d(),
       wpi::units::meter_t{leftEncoder.GetDistance()},
       wpi::units::meter_t{rightEncoder.GetDistance()},
-      wpi::math::Pose2d{},
+      wpi::math::Pose2d{},  // Field center, facing the blue alliance wall.
       {0.01, 0.01, 0.01},
       {0.1, 0.1, 0.1}};
 

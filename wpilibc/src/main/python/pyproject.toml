@@ -143,10 +143,6 @@ Switch2ProController = "wpi/driverstation/Switch2ProController.hpp"
 SwitchN64Controller = "wpi/driverstation/SwitchN64Controller.hpp"
 SwitchProController = "wpi/driverstation/SwitchProController.hpp"
 XboxController = "wpi/driverstation/XboxController.hpp"
-NiDsPS4Controller = "wpi/driverstation/NiDsPS4Controller.hpp"
-NiDsPS5Controller = "wpi/driverstation/NiDsPS5Controller.hpp"
-NiDsStadiaController = "wpi/driverstation/NiDsStadiaController.hpp"
-NiDsXboxController = "wpi/driverstation/NiDsXboxController.hpp"
 
 # wpi/event
 BooleanEvent = "wpi/event/BooleanEvent.hpp"
@@ -257,7 +253,6 @@ Preferences = "wpi/preferences/Preferences.hpp"
 # wpi/util
 SensorUtil = "wpi/util/SensorUtil.hpp"
 
-
 [tool.semiwrap.extension_modules."wpilib.simulation._simulation"]
 name = "wpilib_simulation"
 wraps = ["robotpy-native-wpilib"]
@@ -300,8 +295,6 @@ Switch2ProControllerSim = "wpi/simulation/Switch2ProControllerSim.hpp"
 SwitchN64ControllerSim = "wpi/simulation/SwitchN64ControllerSim.hpp"
 SwitchProControllerSim = "wpi/simulation/SwitchProControllerSim.hpp"
 XboxControllerSim = "wpi/simulation/XboxControllerSim.hpp"
-NiDsPS4ControllerSim = "wpi/simulation/NiDsPS4ControllerSim.hpp"
-NiDsPS5ControllerSim = "wpi/simulation/NiDsPS5ControllerSim.hpp"
 OnboardIMUSim = "wpi/simulation/OnboardIMUSim.hpp"
 PWMSim = "wpi/simulation/PWMSim.hpp"
 PneumaticsBaseSim = "wpi/simulation/PneumaticsBaseSim.hpp"
@@ -314,5 +307,3 @@ SimDeviceSim = "wpi/simulation/SimDeviceSim.hpp"
 SimHooks = "wpi/simulation/SimHooks.hpp"
 SingleJointedArmSim = "wpi/simulation/SingleJointedArmSim.hpp"
 SolenoidSim = "wpi/simulation/SolenoidSim.hpp"
-NiDsStadiaControllerSim = "wpi/simulation/NiDsStadiaControllerSim.hpp"
-NiDsXboxControllerSim = "wpi/simulation/NiDsXboxControllerSim.hpp"

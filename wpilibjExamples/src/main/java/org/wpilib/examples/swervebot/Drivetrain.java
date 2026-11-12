@@ -44,6 +44,7 @@ public class Drivetrain {
           });
 
   public Drivetrain() {
+    // Start facing the blue alliance wall so yaw zero aligns with field +X.
     imu.resetYaw();
   }
 
