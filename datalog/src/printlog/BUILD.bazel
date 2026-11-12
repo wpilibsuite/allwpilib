@@ -1,0 +1,10 @@
+load("@rules_java//java:defs.bzl", "java_binary")
+
+java_binary(
+    name = "printlog",
+    srcs = ["java/printlog/PrintLog.java"],
+    main_class = "printlog.PrintLog",
+    deps = [
+        "//datalog/src/main/java",
+    ],
+)
