@@ -1,3 +1,4 @@
+import dataclasses
 from pathlib import Path
 
 import wpilog
@@ -59,8 +60,20 @@ class OuterProto(ProtobufDescriptor[tuple[str, int], Outer]):
 US = 1000
 
 
+@dataclasses.dataclass
+class Start:
+    name: str
+    type: str
+    metadata: str
+
+
 def _read(path: Path):
-    """Returns ({entry id: start data}, [(entry id, timestamp in ns, raw bytes)])."""
+    """
+    Returns ({entry id: start record}, [(entry id, timestamp in ns, raw bytes)]).
+
+    Everything is copied out of the reader: a StartRecordData only views the reader's buffer,
+    so it is invalid once the reader is gone.
+    """
     reader = wpilog.DataLogReader(str(path))
     assert reader.is_valid()
     starts = {}
@@ -68,7 +81,7 @@ def _read(path: Path):
     for record in reader:
         if record.is_start():
             start = record.get_start_data()
-            starts[start.entry] = start
+            starts[start.entry] = Start(start.name, start.type, start.metadata)
         elif not record.is_control():
             records.append(
                 (record.get_entry(), record.get_timestamp(), bytes(record.get_raw()))
