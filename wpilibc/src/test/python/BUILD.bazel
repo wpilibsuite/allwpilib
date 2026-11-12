@@ -8,6 +8,7 @@ robotpy_py_test(
     tags = ["exclusive-if-local"],
     deps = [
         "//wpilibc/src/main/python",
+        requirement("protobuf"),
         requirement("pytest"),
         requirement("pytest-order"),
     ],

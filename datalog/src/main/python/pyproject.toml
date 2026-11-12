@@ -19,7 +19,8 @@ authors = [
 license = "BSD-3-Clause"
 dependencies = [
     "robotpy-native-datalog==0.0.0",
-    "robotpy-wpiutil==0.0.0"
+    "robotpy-wpiutil==0.0.0",
+    "protobuf>=5.28.1,<6",
 ]
 
 [project.urls]

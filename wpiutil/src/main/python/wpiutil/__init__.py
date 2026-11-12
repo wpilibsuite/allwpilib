@@ -38,5 +38,14 @@ __all__ = [
 # Imported for side effects only
 from . import _stacktrace  # noqa: F401
 
+from .protobuf import (
+    Protobuf,
+    get_serializer,
+    message_serializer,
+    register_serializer,
+)
+
+__all__ += ["Protobuf", "get_serializer", "message_serializer", "register_serializer"]
+
 # Type alias
 type json = bool | int | float | str | list | dict | None

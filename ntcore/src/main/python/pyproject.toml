@@ -26,6 +26,7 @@ dependencies = [
     "robotpy-wpiutil==0.0.0",
     "robotpy-wpinet==0.0.0",
     "robotpy-wpilog==0.0.0",
+    "protobuf>=5.28.1,<6",
 ]
 
 [project.urls]

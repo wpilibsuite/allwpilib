@@ -100,6 +100,11 @@ class PyTelemetryTable {
    * as custom type metadata for scalar str and bytes-like values (bytes,
    * bytearray, and memoryview). Wrap other buffer exporters in memoryview to
    * explicitly log their raw bytes in C order.
+   *
+   * A value with no struct serialization is logged as protobuf if it is a
+   * generated message or its type has a serializer registered in
+   * wpiutil.protobuf; the schemas for the message and its imports are
+   * published first.
    */
   void Log(std::string_view name, pybind11::object value,
            pybind11::typing::Optional<pybind11::typing::Type<pybind11::object>>
@@ -120,6 +125,9 @@ class PyTelemetryTable {
   static void AddStructSchemas(
       const wpi::telemetry::TelemetryTable::EntryHandle& entry,
       std::string_view typeString, const WPyStructInfo& info);
+  static void AddProtobufSchemas(
+      const wpi::telemetry::TelemetryTable::EntryHandle& entry,
+      std::string_view typeString, pybind11::handle messageType);
 
   wpi::telemetry::TelemetryTable::EntryHandle GetEntry(
       std::string_view name) const;
@@ -135,6 +143,8 @@ class PyTelemetryTable {
   void LogSequence(std::string_view name, const pybind11::sequence& value,
                    pybind11::handle valueType) const;
   void LogStruct(std::string_view name, pybind11::handle value) const;
+  void LogProtobuf(std::string_view name, pybind11::handle value,
+                   pybind11::handle serializer) const;
   void LogStructSequence(std::string_view name, const pybind11::sequence& value,
                          const pybind11::type& type) const;
   void LogStructSequenceImpl(
