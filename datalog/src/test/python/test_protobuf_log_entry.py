@@ -3,7 +3,7 @@ from pathlib import Path
 import wpilog
 from google.protobuf import descriptor_pb2, descriptor_pool, message_factory
 from wpilog import protobuf as logproto
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 
 def _make_messages():
@@ -41,7 +41,7 @@ def _make_messages():
 Outer = _make_messages()
 
 
-class OuterProto(Protobuf[tuple[str, int], Outer]):
+class OuterProto(ProtobufDescriptor[tuple[str, int], Outer]):
     """Serializes a (name, x) tuple."""
 
     message_type = Outer

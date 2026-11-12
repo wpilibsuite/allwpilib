@@ -1,7 +1,7 @@
 """
 Publish and subscribe to protobuf data over NetworkTables.
 
-A topic is bound to a :class:`wpiutil.protobuf.Protobuf` serializer, which converts between a
+A topic is bound to a :class:`wpiutil.protobuf.ProtobufDescriptor` serializer, which converts between a
 Python type and its wire message::
 
     from wpimath import Pose2dProto
@@ -23,7 +23,7 @@ from typing import overload
 
 from google.protobuf.message import DecodeError, Message
 from wpiutil import protobuf as _proto
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 from ._ntcore import (
     NetworkTableInstance,
@@ -68,7 +68,7 @@ class ProtobufSubscriber[T, M: Message]:
     """Subscribes to a protobuf topic; created by :meth:`ProtobufTopic.subscribe`."""
 
     def __init__(
-        self, sub: RawSubscriber, serializer: type[Protobuf[T, M]], default: T
+        self, sub: RawSubscriber, serializer: type[ProtobufDescriptor[T, M]], default: T
     ):
         self._sub = sub
         self._serializer = serializer
@@ -120,7 +120,7 @@ class ProtobufSubscriber[T, M: Message]:
 class ProtobufPublisher[T, M: Message]:
     """Publishes to a protobuf topic; created by :meth:`ProtobufTopic.publish`."""
 
-    def __init__(self, pub: RawPublisher, serializer: type[Protobuf[T, M]]):
+    def __init__(self, pub: RawPublisher, serializer: type[ProtobufDescriptor[T, M]]):
         self._pub = pub
         self._serializer = serializer
 
@@ -154,7 +154,7 @@ class ProtobufTopic[T, M: Message]:
         self,
         inst: NetworkTableInstance,
         topic: RawTopic,
-        serializer: type[Protobuf[T, M]],
+        serializer: type[ProtobufDescriptor[T, M]],
     ):
         self._inst = inst
         self._topic = topic
@@ -200,7 +200,7 @@ class ProtobufTopic[T, M: Message]:
 
 @overload
 def get_protobuf_topic[T, M: Message](
-    inst: NetworkTableInstance, name: str, serializer: type[Protobuf[T, M]]
+    inst: NetworkTableInstance, name: str, serializer: type[ProtobufDescriptor[T, M]]
 ) -> ProtobufTopic[T, M]: ...
 
 
@@ -213,14 +213,14 @@ def get_protobuf_topic[M: Message](
 def get_protobuf_topic(
     inst: NetworkTableInstance,
     name: str,
-    serializer: type[Protobuf] | type[Message],
+    serializer: type[ProtobufDescriptor] | type[Message],
 ) -> ProtobufTopic:
     """
     Returns the protobuf topic for ``name``, creating it if needed.
 
-    :param serializer: a :class:`~wpiutil.protobuf.Protobuf` serializer class, or a generated
+    :param serializer: a :class:`~wpiutil.protobuf.ProtobufDescriptor` serializer class, or a generated
         message class to publish the messages themselves
     """
-    if not issubclass(serializer, Protobuf):
+    if not issubclass(serializer, ProtobufDescriptor):
         serializer = _proto.message_serializer(serializer)
     return ProtobufTopic(inst, inst.get_raw_topic(name), serializer)

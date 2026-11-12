@@ -1,4 +1,4 @@
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 from .. import (
     ChassisAccelerations,
@@ -42,7 +42,7 @@ __all__ = [
 
 
 class ChassisVelocitiesProto(
-    Protobuf[ChassisVelocities, kinematics_pb2.ProtobufChassisVelocities]
+    ProtobufDescriptor[ChassisVelocities, kinematics_pb2.ProtobufChassisVelocities]
 ):
     message_type = kinematics_pb2.ProtobufChassisVelocities
 
@@ -58,7 +58,9 @@ class ChassisVelocitiesProto(
 
 
 class ChassisAccelerationsProto(
-    Protobuf[ChassisAccelerations, kinematics_pb2.ProtobufChassisAccelerations]
+    ProtobufDescriptor[
+        ChassisAccelerations, kinematics_pb2.ProtobufChassisAccelerations
+    ]
 ):
     message_type = kinematics_pb2.ProtobufChassisAccelerations
 
@@ -74,7 +76,7 @@ class ChassisAccelerationsProto(
 
 
 class DifferentialDriveKinematicsProto(
-    Protobuf[
+    ProtobufDescriptor[
         DifferentialDriveKinematics, kinematics_pb2.ProtobufDifferentialDriveKinematics
     ]
 ):
@@ -90,7 +92,7 @@ class DifferentialDriveKinematicsProto(
 
 
 class DifferentialDriveWheelVelocitiesProto(
-    Protobuf[
+    ProtobufDescriptor[
         DifferentialDriveWheelVelocities,
         kinematics_pb2.ProtobufDifferentialDriveWheelVelocities,
     ]
@@ -108,7 +110,7 @@ class DifferentialDriveWheelVelocitiesProto(
 
 
 class DifferentialDriveWheelAccelerationsProto(
-    Protobuf[
+    ProtobufDescriptor[
         DifferentialDriveWheelAccelerations,
         kinematics_pb2.ProtobufDifferentialDriveWheelAccelerations,
     ]
@@ -126,7 +128,7 @@ class DifferentialDriveWheelAccelerationsProto(
 
 
 class DifferentialDriveWheelPositionsProto(
-    Protobuf[
+    ProtobufDescriptor[
         DifferentialDriveWheelPositions,
         kinematics_pb2.ProtobufDifferentialDriveWheelPositions,
     ]
@@ -148,7 +150,9 @@ class DifferentialDriveWheelPositionsProto(
 
 
 class MecanumDriveKinematicsProto(
-    Protobuf[MecanumDriveKinematics, kinematics_pb2.ProtobufMecanumDriveKinematics]
+    ProtobufDescriptor[
+        MecanumDriveKinematics, kinematics_pb2.ProtobufMecanumDriveKinematics
+    ]
 ):
     message_type = kinematics_pb2.ProtobufMecanumDriveKinematics
 
@@ -170,7 +174,7 @@ class MecanumDriveKinematicsProto(
 
 
 class MecanumDriveWheelPositionsProto(
-    Protobuf[
+    ProtobufDescriptor[
         MecanumDriveWheelPositions, kinematics_pb2.ProtobufMecanumDriveWheelPositions
     ]
 ):
@@ -191,7 +195,7 @@ class MecanumDriveWheelPositionsProto(
 
 
 class MecanumDriveWheelVelocitiesProto(
-    Protobuf[
+    ProtobufDescriptor[
         MecanumDriveWheelVelocities, kinematics_pb2.ProtobufMecanumDriveWheelVelocities
     ]
 ):
@@ -212,7 +216,7 @@ class MecanumDriveWheelVelocitiesProto(
 
 
 class MecanumDriveWheelAccelerationsProto(
-    Protobuf[
+    ProtobufDescriptor[
         MecanumDriveWheelAccelerations,
         kinematics_pb2.ProtobufMecanumDriveWheelAccelerations,
     ]
@@ -250,7 +254,9 @@ SwerveDriveKinematics = (
 
 
 class SwerveDriveKinematicsProto(
-    Protobuf[SwerveDriveKinematics, kinematics_pb2.ProtobufSwerveDriveKinematics]
+    ProtobufDescriptor[
+        SwerveDriveKinematics, kinematics_pb2.ProtobufSwerveDriveKinematics
+    ]
 ):
     """Works for every module count the bindings provide (2, 3, 4 and 6)."""
 
@@ -274,7 +280,9 @@ class SwerveDriveKinematicsProto(
 
 
 class SwerveModulePositionProto(
-    Protobuf[SwerveModulePosition, kinematics_pb2.ProtobufSwerveModulePosition]
+    ProtobufDescriptor[
+        SwerveModulePosition, kinematics_pb2.ProtobufSwerveModulePosition
+    ]
 ):
     message_type = kinematics_pb2.ProtobufSwerveModulePosition
 
@@ -289,7 +297,9 @@ class SwerveModulePositionProto(
 
 
 class SwerveModuleVelocityProto(
-    Protobuf[SwerveModuleVelocity, kinematics_pb2.ProtobufSwerveModuleVelocity]
+    ProtobufDescriptor[
+        SwerveModuleVelocity, kinematics_pb2.ProtobufSwerveModuleVelocity
+    ]
 ):
     message_type = kinematics_pb2.ProtobufSwerveModuleVelocity
 
@@ -304,7 +314,9 @@ class SwerveModuleVelocityProto(
 
 
 class SwerveModuleAccelerationProto(
-    Protobuf[SwerveModuleAcceleration, kinematics_pb2.ProtobufSwerveModuleAcceleration]
+    ProtobufDescriptor[
+        SwerveModuleAcceleration, kinematics_pb2.ProtobufSwerveModuleAcceleration
+    ]
 ):
     message_type = kinematics_pb2.ProtobufSwerveModuleAcceleration
 

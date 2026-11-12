@@ -2,7 +2,7 @@ from google.protobuf import descriptor_pb2, descriptor_pool, message_factory
 
 import ntcore
 from ntcore import protobuf as ntproto
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 
 def _make_messages():
@@ -120,7 +120,7 @@ def test_unparseable_value_returns_default(nt: ntcore.NetworkTableInstance):
     assert sub.read_queue() == []
 
 
-class OuterProto(Protobuf[tuple[str, int], Outer]):
+class OuterProto(ProtobufDescriptor[tuple[str, int], Outer]):
     """Serializes a (name, x) tuple, and rejects a negative x on the way in."""
 
     message_type = Outer

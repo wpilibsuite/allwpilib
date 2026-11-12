@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 from ._generated import wpimath_pb2
 
@@ -13,7 +13,9 @@ __all__ = ["MatrixProto", "VectorProto"]
 # numpy is imported inside the methods so that importing wpimath.protobuf doesn't require it.
 
 
-class MatrixProto(Protobuf["npt.NDArray[np.float64]", wpimath_pb2.ProtobufMatrix]):
+class MatrixProto(
+    ProtobufDescriptor["npt.NDArray[np.float64]", wpimath_pb2.ProtobufMatrix]
+):
     """
     A 2-D array of any shape. ``data`` is column-major, the storage order of the matrices
     returned by the C++ bindings (Eigen's default).
@@ -45,7 +47,9 @@ class MatrixProto(Protobuf["npt.NDArray[np.float64]", wpimath_pb2.ProtobufMatrix
         )
 
 
-class VectorProto(Protobuf["npt.NDArray[np.float64]", wpimath_pb2.ProtobufVector]):
+class VectorProto(
+    ProtobufDescriptor["npt.NDArray[np.float64]", wpimath_pb2.ProtobufVector]
+):
     """A column vector. Accepts a 1-D array or an ``(n, 1)`` array; unpacks to ``(n, 1)``."""
 
     message_type = wpimath_pb2.ProtobufVector

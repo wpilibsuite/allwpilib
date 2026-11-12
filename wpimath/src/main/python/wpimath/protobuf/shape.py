@@ -1,4 +1,4 @@
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 from .. import Ellipse2d, Rectangle2d
 from ._generated import shape_pb2
@@ -8,7 +8,7 @@ from .geometry import Pose2dProto
 __all__ = ["Rectangle2dProto", "Ellipse2dProto"]
 
 
-class Rectangle2dProto(Protobuf[Rectangle2d, shape_pb2.ProtobufRectangle2d]):
+class Rectangle2dProto(ProtobufDescriptor[Rectangle2d, shape_pb2.ProtobufRectangle2d]):
     message_type = shape_pb2.ProtobufRectangle2d
 
     @classmethod
@@ -22,7 +22,7 @@ class Rectangle2dProto(Protobuf[Rectangle2d, shape_pb2.ProtobufRectangle2d]):
         return Rectangle2d(Pose2dProto.unpack(msg.center), msg.xWidth, msg.yWidth)
 
 
-class Ellipse2dProto(Protobuf[Ellipse2d, shape_pb2.ProtobufEllipse2d]):
+class Ellipse2dProto(ProtobufDescriptor[Ellipse2d, shape_pb2.ProtobufEllipse2d]):
     message_type = shape_pb2.ProtobufEllipse2d
 
     @classmethod

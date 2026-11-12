@@ -1,4 +1,4 @@
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 from .. import (
     DifferentialSample,
@@ -20,7 +20,7 @@ __all__ = [
 
 
 class HolonomicSampleProto(
-    Protobuf[HolonomicSample, trajectory_pb2.ProtobufHolonomicSample]
+    ProtobufDescriptor[HolonomicSample, trajectory_pb2.ProtobufHolonomicSample]
 ):
     message_type = trajectory_pb2.ProtobufHolonomicSample
 
@@ -42,7 +42,7 @@ class HolonomicSampleProto(
 
 
 class DifferentialSampleProto(
-    Protobuf[DifferentialSample, trajectory_pb2.ProtobufDifferentialSample]
+    ProtobufDescriptor[DifferentialSample, trajectory_pb2.ProtobufDifferentialSample]
 ):
     message_type = trajectory_pb2.ProtobufDifferentialSample
 
@@ -68,7 +68,7 @@ class DifferentialSampleProto(
 
 
 class HolonomicTrajectoryProto(
-    Protobuf[HolonomicTrajectory, trajectory_pb2.ProtobufHolonomicTrajectory]
+    ProtobufDescriptor[HolonomicTrajectory, trajectory_pb2.ProtobufHolonomicTrajectory]
 ):
     message_type = trajectory_pb2.ProtobufHolonomicTrajectory
 
@@ -86,7 +86,9 @@ class HolonomicTrajectoryProto(
 
 
 class DifferentialTrajectoryProto(
-    Protobuf[DifferentialTrajectory, trajectory_pb2.ProtobufDifferentialTrajectory]
+    ProtobufDescriptor[
+        DifferentialTrajectory, trajectory_pb2.ProtobufDifferentialTrajectory
+    ]
 ):
     message_type = trajectory_pb2.ProtobufDifferentialTrajectory
 

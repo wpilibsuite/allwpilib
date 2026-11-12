@@ -1,4 +1,4 @@
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 from .. import (
     Pose2d,
@@ -31,7 +31,9 @@ __all__ = [
 ]
 
 
-class Translation2dProto(Protobuf[Translation2d, geometry2d_pb2.ProtobufTranslation2d]):
+class Translation2dProto(
+    ProtobufDescriptor[Translation2d, geometry2d_pb2.ProtobufTranslation2d]
+):
     message_type = geometry2d_pb2.ProtobufTranslation2d
 
     @classmethod
@@ -44,7 +46,9 @@ class Translation2dProto(Protobuf[Translation2d, geometry2d_pb2.ProtobufTranslat
         return Translation2d(msg.x, msg.y)
 
 
-class Rotation2dProto(Protobuf[Rotation2d, geometry2d_pb2.ProtobufRotation2d]):
+class Rotation2dProto(
+    ProtobufDescriptor[Rotation2d, geometry2d_pb2.ProtobufRotation2d]
+):
     message_type = geometry2d_pb2.ProtobufRotation2d
 
     @classmethod
@@ -56,7 +60,7 @@ class Rotation2dProto(Protobuf[Rotation2d, geometry2d_pb2.ProtobufRotation2d]):
         return Rotation2d(msg.value)
 
 
-class Pose2dProto(Protobuf[Pose2d, geometry2d_pb2.ProtobufPose2d]):
+class Pose2dProto(ProtobufDescriptor[Pose2d, geometry2d_pb2.ProtobufPose2d]):
     message_type = geometry2d_pb2.ProtobufPose2d
 
     @classmethod
@@ -72,7 +76,9 @@ class Pose2dProto(Protobuf[Pose2d, geometry2d_pb2.ProtobufPose2d]):
         )
 
 
-class Transform2dProto(Protobuf[Transform2d, geometry2d_pb2.ProtobufTransform2d]):
+class Transform2dProto(
+    ProtobufDescriptor[Transform2d, geometry2d_pb2.ProtobufTransform2d]
+):
     message_type = geometry2d_pb2.ProtobufTransform2d
 
     @classmethod
@@ -88,7 +94,7 @@ class Transform2dProto(Protobuf[Transform2d, geometry2d_pb2.ProtobufTransform2d]
         )
 
 
-class Twist2dProto(Protobuf[Twist2d, geometry2d_pb2.ProtobufTwist2d]):
+class Twist2dProto(ProtobufDescriptor[Twist2d, geometry2d_pb2.ProtobufTwist2d]):
     message_type = geometry2d_pb2.ProtobufTwist2d
 
     @classmethod
@@ -102,7 +108,9 @@ class Twist2dProto(Protobuf[Twist2d, geometry2d_pb2.ProtobufTwist2d]):
         return Twist2d(msg.dx, msg.dy, msg.dtheta)
 
 
-class Translation3dProto(Protobuf[Translation3d, geometry3d_pb2.ProtobufTranslation3d]):
+class Translation3dProto(
+    ProtobufDescriptor[Translation3d, geometry3d_pb2.ProtobufTranslation3d]
+):
     message_type = geometry3d_pb2.ProtobufTranslation3d
 
     @classmethod
@@ -116,7 +124,9 @@ class Translation3dProto(Protobuf[Translation3d, geometry3d_pb2.ProtobufTranslat
         return Translation3d(msg.x, msg.y, msg.z)
 
 
-class QuaternionProto(Protobuf[Quaternion, geometry3d_pb2.ProtobufQuaternion]):
+class QuaternionProto(
+    ProtobufDescriptor[Quaternion, geometry3d_pb2.ProtobufQuaternion]
+):
     message_type = geometry3d_pb2.ProtobufQuaternion
 
     @classmethod
@@ -131,7 +141,9 @@ class QuaternionProto(Protobuf[Quaternion, geometry3d_pb2.ProtobufQuaternion]):
         return Quaternion(msg.w, msg.x, msg.y, msg.z)
 
 
-class Rotation3dProto(Protobuf[Rotation3d, geometry3d_pb2.ProtobufRotation3d]):
+class Rotation3dProto(
+    ProtobufDescriptor[Rotation3d, geometry3d_pb2.ProtobufRotation3d]
+):
     message_type = geometry3d_pb2.ProtobufRotation3d
 
     @classmethod
@@ -143,7 +155,7 @@ class Rotation3dProto(Protobuf[Rotation3d, geometry3d_pb2.ProtobufRotation3d]):
         return Rotation3d(QuaternionProto.unpack(msg.q))
 
 
-class Pose3dProto(Protobuf[Pose3d, geometry3d_pb2.ProtobufPose3d]):
+class Pose3dProto(ProtobufDescriptor[Pose3d, geometry3d_pb2.ProtobufPose3d]):
     message_type = geometry3d_pb2.ProtobufPose3d
 
     @classmethod
@@ -159,7 +171,9 @@ class Pose3dProto(Protobuf[Pose3d, geometry3d_pb2.ProtobufPose3d]):
         )
 
 
-class Transform3dProto(Protobuf[Transform3d, geometry3d_pb2.ProtobufTransform3d]):
+class Transform3dProto(
+    ProtobufDescriptor[Transform3d, geometry3d_pb2.ProtobufTransform3d]
+):
     message_type = geometry3d_pb2.ProtobufTransform3d
 
     @classmethod
@@ -175,7 +189,7 @@ class Transform3dProto(Protobuf[Transform3d, geometry3d_pb2.ProtobufTransform3d]
         )
 
 
-class Twist3dProto(Protobuf[Twist3d, geometry3d_pb2.ProtobufTwist3d]):
+class Twist3dProto(ProtobufDescriptor[Twist3d, geometry3d_pb2.ProtobufTwist3d]):
     message_type = geometry3d_pb2.ProtobufTwist3d
 
     @classmethod

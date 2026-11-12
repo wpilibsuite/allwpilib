@@ -1,4 +1,4 @@
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 from .. import (
     DCMotor,
@@ -22,7 +22,7 @@ from .linalg import MatrixProto
 __all__ = ["DCMotorProto", "LinearSystemProto"]
 
 
-class DCMotorProto(Protobuf[DCMotor, system_pb2.ProtobufDCMotor]):
+class DCMotorProto(ProtobufDescriptor[DCMotor, system_pb2.ProtobufDCMotor]):
     message_type = system_pb2.ProtobufDCMotor
 
     @classmethod
@@ -78,7 +78,9 @@ LinearSystem = (
 )
 
 
-class LinearSystemProto(Protobuf[LinearSystem, system_pb2.ProtobufLinearSystem]):
+class LinearSystemProto(
+    ProtobufDescriptor[LinearSystem, system_pb2.ProtobufLinearSystem]
+):
     """Works for every (states, inputs, outputs) combination the bindings provide."""
 
     message_type = system_pb2.ProtobufLinearSystem

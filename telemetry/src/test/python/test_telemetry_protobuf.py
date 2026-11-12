@@ -4,7 +4,7 @@ import pytest
 from google.protobuf import descriptor_pb2, descriptor_pool, message_factory
 from wpiutil import protobuf as wpiproto
 from wpiutil import wpistruct
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 import telemetry
 import telemetry.mock_backend as mock_backend
@@ -51,7 +51,7 @@ class Point:
     x: int
 
 
-class PointProto(Protobuf[Point, Outer]):
+class PointProto(ProtobufDescriptor[Point, Outer]):
     message_type = Outer
 
     @classmethod
@@ -70,7 +70,7 @@ class StructWithSerializer:
     x: wpistruct.double
 
 
-class StructWithSerializerProto(Protobuf[StructWithSerializer, Outer]):
+class StructWithSerializerProto(ProtobufDescriptor[StructWithSerializer, Outer]):
     message_type = Outer
 
     @classmethod
@@ -147,10 +147,25 @@ def test_schemas_published_with_dependencies(backend):
     assert inner_file.message_type[0].name == "Inner"
 
 
-def test_struct_is_preferred_over_protobuf(backend, monkeypatch):
-    monkeypatch.setitem(
-        wpiproto._serializers, StructWithSerializer, StructWithSerializerProto
-    )
+def test_serializer_is_stored_on_the_value_type():
+    assert Point.WPIProto is PointProto
+    assert wpiproto.get_serializer(Point) is PointProto
+
+
+def test_subclasses_inherit_the_serializer():
+    class LabeledPoint(Point):
+        pass
+
+    assert wpiproto.get_serializer(LabeledPoint) is PointProto
+
+
+def test_registering_a_type_that_rejects_attributes_fails():
+    with pytest.raises(TypeError, match="can't register"):
+        wpiproto.register_serializer(int, PointProto)
+
+
+def test_struct_is_preferred_over_protobuf(backend):
+    assert StructWithSerializer.WPIProto is StructWithSerializerProto
 
     telemetry.log("both", StructWithSerializer(2.0))
 

@@ -1,4 +1,4 @@
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 from .. import (
     ArmFeedforward,
@@ -25,7 +25,7 @@ def _dt_kwargs(dt: float) -> dict[str, float]:
 
 
 class ArmFeedforwardProto(
-    Protobuf[ArmFeedforward, controller_pb2.ProtobufArmFeedforward]
+    ProtobufDescriptor[ArmFeedforward, controller_pb2.ProtobufArmFeedforward]
 ):
     message_type = controller_pb2.ProtobufArmFeedforward
 
@@ -45,7 +45,7 @@ class ArmFeedforwardProto(
 
 
 class ElevatorFeedforwardProto(
-    Protobuf[ElevatorFeedforward, controller_pb2.ProtobufElevatorFeedforward]
+    ProtobufDescriptor[ElevatorFeedforward, controller_pb2.ProtobufElevatorFeedforward]
 ):
     message_type = controller_pb2.ProtobufElevatorFeedforward
 
@@ -64,7 +64,9 @@ class ElevatorFeedforwardProto(
 
 
 class SimpleMotorFeedforwardProto(
-    Protobuf[SimpleMotorFeedforward, controller_pb2.ProtobufSimpleMotorFeedforward]
+    ProtobufDescriptor[
+        SimpleMotorFeedforward, controller_pb2.ProtobufSimpleMotorFeedforward
+    ]
 ):
     message_type = controller_pb2.ProtobufSimpleMotorFeedforward
 
@@ -81,7 +83,7 @@ class SimpleMotorFeedforwardProto(
 
 
 class DifferentialDriveFeedforwardProto(
-    Protobuf[
+    ProtobufDescriptor[
         DifferentialDriveFeedforward,
         controller_pb2.ProtobufDifferentialDriveFeedforward,
     ]
@@ -103,7 +105,7 @@ class DifferentialDriveFeedforwardProto(
 
 
 class DifferentialDriveWheelVoltagesProto(
-    Protobuf[
+    ProtobufDescriptor[
         DifferentialDriveWheelVoltages,
         controller_pb2.ProtobufDifferentialDriveWheelVoltages,
     ]

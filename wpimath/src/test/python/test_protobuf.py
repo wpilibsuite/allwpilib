@@ -3,8 +3,7 @@ import inspect
 import numpy as np
 import pytest
 from google.protobuf.message import Message
-from wpiutil import get_serializer
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor, get_serializer
 
 import wpimath
 from wpimath import protobuf
@@ -58,7 +57,9 @@ _GENERATED_MODULES = [
 _SERIALIZERS = [
     obj
     for obj in vars(protobuf).values()
-    if inspect.isclass(obj) and issubclass(obj, Protobuf) and obj is not Protobuf
+    if inspect.isclass(obj)
+    and issubclass(obj, ProtobufDescriptor)
+    and obj is not ProtobufDescriptor
 ]
 
 
@@ -293,6 +294,8 @@ def test_serializers_are_exported_from_wpimath():
 
 
 def test_serializers_are_registered_for_their_value_types():
+    # the serializer is a class attribute of the (pybind) value type, like WPIStruct
+    assert wpimath.Pose2d.WPIProto is Pose2dProto
     assert get_serializer(wpimath.Pose2d) is Pose2dProto
     assert get_serializer(wpimath.HolonomicTrajectory) is HolonomicTrajectoryProto
     # unions register every member

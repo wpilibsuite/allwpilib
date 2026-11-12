@@ -1,7 +1,7 @@
 """
 Log protobuf data to a DataLog.
 
-An entry is bound to a :class:`wpiutil.protobuf.Protobuf` serializer, which converts between a
+An entry is bound to a :class:`wpiutil.protobuf.ProtobufDescriptor` serializer, which converts between a
 Python type and its wire message::
 
     from wpimath import Pose2dProto
@@ -20,7 +20,7 @@ from typing import overload
 
 from google.protobuf.message import Message
 from wpiutil import protobuf as _proto
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 from ._wpilog import DataLog, RawLogEntry
 
@@ -53,7 +53,7 @@ class ProtobufLogEntry[T, M: Message]:
         self,
         log: DataLog,
         name: str,
-        serializer: type[Protobuf[T, M]],
+        serializer: type[ProtobufDescriptor[T, M]],
         *,
         metadata: str = "",
         timestamp: int = 0,
@@ -74,7 +74,7 @@ class ProtobufLogEntry[T, M: Message]:
         self,
         log: DataLog,
         name: str,
-        serializer: type[Protobuf] | type[Message],
+        serializer: type[ProtobufDescriptor] | type[Message],
         *,
         metadata: str = "",
         timestamp: int = 0,
@@ -82,12 +82,12 @@ class ProtobufLogEntry[T, M: Message]:
         """
         :param log: log to write to
         :param name: name of the entry
-        :param serializer: a :class:`~wpiutil.protobuf.Protobuf` serializer class, or a
+        :param serializer: a :class:`~wpiutil.protobuf.ProtobufDescriptor` serializer class, or a
             generated message class to record the messages themselves
         :param metadata: initial metadata for the entry
         :param timestamp: timestamp in nanoseconds; 0 means now
         """
-        if not issubclass(serializer, Protobuf):
+        if not issubclass(serializer, ProtobufDescriptor):
             serializer = _proto.message_serializer(serializer)
         self._serializer = serializer
         add_protobuf_schema(log, serializer.message_type, timestamp)

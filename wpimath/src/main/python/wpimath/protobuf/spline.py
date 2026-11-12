@@ -1,4 +1,4 @@
-from wpiutil.protobuf import Protobuf
+from wpiutil.protobuf import ProtobufDescriptor
 
 from .. import CubicHermiteSpline, QuinticHermiteSpline
 from ._generated import spline_pb2
@@ -15,7 +15,7 @@ def _control_vector(name: str, values, expected: int) -> tuple[float, ...]:
 
 
 class CubicHermiteSplineProto(
-    Protobuf[CubicHermiteSpline, spline_pb2.ProtobufCubicHermiteSpline]
+    ProtobufDescriptor[CubicHermiteSpline, spline_pb2.ProtobufCubicHermiteSpline]
 ):
     message_type = spline_pb2.ProtobufCubicHermiteSpline
 
@@ -39,7 +39,7 @@ class CubicHermiteSplineProto(
 
 
 class QuinticHermiteSplineProto(
-    Protobuf[QuinticHermiteSpline, spline_pb2.ProtobufQuinticHermiteSpline]
+    ProtobufDescriptor[QuinticHermiteSpline, spline_pb2.ProtobufQuinticHermiteSpline]
 ):
     message_type = spline_pb2.ProtobufQuinticHermiteSpline
 
