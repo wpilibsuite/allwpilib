@@ -4,26 +4,32 @@ def __generate_wpimath_impl(ctx):
     """
     output_dir = ctx.actions.declare_directory("_gendir")
 
+    # separate output directory so that generated python files can live in the
+    python_output_dir = ctx.actions.declare_directory("_pygendir")
+
     protoc = ctx.toolchains["@protobuf//bazel/private:proto_toolchain_type"].proto.proto_compiler
 
     args = ctx.actions.args()
     args.add("--output_directory", output_dir.path)
     args.add("--template_root", "wpimath/src/generate")
     args.add("--proto_directory", "wpimath/src/main/proto")
-    args.add("--python_output_directory", "__none__")
+    args.add("--python_output_directory", python_output_dir.path)
     args.add("--protoc", protoc.executable)
     args.add("--quickbuf_plugin", ctx.executable._quickbuf)
     args.add("--nanopb", ctx.executable._nanopb)
 
     ctx.actions.run(
         inputs = ctx.attr._templates.files.to_list() + ctx.attr.proto_files.files.to_list(),
-        outputs = [output_dir],
+        outputs = [output_dir, python_output_dir],
         executable = ctx.executable._tool,
         arguments = [args],
         tools = [protoc, ctx.executable._nanopb, ctx.executable._quickbuf],
     )
 
-    return [DefaultInfo(files = depset([output_dir]))]
+    return [
+        DefaultInfo(files = depset([output_dir])),
+        OutputGroupInfo(python = depset([python_output_dir])),
+    ]
 
 generate_wpimath = rule(
     implementation = __generate_wpimath_impl,

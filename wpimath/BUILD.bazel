@@ -70,6 +70,18 @@ py_binary(
 )
 
 py_binary(
+    name = "generate_python_protobuf",
+    srcs = ["generate_python_protobuf.py"],
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "//:generation",
+    ],
+)
+
+py_binary(
     name = "generate_quickbuf",
     srcs = ["generate_quickbuf.py"],
     target_compatible_with = select({
@@ -92,6 +104,7 @@ py_binary(
     deps = [
         ":generate_nanopb",
         ":generate_numbers",
+        ":generate_python_protobuf",
         ":generate_quickbuf",
     ],
 )
@@ -101,11 +114,19 @@ generate_wpimath(
     tags = ["pregeneration"],
 )
 
+filegroup(
+    name = "generate_wpimath_python",
+    srcs = [":generate_wpimath"],
+    output_group = "python",
+    tags = ["pregeneration"],
+)
+
 write_source_files(
     name = "write_wpimath",
     diff_args = ["-u"],
     files = {
         "src/generated": ":generate_wpimath",
+        "src/main/python/wpimath/protobuf/_generated": ":generate_wpimath_python",
     },
     suggested_update_target = "//:write_all",
     tags = ["pregeneration"],

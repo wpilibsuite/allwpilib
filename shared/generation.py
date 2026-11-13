@@ -191,6 +191,10 @@ def generate_python_protobuf(
                 newline="\n",
             )
 
+        # Mark the directory as a package. This is written here so that syncing the
+        # whole directory into the source tree doesn't delete it.
+        (output_directory / "__init__.py").touch()
+
 
 def generate_nanopb(
     nanopb: Path,
