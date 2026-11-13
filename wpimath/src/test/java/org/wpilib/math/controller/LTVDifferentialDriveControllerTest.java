@@ -113,7 +113,7 @@ class LTVDifferentialDriveControllerTest {
               new DifferentialSample(state, kinematics));
 
       x =
-          NumericalIntegration.rkdp(
+          NumericalIntegration.tsit5(
               LTVDifferentialDriveControllerTest::dynamics,
               x,
               VecBuilder.fill(output.left, output.right),

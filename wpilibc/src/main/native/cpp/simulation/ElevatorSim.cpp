@@ -107,7 +107,7 @@ void ElevatorSim::SetInputVoltage(wpi::units::volt_t voltage) {
 wpi::math::Vectord<2> ElevatorSim::UpdateX(
     const wpi::math::Vectord<2>& currentXhat, const wpi::math::Vectord<1>& u,
     wpi::units::second_t dt) {
-  auto updatedXhat = wpi::math::RKDP(
+  auto updatedXhat = wpi::math::Tsit5(
       [&](const wpi::math::Vectord<2>& x,
           const wpi::math::Vectord<1>& u_) -> wpi::math::Vectord<2> {
         wpi::math::Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
