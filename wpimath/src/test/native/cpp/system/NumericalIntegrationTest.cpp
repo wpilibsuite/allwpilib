@@ -99,5 +99,5 @@ TEST_CASE("NumericalIntegrationTest Tsit5TimeVarying", "[wpimath]") {
       },
       5_s, y0, 1_s, 1e-12);
   CHECK_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),
-             1e-3);
+             1e-10);
 }

@@ -101,6 +101,6 @@ class NumericalIntegrationTest {
             y0,
             1.0,
             1e-12);
-    assertEquals(12.0 * Math.exp(6.0) / Math.pow(Math.exp(6.0) + 1.0, 2.0), y1.get(0, 0), 1e-3);
+    assertEquals(12.0 * Math.exp(6.0) / Math.pow(Math.exp(6.0) + 1.0, 2.0), y1.get(0, 0), 1e-10);
   }
 }
