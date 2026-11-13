@@ -114,7 +114,7 @@ TEST_CASE("DiscretizationTest DiscretizeFastModelAQ", "[wpimath]") {
   UNSCOPED_INFO("Expected these to be nearly equal:\ndiscQ:\n"
                 << discQ << "\ndiscQIntegrated:\n"
                 << discQIntegrated);
-  CHECK((discQIntegrated - discQ).norm() < 1e-3);
+  CHECK((discQIntegrated - discQ).norm() < 1e-5);
 }
 
 // Test that DiscretizeR() works

@@ -18,9 +18,10 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 
-TEST_CASE("ModelsTest FlywheelFromPhysicalConstants", "[wpimath]") {
-  constexpr auto model = wpi::math::Models::FlywheelFromPhysicalConstants(
-      wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
+TEST_CASE("ModelsTest AngularVelocityFromPhysicalConstants", "[wpimath]") {
+  constexpr auto model =
+      wpi::math::Models::AngularVelocityFromPhysicalConstants(
+          wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
 
   REQUIRE(model.A().isApprox(wpi::math::Matrixd<1, 1>{-26.87032}, 0.001));
   REQUIRE(model.B().isApprox(wpi::math::Matrixd<1, 1>{1354.166667}, 0.001));
@@ -28,11 +29,11 @@ TEST_CASE("ModelsTest FlywheelFromPhysicalConstants", "[wpimath]") {
   REQUIRE(model.D().isApprox(wpi::math::Matrixd<1, 1>{0.0}, 0.001));
 }
 
-TEST_CASE("ModelsTest FlywheelFromSysId", "[wpimath]") {
+TEST_CASE("ModelsTest AngularVelocityFromSysId", "[wpimath]") {
   constexpr double kv = 1.0;
   constexpr double ka = 0.5;
 
-  constexpr auto model = wpi::math::Models::FlywheelFromSysId(
+  constexpr auto model = wpi::math::Models::AngularVelocityFromSysId(
       kv * 1_V / 1_rad_per_s, ka * 1_V / 1_rad_per_s_sq);
 
   REQUIRE(model.A().isApprox(wpi::math::Matrixd<1, 1>{-kv / ka}, 0.001));
@@ -55,8 +56,8 @@ TEST_CASE("ModelsTest DifferentialDriveFromPhysicalConstants", "[wpimath]") {
                              0.001));
 }
 
-TEST_CASE("ModelsTest ElevatorFromPhysicalConstants", "[wpimath]") {
-  auto model = wpi::math::Models::ElevatorFromPhysicalConstants(
+TEST_CASE("ModelsTest LinearPositionFromPhysicalConstants", "[wpimath]") {
+  auto model = wpi::math::Models::LinearPositionFromPhysicalConstants(
                    wpi::math::DCMotor::NEO(2), 5_kg, 0.05_m, 12)
                    .Slice(0);
   REQUIRE(model.A().isApprox(
@@ -66,11 +67,11 @@ TEST_CASE("ModelsTest ElevatorFromPhysicalConstants", "[wpimath]") {
   REQUIRE(model.D().isApprox(wpi::math::Matrixd<1, 1>{0.0}, 0.001));
 }
 
-TEST_CASE("ModelsTest ElevatorFromSysId", "[wpimath]") {
+TEST_CASE("ModelsTest LinearPositionFromSysId", "[wpimath]") {
   constexpr double kv = 1.0;
   constexpr double ka = 0.5;
 
-  constexpr auto model = wpi::math::Models::ElevatorFromSysId(
+  constexpr auto model = wpi::math::Models::LinearPositionFromSysId(
       kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 
   REQUIRE(model.A().isApprox(
@@ -78,11 +79,11 @@ TEST_CASE("ModelsTest ElevatorFromSysId", "[wpimath]") {
   REQUIRE(model.B().isApprox(wpi::math::Matrixd<2, 1>{0.0, 1.0 / ka}, 0.001));
 }
 
-TEST_CASE("ModelsTest SingleJointedArmFromSysId", "[wpimath]") {
+TEST_CASE("ModelsTest AngularPositionFromSysId", "[wpimath]") {
   constexpr double kv = 1.0;
   constexpr double ka = 0.5;
 
-  constexpr auto model = wpi::math::Models::SingleJointedArmFromSysId(
+  constexpr auto model = wpi::math::Models::AngularPositionFromSysId(
       kv * 1_V / 1_rad_per_s, ka * 1_V / 1_rad_per_s_sq);
 
   REQUIRE(model.A().isApprox(

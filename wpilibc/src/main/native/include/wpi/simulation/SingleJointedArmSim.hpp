@@ -6,12 +6,18 @@
 
 #include <array>
 
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/DCMotor.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/simulation/LinearSystemSim.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/current.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/mass.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace wpi::sim {
 /**
@@ -23,7 +29,7 @@ class SingleJointedArmSim : public LinearSystemSim<2, 1, 2> {
    * Creates a simulated arm mechanism.
    *
    * @param system The system representing this arm. This system can be created
-   *     with wpi::math::Models::SingleJointedArmFromPhysicalConstants().
+   *     with wpi::math::Models::AngularPositionFromPhysicalConstants().
    * @param gearbox The type and number of motors on the arm gearbox.
    * @param gearing The gear ratio of the arm (numbers greater than 1 represent
    *     reductions).

@@ -203,8 +203,8 @@ TEST_CASE("MerweUKFTest DriveConvergence", "[wpimath]") {
 
 TEST_CASE("MerweUKFTest LinearUKF", "[wpimath]") {
   constexpr wpi::units::second_t dt = 20_ms;
-  auto plant = wpi::math::Models::FlywheelFromSysId(0.02_V / 1_rad_per_s,
-                                                    0.006_V / 1_rad_per_s_sq);
+  auto plant = wpi::math::Models::AngularVelocityFromSysId(
+      0.02_V / 1_rad_per_s, 0.006_V / 1_rad_per_s_sq);
   wpi::math::MerweUKF<1, 1, 1> observer{
       [&](const wpi::math::Vectord<1>& x, const wpi::math::Vectord<1>& u) {
         return plant.A() * x + plant.B() * u;
