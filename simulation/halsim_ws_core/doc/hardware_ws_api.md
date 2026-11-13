@@ -145,6 +145,8 @@ The basic analog input just reads a voltage. An analog input can also be configu
 | ``">robotMode"``  | Integer | Robot mode: 0 = unknown, 1 = autonomous, 2 = teleoperated, 3 = utility. Independent of enabled state. |
 | ``">autonomous"`` | Boolean | Legacy output flag: true for autonomous mode; false for other modes. Sent with ``">robotMode"`` for compatibility. |
 | ``">test"``       | Boolean | Legacy output flag: true for utility mode; false for other modes. Sent with ``">robotMode"`` for compatibility. |
+| ``">opMode"``     | String  | ID of the selected OpMode, as a decimal string (one of the ``"id"`` values from ``"<opModes"``).  ``"0"`` or an empty string selects no OpMode. |
+| ``"<opModes"``    | Array   | OpModes registered by the robot program; value is an object with ``"id"`` (decimal string), ``"name"``, ``"group"``, ``"description"``, and ``"robotMode"`` (same values as ``">robotMode"``) keys |
 | ``">estop"``      | Boolean | True to emergency stop (no motor outputs) |
 | ``">fms"``        | Boolean | True if the DS is connected to a Field Management System (FMS) |
 | ``">ds"``         | Boolean | True if a DS application is connected |
@@ -154,6 +156,11 @@ The basic analog input just reads a voltage. An analog input can also be configu
 
 Use ``">robotMode"`` to set the mode from a WebSocket client. The legacy
 ``">autonomous"`` and ``">test"`` fields are only emitted by WPILib.
+
+OpMode IDs are 64-bit integers that do not fit in a double, so they are sent as
+decimal strings instead of JSON numbers.  The robot program sees the selected
+OpMode combined with the current ``">robotMode"``, so select an OpMode whose
+``"robotMode"`` matches it.
 
 #### Duty Cycle Input ("DutyCycle")
 
