@@ -272,8 +272,8 @@ void MyHttpConnection::ProcessRequest() {
       if (qmap.get("format").value_or("") == "json") {
         wpi::util::json dirs = wpi::util::json::array();
         wpi::util::json files = wpi::util::json::array();
-        for (fs::directory_iterator it{fullpath, ec}, end;
-             !ec && it != end; it.increment(ec)) {
+        for (fs::directory_iterator it{fullpath, ec}, end; !ec && it != end;
+             it.increment(ec)) {
           auto&& entry = *it;
           bool subdir = entry.is_directory(ec);
           std::string name = entry.path().filename().string();
@@ -295,8 +295,8 @@ void MyHttpConnection::ProcessRequest() {
       } else {
         wpi::util::StringMap<std::string> dirs;
         wpi::util::StringMap<std::string> files;
-        for (fs::directory_iterator it{fullpath, ec}, end;
-             !ec && it != end; it.increment(ec)) {
+        for (fs::directory_iterator it{fullpath, ec}, end; !ec && it != end;
+             it.increment(ec)) {
           auto&& entry = *it;
           bool subdir = entry.is_directory(ec);
           std::string name = entry.path().filename().string();

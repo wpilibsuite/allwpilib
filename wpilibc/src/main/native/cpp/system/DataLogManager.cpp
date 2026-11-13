@@ -161,7 +161,8 @@ static std::pair<std::string, bool> MakeLogDir(std::string_view dir) {
   std::error_code ec;
   fs::create_directory("/home/systemcore/logs", ec);
   if (ec) {
-    WPILIB_ReportError(warn::Warning, "Could not create log dir /home/systemcore/logs: {}",
+    WPILIB_ReportError(warn::Warning,
+                       "Could not create log dir /home/systemcore/logs: {}",
                        ec.message());
   }
   wpi::util::ReportUsage("DataLogManager", "Onboard");
@@ -171,8 +172,8 @@ static std::pair<std::string, bool> MakeLogDir(std::string_view dir) {
   std::error_code ec;
   fs::create_directory(logDir, ec);
   if (ec) {
-    WPILIB_ReportError(warn::Warning, "Could not create log dir {}: {}",
-                       logDir, ec.message());
+    WPILIB_ReportError(warn::Warning, "Could not create log dir {}: {}", logDir,
+                       ec.message());
   }
   return {logDir, false};
 #endif
