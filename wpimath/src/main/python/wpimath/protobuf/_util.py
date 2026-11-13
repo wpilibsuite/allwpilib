@@ -1,13 +1,10 @@
-from typing import TypeVar
-
 from google.protobuf.message import Message
 from wpiutil.protobuf import ProtobufDescriptor
 
-T = TypeVar("T")
-M = TypeVar("M", bound=Message)
 
-
-def pack_nested(msg: M, serializer: type[ProtobufDescriptor[T, M]], value: T) -> None:
+def pack_nested[T, M: Message](
+    msg: M, serializer: type[ProtobufDescriptor[T, M]], value: T
+) -> None:
     """
     Packs ``value`` into the nested message field ``msg``.
 
