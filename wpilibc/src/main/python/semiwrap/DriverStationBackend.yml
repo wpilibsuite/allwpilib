@@ -44,3 +44,6 @@ classes:
 enums:
   JoystickResourceAlert:
     ignore: true
+functions:
+  availableToCount:
+    ignore: true
