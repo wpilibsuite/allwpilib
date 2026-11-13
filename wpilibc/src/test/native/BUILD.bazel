@@ -4,14 +4,14 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_library(
     name = "test-headers",
     testonly = True,
-    hdrs = glob(["include/**"]),
+    hdrs = glob(["include/**/*.hpp"]),
     includes = ["include"],
 )
 
 cc_test(
     name = "wpilibc_tests",
     size = "small",
-    srcs = glob(["cpp/**"]) + ["//wpilibc:generated-test-native-srcs"],
+    srcs = glob(["cpp/**/*.cpp"]) + ["//wpilibc:generated-test-native-srcs"],
     tags = [
         "no-tsan",
         "no-ubsan",

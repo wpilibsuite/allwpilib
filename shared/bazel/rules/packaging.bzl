@@ -45,7 +45,7 @@ def pkg_java_src_files(name, java_srcs_root = "", generated_java_srcs = None, re
 
     pkg_files(
         name = name + "-java-srcs",
-        srcs = native.glob([(java_srcs_root + "/**") if java_srcs_root else "**"], exclude = ["BUILD.bazel"]),
+        srcs = native.glob([(java_srcs_root + "/**/*.java") if java_srcs_root else "**/*.java"], exclude = ["BUILD.bazel"]),
         strip_prefix = java_srcs_root,
     )
 

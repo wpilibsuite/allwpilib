@@ -6,7 +6,7 @@ load("//xrpVendordep:robotpy_native_build_info.bzl", "define_native_wrapper")
 filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/main/native/include/**/*",
+        "src/main/native/include/**/*.hpp",
     ]),
     visibility = ["//visibility:public"],
 )
@@ -14,9 +14,9 @@ filegroup(
 wpilib_cc_library(
     name = "xrpVendordep",
     srcs = glob([
-        "src/main/native/cpp/**",
+        "src/main/native/cpp/xrp/*.cpp",
     ]),
-    hdrs = glob(["src/main/native/include/**"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]),
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [

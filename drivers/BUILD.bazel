@@ -9,13 +9,13 @@ load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native
 
 filegroup(
     name = "generated-native-include-files",
-    srcs = glob(["src/generated/main/native/include/**/*"]),
+    srcs = glob(["src/generated/main/native/include/**/*.hpp"]),
     visibility = ["//drivers:__subpackages__"],
 )
 
 filegroup(
     name = "doxygen-files",
-    srcs = glob(["src/main/native/include/**/*"]) + [":generated-native-include-files"],
+    srcs = glob(["src/main/native/include/**/*.hpp"]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
 
@@ -31,7 +31,10 @@ py_binary(
 
 filegroup(
     name = "templates",
-    srcs = glob(["src/generate/**"]),
+    srcs = glob([
+        "src/generate/**/*.jinja",
+        "src/generate/**/*.json",
+    ]),
 )
 
 generate_drivers(
@@ -63,8 +66,8 @@ filegroup(
 
 wpilib_cc_library(
     name = "drivers",
-    srcs = glob(["src/main/native/cpp/**"]),
-    hdrs = glob(["src/main/native/include/**"]),
+    srcs = glob(["src/main/native/cpp/**/*.cpp"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]),
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
     third_party_libraries = [
