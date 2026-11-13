@@ -8,7 +8,9 @@ strip_prefixes:
 functions:
   HALSIM_SetRuntimeType:
   HALSIM_WaitForProgramStart:
-    ignore: true
+    param_override:
+      waitForFirstNotifier:
+        default: "true"
   HALSIM_SetProgramStarted:
   HALSIM_GetProgramStarted:
   HALSIM_SetProgramState:

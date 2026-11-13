@@ -1,6 +1,7 @@
+import threading
 import time
 
-from ._simulation import get_next_notifier_timeout, get_program_started
+from ._simulation import wait_for_program_start as _wait_for_program_start
 
 
 def wait_for_program_start(
@@ -9,22 +10,33 @@ def wait_for_program_start(
     wait_for_first_notifier: bool = True,
 ):
     """
-    Polls robot program and returns when it has reported that it started
+    Waits for the robot program to report that it started.
+
+    Delegates to HALSIM_WaitForProgramStart so the wait matches C++: a
+    notifier alarm must be set *after* program start (a stale notifier
+    cannot satisfy the check). The C++ call releases the GIL. timeout and
+    CTRL-C are handled on this thread so this remains interruptible.
 
     :param timeout: Amount of time to wait
     :param delta:   Amount of time to sleep between checks
     :param wait_for_first_notifier: Wait for the first notifier alarm to be armed
     """
 
-    # This is basically the same thing that the C version of this function
-    # does. Implemented in python so that CTRL-C works.
+    done = threading.Event()
+
+    def _run():
+        try:
+            _wait_for_program_start(wait_for_first_notifier)
+        finally:
+            done.set()
+
+    threading.Thread(target=_run, daemon=True).start()
 
     until = None
     if timeout and timeout > 0:
         until = time.monotonic() + timeout
-    while not get_program_started() or (
-        wait_for_first_notifier and get_next_notifier_timeout() == 0xFFFFFFFFFFFFFFFF
-    ):
+    while not done.is_set():
         if until is not None and time.monotonic() > until:
             raise TimeoutError("Program did not start")
-        time.sleep(delta)
+        # Wake periodically so CTRL-C can be delivered on this thread.
+        done.wait(timeout=delta)
