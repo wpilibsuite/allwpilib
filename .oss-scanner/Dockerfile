@@ -24,8 +24,10 @@ COPY . /src
 WORKDIR /src
 
 # Build desktop C++ libraries, simulation modules, GUI tools, and tests with
-# debug symbols. Limit parallelism because wpimath uses substantial memory.
-ARG BUILD_JOBS=8
+# debug symbols. Use every CPU by default: the scanner's build machine has
+# 16 CPUs and 64 GB, enough memory for wpimath at that parallelism. Set
+# BUILD_JOBS to limit parallelism on smaller machines.
+ARG BUILD_JOBS=
 RUN cmake -S /src -B /src/build-cmake -G Ninja \
       -DCMAKE_BUILD_TYPE=RelWithDebInfo \
       -DCMAKE_C_FLAGS="-g -fno-omit-frame-pointer" \
@@ -35,7 +37,7 @@ RUN cmake -S /src -B /src/build-cmake -G Ninja \
       -DWPILIB_WITH_CSCORE=ON \
       -DWPILIB_WITH_SIMULATION_MODULES=ON \
       -DWPILIB_WITH_BENCHMARK=OFF \
-    && cmake --build /src/build-cmake --parallel "${BUILD_JOBS}"
+    && cmake --build /src/build-cmake --parallel "${BUILD_JOBS:-$(nproc)}"
 
 # Java/JNI use Gradle; current allwpilib CMake builds only C++.
 # Compile all Java test sources and exercise networking, logging, and cameras
@@ -50,12 +52,12 @@ RUN sed -i 's/\r$//' ./gradlew \
     && avahi-daemon -D \
     && ./gradlew compileJava testClasses \
          :ntcore:test :wpinet:test :wpiutil:test :datalog:test :cscore:test \
-         --no-daemon --max-workers="${BUILD_JOBS}" \
+         --no-daemon --max-workers="${BUILD_JOBS:-$(nproc)}" \
          -Ponlylinuxx86-64 -PskipJavaFormat \
     && ./gradlew cleanTest \
          :ntcore:test :wpinet:test :wpiutil:test :datalog:test :cscore:test \
          --offline --no-daemon \
-         --max-workers="${BUILD_JOBS}" -Ponlylinuxx86-64 -PskipJavaFormat
+         --max-workers="${BUILD_JOBS:-$(nproc)}" -Ponlylinuxx86-64 -PskipJavaFormat
 
 # Fetch Bazel dependencies while online and retain the launcher, Bazel binary,
 # and repository caches for additional builds during the offline audit.
