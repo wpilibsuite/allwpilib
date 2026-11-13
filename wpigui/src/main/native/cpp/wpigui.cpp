@@ -195,7 +195,7 @@ static double GetFrameRateLimit() {
     return mode->refresh_rate * 1.05;
   }
 
-  return 60.0;  // fallback
+  return 60.0 * 1.05;  // fallback
 }
 
 static SDL_GPUTextureFormat SDLGPUTextureFormat(PixelFormat format) {
