@@ -8,14 +8,12 @@
 
 #include <algorithm>
 #include <cctype>
-#include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
 #include <string>
-#include <thread>
 #include <utility>
 
 #define SDL_MAIN_HANDLED
@@ -1477,8 +1475,7 @@ void gui::Main() {
       // Sleep before the next frame's acquisition and input polling.
       double sleepTime = nextFrameTime - now;
       if (sleepTime > 1e-6) {
-        std::this_thread::sleep_for(
-            std::chrono::microseconds(static_cast<int64_t>(sleepTime * 1e6)));
+        SDL_DelayPrecise(static_cast<Uint64>(sleepTime * SDL_NS_PER_SECOND));
       }
     } else {
       previousFps = 0.0;
