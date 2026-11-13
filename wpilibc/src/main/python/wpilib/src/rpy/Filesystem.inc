@@ -4,6 +4,7 @@
 // that
 
 #include <string>
+#include <system_error>
 
 #include <pybind11/eval.h>
 #include <semiwrap.h>
@@ -37,7 +38,8 @@ static fs::path getMainPath() {
 #ifdef __FIRST_SYSTEMCORE__
     return fs::path("/home/systemcore/py");
 #else
-    return fs::current_path();
+    std::error_code ec;
+    return fs::current_path(ec);
 #endif
   }
 }

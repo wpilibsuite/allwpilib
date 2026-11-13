@@ -272,7 +272,9 @@ void MyHttpConnection::ProcessRequest() {
       if (qmap.get("format").value_or("") == "json") {
         wpi::util::json dirs = wpi::util::json::array();
         wpi::util::json files = wpi::util::json::array();
-        for (auto&& entry : fs::directory_iterator{fullpath}) {
+        for (fs::directory_iterator it{fullpath, ec}, end;
+             !ec && it != end; it.increment(ec)) {
+          auto&& entry = *it;
           bool subdir = entry.is_directory(ec);
           std::string name = entry.path().filename().string();
           if (subdir) {
@@ -287,13 +289,15 @@ void MyHttpConnection::ProcessRequest() {
                      wpi::util::json::object("dirs", std::move(dirs), "files",
                                              std::move(files))
                          .to_string());
-      } else if (fs::exists(indexpath)) {
+      } else if (fs::exists(indexpath, ec) && !ec) {
         SendFileResponse(200, "OK", GetMimeType("html"), indexpath,
                          "Content-Disposition: filename=\"index.html\"\r\n");
       } else {
         wpi::util::StringMap<std::string> dirs;
         wpi::util::StringMap<std::string> files;
-        for (auto&& entry : fs::directory_iterator{fullpath}) {
+        for (fs::directory_iterator it{fullpath, ec}, end;
+             !ec && it != end; it.increment(ec)) {
+          auto&& entry = *it;
           bool subdir = entry.is_directory(ec);
           std::string name = entry.path().filename().string();
           wpi::util::SmallString<128> nameUriBuf, nameHtmlBuf;

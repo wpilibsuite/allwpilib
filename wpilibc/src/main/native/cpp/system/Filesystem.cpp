@@ -5,12 +5,14 @@
 #include "wpi/system/Filesystem.hpp"
 
 #include <string>
+#include <system_error>
 
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/util/fs.hpp"
 
 std::string wpi::filesystem::GetLaunchDirectory() {
-  return fs::current_path().string();
+  std::error_code ec;
+  return fs::current_path(ec).string();
 }
 
 std::string wpi::filesystem::GetOperatingDirectory() {
@@ -25,6 +27,7 @@ std::string wpi::filesystem::GetDeployDirectory() {
   if constexpr (!RobotBase::IsSimulation()) {
     return "/home/systemcore/deploy";
   } else {
-    return (fs::current_path() / "src" / "main" / "deploy").string();
+    std::error_code ec;
+    return (fs::current_path(ec) / "src" / "main" / "deploy").string();
   }
 }
