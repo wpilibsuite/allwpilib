@@ -12,7 +12,6 @@
 #include "wpi/glass/hardware/Encoder.hpp"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/DIOData.h"
-#include "wpi/hal/simulation/DigitalPWMData.h"
 #include "wpi/hal/simulation/DutyCycleData.h"
 #include "wpi/hal/simulation/EncoderData.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
@@ -23,37 +22,7 @@ using namespace halsimgui;
 
 namespace {
 HALSIMGUI_DATASOURCE_BOOLEAN_INDEXED(DIOValue, "DIO");
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DigitalPWMDutyCycle, "DPWM");
 HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(DutyCycleOutput, "DutyCycle");
-
-class DPWMSimModel : public wpi::glass::DPWMModel {
- public:
-  DPWMSimModel(int32_t index, int32_t dioChannel)
-      : m_dioChannel{dioChannel}, m_index{index}, m_valueData{index} {}
-
-  void Update() override {}
-
-  bool Exists() override { return HALSIM_GetDigitalPWMInitialized(m_index); }
-
-  const char* GetSimDevice() const override {
-    if (auto simDevice = HALSIM_GetDIOSimDevice(m_dioChannel)) {
-      return HALSIM_GetSimDeviceName(simDevice);
-    } else {
-      return nullptr;
-    }
-  }
-
-  wpi::glass::DoubleSource* GetValueData() override { return &m_valueData; }
-
-  void SetValue(double val) override {
-    HALSIM_SetDigitalPWMDutyCycle(m_index, val);
-  }
-
- private:
-  int32_t m_dioChannel;
-  int32_t m_index;
-  DigitalPWMDutyCycleSource m_valueData;
-};
 
 class DutyCycleSimModel : public wpi::glass::DutyCycleModel {
  public:
@@ -102,11 +71,9 @@ class DIOSimModel : public wpi::glass::DIOModel {
     }
   }
 
-  DPWMSimModel* GetDPWM() override { return m_dpwmSource; }
   DutyCycleSimModel* GetDutyCycle() override { return m_dutyCycleSource; }
   wpi::glass::EncoderModel* GetEncoder() override { return m_encoderSource; }
 
-  void SetDPWM(DPWMSimModel* model) { m_dpwmSource = model; }
   void SetDutyCycle(DutyCycleSimModel* model) { m_dutyCycleSource = model; }
   void SetEncoder(wpi::glass::EncoderModel* model) { m_encoderSource = model; }
 
@@ -119,7 +86,6 @@ class DIOSimModel : public wpi::glass::DIOModel {
  private:
   int32_t m_channel;
   DIOValueSource m_valueData;
-  DPWMSimModel* m_dpwmSource = nullptr;
   DutyCycleSimModel* m_dutyCycleSource = nullptr;
   wpi::glass::EncoderModel* m_encoderSource = nullptr;
 };
@@ -128,7 +94,6 @@ class DIOsSimModel : public wpi::glass::DIOsModel {
  public:
   DIOsSimModel()
       : m_dioModels(HAL_GetNumDigitalChannels()),
-        m_dpwmModels(HAL_GetNumDigitalPWMOutputs()),
         m_dutyCycleModels(HAL_GetNumDutyCycles()) {}
 
   void Update() override;
@@ -143,7 +108,6 @@ class DIOsSimModel : public wpi::glass::DIOsModel {
   // indexed by channel
   std::vector<std::unique_ptr<DIOSimModel>> m_dioModels;
   // indexed by index
-  std::vector<std::unique_ptr<DPWMSimModel>> m_dpwmModels;
   std::vector<std::unique_ptr<DutyCycleSimModel>> m_dutyCycleModels;
 };
 }  // namespace
@@ -156,25 +120,8 @@ void DIOsSimModel::Update() {
       if (!model) {
         model = std::make_unique<DIOSimModel>(i);
       }
-      model->SetDPWM(nullptr);
       model->SetDutyCycle(nullptr);
       model->SetEncoder(nullptr);
-    } else {
-      model.reset();
-    }
-  }
-
-  const int32_t numPWM = m_dpwmModels.size();
-  for (int32_t i = 0; i < numPWM; ++i) {
-    auto& model = m_dpwmModels[i];
-    if (HALSIM_GetDigitalPWMInitialized(i)) {
-      if (!model) {
-        int channel = HALSIM_GetDigitalPWMPin(i);
-        if (channel >= 0 && channel < numDIO && m_dioModels[channel]) {
-          model = std::make_unique<DPWMSimModel>(i, channel);
-          m_dioModels[channel]->SetDPWM(model.get());
-        }
-      }
     } else {
       model.reset();
     }

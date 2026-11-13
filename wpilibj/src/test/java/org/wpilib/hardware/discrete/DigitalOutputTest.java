@@ -4,42 +4,15 @@
 
 package org.wpilib.hardware.discrete;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.simulation.DIOSim;
 
 class DigitalOutputTest {
   @Test
   void testDefaultFunctions() {
     try (DigitalOutput output = new DigitalOutput(0)) {
-      assertFalse(output.isPulsing());
-    }
-  }
-
-  @Test
-  void testPwmFunctionsWithoutInitialization() {
-    HAL.initialize();
-
-    try (DigitalOutput output = new DigitalOutput(0)) {
-      assertDoesNotThrow(() -> output.updateDutyCycle(0.6));
-      assertDoesNotThrow(output::disablePWM);
-    }
-  }
-
-  @Test
-  void testPwmFunctionsWithInitialization() {
-    HAL.initialize();
-
-    try (DigitalOutput output = new DigitalOutput(0)) {
-      DIOSim sim = new DIOSim(output);
-      assertEquals(0, sim.getPulseLength());
-
-      output.enablePWM(0.5);
-      output.updateDutyCycle(0.6);
+      assertTrue(output.get());
     }
   }
 }

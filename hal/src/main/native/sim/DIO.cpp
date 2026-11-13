@@ -8,26 +8,14 @@
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
 #include "mockdata/DIODataInternal.hpp"
-#include "mockdata/DigitalPWMDataInternal.hpp"
 #include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
-#include "wpi/hal/handles/LimitedHandleResource.hpp"
 
 using namespace wpi::hal;
 
-static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
-                             NUM_DIGITAL_PWM_OUTPUTS,
-                             HAL_HandleEnum::DIGITAL_PWM>* digitalPWMHandles;
-
 namespace wpi::hal::init {
-void InitializeDIO() {
-  static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
-                               NUM_DIGITAL_PWM_OUTPUTS,
-                               HAL_HandleEnum::DIGITAL_PWM>
-      dpH;
-  digitalPWMHandles = &dpH;
-}
+void InitializeDIO() {}
 }  // namespace wpi::hal::init
 
 extern "C" {
@@ -84,90 +72,6 @@ void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
     return;
   }
   SimDIOData[port->channel].simDevice = device;
-}
-
-HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
-  auto handle = digitalPWMHandles->Allocate();
-  if (handle == HAL_INVALID_HANDLE) {
-    *status = HAL_NO_AVAILABLE_RESOURCES;
-    return HAL_INVALID_HANDLE;
-  }
-
-  auto id = digitalPWMHandles->Get(handle);
-  if (id == nullptr) {  // would only occur on thread issue.
-    *status = HAL_HANDLE_ERROR;
-    return HAL_INVALID_HANDLE;
-  }
-  *id = static_cast<uint8_t>(getHandleIndex(handle));
-
-  SimDigitalPWMData[*id].initialized = true;
-
-  return handle;
-}
-
-void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator) {
-  auto port = digitalPWMHandles->Get(pwmGenerator);
-  digitalPWMHandles->Free(pwmGenerator);
-  if (port == nullptr) {
-    return;
-  }
-  int32_t id = *port;
-  SimDigitalPWMData[id].initialized = false;
-}
-
-void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
-  // Currently rounding in the log rate domain... heavy weight toward picking a
-  // higher freq.
-  // TODO: Round in the linear rate domain.
-  // uint8_t pwmPeriodPower = static_cast<uint8_t>(
-  //     std::log2(1.0 / (EXPECTED_LOOP_TIMING * 0.25E-6 * rate)) + 0.5);
-  // TODO(THAD) : Add a case to set this in the simulator
-  // digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
-}
-
-void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
-                                double dutyCycle, int32_t* status) {
-  auto port = digitalPWMHandles->Get(pwmGenerator);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  int32_t id = *port;
-  if (dutyCycle > 1.0) {
-    dutyCycle = 1.0;
-  }
-  if (dutyCycle < 0.0) {
-    dutyCycle = 0.0;
-  }
-  SimDigitalPWMData[id].dutyCycle = dutyCycle;
-}
-
-void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
-                          int32_t* status) {
-  auto port = digitalPWMHandles->Get(pwmGenerator);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  int32_t id = *port;
-  if (dutyCycle > 1.0) {
-    dutyCycle = 1.0;
-  }
-  if (dutyCycle < 0.0) {
-    dutyCycle = 0.0;
-  }
-  SimDigitalPWMData[id].dutyCycle = dutyCycle;
-}
-
-void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
-                                    int32_t channel, int32_t* status) {
-  auto port = digitalPWMHandles->Get(pwmGenerator);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  int32_t id = *port;
-  SimDigitalPWMData[id].pin = channel;
 }
 
 void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
@@ -231,34 +135,5 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
     value = 0;
   }
   return value;
-}
-
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLengthSeconds,
-               int32_t* status) {
-  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  // TODO (Thad) Add this
-}
-
-void HAL_PulseMultiple(uint32_t channelMask, double pulseLengthSeconds,
-                       int32_t* status) {
-  // TODO (Thad) Add this
-}
-
-HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
-  if (port == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return false;
-  }
-  return false;
-  // TODO (Thad) Add this
-}
-
-HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
-  return false;  // TODO(Thad) Figure this out
 }
 }  // extern "C"

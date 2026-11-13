@@ -113,56 +113,6 @@ Java_org_wpilib_hardware_hal_simulation_DIODataJNI_setValue
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_DIODataJNI
- * Method:    registerPulseLengthCallback
- * Signature: (ILjava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_simulation_DIODataJNI_registerPulseLengthCallback
-  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterDIOPulseLengthCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DIODataJNI
- * Method:    cancelPulseLengthCallback
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DIODataJNI_cancelPulseLengthCallback
-  (JNIEnv* env, jclass, jint index, jint handle)
-{
-  return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelDIOPulseLengthCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DIODataJNI
- * Method:    getPulseLength
- * Signature: (I)D
- */
-JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_simulation_DIODataJNI_getPulseLength
-  (JNIEnv*, jclass, jint index)
-{
-  return HALSIM_GetDIOPulseLength(index);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DIODataJNI
- * Method:    setPulseLength
- * Signature: (ID)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DIODataJNI_setPulseLength
-  (JNIEnv*, jclass, jint index, jdouble value)
-{
-  HALSIM_SetDIOPulseLength(index, value);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DIODataJNI
  * Method:    registerIsInputCallback
  * Signature: (ILjava/lang/Object;Z)I
  */
@@ -209,56 +159,6 @@ Java_org_wpilib_hardware_hal_simulation_DIODataJNI_setIsInput
   (JNIEnv*, jclass, jint index, jboolean value)
 {
   HALSIM_SetDIOIsInput(index, value);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DIODataJNI
- * Method:    registerFilterIndexCallback
- * Signature: (ILjava/lang/Object;Z)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_simulation_DIODataJNI_registerFilterIndexCallback
-  (JNIEnv* env, jclass, jint index, jobject callback, jboolean initialNotify)
-{
-  return sim::AllocateCallback(env, index, callback, initialNotify,
-                               &HALSIM_RegisterDIOFilterIndexCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DIODataJNI
- * Method:    cancelFilterIndexCallback
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DIODataJNI_cancelFilterIndexCallback
-  (JNIEnv* env, jclass, jint index, jint handle)
-{
-  return sim::FreeCallback(env, handle, index,
-                           &HALSIM_CancelDIOFilterIndexCallback);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DIODataJNI
- * Method:    getFilterIndex
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_simulation_DIODataJNI_getFilterIndex
-  (JNIEnv*, jclass, jint index)
-{
-  return HALSIM_GetDIOFilterIndex(index);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_DIODataJNI
- * Method:    setFilterIndex
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_DIODataJNI_setFilterIndex
-  (JNIEnv*, jclass, jint index, jint value)
-{
-  HALSIM_SetDIOFilterIndex(index, value);
 }
 
 /*

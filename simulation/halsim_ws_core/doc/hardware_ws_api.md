@@ -80,7 +80,6 @@ The “hardware“ (which might be a full-fledged 3D simulation engine, a physic
 | [``"AI"``][]            | Analog input               | Port index, e.g. "1", "2" |
 | [``"CTREPCM"``][]       | PCM                        | Module number, e.g. "1", "2" |
 | [``"DIO"``][]           | Digital input/output       | Port index, e.g. "1", "2" |
-| [``"dPWM"``][]          | Duty cycle output          | Arbitrary device number   |
 | [``"DriverStation"``][] | Driver station / FMS state | Blank                     |
 | [``"DutyCycle"``][]     | Duty cycle input           | Arbitrary device name     |
 | [``"Encoder"``][]       | Quadrature encoder         | Arbitrary device number   |
@@ -123,16 +122,6 @@ The basic analog input just reads a voltage. An analog input can also be configu
 | ``"<input"``  | Boolean | True if input, false if output             |
 | ``"<>value"`` | Boolean | Input or output state                      |
 | ``"<pulse_length"`` | Float | Reserved for future use                |
-
-#### Duty Cycle Output ("dPWM")
-
-[``"dPWM"``]:#duty-cycle-output-dpwm
-
-| Data Key          | Type    | Description                                   |
-| ----------------- | ------- | --------------------------------------------- |
-| ``"<init"``       | Boolean | If output is initialized in the robot program |
-| ``"<duty_cycle"`` | Float   | Duty cycle % (0.0 to 1.0)                     |
-| ``"<dio_pin"``    | Integer | DIO pin number                                |
 
 #### Driver Station ("DriverStation")
 

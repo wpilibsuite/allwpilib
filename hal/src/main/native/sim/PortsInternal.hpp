@@ -18,7 +18,6 @@ constexpr int32_t NUM_DIGITAL_HEADERS = 10;
 constexpr int32_t NUM_PWM_HEADERS = 10;
 constexpr int32_t NUM_DIGITAL_CHANNELS = 31;
 constexpr int32_t NUM_PWM_CHANNELS = 20;
-constexpr int32_t NUM_DIGITAL_PWM_OUTPUTS = 6;
 constexpr int32_t NUM_ENCODERS = 8;
 constexpr int32_t I2C_PORTS = 2;
 constexpr int32_t NUM_INTERRUPTS = 8;

@@ -18,7 +18,6 @@ constexpr int32_t NUM_COUNTERS = 0;
 constexpr int32_t NUM_DIGITAL_SPI_PORT_CHANNELS = 0;
 constexpr int32_t NUM_DIGITAL_CHANNELS = NUM_SMART_IO;
 constexpr int32_t NUM_PWM_CHANNELS = NUM_SMART_IO;
-constexpr int32_t NUM_DIGITAL_PWM_OUTPUTS = 0;
 constexpr int32_t NUM_ENCODERS = NUM_SMART_IO / 2;
 constexpr int32_t NUM_INTERRUPTS = 0;
 constexpr int32_t NUM_RELAY_CHANNELS = 0;

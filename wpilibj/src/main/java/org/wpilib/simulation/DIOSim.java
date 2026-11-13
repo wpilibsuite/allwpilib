@@ -101,36 +101,6 @@ public class DIOSim {
   }
 
   /**
-   * Register a callback to be run whenever the pulse length changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to call the callback with the initial state
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public CallbackStore registerPulseLengthCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = DIODataJNI.registerPulseLengthCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, DIODataJNI::cancelPulseLengthCallback);
-  }
-
-  /**
-   * Read the pulse length.
-   *
-   * @return the pulse length of this DIO port
-   */
-  public double getPulseLength() {
-    return DIODataJNI.getPulseLength(m_index);
-  }
-
-  /**
-   * Change the pulse length of this DIO port.
-   *
-   * @param pulseLength the new pulse length
-   */
-  public void setPulseLength(double pulseLength) {
-    DIODataJNI.setPulseLength(m_index, pulseLength);
-  }
-
-  /**
    * Register a callback to be run whenever this DIO changes to be an input.
    *
    * @param callback the callback
@@ -158,36 +128,6 @@ public class DIOSim {
    */
   public void setIsInput(boolean isInput) {
     DIODataJNI.setIsInput(m_index, isInput);
-  }
-
-  /**
-   * Register a callback to be run whenever the filter index changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether the callback should be called with the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public CallbackStore registerFilterIndexCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = DIODataJNI.registerFilterIndexCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, DIODataJNI::cancelFilterIndexCallback);
-  }
-
-  /**
-   * Read the filter index.
-   *
-   * @return the filter index of this DIO port
-   */
-  public int getFilterIndex() {
-    return DIODataJNI.getFilterIndex(m_index);
-  }
-
-  /**
-   * Change the filter index of this DIO port.
-   *
-   * @param filterIndex the new filter index
-   */
-  public void setFilterIndex(int filterIndex) {
-    DIODataJNI.setFilterIndex(m_index, filterIndex);
   }
 
   /** Reset all simulation data of this object. */

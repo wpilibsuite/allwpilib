@@ -26,15 +26,6 @@ public class DIODataJNI extends JNIWrapper {
 
   public static native void setValue(int index, boolean value);
 
-  public static native int registerPulseLengthCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelPulseLengthCallback(int index, int uid);
-
-  public static native double getPulseLength(int index);
-
-  public static native void setPulseLength(int index, double pulseLength);
-
   public static native int registerIsInputCallback(
       int index, NotifyCallback callback, boolean initialNotify);
 
@@ -43,15 +34,6 @@ public class DIODataJNI extends JNIWrapper {
   public static native boolean getIsInput(int index);
 
   public static native void setIsInput(int index, boolean isInput);
-
-  public static native int registerFilterIndexCallback(
-      int index, NotifyCallback callback, boolean initialNotify);
-
-  public static native void cancelFilterIndexCallback(int index, int uid);
-
-  public static native int getFilterIndex(int index);
-
-  public static native void setFilterIndex(int index, int filterIndex);
 
   public static native void resetData(int index);
 

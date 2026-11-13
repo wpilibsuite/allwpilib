@@ -20,7 +20,6 @@ extern void InitializeAddressableLEDData();
 extern void InitializeAnalogInData();
 extern void InitializeCanData();
 extern void InitializeCANAPI();
-extern void InitializeDigitalPWMData();
 extern void InitializeDutyCycleData();
 extern void InitializeDIOData();
 extern void InitializeDutyCycle();

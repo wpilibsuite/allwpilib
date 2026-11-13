@@ -43,7 +43,6 @@ components:
             - $ref: "#/components/schemas/addressableLEDData"
             - $ref: "#/components/schemas/aiData"
             - $ref: "#/components/schemas/dioData"
-            - $ref: "#/components/schemas/dpwmData"
             - $ref: "#/components/schemas/driverstationData"
             - $ref: "#/components/schemas/dutycycleData"
             - $ref: "#/components/schemas/encoderData"
@@ -160,35 +159,6 @@ components:
             "<pulse_length":
               type: number
               description: "Reserved for future use"
-
-    dpwmData:
-      type: object
-      required:
-      - type
-      - device
-      properties:
-        type:
-          type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
-          const: dPWM
-        device:
-          type: string
-          description: Device Identifier (usually channel)
-        data:
-          type: object
-          description: "Duty Cycle Output Data (type: dPWM, device: channel number)"
-          properties:
-            <init:
-              type: boolean
-              description: "If output is initialized in the robot program"
-            <duty_cycle:
-              type: number
-              description: "Duty cycle %"
-              minimum: 0.0
-              maximum: 1.0
-            <dio_pin:
-              type: integer
-              description: "DIO pin number"
 
     driverstationData:
       type: object
