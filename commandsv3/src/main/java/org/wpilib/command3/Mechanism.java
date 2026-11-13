@@ -86,7 +86,7 @@ public interface Mechanism {
    * @return The command builder, for further configuration.
    */
   default NeedsNameBuilderStage run(Consumer<Coroutine> commandBody) {
-    return new StagedCommandBuilder().requiring(this).executing(commandBody);
+    return StagedCommandBuilder.requiring(this).executing(commandBody);
   }
 
   /**

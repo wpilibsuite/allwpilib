@@ -246,7 +246,7 @@ public interface Command {
    * @return a builder that can be used to configure the resulting command
    */
   static NeedsNameBuilderStage noRequirements(Consumer<Coroutine> body) {
-    return new StagedCommandBuilder().noRequirements().executing(body);
+    return StagedCommandBuilder.noRequirements().executing(body);
   }
 
   /**
@@ -261,7 +261,7 @@ public interface Command {
    */
   static NeedsExecutionBuilderStage requiring(Mechanism requirement, Mechanism... rest) {
     // parameters will be null checked by the builder
-    return new StagedCommandBuilder().requiring(requirement, rest);
+    return StagedCommandBuilder.requiring(requirement, rest);
   }
 
   /**
@@ -275,7 +275,7 @@ public interface Command {
    */
   static NeedsExecutionBuilderStage requiring(Collection<Mechanism> requirements) {
     // parameters will be null checked by the builder
-    return new StagedCommandBuilder().requiring(requirements);
+    return StagedCommandBuilder.requiring(requirements);
   }
 
   /**
