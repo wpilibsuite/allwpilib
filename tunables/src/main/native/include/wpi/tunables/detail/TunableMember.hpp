@@ -9,6 +9,7 @@
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <new>
 #include <string>
 #include <string_view>
@@ -17,7 +18,6 @@
 #include <vector>
 
 #include "wpi/tunables/ComplexTunable.hpp"
-#include "wpi/tunables/detail/TunableBase.hpp"
 #include "wpi/tunables/detail/TunableTypeTraits.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/struct/Struct.hpp"
@@ -432,5 +432,56 @@ class TunableMemberProtobuf : public detail::TunableMemberProtobufBase {
   [[no_unique_address]]
   mutable wpi::util::ProtobufMessage<T> m_message;
 };
+
+template <typename T, typename Class, typename... Args>
+  requires TunableValueType<T>
+std::unique_ptr<TunableMemberBase> MakeTunableMember(T Class::* member,
+                                                     Args&&... args) {
+  return std::make_unique<TunableMemberValue<T>>(member,
+                                                 std::forward<Args>(args)...);
+}
+
+template <typename T, typename Class, typename... I>
+  requires(!TunableValueType<T> && wpi::util::StructSerializable<T, I...>)
+std::unique_ptr<TunableMemberBase> MakeTunableMember(T Class::* member,
+                                                     I&&... info) {
+  return std::make_unique<TunableMemberStruct<T, I...>>(
+      member, std::forward<I>(info)...);
+}
+
+template <typename T, typename Class, typename... I>
+  requires(!TunableValueType<T> && wpi::util::StructSerializable<T, I...>)
+std::unique_ptr<TunableMemberBase> MakeTunableMember(
+    T Class::* member, const TunableConfig& config, I&&... info) {
+  return std::make_unique<TunableMemberStruct<T, I...>>(
+      member, config, std::forward<I>(info)...);
+}
+
+template <typename T, typename Class, typename... I>
+  requires(!TunableValueType<std::vector<T>> &&
+           wpi::util::StructSerializable<T, I...>)
+std::unique_ptr<TunableMemberBase> MakeTunableMember(
+    std::vector<T> Class::* member, I&&... info) {
+  return std::make_unique<TunableMemberStructVector<T, I...>>(
+      member, std::forward<I>(info)...);
+}
+
+template <typename T, typename Class, typename... I>
+  requires(!TunableValueType<std::vector<T>> &&
+           wpi::util::StructSerializable<T, I...>)
+std::unique_ptr<TunableMemberBase> MakeTunableMember(
+    std::vector<T> Class::* member, const TunableConfig& config, I&&... info) {
+  return std::make_unique<TunableMemberStructVector<T, I...>>(
+      member, config, std::forward<I>(info)...);
+}
+
+template <typename T, typename Class, typename... Args>
+  requires(!TunableValueType<T> && !wpi::util::StructSerializable<T> &&
+           wpi::util::ProtobufSerializable<T>)
+std::unique_ptr<TunableMemberBase> MakeTunableMember(T Class::* member,
+                                                     Args&&... args) {
+  return std::make_unique<TunableMemberProtobuf<T>>(
+      member, std::forward<Args>(args)...);
+}
 
 }  // namespace wpi::tunables::detail
