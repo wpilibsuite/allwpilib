@@ -119,6 +119,7 @@ filegroup(
     srcs = [":generate_wpimath"],
     output_group = "python",
     tags = ["pregeneration"],
+    visibility = ["//wpimath/src/main/python:__pkg__"],
 )
 
 write_source_files(
@@ -126,7 +127,6 @@ write_source_files(
     diff_args = ["-u"],
     files = {
         "src/generated": ":generate_wpimath",
-        "src/main/python/wpimath/protobuf/_generated": ":generate_wpimath_python",
     },
     suggested_update_target = "//:write_all",
     tags = ["pregeneration"],
