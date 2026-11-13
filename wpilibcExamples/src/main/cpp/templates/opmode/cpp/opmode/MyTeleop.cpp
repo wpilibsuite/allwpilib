@@ -13,6 +13,10 @@ MyTeleop::~MyTeleop() {
   /* Called when the opmode is de-selected. */
 }
 
+void MyTeleop::DisabledPeriodic() {
+  /* Called periodically (set time interval) while the robot is disabled. */
+}
+
 void MyTeleop::Start() {
   /* Called once when the robot is first enabled. */
 }

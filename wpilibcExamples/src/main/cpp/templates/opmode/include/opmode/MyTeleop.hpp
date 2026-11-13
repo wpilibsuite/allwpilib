@@ -13,6 +13,7 @@ class MyTeleop : public wpi::PeriodicOpMode {
   /** The Robot instance is passed into the opmode via the constructor. */
   explicit MyTeleop(Robot& robot);
   ~MyTeleop() override;
+  void DisabledPeriodic() override;
   void Start() override;
   void Periodic() override;
   void End() override;
