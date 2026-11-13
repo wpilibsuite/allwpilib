@@ -199,13 +199,7 @@ http_jar(
     urls = ["https://github.com/google/copybara/releases/download/v20251027/copybara_deploy.jar"],
 )
 
-bazel_dep(name = "aos")
-archive_override(
-    module_name = "aos",
-    integrity = "sha256-4xtiaA43eKSj4PXtpOCQoqLxFQFfPivPUF+cW8ufxIE=",
-    strip_prefix = "aos-1.0.0",
-    urls = ["https://github.com/RealtimeRoboticsGroup/aos/releases/download/v1.0.0/aos-1.0.0.tar.zst"],
-)
+bazel_dep(name = "aos", version = "1.0.0")
 
 # The flatbuffers AOS is built against, which aosnt reads reflection schemas
 # with. AOS patches it, so it is not the registry's flatbuffers.
