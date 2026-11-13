@@ -46,7 +46,7 @@ class ComplexTunable(ABC):
     """An object composed of one or more tunable values."""
 
     @abstractmethod
-    def publish_tunables(self, table: TunableTable) -> None:
+    def publish_tunable(self, table: TunableTable) -> None:
         """Publishes this object's tunable values to ``table``.
 
         This method may be called when the tunable is initially published or
@@ -59,7 +59,7 @@ class ComplexTunable(ABC):
         """Returns this object's stable tunable type, or an empty string."""
         return ""
 
-    def update_tunables(self) -> None:
+    def update_tunable(self) -> None:
         """Updates callback-backed values before they are sent to the backend.
 
         This method must not raise. If an exception escapes, registry and
@@ -117,7 +117,7 @@ class Selectable[T](ComplexTunable):
         """Sets the listener called when a valid option is selected."""
         self._listener = listener
 
-    def publish_tunables(self, table: TunableTable) -> None:
+    def publish_tunable(self, table: TunableTable) -> None:
         table.publish("default", self._default)
         table.publish("options", self._options)
         table.publish("selected", self._selected)
