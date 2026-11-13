@@ -26,8 +26,9 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * Creates a simulated flywheel mechanism.
    *
    * @param plant The linear system that represents the flywheel. Use either {@link
-   *     Models#flywheelFromPhysicalConstants(DCMotor, double, double)} if using physical constants
-   *     or {@link Models#flywheelFromSysId(double, double)} if using system characterization.
+   *     Models#angularVelocityFromPhysicalConstants(DCMotor, double, double)} if using physical
+   *     constants or {@link Models#angularVelocityFromSysId(double, double)} if using system
+   *     characterization.
    * @param gearbox The type of and number of motors in the flywheel gearbox.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for velocity.

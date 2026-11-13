@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/net/SystemCoreResolverClient.hpp"
+#include "wpi/net/SystemcoreResolverClient.hpp"
 
 #include <stdint.h>
 
@@ -18,9 +18,9 @@
 
 using namespace wpi::net;
 
-static constexpr std::string_view SYSTEM_CORE_SERVICE_TYPE = "_SystemCore._tcp";
+static constexpr std::string_view SYSTEM_CORE_SERVICE_TYPE = "_Systemcore._tcp";
 static constexpr std::string_view SYSTEM_CORE_SERVICE_PREFIX =
-    "SystemCore-FIRST";
+    "Systemcore-FIRST";
 
 static std::string Ipv4AddressToString(uint32_t address) {
   return std::format("{}.{}.{}.{}", (address >> 24) & 0xff,
@@ -38,9 +38,9 @@ static bool HasMatchingTeam(const MulticastResolverClient::ServiceData& data,
   return false;
 }
 
-std::shared_ptr<SystemCoreResolverClient> SystemCoreResolverClient::Create(
+std::shared_ptr<SystemcoreResolverClient> SystemcoreResolverClient::Create(
     wpi::net::uv::Loop& loop, wpi::util::Logger& logger, unsigned int port) {
-  auto client = std::make_shared<SystemCoreResolverClient>(
+  auto client = std::make_shared<SystemcoreResolverClient>(
       loop, logger, std::nullopt, port, private_init{});
   if (!client->Init()) {
     return nullptr;
@@ -48,10 +48,10 @@ std::shared_ptr<SystemCoreResolverClient> SystemCoreResolverClient::Create(
   return client;
 }
 
-std::shared_ptr<SystemCoreResolverClient> SystemCoreResolverClient::Create(
+std::shared_ptr<SystemcoreResolverClient> SystemcoreResolverClient::Create(
     wpi::net::uv::Loop& loop, wpi::util::Logger& logger, std::string_view team,
     unsigned int port) {
-  auto client = std::make_shared<SystemCoreResolverClient>(
+  auto client = std::make_shared<SystemcoreResolverClient>(
       loop, logger, std::string{wpi::util::trim(team)}, port, private_init{});
   if (!client->Init()) {
     return nullptr;
@@ -59,14 +59,14 @@ std::shared_ptr<SystemCoreResolverClient> SystemCoreResolverClient::Create(
   return client;
 }
 
-SystemCoreResolverClient::SystemCoreResolverClient(
+SystemcoreResolverClient::SystemcoreResolverClient(
     wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
     std::optional<std::string> team, unsigned int port, const private_init&)
     : m_loop{loop}, m_logger{logger}, m_team{std::move(team)}, m_port{port} {}
 
-SystemCoreResolverClient::~SystemCoreResolverClient() = default;
+SystemcoreResolverClient::~SystemcoreResolverClient() = default;
 
-bool SystemCoreResolverClient::Init() {
+bool SystemcoreResolverClient::Init() {
   m_resolver = MulticastResolverClient::Create(m_loop, m_logger,
                                                SYSTEM_CORE_SERVICE_TYPE);
   if (!m_resolver) {
@@ -83,14 +83,14 @@ bool SystemCoreResolverClient::Init() {
   return true;
 }
 
-void SystemCoreResolverClient::Close() {
+void SystemcoreResolverClient::Close() {
   if (m_resolver) {
     m_resolver->Close();
     m_resolver.reset();
   }
 }
 
-void SystemCoreResolverClient::HandleResolved(
+void SystemcoreResolverClient::HandleResolved(
     MulticastResolverClient::ServiceData data) {
   if (!wpi::util::starts_with(data.serviceName, SYSTEM_CORE_SERVICE_PREFIX)) {
     return;

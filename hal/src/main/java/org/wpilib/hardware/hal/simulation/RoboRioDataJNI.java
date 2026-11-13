@@ -92,10 +92,6 @@ public class RoboRioDataJNI extends JNIWrapper {
 
   public static native void setSerialNumber(String serialNumber);
 
-  public static native String getComments();
-
-  public static native void setComments(String comments);
-
   public static native void resetData();
 
   /** Utility class. */

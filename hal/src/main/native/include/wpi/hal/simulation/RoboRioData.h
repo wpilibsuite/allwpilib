@@ -76,12 +76,6 @@ void HALSIM_CancelRoboRioSerialNumberCallback(int32_t uid);
 void HALSIM_GetRoboRioSerialNumber(struct WPI_String* serialNumber);
 void HALSIM_SetRoboRioSerialNumber(const struct WPI_String* serialNumber);
 
-int32_t HALSIM_RegisterRoboRioCommentsCallback(
-    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify);
-void HALSIM_CancelRoboRioCommentsCallback(int32_t uid);
-void HALSIM_GetRoboRioComments(struct WPI_String* comments);
-void HALSIM_SetRoboRioComments(const struct WPI_String* comments);
-
 int32_t HALSIM_RegisterRoboRioCPUTempCallback(HAL_NotifyCallback callback,
                                               void* param,
                                               HAL_Bool initialNotify);

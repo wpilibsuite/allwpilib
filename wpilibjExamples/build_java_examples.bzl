@@ -8,6 +8,7 @@ _EXAMPLE_DEPS = [
     "//apriltag/src/main/java",
     "//cameraserver/src/main/java",
     "//cscore/src/main/java",
+    "//datalog/src/main/java",
     "//drivers/src/main/java",
     "//fields/src/main/java",
     "//hal/src/main/java",

@@ -47,6 +47,9 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
                                        wpi::units::meter_t rightDistance,
                                        const Pose3d& initialPose = Pose3d{});
 
+  using Odometry3d::ResetPosition;
+  using Odometry3d::Update;
+
   /**
    * Resets the robot's position on the field.
    *

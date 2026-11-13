@@ -97,7 +97,7 @@ TEST_CASE("ElevatorSimTest Stability", "[wpilibc][simulation]") {
   }
 
   wpi::math::LinearSystem<2, 1, 1> system =
-      wpi::math::Models::ElevatorFromPhysicalConstants(
+      wpi::math::Models::LinearPositionFromPhysicalConstants(
           wpi::math::DCMotor::Vex775Pro(4), 4_kg, 0.5_in, 100)
           .Slice(0);
   CHECK_NEAR_UNITS(wpi::units::meter_t{system.CalculateX(

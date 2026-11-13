@@ -1,0 +1,12 @@
+load("//robotpyExamples:project.bzl", "robotpy_project")
+
+robotpy_project(
+    name = "DataLogCustom",
+    srcs = glob(["**/*.py"]),
+    main = "robot.py",
+    deps = [
+        "//datalog/src/main/python",
+        "//drivers/src/main/python",
+        "//wpiutil/src/main/python",
+    ],
+)

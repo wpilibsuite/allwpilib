@@ -21,8 +21,8 @@ namespace uv {
 class Loop;
 }  // namespace uv
 
-class SystemCoreResolverClient
-    : public std::enable_shared_from_this<SystemCoreResolverClient> {
+class SystemcoreResolverClient
+    : public std::enable_shared_from_this<SystemcoreResolverClient> {
   struct private_init {};
 
  public:
@@ -32,18 +32,18 @@ class SystemCoreResolverClient
     unsigned int port = 0;
   };
 
-  static std::shared_ptr<SystemCoreResolverClient> Create(
+  static std::shared_ptr<SystemcoreResolverClient> Create(
       wpi::net::uv::Loop& loop, wpi::util::Logger& logger, unsigned int port);
-  static std::shared_ptr<SystemCoreResolverClient> Create(
+  static std::shared_ptr<SystemcoreResolverClient> Create(
       wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
       std::string_view team, unsigned int port);
 
-  SystemCoreResolverClient(wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
+  SystemcoreResolverClient(wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
                            std::optional<std::string> team, unsigned int port,
                            const private_init&);
-  ~SystemCoreResolverClient();
-  SystemCoreResolverClient(const SystemCoreResolverClient&) = delete;
-  SystemCoreResolverClient& operator=(const SystemCoreResolverClient&) = delete;
+  ~SystemcoreResolverClient();
+  SystemcoreResolverClient(const SystemcoreResolverClient&) = delete;
+  SystemcoreResolverClient& operator=(const SystemcoreResolverClient&) = delete;
 
   void Close();
 

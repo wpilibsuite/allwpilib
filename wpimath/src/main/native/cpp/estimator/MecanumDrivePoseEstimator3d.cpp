@@ -8,6 +8,7 @@
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 #include "wpi/util/array.hpp"
 
@@ -26,7 +27,8 @@ wpi::math::MecanumDrivePoseEstimator3d::MecanumDrivePoseEstimator3d(
     const MecanumDriveWheelPositions& wheelPositions, const Pose3d& initialPose,
     const wpi::util::array<double, 4>& stateStdDevs,
     const wpi::util::array<double, 4>& visionMeasurementStdDevs)
-    : PoseEstimator3d(m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
-      m_odometryImpl(kinematics, gyroAngle, wheelPositions, initialPose) {
+    : PoseEstimator3d(MecanumDriveOdometry3d{kinematics, gyroAngle,
+                                             wheelPositions, initialPose},
+                      stateStdDevs, visionMeasurementStdDevs) {
   ResetPose(initialPose);
 }

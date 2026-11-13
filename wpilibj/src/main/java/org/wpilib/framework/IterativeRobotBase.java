@@ -4,7 +4,6 @@
 
 package org.wpilib.framework;
 
-import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -13,6 +12,7 @@ import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.system.Watchdog;
 import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.util.Alert;
 
 /**
  * IterativeRobotBase implements a specific type of robot program framework, extending the RobotBase
@@ -46,6 +46,21 @@ import org.wpilib.tunable.TunableRegistry;
  *   <li>utilityPeriodic()
  * </ul>
  *
+ * <p>Order within one loop iteration:
+ *
+ * <ol>
+ *   <li>{@link #driverStationConnected()}, once, the first time the DS is connected
+ *   <li>the exit function of the previous mode and the init function of the new mode, only on a
+ *       mode change
+ *   <li>the periodic function for the current mode ({@link #disabledPeriodic()}, {@link
+ *       #autonomousPeriodic()}, {@link #teleopPeriodic()}, or {@link #utilityPeriodic()})
+ *   <li>{@link #robotPeriodic()}
+ *   <li>{@link #simulationPeriodic()}, only in simulation
+ * </ol>
+ *
+ * <p>The mode-specific periodic function runs before {@link #robotPeriodic()}. Exactly one
+ * mode-specific periodic function runs per iteration.
+ *
  * <p>exit() functions -- each of the following functions is called once when the appropriate mode
  * is exited:
  *
@@ -61,6 +76,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   private RobotMode m_lastMode;
   private final double m_period;
   private final Watchdog m_watchdog;
+  private final Alert m_loopOverrunAlert;
   private boolean m_calledDsConnected;
 
   /**
@@ -70,7 +86,12 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   protected IterativeRobotBase(double period) {
     m_period = period;
-    m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
+    m_loopOverrunAlert =
+        new Alert(
+            "iterativerobot-loop-overrun",
+            "Loop time of " + m_period + "s overrun",
+            Alert.Level.MEDIUM);
+    m_watchdog = new Watchdog(period, () -> m_loopOverrunAlert.set(true));
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
@@ -132,7 +153,13 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_rpFirstRun = true;
 
-  /** Periodic code for all robot modes should go here. */
+  /**
+   * Periodic code for all robot modes should go here.
+   *
+   * <p>Runs after the current mode's periodic function ({@link #disabledPeriodic()}, {@link
+   * #autonomousPeriodic()}, {@link #teleopPeriodic()}, or {@link #utilityPeriodic()}) and before
+   * {@link #simulationPeriodic()}.
+   */
   public void robotPeriodic() {
     if (m_rpFirstRun) {
       System.out.println("Default robotPeriodic() method... Override me!");
@@ -145,7 +172,9 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Periodic simulation code should go here.
    *
-   * <p>This function is called in a simulated robot after user code executes.
+   * <p>This function is called in a simulated robot after user code executes. Within a loop
+   * iteration it runs last, after the current mode's periodic function and {@link
+   * #robotPeriodic()}.
    */
   public void simulationPeriodic() {
     if (m_spFirstRun) {
@@ -156,7 +185,12 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_dpFirstRun = true;
 
-  /** Periodic code for disabled mode should go here. */
+  /**
+   * Periodic code for disabled mode should go here.
+   *
+   * <p>Runs before {@link #robotPeriodic()} and {@link #simulationPeriodic()}. Never runs in the
+   * same iteration as another mode's periodic function.
+   */
   public void disabledPeriodic() {
     if (m_dpFirstRun) {
       System.out.println("Default disabledPeriodic() method... Override me!");
@@ -166,7 +200,11 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_apFirstRun = true;
 
-  /** Periodic code for autonomous mode should go here. */
+  /**
+   * Periodic code for autonomous mode should go here.
+   *
+   * <p>Runs before {@link #robotPeriodic()} and {@link #simulationPeriodic()}.
+   */
   public void autonomousPeriodic() {
     if (m_apFirstRun) {
       System.out.println("Default autonomousPeriodic() method... Override me!");
@@ -176,7 +214,11 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_tpFirstRun = true;
 
-  /** Periodic code for teleop mode should go here. */
+  /**
+   * Periodic code for teleop mode should go here.
+   *
+   * <p>Runs before {@link #robotPeriodic()} and {@link #simulationPeriodic()}.
+   */
   public void teleopPeriodic() {
     if (m_tpFirstRun) {
       System.out.println("Default teleopPeriodic() method... Override me!");
@@ -186,7 +228,11 @@ public abstract class IterativeRobotBase extends RobotBase {
 
   private boolean m_tmpFirstRun = true;
 
-  /** Periodic code for utility mode should go here. */
+  /**
+   * Periodic code for utility mode should go here.
+   *
+   * <p>Runs before {@link #robotPeriodic()} and {@link #simulationPeriodic()}.
+   */
   public void utilityPeriodic() {
     if (m_tmpFirstRun) {
       System.out.println("Default utilityPeriodic() method... Override me!");
@@ -333,10 +379,11 @@ public abstract class IterativeRobotBase extends RobotBase {
     // Flush NetworkTables
     NetworkTableInstance.getDefault().flushLocal();
 
-    // Warn on loop time overruns
+    // Warn on loop time overruns, and clear the alert once the loop is back on time
     if (m_watchdog.isExpired()) {
       m_watchdog.printEpochs();
     }
+    m_loopOverrunAlert.set(m_watchdog.isExpired());
   }
 
   /** Prints list of epochs added so far and their times. */
@@ -344,7 +391,9 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.printEpochs();
   }
 
-  private void printLoopOverrunMessage() {
-    DriverStationErrors.reportWarning("Loop time of " + m_period + "s overrun\n", false);
+  @Override
+  public void close() {
+    m_loopOverrunAlert.close();
+    super.close();
   }
 }

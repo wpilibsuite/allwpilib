@@ -4,12 +4,18 @@
 
 #pragma once
 
+#include <array>
+
+#include <Eigen/Core>
+
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/units/current.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"

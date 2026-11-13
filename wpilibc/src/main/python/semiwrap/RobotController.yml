@@ -10,7 +10,6 @@ classes:
     nodelete: true
     methods:
       GetSerialNumber:
-      GetComments:
       GetTeamNumber:
       SetTimeSource:
       GetTime:

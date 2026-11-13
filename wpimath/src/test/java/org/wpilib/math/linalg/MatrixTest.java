@@ -5,6 +5,7 @@
 package org.wpilib.math.linalg;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,6 +16,7 @@ import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N4;
 import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 
 class MatrixTest {
   @Test
@@ -189,5 +191,62 @@ class MatrixTest {
     assertEquals(MatBuilder.fill(Nat.N2(), Nat.N2(), -4.0, -4.0, -4.0, -4.0), mat1.minus(mat2));
 
     assertEquals(MatBuilder.fill(Nat.N2(), Nat.N2(), 6.0, 8.0, 10.0, 12.0), mat1.plus(mat2));
+  }
+
+  <R extends Num> void assertRankUpdatePass(Matrix<R, R> L, Matrix<R, N1> v, double sigma) {
+    var U = L.transpose();
+
+    // Lower triangular
+    var new_L = L.copy();
+    assertTrue(new_L.rankUpdate(v, sigma, true));
+    var new_A = new_L.times(new_L.transpose());
+    var expected_new_A = L.times(U).plus(v.times(v.transpose()).times(sigma));
+    assertTrue(expected_new_A.isEqual(new_A, 1E-9));
+
+    // Upper triangular
+    var new_U = U.copy();
+    assertTrue(new_U.rankUpdate(v, sigma, false));
+    new_A = new_U.transpose().times(new_U);
+    assertTrue(expected_new_A.isEqual(new_A, 1E-9));
+  }
+
+  <R extends Num> void assertRankUpdateFail(Matrix<R, R> L, Matrix<R, N1> v, double sigma) {
+    var U = L.transpose();
+
+    // Lower triangular
+    var updated_L = L.copy();
+    assertFalse(updated_L.rankUpdate(v, sigma, true));
+
+    // Upper triangular
+    var updated_U = U.copy();
+    assertFalse(updated_U.rankUpdate(v, sigma, false));
+  }
+
+  @Test
+  void testRankUpdate() {
+    // No-op
+    assertRankUpdatePass(Matrix.eye(Nat.N2()), VecBuilder.fill(0.0, 0.0), 1.0);
+    assertRankUpdatePass(Matrix.eye(Nat.N2()), VecBuilder.fill(1.0, 2.0), 0.0);
+
+    // Update
+    assertRankUpdatePass(
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 0.0, 1.0, 1.0), VecBuilder.fill(2.0, 3.0), 2.0);
+
+    // Downdate
+    assertRankUpdatePass(
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 0.0, 2.0, 2.0), VecBuilder.fill(1.0, 0.5), -1.0);
+
+    // Failed downdate
+    assertRankUpdateFail(
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 0.0, 2.0, 2.0), VecBuilder.fill(1.0, 1.0), -4.0);
+
+    // Semidefinite update
+    assertRankUpdatePass(new Matrix<>(Nat.N2(), Nat.N2()), VecBuilder.fill(1.0, 2.0), 1.0);
+
+    // Semidefinite downdate (has a valid downdate, but our algorithm can't recover it)
+    assertRankUpdateFail(
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 0.0, 0.0, 0.0),
+        VecBuilder.fill(Math.sqrt(0.5), 0.0),
+        -1.0);
   }
 }

@@ -185,23 +185,4 @@ class RoboRioSimTest {
     assertEquals(SERIAL_NUMBER_TRUNCATED, RoboRioSim.getSerialNumber());
     assertEquals(SERIAL_NUMBER_TRUNCATED, RobotController.getSerialNumber());
   }
-
-  @Test
-  void testComments() {
-    RoboRioSim.resetData();
-
-    final String COMMENTS = "Hello! These are comments in the roboRIO web interface!";
-
-    RoboRioSim.setComments(COMMENTS);
-    assertEquals(COMMENTS, RoboRioSim.getComments());
-    assertEquals(COMMENTS, RobotController.getComments());
-
-    final String COMMENTS_OVERFLOW =
-        "Hello! These are comments in the roboRIO web interface!"
-            + " This comment exceeds 64 characters!";
-    final String COMMENTS_TRUNCATED = COMMENTS_OVERFLOW.substring(0, 64);
-    RoboRioSim.setComments(COMMENTS_OVERFLOW);
-    assertEquals(COMMENTS_TRUNCATED, RoboRioSim.getComments());
-    assertEquals(COMMENTS_TRUNCATED, RobotController.getComments());
-  }
 }

@@ -1,0 +1,43 @@
+--- a/python/private/python_bootstrap_template.txt
++++ b/python/private/python_bootstrap_template.txt
+@@ -402,7 +402,10 @@
+ 
+     # Windows requires supporting .dll files in the venv bin dir, but
+     # they aren't known in advance when the interpreter is resolved at runtime.
+-    if RESOLVE_PYTHON_BINARY_AT_RUNTIME and IS_WINDOWS:
++    # A python.exe that had to be hard linked or copied rather than symlinked
++    # does not find them next to the real one either.
++    if IS_WINDOWS and (RESOLVE_PYTHON_BINARY_AT_RUNTIME or
++                       not os.path.islink(venv_python_exe)):
+         files = os.listdir(python_home)
+         for f in files:
+             if not f.endswith((".dll", ".pdb")): continue
+@@ -567,6 +570,28 @@
+     os.symlink(to, from_, target_is_directory=os.path.isdir(to))
+   except FileExistsError:
+     pass
++  except OSError as e:
++    # ERROR_PRIVILEGE_NOT_HELD: symlinks on Windows need Developer Mode or
++    # SeCreateSymbolicLinkPrivilege. Fall back to what needs neither.
++    if not IS_WINDOWS or getattr(e, "winerror", None) != 1314:
++      raise
++    _link_without_symlink_privilege(from_=from_, to=to)
++
++def _link_without_symlink_privilege(*, from_, to):
++  # A relative symlink target is relative to the link's directory.
++  to = normpath(join(dirname(from_), to))
++  if os.path.lexists(from_):
++    return
++  if os.path.isdir(to):
++    # A junction needs no privilege, and shutil.rmtree removes one
++    # without descending into it.
++    import _winapi
++    _winapi.CreateJunction(to, from_)
++    return
++  try:
++    os.link(to, from_)
++  except OSError:
++    shutil.copy2(to, from_)
+ 
+ 
+ def main():

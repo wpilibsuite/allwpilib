@@ -40,14 +40,6 @@ public final class HALUtil extends JNIWrapper {
   public static native String getSerialNumber();
 
   /**
-   * Returns the comments from the Systemcore web interface.
-   *
-   * @return The comments string.
-   * @see "HAL_GetComments"
-   */
-  public static native String getComments();
-
-  /**
    * Returns the team number configured for the robot controller.
    *
    * @return team number, or 0 if not found.

@@ -4,7 +4,7 @@
 
 /**
  * Defines APIs for streaming cameras from the robot for use by dashboards and coprocessors and for
- * running OpenCV pipelines. Note that vision processing on the SystemCore may cause decreased
+ * running OpenCV pipelines. Note that vision processing on the Systemcore may cause decreased
  * performance of the main robot program.
  */
 open module wpilib.cameraserver {

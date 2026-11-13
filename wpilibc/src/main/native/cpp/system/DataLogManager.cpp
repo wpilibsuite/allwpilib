@@ -60,7 +60,7 @@ struct Thread final : public wpi::util::SafeThread {
   wpi::log::StringLogEntry m_messageLog;
   wpi::util::Alert m_internalStorageAlert{
       "DataLogManager", "internalStorage",
-      "DataLogManager: Logging to SystemCore internal storage. Attach a USB "
+      "DataLogManager: Logging to Systemcore internal storage. Attach a USB "
       "drive to store logs externally.",
       wpi::util::Alert::Level::LOW};
   wpi::util::Alert m_freeSpaceAlert{"DataLogManager", "lowSpace", "",
