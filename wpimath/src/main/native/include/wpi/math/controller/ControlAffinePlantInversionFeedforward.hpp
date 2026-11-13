@@ -5,6 +5,7 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 
 #include <Eigen/QR>
 
@@ -56,10 +57,7 @@ class ControlAffinePlantInversionFeedforward {
   ControlAffinePlantInversionFeedforward(
       std::function<StateVector(const StateVector&, const InputVector&)> f,
       wpi::units::second_t dt)
-      : m_B(Matrixd<States, Inputs>::Zero()),
-        m_recomputeB(true),
-        m_dt(dt),
-        m_f(f) {
+      : m_dt(dt), m_f(f) {
     Reset();
   }
 
@@ -75,7 +73,7 @@ class ControlAffinePlantInversionFeedforward {
   ControlAffinePlantInversionFeedforward(
       std::function<StateVector(const StateVector&)> f,
       const Matrixd<States, Inputs>& B, wpi::units::second_t dt)
-      : m_B(B), m_recomputeB(false), m_dt(dt) {
+      : m_B(B), m_dt(dt) {
     m_f = [=](const StateVector& x, const InputVector& u) -> StateVector {
       return f(x);
     };
@@ -166,23 +164,23 @@ class ControlAffinePlantInversionFeedforward {
   InputVector Calculate(const StateVector& r, const StateVector& nextR) {
     StateVector rDot = (nextR - r) / m_dt.value();
 
-    if (m_recomputeB) {
-      m_B = NumericalJacobianU<States, States, Inputs>(m_f, r,
-                                                       InputVector::Zero());
-    }
-
     // ṙ = f(r) + Bu
     // Bu = ṙ − f(r)
     // u = B⁺(ṙ − f(r))
-    m_uff = m_B.householderQr().solve(rDot - m_f(r, InputVector::Zero()));
+    Matrixd<States, Inputs> B =
+        m_B ? m_B.value()
+            : NumericalJacobianU<States, States, Inputs>(m_f, r,
+                                                         InputVector::Zero());
+    m_uff = B.householderQr().solve(rDot - m_f(r, InputVector::Zero()));
 
     m_r = nextR;
     return m_uff;
   }
 
  private:
-  Matrixd<States, Inputs> m_B;
-  bool m_recomputeB;
+  /// Input matrix, or std::nullopt if it's recomputed from f(x, u) at the
+  /// current reference every timestep.
+  std::optional<Matrixd<States, Inputs>> m_B;
 
   wpi::units::second_t m_dt;
 

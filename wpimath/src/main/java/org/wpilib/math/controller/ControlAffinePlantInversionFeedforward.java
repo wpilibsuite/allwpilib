@@ -38,8 +38,8 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
   /** The computed feedforward. */
   private Matrix<Inputs, N1> m_uff;
 
-  private Matrix<States, Inputs> m_B;
-  private final boolean m_recomputeB;
+  /** Input matrix, or null if it's recomputed from f(x, u) at the current reference every call. */
+  private final Matrix<States, Inputs> m_B;
 
   private final Nat<States> m_states;
 
@@ -69,8 +69,7 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
     this.m_states = states;
     this.m_inputs = inputs;
 
-    this.m_B = new Matrix<>(states, inputs);
-    this.m_recomputeB = true;
+    this.m_B = null;
 
     m_r = new Matrix<>(states, Nat.N1());
     m_uff = new Matrix<>(inputs, Nat.N1());
@@ -101,7 +100,6 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
 
     this.m_f = (x, u) -> f.apply(x);
     this.m_B = B;
-    this.m_recomputeB = false;
 
     m_r = new Matrix<>(states, Nat.N1());
     m_uff = new Matrix<>(inputs, Nat.N1());
@@ -188,16 +186,15 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> r, Matrix<States, N1> nextR) {
     var rDot = nextR.minus(r).div(m_dt);
 
-    if (m_recomputeB) {
-      m_B =
-          NumericalJacobian.numericalJacobianU(
-              m_states, m_inputs, m_f, r, new Matrix<>(m_inputs, Nat.N1()));
-    }
-
     // ṙ = f(r) + Bu
     // Bu = ṙ − f(r)
     // u = B⁺(ṙ − f(r))
-    m_uff = m_B.solve(rDot.minus(m_f.apply(r, new Matrix<>(m_inputs, Nat.N1()))));
+    var B =
+        m_B != null
+            ? m_B
+            : NumericalJacobian.numericalJacobianU(
+                m_states, m_inputs, m_f, r, new Matrix<>(m_inputs, Nat.N1()));
+    m_uff = B.solve(rDot.minus(m_f.apply(r, new Matrix<>(m_inputs, Nat.N1()))));
 
     m_r = nextR;
     return m_uff;
