@@ -7,12 +7,7 @@ package org.wpilib.driverstation.internal;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.concurrent.locks.ReentrantLock;
-import org.wpilib.datalog.BooleanArrayLogEntry;
 import org.wpilib.datalog.DataLog;
-import org.wpilib.datalog.FloatArrayLogEntry;
-import org.wpilib.datalog.IntegerArrayLogEntry;
-import org.wpilib.datalog.StringLogEntry;
-import org.wpilib.datalog.StructLogEntry;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.POVDirection;
 import org.wpilib.driverstation.RobotState;
@@ -33,7 +28,7 @@ public final class DriverStationBackend {
   private static final long[] m_metadataCache = new long[7];
   private static final float[] m_touchpadFingersCache = new float[8];
 
-  private static int availableToCount(long available) {
+  static int availableToCount(long available) {
     // Top bit has to be set
     if (available < 0) {
       return 64;
@@ -79,12 +74,12 @@ public final class DriverStationBackend {
     }
   }
 
-  private static final class HALJoystickButtons {
+  static final class HALJoystickButtons {
     long m_buttons;
     long m_available;
   }
 
-  private static class HALJoystickAxes {
+  static class HALJoystickAxes {
     final float[] m_axes;
     int m_available;
 
@@ -104,7 +99,7 @@ public final class DriverStationBackend {
     }
   }
 
-  private static class HALJoystickPOVs {
+  static class HALJoystickPOVs {
     final byte[] m_povs;
     int m_available;
 
@@ -114,160 +109,6 @@ public final class DriverStationBackend {
         m_povs[i] = 0;
       }
     }
-  }
-
-  private static class JoystickLogSender {
-    JoystickLogSender(DataLog log, int stick, long timestamp) {
-      m_stick = stick;
-
-      m_logButtons = new BooleanArrayLogEntry(log, "DS:joystick" + stick + "/buttons", timestamp);
-      m_logAxes = new FloatArrayLogEntry(log, "DS:joystick" + stick + "/axes", timestamp);
-      m_logPOVs = new IntegerArrayLogEntry(log, "DS:joystick" + stick + "/povs", timestamp);
-
-      appendButtons(m_joystickButtons[m_stick], timestamp);
-      appendAxes(m_joystickAxes[m_stick], timestamp);
-      appendPOVs(m_joystickPOVs[m_stick], timestamp);
-    }
-
-    public void send(long timestamp) {
-      HALJoystickButtons buttons = m_joystickButtons[m_stick];
-      if (buttons.m_available != m_prevButtons.m_available
-          || buttons.m_buttons != m_prevButtons.m_buttons) {
-        appendButtons(buttons, timestamp);
-      }
-
-      HALJoystickAxes axes = m_joystickAxes[m_stick];
-      int available = axes.m_available;
-      boolean needToLog = false;
-      if (available != m_prevAxes.m_available) {
-        needToLog = true;
-      } else {
-        for (int i = 0; i < m_prevAxes.m_axes.length; i++) {
-          if (axes.m_axes[i] != m_prevAxes.m_axes[i]) {
-            needToLog = true;
-            break;
-          }
-        }
-      }
-      if (needToLog) {
-        appendAxes(axes, timestamp);
-      }
-
-      HALJoystickPOVs povs = m_joystickPOVs[m_stick];
-      available = m_joystickPOVs[m_stick].m_available;
-      needToLog = false;
-      if (available != m_prevPOVs.m_available) {
-        needToLog = true;
-      } else {
-        for (int i = 0; i < m_prevPOVs.m_povs.length; i++) {
-          if (povs.m_povs[i] != m_prevPOVs.m_povs[i]) {
-            needToLog = true;
-            break;
-          }
-        }
-      }
-      if (needToLog) {
-        appendPOVs(povs, timestamp);
-      }
-    }
-
-    void appendButtons(HALJoystickButtons buttons, long timestamp) {
-      int count = availableToCount(buttons.m_available);
-      if (m_sizedButtons == null || m_sizedButtons.length != count) {
-        m_sizedButtons = new boolean[count];
-      }
-      long buttonsValue = buttons.m_buttons;
-      for (int i = 0; i < count; i++) {
-        m_sizedButtons[i] = (buttonsValue & (1L << i)) != 0;
-      }
-      m_logButtons.append(m_sizedButtons, timestamp);
-      m_prevButtons.m_available = buttons.m_available;
-      m_prevButtons.m_buttons = buttons.m_buttons;
-    }
-
-    void appendAxes(HALJoystickAxes axes, long timestamp) {
-      int count = availableToCount(axes.m_available);
-      if (m_sizedAxes == null || m_sizedAxes.length != count) {
-        m_sizedAxes = new float[count];
-      }
-      System.arraycopy(axes.m_axes, 0, m_sizedAxes, 0, count);
-      m_logAxes.append(m_sizedAxes, timestamp);
-      m_prevAxes.m_available = axes.m_available;
-      System.arraycopy(axes.m_axes, 0, m_prevAxes.m_axes, 0, count);
-    }
-
-    void appendPOVs(HALJoystickPOVs povs, long timestamp) {
-      int count = availableToCount(povs.m_available);
-      if (m_sizedPOVs == null || m_sizedPOVs.length != count) {
-        m_sizedPOVs = new long[count];
-      }
-      for (int i = 0; i < count; i++) {
-        m_sizedPOVs[i] = povs.m_povs[i];
-      }
-      m_logPOVs.append(m_sizedPOVs, timestamp);
-      m_prevPOVs.m_available = povs.m_available;
-      System.arraycopy(povs.m_povs, 0, m_prevPOVs.m_povs, 0, count);
-    }
-
-    final int m_stick;
-    boolean[] m_sizedButtons;
-    float[] m_sizedAxes;
-    long[] m_sizedPOVs;
-    final HALJoystickButtons m_prevButtons = new HALJoystickButtons();
-    final HALJoystickAxes m_prevAxes = new HALJoystickAxes(DriverStationJNI.MAX_JOYSTICK_AXES);
-    final HALJoystickPOVs m_prevPOVs = new HALJoystickPOVs(DriverStationJNI.MAX_JOYSTICK_POVS);
-    final BooleanArrayLogEntry m_logButtons;
-    final FloatArrayLogEntry m_logAxes;
-    final IntegerArrayLogEntry m_logPOVs;
-  }
-
-  private static class DataLogSender {
-    DataLogSender(DataLog log, boolean logJoysticks, long timestamp) {
-      m_logControlWord =
-          StructLogEntry.create(log, "DS:controlWord", ControlWord.struct, timestamp);
-
-      // append initial control word value
-      m_logControlWord.append(m_controlWord, timestamp);
-      m_oldControlWord.update(m_controlWord);
-
-      // append initial opmode value
-      m_logOpMode = new StringLogEntry(log, "DS:opMode", timestamp);
-      m_logOpMode.append(RobotState.getOpMode(), timestamp);
-
-      if (logJoysticks) {
-        m_joysticks = new JoystickLogSender[JOYSTICK_PORTS];
-        for (int i = 0; i < JOYSTICK_PORTS; i++) {
-          m_joysticks[i] = new JoystickLogSender(log, i, timestamp);
-        }
-      } else {
-        m_joysticks = new JoystickLogSender[0];
-      }
-    }
-
-    public void send(long timestamp) {
-      // append control word value changes
-      if (!m_controlWord.equals(m_oldControlWord)) {
-        // append opmode value changes
-        long opModeId = m_controlWord.getOpModeId();
-        if (opModeId != m_oldControlWord.getOpModeId()) {
-          m_logOpMode.append(RobotState.getOpMode(), timestamp);
-        }
-
-        m_logControlWord.append(m_controlWord, timestamp);
-        m_oldControlWord.update(m_controlWord);
-      }
-
-      // append joystick value changes
-      for (JoystickLogSender joystick : m_joysticks) {
-        joystick.send(timestamp);
-      }
-    }
-
-    final ControlWord m_oldControlWord = new ControlWord();
-    final StructLogEntry<ControlWord> m_logControlWord;
-    final StringLogEntry m_logOpMode;
-
-    final JoystickLogSender[] m_joysticks;
   }
 
   // Joystick User Data
@@ -942,7 +783,8 @@ public final class DriverStationBackend {
 
     m_matchDataSender.sendMatchData(m_controlWord, m_gameDataCache);
     if (dataLogSender != null) {
-      dataLogSender.send(WPIUtilJNI.now());
+      dataLogSender.send(
+          m_controlWord, m_joystickButtons, m_joystickAxes, m_joystickPOVs, WPIUtilJNI.now());
     }
   }
 
@@ -975,7 +817,15 @@ public final class DriverStationBackend {
     m_cacheDataMutex.lock();
     try {
       if (m_dataLogSender == null) {
-        m_dataLogSender = new DataLogSender(log, logJoysticks, WPIUtilJNI.now());
+        m_dataLogSender =
+            new DataLogSender(
+                log,
+                logJoysticks,
+                m_controlWord,
+                m_joystickButtons,
+                m_joystickAxes,
+                m_joystickPOVs,
+                WPIUtilJNI.now());
       }
     } finally {
       m_cacheDataMutex.unlock();

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <bit>
 #include <optional>
 #include <string>
 
@@ -28,6 +29,10 @@ class Color;
 namespace wpi::internal {
 
 using wpi::hal::RobotMode;
+constexpr int availableToCount(uint64_t available) {
+  return 64 - std::countl_zero(available);
+}
+
 enum class JoystickResourceAlert { BUTTON, AXIS, POV };
 
 struct JoystickAlertState {
@@ -58,6 +63,7 @@ struct JoystickAlerts {
   int touchpadFingerAlertTouchpad = 0;
   int touchpadFingerAlertFinger = 0;
 };
+
 /**
  * Provide access to the network communication data to / from the Driver
  * Station.
