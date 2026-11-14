@@ -1,8 +1,13 @@
+import org.gradle.internal.os.OperatingSystem
+
 if (project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
 apply plugin: 'cpp'
+if (OperatingSystem.current().isMacOsX()) {
+    apply plugin: 'objective-cpp'
+}
 apply plugin: 'visual-studio'
 apply plugin: 'org.wpilib.NativeUtils'
 
@@ -37,6 +42,17 @@ model {
                     return
                 }
                 project.addLibSdlGpuDependency(it)
+                if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.objcppCompiler.args << '-fobjc-arc'
+                    it.sources {
+                        wpiguiMacOSObjectiveCpp(ObjectiveCppSourceSet) {
+                            source {
+                                srcDirs 'src/main/native/macOS'
+                                include '**/*.mm'
+                            }
+                        }
+                    }
+                }
                 it.sources.each {
                     it.exportedHeaders {
                         srcDirs 'src/main/native/include'

@@ -42,6 +42,12 @@
 
 using namespace wpi::gui;
 
+#ifdef __APPLE__
+namespace wpi::gui {
+void ConfigureMetalSwapchain(SDL_Window* window);
+}  // namespace wpi::gui
+#endif
+
 namespace wpi {
 
 Context* gui::gContext;
@@ -543,6 +549,10 @@ static bool TryInitGPURenderer() {
       return false;
     }
   }
+
+#ifdef __APPLE__
+  ConfigureMetalSwapchain(gContext->window);
+#endif
 
   if (!ImGui_ImplSDL3_InitForSDLGPU(gContext->window)) {
     ShutdownGPURenderer();
