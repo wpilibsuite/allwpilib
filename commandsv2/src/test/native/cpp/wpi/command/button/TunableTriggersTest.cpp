@@ -14,9 +14,11 @@
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/Commands.hpp"
 #include "wpi/event/EventLoop.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
 #include "wpi/tunables/CustomTunable.hpp"
 #include "wpi/tunables/MockTunableBackend.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/TunableTable.hpp"
 #include "wpi/tunables/Tunables.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/tunable.hpp"
@@ -55,6 +57,10 @@ static_assert(wpi::cmd::detail::TuneRevisionSource<
               const wpi::tunables::Tunable<CustomTriggerValue>>);
 static_assert(wpi::cmd::detail::TuneRevisionSource<
               wpi::tunables::Tunable<wpi::units::meter_t>>);
+static_assert(
+    wpi::cmd::detail::TuneRevisionSource<wpi::tunables::ComplexTunable>);
+static_assert(
+    wpi::cmd::detail::TuneRevisionSource<const wpi::tunables::ComplexTunable>);
 
 class TunableTriggersTest : public wpi::cmd::CommandTestBase {
  public:
@@ -131,6 +137,64 @@ TEST_CASE_METHOD(TunableTriggersTest, "TunableTriggersTest LocalWritesInactive",
   loop.Poll();
 
   CHECK_FALSE(trigger.Get());
+}
+
+TEST_CASE_METHOD(TunableTriggersTest,
+                 "TunableTriggersTest ComplexChildrenActivateParent",
+                 "[commandsv2][command]") {
+  struct Child : wpi::tunables::ComplexTunable {
+    wpi::tunables::TunableDouble gain{1.0};
+
+    void PublishTunable(wpi::tunables::TunableTable& table) override {
+      table.Publish("gain", gain);
+    }
+  };
+  struct Parent : wpi::tunables::ComplexTunable {
+    wpi::tunables::TunableDouble gain{1.0};
+    Child child;
+
+    void PublishTunable(wpi::tunables::TunableTable& table) override {
+      table.Publish("gain", gain);
+      table.Publish("child", child);
+    }
+  };
+
+  wpi::EventLoop loop;
+  Parent parent;
+  wpi::tunables::Publish("parent", parent);
+  const wpi::tunables::ComplexTunable& complex = parent;
+  auto parentTrigger = wpi::cmd::TunableTriggers::Tuned(&loop, complex);
+  auto childTrigger = wpi::cmd::TunableTriggers::Tuned(&loop, parent.child);
+
+  loop.Poll();
+  CHECK_FALSE(parentTrigger.Get());
+  CHECK_FALSE(childTrigger.Get());
+
+  Tune("/parent/gain", 2.0);
+  loop.Poll();
+  CHECK(parentTrigger.Get());
+  CHECK_FALSE(childTrigger.Get());
+
+  loop.Poll();
+  CHECK_FALSE(parentTrigger.Get());
+  CHECK_FALSE(childTrigger.Get());
+
+  Tune("/parent/child/gain", 3.0);
+  loop.Poll();
+  CHECK(parentTrigger.Get());
+  CHECK(childTrigger.Get());
+
+  Tune("/parent/child/gain", 3.0);
+  loop.Poll();
+  CHECK(parentTrigger.Get());
+  CHECK(childTrigger.Get());
+
+  parent.gain = 4.0;
+  parent.child.gain = 5.0;
+  wpi::tunables::TunableRegistry::Update();
+  loop.Poll();
+  CHECK_FALSE(parentTrigger.Get());
+  CHECK_FALSE(childTrigger.Get());
 }
 
 TEST_CASE_METHOD(TunableTriggersTest,

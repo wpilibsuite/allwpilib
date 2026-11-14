@@ -73,6 +73,60 @@ def test_local_writes_do_not_activate_trigger(backend):
     assert not trigger.get_as_boolean()
 
 
+def test_complex_children_activate_parent(backend):
+    class Child(tunables.ComplexTunable):
+        def __init__(self) -> None:
+            self.gain = tunables.Tunable(1.0)
+
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
+            table.publish("gain", self.gain)
+
+    class Parent(tunables.ComplexTunable):
+        def __init__(self) -> None:
+            self.gain = tunables.Tunable(1.0)
+            self.child = Child()
+
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
+            table.publish("gain", self.gain)
+            table.publish("child", self.child)
+
+    loop = wpilib.EventLoop()
+    parent = Parent()
+    tunables.publish("parent", parent)
+    parent_trigger = commands2.button.TunableTriggers.tuned(loop, parent)
+    child_trigger = commands2.button.TunableTriggers.tuned(loop, parent.child)
+
+    loop.poll()
+    assert not parent_trigger.get_as_boolean()
+    assert not child_trigger.get_as_boolean()
+
+    tune(backend, "/parent/gain", 2.0)
+    loop.poll()
+    assert parent_trigger.get_as_boolean()
+    assert not child_trigger.get_as_boolean()
+
+    loop.poll()
+    assert not parent_trigger.get_as_boolean()
+    assert not child_trigger.get_as_boolean()
+
+    tune(backend, "/parent/child/gain", 3.0)
+    loop.poll()
+    assert parent_trigger.get_as_boolean()
+    assert child_trigger.get_as_boolean()
+
+    tune(backend, "/parent/child/gain", 3.0)
+    loop.poll()
+    assert parent_trigger.get_as_boolean()
+    assert child_trigger.get_as_boolean()
+
+    parent.gain.set(4.0)
+    parent.child.gain.set(5.0)
+    tunables.TunableRegistry.update()
+    loop.poll()
+    assert not parent_trigger.get_as_boolean()
+    assert not child_trigger.get_as_boolean()
+
+
 def test_multiple_bindings_repeated_reads_and_independent_observers(backend):
     loop = wpilib.EventLoop()
     gain = tunables.add_double("gain", 1.0)

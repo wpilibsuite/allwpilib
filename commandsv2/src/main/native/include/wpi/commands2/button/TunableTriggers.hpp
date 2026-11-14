@@ -41,6 +41,9 @@ concept TuneRevisionSource =
  * backend-applied tunes between polls coalesce into one true poll, and local
  * writes do not activate the trigger.
  *
+ * For a complex tunable, tuning any published child or descendant activates
+ * the trigger.
+ *
  * Use Trigger::IfTrue() to react to every poll containing a tune.
  * Trigger::OnTrue() keeps ordinary rising-edge semantics and merges consecutive
  * true polls.

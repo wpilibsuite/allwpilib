@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 from typing import overload
 
-from tunables import Tunable, TunableRegistry
+from tunables import ComplexTunable, Tunable, TunableRegistry
 
 from wpilib import EventLoop
 
@@ -19,6 +19,8 @@ class TunableTriggers:
     during the current event-loop poll. It initially reports ``False``, including when
     the tunable was tuned before observation began. Multiple backend-applied tunes between
     polls coalesce into one ``True`` poll, and local writes do not activate the trigger.
+
+    For a complex tunable, tuning any published child or descendant activates the trigger.
 
     Use :meth:`Trigger.if_true` to react to every poll containing a tune.
     :meth:`Trigger.on_true` keeps ordinary rising-edge semantics and merges consecutive
@@ -42,7 +44,7 @@ class TunableTriggers:
 
     @overload
     @staticmethod
-    def tuned(tunable: Tunable) -> Trigger:
+    def tuned(tunable: Tunable | ComplexTunable) -> Trigger:
         """
         Creates a trigger for detecting backend-applied tunes to a tunable.
 
@@ -55,7 +57,7 @@ class TunableTriggers:
 
     @overload
     @staticmethod
-    def tuned(loop: EventLoop, tunable: Tunable) -> Trigger:
+    def tuned(loop: EventLoop, tunable: Tunable | ComplexTunable) -> Trigger:
         """
         Creates a trigger for detecting backend-applied tunes to a tunable.
 
@@ -84,7 +86,9 @@ class TunableTriggers:
         :returns: a trigger that is true for polls where this observer detected a new tuning revision
         """
 
-        def init_loop_tunable(loop: EventLoop, tunable: Tunable) -> Trigger:
+        def init_loop_tunable(
+            loop: EventLoop, tunable: Tunable | ComplexTunable
+        ) -> Trigger:
             if loop is None:
                 raise TypeError("loop cannot be None")
 
@@ -100,7 +104,7 @@ class TunableTriggers:
 
             return Trigger(loop, lambda: state.tuned)
 
-        def init_tunable(tunable: Tunable) -> Trigger:
+        def init_tunable(tunable: Tunable | ComplexTunable) -> Trigger:
             return init_loop_tunable(
                 CommandScheduler.get_instance().get_default_button_loop(), tunable
             )
@@ -122,8 +126,8 @@ class TunableTriggers:
 
         raise TypeError(f"""
 TypeError: TunableTriggers.tuned(): incompatible function arguments. The following argument types are supported:
-    1. (tunable: Tunable)
-    2. (loop: EventLoop, tunable: Tunable)
+    1. (tunable: Tunable | ComplexTunable)
+    2. (loop: EventLoop, tunable: Tunable | ComplexTunable)
 
 Invoked with: {format_args_kwargs(*args, **kwargs)}
 """)
