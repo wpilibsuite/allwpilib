@@ -781,8 +781,8 @@ public abstract class OpModeRobot extends RobotBase {
         m_currentOpMode.disabledPeriodic();
         m_watchdog.addEpoch("opMode.disabledPeriodic()");
       }
-    } else if (m_currentOpMode != null) {  // Call enabledPeriodic when enabled 
-                                           // with a current opmode
+    } else if (m_currentOpMode != null) {
+      // Call enabledPeriodic when enabled with a current opmode
       enabledPeriodic();
       m_watchdog.addEpoch("enabledPeriodic()");
     }
