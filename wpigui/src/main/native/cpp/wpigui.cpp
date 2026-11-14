@@ -8,13 +8,12 @@
 
 #include <algorithm>
 #include <cctype>
-#include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
 #include <string>
-#include <thread>
 #include <utility>
 
 #define SDL_MAIN_HANDLED
@@ -43,6 +42,12 @@
 
 using namespace wpi::gui;
 
+#ifdef __APPLE__
+namespace wpi::gui {
+void ConfigureMetalSwapchain(SDL_Window* window);
+}  // namespace wpi::gui
+#endif
+
 namespace wpi {
 
 Context* gui::gContext;
@@ -55,11 +60,19 @@ struct RendererContext {
   uint32_t textureTransferBufferSize = 0;
   SDL_Renderer* sdlRenderer = nullptr;
   RendererBackend backend = RendererBackend::NONE;
+  SDL_GPUPresentMode presentMode = SDL_GPU_PRESENTMODE_VSYNC;
   bool gpuWindowClaimed = false;
   bool imguiRendererInitialized = false;
 };
 
 RendererContext gRendererContext;
+
+struct GPUFrame {
+  SDL_GPUCommandBuffer* commandBuffer = nullptr;
+  SDL_GPUTexture* swapchainTexture = nullptr;
+  uint32_t swapchainWidth = 0;
+  uint32_t swapchainHeight = 0;
+};
 
 constexpr const char* WPIGUI_FORCE_RENDERER_ENV = "WPIGUI_FORCE_RENDERER";
 constexpr const char* WPIGUI_SDL_GPU_DEBUG_ENV = "WPIGUI_SDL_GPU_DEBUG";
@@ -170,6 +183,25 @@ static void Update2DRendererVSync() {
 static void SetFPSInternal(int fps) {
   gContext->fps = fps;
   Update2DRendererVSync();
+}
+
+static double GetFrameRateLimit() {
+  if (gContext->fps != 0 || gRendererContext.backend != RendererBackend::GPU ||
+      gRendererContext.presentMode != SDL_GPU_PRESENTMODE_MAILBOX) {
+    return gContext->fps;
+  }
+
+  // Mailbox can render faster than the display refreshes. Query each frame to
+  // follow changes to the window's display and its refresh rate.
+  SDL_DisplayID display = SDL_GetDisplayForWindow(gContext->window);
+  const SDL_DisplayMode* mode =
+      display ? SDL_GetCurrentDisplayMode(display) : nullptr;
+  if (mode && mode->refresh_rate > 0.0f && std::isfinite(mode->refresh_rate)) {
+    // Leave some headroom for timer jitter when pacing independently of vblank.
+    return mode->refresh_rate * 1.05;
+  }
+
+  return 60.0 * 1.05;  // fallback
 }
 
 static SDL_GPUTextureFormat SDLGPUTextureFormat(PixelFormat format) {
@@ -484,6 +516,12 @@ static bool TryInitGPURenderer() {
     return false;
   }
 
+  // Try to limit queued frames to reduce input-to-display latency.
+  if (!SDL_SetGPUAllowedFramesInFlight(gContext->gpuDevice, 1)) {
+    std::fprintf(stderr, "SDL_SetGPUAllowedFramesInFlight failed: %s\n",
+                 SDL_GetError());
+  }
+
   if (!SDL_ClaimWindowForGPUDevice(gContext->gpuDevice, gContext->window)) {
     std::fprintf(stderr, "SDL_ClaimWindowForGPUDevice failed: %s\n",
                  SDL_GetError());
@@ -491,9 +529,30 @@ static bool TryInitGPURenderer() {
     return false;
   }
   gRendererContext.gpuWindowClaimed = true;
-  SDL_SetGPUSwapchainParameters(gContext->gpuDevice, gContext->window,
-                                SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
-                                SDL_GPU_PRESENTMODE_VSYNC);
+
+  // Mailbox presents the newest frame without queuing older frames for display.
+  // Claiming the window already creates an SDR VSync swapchain.
+  SDL_GPUPresentMode presentMode = SDL_GPU_PRESENTMODE_VSYNC;
+  if (SDL_WindowSupportsGPUPresentMode(gContext->gpuDevice, gContext->window,
+                                       SDL_GPU_PRESENTMODE_MAILBOX)) {
+    if (SDL_SetGPUSwapchainParameters(gContext->gpuDevice, gContext->window,
+                                      SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
+                                      SDL_GPU_PRESENTMODE_MAILBOX)) {
+      presentMode = SDL_GPU_PRESENTMODE_MAILBOX;
+    } else if (!SDL_SetGPUSwapchainParameters(gContext->gpuDevice,
+                                              gContext->window,
+                                              SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
+                                              SDL_GPU_PRESENTMODE_VSYNC)) {
+      std::fprintf(stderr, "SDL_SetGPUSwapchainParameters failed: %s\n",
+                   SDL_GetError());
+      ShutdownGPURenderer();
+      return false;
+    }
+  }
+
+#ifdef __APPLE__
+  ConfigureMetalSwapchain(gContext->window);
+#endif
 
   if (!ImGui_ImplSDL3_InitForSDLGPU(gContext->window)) {
     ShutdownGPURenderer();
@@ -506,7 +565,7 @@ static bool TryInitGPURenderer() {
       SDL_GetGPUSwapchainTextureFormat(gContext->gpuDevice, gContext->window);
   initInfo.MSAASamples = SDL_GPU_SAMPLECOUNT_1;
   initInfo.SwapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
-  initInfo.PresentMode = SDL_GPU_PRESENTMODE_VSYNC;
+  initInfo.PresentMode = presentMode;
   if (!ImGui_ImplSDLGPU3_Init(&initInfo)) {
     ImGui_ImplSDL3_Shutdown();
     ShutdownGPURenderer();
@@ -514,6 +573,7 @@ static bool TryInitGPURenderer() {
   }
 
   gRendererContext.imguiRendererInitialized = true;
+  gRendererContext.presentMode = presentMode;
   gRendererContext.backend = RendererBackend::GPU;
   return true;
 }
@@ -587,35 +647,38 @@ static void BuildImGuiFrame() {
   ImGui::Render();
 }
 
-static void RenderGPUFrame(ImDrawData* drawData) {
-  bool isMinimized =
-      drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f;
-  if (isMinimized) {
+static GPUFrame AcquireGPUFrame() {
+  GPUFrame frame;
+  frame.commandBuffer = SDL_AcquireGPUCommandBuffer(gContext->gpuDevice);
+  if (!frame.commandBuffer) {
+    return frame;
+  }
+
+  if (!SDL_WaitAndAcquireGPUSwapchainTexture(
+          frame.commandBuffer, gContext->window, &frame.swapchainTexture,
+          &frame.swapchainWidth, &frame.swapchainHeight)) {
+    SDL_CancelGPUCommandBuffer(frame.commandBuffer);
+    return {};
+  }
+  return frame;
+}
+
+static void RenderGPUFrame(ImDrawData* drawData, const GPUFrame& frame) {
+  if (!frame.commandBuffer) {
     return;
   }
 
-  SDL_GPUCommandBuffer* commandBuffer =
-      SDL_AcquireGPUCommandBuffer(gContext->gpuDevice);
-  if (!commandBuffer) {
-    return;
-  }
-
-  SDL_GPUTexture* swapchainTexture = nullptr;
-  uint32_t swapchainWidth = 0;
-  uint32_t swapchainHeight = 0;
-  if (!SDL_WaitAndAcquireGPUSwapchainTexture(commandBuffer, gContext->window,
-                                             &swapchainTexture, &swapchainWidth,
-                                             &swapchainHeight)) {
-    SDL_CancelGPUCommandBuffer(commandBuffer);
-    return;
-  }
-
-  if (swapchainTexture) {
-    UpdateFramebufferScale(drawData, swapchainWidth, swapchainHeight);
-    ImGui_ImplSDLGPU3_PrepareDrawData(drawData, commandBuffer);
+  // Acquired images must be submitted even if event processing minimized the
+  // window. A null drawData clears and presents the image without drawing UI.
+  if (frame.swapchainTexture) {
+    if (drawData) {
+      UpdateFramebufferScale(drawData, frame.swapchainWidth,
+                             frame.swapchainHeight);
+      ImGui_ImplSDLGPU3_PrepareDrawData(drawData, frame.commandBuffer);
+    }
 
     SDL_GPUColorTargetInfo targetInfo = {};
-    targetInfo.texture = swapchainTexture;
+    targetInfo.texture = frame.swapchainTexture;
     targetInfo.clear_color =
         SDL_FColor{gContext->clearColor.x, gContext->clearColor.y,
                    gContext->clearColor.z, gContext->clearColor.w};
@@ -625,15 +688,18 @@ static void RenderGPUFrame(ImDrawData* drawData) {
     targetInfo.layer_or_depth_plane = 0;
     targetInfo.cycle = false;
     SDL_GPURenderPass* renderPass =
-        SDL_BeginGPURenderPass(commandBuffer, &targetInfo, 1, nullptr);
+        SDL_BeginGPURenderPass(frame.commandBuffer, &targetInfo, 1, nullptr);
 
-    ImGui_ImplSDLGPU3_RenderDrawData(drawData, commandBuffer, renderPass);
+    if (drawData) {
+      ImGui_ImplSDLGPU3_RenderDrawData(drawData, frame.commandBuffer,
+                                       renderPass);
+    }
 
     SDL_EndGPURenderPass(renderPass);
   }
 
   ImGuiIO& io = ImGui::GetIO();
-  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+  if (drawData && (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)) {
     ImGui::UpdatePlatformWindows();
     ImGui::RenderPlatformWindowsDefault();
   }
@@ -643,7 +709,7 @@ static void RenderGPUFrame(ImDrawData* drawData) {
       execute();
     }
   }
-  SDL_SubmitGPUCommandBuffer(commandBuffer);
+  SDL_SubmitGPUCommandBuffer(frame.commandBuffer);
   for (auto&& execute : gContext->postSwapExecutors) {
     if (execute) {
       execute();
@@ -701,21 +767,23 @@ static bool InitRenderer(SDL_WindowFlags windowFlags,
   return true;
 }
 
-static void RenderFrame(bool skipRender) {
+static void RenderFrame(bool skipRender, const GPUFrame& gpuFrame) {
   NewRendererFrame();
   BuildImGuiFrame();
 
-  if (skipRender) {
-    return;
-  }
-
   ImDrawData* drawData = ImGui::GetDrawData();
+  if (skipRender || drawData->DisplaySize.x <= 0.0f ||
+      drawData->DisplaySize.y <= 0.0f) {
+    drawData = nullptr;
+  }
   switch (gRendererContext.backend) {
     case RendererBackend::GPU:
-      RenderGPUFrame(drawData);
+      RenderGPUFrame(drawData, gpuFrame);
       break;
     case RendererBackend::SDL_RENDERER:
-      Render2DFrame(drawData);
+      if (drawData) {
+        Render2DFrame(drawData);
+      }
       break;
     default:
       break;
@@ -1341,12 +1409,22 @@ static void ProcessImGuiSDLEvent(const SDL_Event& event) {
 void gui::Main() {
   // Main loop
   double previousStartTime = 0.0;
+  double nextFrameTime = 0.0;
+  double previousFps = 0.0;
   while (!gContext->exit) {
     double startTime = GetTime();
     double framePeriod = previousStartTime > 0.0
                              ? startTime - previousStartTime
                              : 1.0 / FALLBACK_MOUSE_MOTION_WHEEL_FPS;
     previousStartTime = startTime;
+
+    // Acquire before polling: Vulkan can block on image availability even
+    // after SDL_WaitForGPUSwapchain() has finished waiting for GPU fences.
+    GPUFrame gpuFrame;
+    if (gRendererContext.backend == RendererBackend::GPU &&
+        (SDL_GetWindowFlags(gContext->window) & SDL_WINDOW_MINIMIZED) == 0) {
+      gpuFrame = AcquireGPUFrame();
+    }
 
     // Poll and handle events (inputs, window resize, etc.)
     SDL_Event event;
@@ -1376,7 +1454,7 @@ void gui::Main() {
 
     gContext->isRendering = true;
     UpdateFontScale();
-    RenderFrame(windowMinimized);
+    RenderFrame(windowMinimized, gpuFrame);
     gContext->isRendering = false;
 
     auto& io = ImGui::GetIO();
@@ -1390,14 +1468,27 @@ void gui::Main() {
     }
 
     if (windowMinimized) {
+      previousFps = 0.0;
       SDL_Delay(10);
-    } else if (gContext->fps != 0) {
-      // if FPS limiting, sleep until next frame time
-      double sleepTime = (1.0 / gContext->fps) - (GetTime() - startTime);
-      if (sleepTime > 1e-6) {
-        std::this_thread::sleep_for(
-            std::chrono::microseconds(static_cast<int64_t>(sleepTime * 1e6)));
+    } else if (double fps = GetFrameRateLimit(); fps > 0.0) {
+      if (fps != previousFps) {
+        nextFrameTime = startTime;
+        previousFps = fps;
       }
+      // Advance the deadline so sleep overshoot doesn't accumulate.
+      nextFrameTime += 1.0 / fps;
+      double now = GetTime();
+      if (nextFrameTime < now) {
+        // Drop overdue deadlines to avoid a burst of catch-up frames.
+        nextFrameTime = now;
+      }
+      // Sleep before the next frame's acquisition and input polling.
+      double sleepTime = nextFrameTime - now;
+      if (sleepTime > 1e-6) {
+        SDL_DelayPrecise(static_cast<Uint64>(sleepTime * SDL_NS_PER_SECOND));
+      }
+    } else {
+      previousFps = 0.0;
     }
   }
 
@@ -2042,6 +2133,19 @@ void gui::EmitRendererInfo() {
       const char* rendererName = SDL_GetGPUDeviceDriver(gContext->gpuDevice);
       ImGui::Text("Renderer: 3D (%s)",
                   rendererName && *rendererName ? rendererName : "unknown");
+      const char* presentModeName = "unknown";
+      switch (gRendererContext.presentMode) {
+        case SDL_GPU_PRESENTMODE_VSYNC:
+          presentModeName = "VSync";
+          break;
+        case SDL_GPU_PRESENTMODE_IMMEDIATE:
+          presentModeName = "Immediate";
+          break;
+        case SDL_GPU_PRESENTMODE_MAILBOX:
+          presentModeName = "Mailbox";
+          break;
+      }
+      ImGui::Text("Presentation mode: %s", presentModeName);
       break;
     }
     case RendererBackend::SDL_RENDERER: {

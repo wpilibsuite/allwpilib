@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 load("//shared/bazel/rules:packaging.bzl", "package_static_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 
@@ -7,6 +8,16 @@ cc_library(
     name = "headers",
     hdrs = glob(["src/main/native/include/**/*"]),
     strip_include_prefix = "src/main/native/include",
+)
+
+wpilib_objc_library(
+    name = "wpigui-mac-metal",
+    srcs = glob(["src/main/native/macOS/**/*.mm"]),
+    sdk_frameworks = [
+        "AppKit",
+        "QuartzCore",
+    ],
+    deps = ["//shared/bazel/thirdparty/libsdlgpu"],
 )
 
 wpilib_cc_library(
@@ -25,7 +36,10 @@ wpilib_cc_library(
         ":headers",
         "//shared/bazel/thirdparty/libsdlgpu",
         "//thirdparty/imgui_suite",
-    ],
+    ] + select({
+        "@platforms//os:osx": [":wpigui-mac-metal"],
+        "//conditions:default": [],
+    }),
 )
 
 wpilib_cc_static_library(
