@@ -1,0 +1,16 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+py_test(
+    name = "dependency_versions_test",
+    srcs = ["dependency_versions_test.py"],
+    data = [
+        "//:MODULE.bazel",
+        "//:gradle/libs.versions.toml",
+        "//apriltag:AprilTag.json",
+        "//cameraserver:CameraServer.json",
+        "//shared/bazel/thirdparty/ceres:ceres.MODULE.bazel",
+        "//shared/bazel/thirdparty/libsdlgpu:libsdlgpu.MODULE.bazel",
+        "//shared/bazel/thirdparty/libssh:libssh.MODULE.bazel",
+        "//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel",
+    ],
+)

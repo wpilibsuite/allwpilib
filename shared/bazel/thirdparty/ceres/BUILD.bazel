@@ -41,3 +41,10 @@ cc_library(
         "@ceres_headers//:headers",
     ],
 )
+
+exports_files(
+    [
+        "ceres.MODULE.bazel",
+    ],
+    visibility = ["//shared/bazel/dependency_versions:__pkg__"],
+)
