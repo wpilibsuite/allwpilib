@@ -364,8 +364,9 @@ void DeleteOldDataLogs(std::string_view logDir, uintmax_t freeSpace) {
     if (IsMatchLog(entry.path().filename().string())) {
       continue;
     }
-    auto size = entry.file_size(ec);
-    if (fs::remove(entry.path(), ec)) {
+    std::error_code ecSize;
+    auto size = entry.file_size(ecSize);
+    if (fs::remove(entry.path(), ec) && !ec && !ecSize) {
       --count;
       WPILIB_ReportError(warn::Warning, "DataLogManager: Deleted {}",
                          entry.path().string());
