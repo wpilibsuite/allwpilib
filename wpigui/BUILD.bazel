@@ -17,6 +17,7 @@ wpilib_objc_library(
         "AppKit",
         "QuartzCore",
     ],
+    visibility = ["//simulation/halsim_gui:__pkg__"],
     deps = ["//shared/bazel/thirdparty/libsdlgpu"],
 )
 
