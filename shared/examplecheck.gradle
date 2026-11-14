@@ -64,11 +64,13 @@ def tagList = [
         /* --- RobotBase --- */
         "Timed", "Timeslice", "RobotBase", "Educational", "OpMode",
 
+        /* --- Competition --- */
+        "FRC", "FTC",
+
         /* --- Misc --- */
         /* (try to keep this section minimal) */
         "EventLoop", "Mechanism2d", "Preferences", "Skeleton",
-
-        "FTC", "ExpansionHub"
+        "ExpansionHub", "UnitTests",
 ]
 
 tasks.register('checkTemplates') {

@@ -19,7 +19,8 @@
       "DataLog",
       "Joystick",
       "Swerve Drive",
-      "OpMode"
+      "OpMode",
+      "FRC"
     ],
     "foldername": "rebuiltcmdv3",
     "gradlebase": "java",
@@ -155,7 +156,8 @@
       "Telemetry",
       "Tunable",
       "DataLog",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "hatchbottraditional",
     "gradlebase": "java",
@@ -174,7 +176,8 @@
       "Telemetry",
       "Tunable",
       "DataLog",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "hatchbotinlined",
     "gradlebase": "java",
@@ -193,7 +196,8 @@
       "Telemetry",
       "Tunable",
       "DataLog",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "hatchbotcmdv3",
     "gradlebase": "java",
@@ -215,7 +219,8 @@
       "PID",
       "Gyro",
       "Profiled PID",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "rapidreactcommandbot",
     "gradlebase": "java",
@@ -470,7 +475,8 @@
       "Simulation",
       "Mechanism2d",
       "PID",
-      "Exponential Profile"
+      "Exponential Profile",
+      "UnitTests"
     ],
     "foldername": "elevatorexponentialsimulation",
     "gradlebase": "java",
@@ -486,7 +492,8 @@
       "State-Space",
       "Simulation",
       "Mechanism2d",
-      "Preferences"
+      "Preferences",
+      "UnitTests"
     ],
     "foldername": "armsimulation",
     "gradlebase": "java",
@@ -499,7 +506,8 @@
     "description": "Test a robot project with basic unit tests in simulation.",
     "tags": [
       "Intake",
-      "Pneumatics"
+      "Pneumatics",
+      "UnitTests"
     ],
     "foldername": "unittest",
     "gradlebase": "java",
