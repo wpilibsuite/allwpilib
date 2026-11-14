@@ -12,6 +12,10 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import org.wpilib.annotation.NoDiscard;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.TunableConfig;
+import org.wpilib.tunable.TunableOption;
+import org.wpilib.tunable.TunableTable;
 import org.wpilib.units.measure.Time;
 
 /**
@@ -95,7 +99,7 @@ import org.wpilib.units.measure.Time;
  * }</pre>
  */
 @NoDiscard("Commands must be used! Did you mean to fork it or bind it to a trigger?")
-public interface Command {
+public interface Command extends ComplexTunable {
   /** The default command priority. */
   int DEFAULT_PRIORITY = 0;
 
@@ -424,5 +428,46 @@ public interface Command {
    */
   default ParallelGroupBuilder raceWith(Command... parallel) {
     return new ParallelGroupBuilder().optional(this).optional(parallel);
+  }
+
+  @Override
+  default void publishTunable(TunableTable table) {
+    // Finds the scheduler that owns the command requirements. If the command doesn't have any, gets
+    // the default scheduler.
+    Scheduler scheduler =
+        requirements().stream()
+            .findFirst()
+            .map(Mechanism::getRegisteredScheduler)
+            .orElseGet(Scheduler::getDefault);
+
+    // Borrows the publish logic of command V2
+    table.publishValue(
+        "name",
+        this::name,
+        null,
+        String.class,
+        TunableConfig.of(TunableOption.IMMUTABLE, TunableOption.GET_ON_CHANGE));
+
+    table.publishBoolean(
+        "running",
+        () -> scheduler.isScheduledOrRunning(this),
+        value -> {
+          boolean isScheduled = scheduler.isScheduledOrRunning(this);
+          if (value) {
+            if (!isScheduled) {
+              scheduler.schedule(this);
+            }
+          } else {
+            if (isScheduled) {
+              scheduler.cancel(this);
+            }
+          }
+        },
+        TunableConfig.of(TunableOption.ALWAYS_GET));
+  }
+
+  @Override
+  default String getTunableType() {
+    return "Command";
   }
 }
