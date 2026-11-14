@@ -2,10 +2,9 @@ load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 
 robotpy_py_test(
-    "python",
+    name = "python",
     size = "medium",
     srcs = glob(["**/*.py"]),
-    tags = ["exclusive-if-local"],
     deps = [
         "//wpilibc/src/main/python",
         requirement("pytest"),

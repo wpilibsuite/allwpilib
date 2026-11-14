@@ -7,6 +7,7 @@
 #include <catch2/catch_session.hpp>
 
 #include "wpi/hal/HAL.h"
+#include "wpi/nt/NetworkTableInstance.hpp"
 
 #ifndef __FIRST_SYSTEMCORE__
 namespace wpi::impl {
@@ -31,6 +32,7 @@ bool IsCatchListCommand(int argc, char** argv) {
 
 int main(int argc, char** argv) {
   if (!IsCatchListCommand(argc, argv)) {
+    wpi::nt::NetworkTableInstance::GetDefault().StartLocal();
     HAL_Initialize();
   }
   int ret = Catch::Session().run(argc, argv);
