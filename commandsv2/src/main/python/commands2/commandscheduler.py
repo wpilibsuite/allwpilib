@@ -634,7 +634,7 @@ class CommandScheduler(TelemetryLoggable, ComplexTunable):
     def get_telemetry_type(self) -> str:
         return "Scheduler"
 
-    def publish_tunables(self, table: TunableTable) -> None:
+    def publish_tunable(self, table: TunableTable) -> None:
         table.publish(
             "Names",
             Tunable(
