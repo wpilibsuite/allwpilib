@@ -634,7 +634,11 @@ class CommandScheduler(TelemetryLoggable, ComplexTunable):
     def get_telemetry_type(self) -> str:
         return "Scheduler"
 
-    def publish_tunables(self, table: TunableTable) -> None:
+    def publish_tunable(self, table: TunableTable) -> None:
+        """Publishes scheduled command names, IDs, and cancellation controls.
+
+        :param table: the tunable table to publish to
+        """
         table.publish(
             "Names",
             Tunable(

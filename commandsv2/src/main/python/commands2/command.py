@@ -513,7 +513,11 @@ class Command(TelemetryLoggable, ComplexTunable):
     def get_telemetry_type(self) -> str:
         return "Command"
 
-    def publish_tunables(self, table: TunableTable) -> None:
+    def publish_tunable(self, table: TunableTable) -> None:
+        """Publishes the command's name and run/cancel control.
+
+        :param table: the tunable table to publish to
+        """
 
         def on_set(value: bool) -> None:
             if value:
