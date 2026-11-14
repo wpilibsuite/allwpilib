@@ -69,7 +69,7 @@ class MockRobot : public wpi::OpModeRobot<MockRobot> {
   std::atomic<uint32_t> m_robotPeriodicCount{0};
 
   // Disabled method counters
-  std::atomic<uint32_t> m_disabledInitCount{0};
+  std::atomic<uint32_t> m_disabledEnterCount{0};
   std::atomic<uint32_t> m_disabledPeriodicCount{0};
   std::atomic<uint32_t> m_disabledExitCount{0};
 
@@ -81,7 +81,7 @@ class MockRobot : public wpi::OpModeRobot<MockRobot> {
 
   void RobotPeriodic() override { m_robotPeriodicCount++; }
 
-  void DisabledInit() override { m_disabledInitCount++; }
+  void DisabledEnter() override { m_disabledEnterCount++; }
 
   void DisabledPeriodic() override { m_disabledPeriodicCount++; }
 
@@ -266,17 +266,17 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest DisabledOnStartup",
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK(robot.m_disabledInitCount.load() == 0u);
+  CHECK(robot.m_disabledEnterCount.load() == 0u);
   CHECK(robot.m_disabledPeriodicCount.load() == 0u);
 
-  // DisabledInit and DisabledPeriodic both run on the first loop
+  // DisabledEnter and DisabledPeriodic both run on the first loop
   wpi::sim::StepTiming(PERIOD);
-  CHECK(robot.m_disabledInitCount.load() == 1u);
+  CHECK(robot.m_disabledEnterCount.load() == 1u);
   CHECK(robot.m_disabledPeriodicCount.load() == 1u);
   CHECK(robot.m_disabledExitCount.load() == 0u);
 
   wpi::sim::StepTiming(PERIOD);
-  CHECK(robot.m_disabledInitCount.load() == 1u);
+  CHECK(robot.m_disabledEnterCount.load() == 1u);
   CHECK(robot.m_disabledPeriodicCount.load() == 2u);
   CHECK(robot.m_disabledExitCount.load() == 0u);
 
@@ -301,13 +301,13 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest OpModeLifecycle",
   wpi::sim::StepTiming(PERIOD);
   MockOpMode* opMode = robot.m_opMode.load();
   REQUIRE(opMode != nullptr);
-  CHECK(robot.m_disabledInitCount.load() == 1u);
+  CHECK(robot.m_disabledEnterCount.load() == 1u);
   CHECK(robot.m_disabledPeriodicCount.load() == 1u);
   CHECK(opMode->m_disabledPeriodicCount.load() == 1u);
   CHECK(opMode->m_startCount.load() == 0u);
 
   wpi::sim::StepTiming(PERIOD);
-  CHECK(robot.m_disabledInitCount.load() == 1u);
+  CHECK(robot.m_disabledEnterCount.load() == 1u);
   CHECK(robot.m_disabledPeriodicCount.load() == 2u);
   CHECK(opMode->m_disabledPeriodicCount.load() == 2u);
 
@@ -321,11 +321,11 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest OpModeLifecycle",
   CHECK(opMode->m_startCount.load() == 1u);
   CHECK(opMode->m_endCount.load() == 0u);
 
-  // Disable: the opmode ends and DisabledInit runs again
+  // Disable: the opmode ends and DisabledEnter runs again
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(PERIOD);
-  CHECK(robot.m_disabledInitCount.load() == 2u);
+  CHECK(robot.m_disabledEnterCount.load() == 2u);
   CHECK(robot.m_disabledPeriodicCount.load() == 3u);
   CHECK(robot.m_disabledExitCount.load() == 1u);
 
@@ -353,7 +353,7 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest OpModeCreatedWhileEnabled",
   REQUIRE(opMode != nullptr);
   CHECK(opMode->m_disabledPeriodicCount.load() == 1u);
   CHECK(opMode->m_startCount.load() == 1u);
-  CHECK(robot.m_disabledInitCount.load() == 0u);
+  CHECK(robot.m_disabledEnterCount.load() == 0u);
   CHECK(robot.m_disabledPeriodicCount.load() == 0u);
   CHECK(robot.m_disabledExitCount.load() == 0u);
 

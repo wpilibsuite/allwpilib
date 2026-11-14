@@ -150,9 +150,9 @@ class OpModeRobotBase : public RobotBase {
   virtual void SimulationPeriodic() {}
 
   /**
-   * Function called once when the robot becomes disabled.
+   * Function called each time the robot enters disabled state.
    */
-  virtual void DisabledInit() {}
+  virtual void DisabledEnter() {}
 
   /**
    * Function called periodically while the robot is disabled.
@@ -163,7 +163,7 @@ class OpModeRobotBase : public RobotBase {
   virtual void DisabledPeriodic() {}
 
   /**
-   * Function called once when the robot exits disabled state.
+   * Function called each time the robot exits disabled state.
    */
   virtual void DisabledExit() {}
 
@@ -319,7 +319,7 @@ class OpModeRobotBase : public RobotBase {
   // OpMode lifecycle state
   int64_t m_lastModeId = -1;
   bool m_calledDriverStationConnected = false;
-  // Empty until the first loop, so that DisabledInit() runs on startup
+  // Empty until the first loop, so that DisabledEnter() runs on startup
   std::optional<RobotMode> m_lastMode;
   std::shared_ptr<OpMode> m_currentOpMode;
   std::string m_currentOpModeName;
