@@ -26,3 +26,10 @@ cc_import(
         "@libssh_headers//:headers",
     ],
 )
+
+exports_files(
+    [
+        "libssh.MODULE.bazel",
+    ],
+    visibility = ["//shared/bazel/dependency_versions:__pkg__"],
+)

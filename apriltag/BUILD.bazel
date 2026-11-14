@@ -146,3 +146,10 @@ define_native_wrapper(
     name = "robotpy-native-apriltag",
     pyproject_toml = "src/main/native/pyproject.toml",
 )
+
+exports_files(
+    [
+        "AprilTag.json",
+    ],
+    visibility = ["//shared/bazel/dependency_versions:__pkg__"],
+)

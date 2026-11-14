@@ -63,3 +63,10 @@ package_default_cc_project(
     maven_artifact_name = "cameraserver-cpp",
     maven_group_id = "org.wpilib.cameraserver",
 )
+
+exports_files(
+    [
+        "CameraServer.json",
+    ],
+    visibility = ["//shared/bazel/dependency_versions:__pkg__"],
+)

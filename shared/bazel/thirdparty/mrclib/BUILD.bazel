@@ -35,3 +35,10 @@ cc_import(
     visibility = ["//visibility:public"],
     deps = ["@mrclib_headers//:headers"],
 )
+
+exports_files(
+    [
+        "mrclib.MODULE.bazel",
+    ],
+    visibility = ["//shared/bazel/dependency_versions:__pkg__"],
+)
