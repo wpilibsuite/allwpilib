@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Drew Williams <williams.r.drew@gmail.com>
+Date: Wed, 2 Sep 2026 11:55:32 -0700
+Subject: [PATCH 4/5] Include helper headers by name rather than by ../src path
+
+The public header reached into ../src for its inline templates and helper
+headers, which only resolves when include/ and src/ keep their upstream
+relative positions. That prevented the header from being packaged the way
+the rest of the imgui suite is -- flattened into a single include root --
+so downstream consumers of the published headers could not compile it.
+
+Include the helper headers by bare name and let the build put src/ on the
+include path. The src-side headers already include each other this way.
+---
+ include/ImNodeFlow.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/ImNodeFlow.h b/include/ImNodeFlow.h
+index 466aadfa4b9593b24a3a5e75e658cc03b07f6595..353587ab43850491d5d217c8675728e3cece5069 100644
+--- a/include/ImNodeFlow.h
++++ b/include/ImNodeFlow.h
+@@ -13,8 +13,8 @@
+ #include <unordered_map>
+ #include <cstdint>
+ #include <imgui.h>
+-#include "../src/imgui_bezier_math.h"
+-#include "../src/context_wrapper.h"
++#include "imgui_bezier_math.h"
++#include "context_wrapper.h"
+ 
+ //#define ConnectionFilter_None       [](ImFlow::Pin* out, ImFlow::Pin* in){ return true; }
+ //#define ConnectionFilter_SameType   [](ImFlow::Pin* out, ImFlow::Pin* in){ return out->getDataType() == in->getDataType(); }
+@@ -1259,6 +1259,6 @@ namespace ImFlow
+     };
+ }
+ 
+-#include "../src/ImNodeFlow.inl"
++#include "ImNodeFlow.inl"
+ 
+ #endif
