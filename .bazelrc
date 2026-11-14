@@ -4,6 +4,10 @@ common --enable_bzlmod
 # Resolves to --config=linux on Linux, --config=macos on Mac, --windows on windows
 common --enable_platform_specific_config
 
+# bazel_lib pulls in Aspect's telemetry, which reports each build's rulesets and
+# Bazel version.  Opt out here rather than in everyone's environment.
+common --repo_env=ASPECT_TOOLS_TELEMETRY=-all
+
 # Make bazel 8 work for us.
 build --experimental_cc_static_library
 build --experimental_cc_shared_library
