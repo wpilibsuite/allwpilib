@@ -22,18 +22,32 @@ struct RunningSetter {
 
 EventLoop::EventLoop() {}
 
-void EventLoop::Bind(wpi::util::unique_function<void()> action) {
+size_t EventLoop::Bind(wpi::util::unique_function<void()>&& action) {
   if (m_running) {
     throw WPILIB_MakeError(err::Error,
                            "Cannot bind EventLoop while it is running");
   }
-  m_bindings.emplace_back(std::move(action));
+  return m_bindings.emplace_back(nextId++, std::move(action)).id;
+}
+
+void EventLoop::Unbind(size_t actionId) {
+  if (m_running) {
+    throw WPILIB_MakeError(err::Error,
+                           "Cannot unbind EventLoop while it is running");
+  }
+  for (auto iter = m_bindings.begin(); iter != m_bindings.end(); iter++) {
+    if (iter->id == actionId) {
+      std::swap(*iter, m_bindings.back());
+      m_bindings.pop_back();
+      break;
+    }
+  }
 }
 
 void EventLoop::Poll() {
   RunningSetter runSetter{m_running};
-  for (wpi::util::unique_function<void()>& action : m_bindings) {
-    action();
+  for (Binding& action : m_bindings) {
+    action.handler();
   }
 }
 
