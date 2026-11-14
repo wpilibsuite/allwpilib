@@ -102,6 +102,51 @@ class NetworkTablesModel : public Model {
     }
     void UpdateInfo(wpi::nt::TopicInfo&& info_);
 
+    /**
+     * Returns the latest successfully decoded `$pub$...` metadata for this
+     * topic.
+     *
+     * An empty span indicates that the topic has no publishers. An empty
+     * optional indicates that metadata has not been received or has been
+     * unpublished.
+     *
+     * The returned span is owned by this entry and must not be retained across
+     * calls to NetworkTablesModel::Update() or destruction of this entry.
+     *
+     * @return The topic's publishers, or std::nullopt if metadata is
+     * unavailable.
+     */
+    std::optional<std::span<const wpi::nt::meta::TopicPublisher>>
+    GetTopicPublishers() const {
+      if (!m_publishers) {
+        return std::nullopt;
+      }
+      return std::span<const wpi::nt::meta::TopicPublisher>{*m_publishers};
+    }
+
+    /**
+     * Returns the latest successfully decoded `$sub$...` metadata for this
+     * topic.
+     *
+     * An empty span indicates that the topic has no subscribers. An empty
+     * optional indicates that metadata has not been received or has been
+     * unpublished. Subscribers are not inferred from client or server
+     * subscriptions.
+     *
+     * The returned span is owned by this entry and must not be retained across
+     * calls to NetworkTablesModel::Update() or destruction of this entry.
+     *
+     * @return The topic's subscribers, or std::nullopt if metadata is
+     * unavailable.
+     */
+    std::optional<std::span<const wpi::nt::meta::TopicSubscriber>>
+    GetTopicSubscribers() const {
+      if (!m_subscribers) {
+        return std::nullopt;
+      }
+      return std::span<const wpi::nt::meta::TopicSubscriber>{*m_subscribers};
+    }
+
     /** Topic information. */
     wpi::nt::TopicInfo info;
 
@@ -115,8 +160,14 @@ class NetworkTablesModel : public Model {
     /** Publisher (created when the value changes). */
     NT_Publisher publisher{0};
 
-    std::vector<wpi::nt::meta::TopicPublisher> publishers;
-    std::vector<wpi::nt::meta::TopicSubscriber> subscribers;
+   private:
+    friend class NetworkTablesModel;
+
+    // Disengaged until `$pub$...` metadata is received, or after it is removed.
+    std::optional<std::vector<wpi::nt::meta::TopicPublisher>> m_publishers;
+
+    // Disengaged until `$sub$...` metadata is received, or after it is removed.
+    std::optional<std::vector<wpi::nt::meta::TopicSubscriber>> m_subscribers;
   };
 
   struct TreeNode {
@@ -178,7 +229,12 @@ class NetworkTablesModel : public Model {
   }
   const Client& GetServer() const { return m_server; }
   Entry* GetEntry(std::string_view name);
-  Entry* AddEntry(NT_Topic topic);
+
+  Entry* AddEntry(NT_Topic topic) {
+    auto* entry = AddEntryForUpdate(topic);
+    RebuildTree();
+    return entry;
+  }
 
   wpi::util::StructDescriptorDatabase& GetStructDatabase() {
     return m_structDb;
@@ -188,6 +244,9 @@ class NetworkTablesModel : public Model {
   }
 
  private:
+  Entry* AddEntryForUpdate(NT_Topic topic);
+  Entry* FindEntry(std::string_view name);
+  void UpdateTopicMetadata(Entry& entry);
   void RebuildTree();
   void RebuildTreeImpl(std::vector<TreeNode>* tree, int category);
   void UpdateClients(std::span<const uint8_t> data);

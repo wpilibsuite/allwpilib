@@ -729,6 +729,10 @@ void NetworkTablesModel::ValueSource::UpdateFromEnum(std::string_view name,
   valueChildren.clear();
   value = wpi::nt::Value::MakeString(v, time);
   valueStr = v;
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<StringSource*>(source.get());
   if (!s) {
     source = std::make_unique<StringSource>(std::format("NT:{}", name));
@@ -758,6 +762,10 @@ void NetworkTablesModel::ValueSource::UpdateFromEnum(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, bool value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<BooleanSource*>(source.get());
   if (!s) {
     source = std::make_unique<BooleanSource>(std::format("NT:{}", name));
@@ -769,6 +777,10 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, float value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<FloatSource*>(source.get());
   if (!s) {
     source = std::make_unique<FloatSource>(std::format("NT:{}", name));
@@ -780,6 +792,10 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, double value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<DoubleSource*>(source.get());
   if (!s) {
     source = std::make_unique<DoubleSource>(std::format("NT:{}", name));
@@ -791,6 +807,10 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, int64_t value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<IntegerSource*>(source.get());
   if (!s) {
     source = std::make_unique<IntegerSource>(std::format("NT:{}", name));
@@ -887,6 +907,10 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         os.write_escaped(value.GetString());
         os << '"';
 
+        if (!gContext) {
+          source.reset();
+          return;
+        }
         auto s = dynamic_cast<StringSource*>(source.get());
         if (!s) {
           source = std::make_unique<StringSource>(std::format("NT:{}", name));
@@ -968,12 +992,14 @@ void NetworkTablesModel::Update() {
   for (auto&& event : m_poller.ReadQueue()) {
     if (auto info = event.GetTopicInfo()) {
       auto& entry = m_entries[info->topic];
+      bool created = false;
       if (event.flags & wpi::nt::EventFlags::PUBLISH) {
         if (!entry) {
           entry = std::make_unique<Entry>();
           m_sortedEntries.emplace_back(entry.get());
-          updateTree = true;
+          created = true;
         }
+        updateTree = true;
       }
       if (event.flags & wpi::nt::EventFlags::UNPUBLISH) {
         if (info->name == PROGRAM_START_TIME_TOPIC) {
@@ -1001,6 +1027,16 @@ void NetworkTablesModel::Update() {
             if (it != m_clients.end()) {
               it->second.subscribers.clear();
             }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(info->name, "$pub$")) {
+            if (auto* topicEntry = FindEntry(*topicName)) {
+              topicEntry->m_publishers.reset();
+            }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(info->name, "$sub$")) {
+            if (auto* topicEntry = FindEntry(*topicName)) {
+              topicEntry->m_subscribers.reset();
+            }
           }
         }
         auto it = std::find(m_sortedEntries.begin(), m_sortedEntries.end(),
@@ -1018,6 +1054,9 @@ void NetworkTablesModel::Update() {
       }
       if (entry) {
         entry->UpdateTopic(std::move(event));
+        if (created) {
+          UpdateTopicMetadata(*entry);
+        }
       }
     } else if (auto valueData = event.GetValueEventData()) {
       auto& entry = m_entries[valueData->topic];
@@ -1051,6 +1090,26 @@ void NetworkTablesModel::Update() {
             auto it = m_clients.find(*client);
             if (it != m_clients.end()) {
               it->second.UpdateSubscribers(entry->value.GetRaw());
+            }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(entry->info.name, "$pub$")) {
+            if (auto publishers = wpi::nt::meta::DecodeTopicPublishers(
+                    entry->value.GetRaw())) {
+              if (auto* topicEntry = FindEntry(*topicName)) {
+                topicEntry->m_publishers = std::move(*publishers);
+              }
+            } else {
+              wpi::util::print(stderr, "Failed to update topic publishers\n");
+            }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(entry->info.name, "$sub$")) {
+            if (auto subscribers = wpi::nt::meta::DecodeTopicSubscribers(
+                    entry->value.GetRaw())) {
+              if (auto* topicEntry = FindEntry(*topicName)) {
+                topicEntry->m_subscribers = std::move(*subscribers);
+              }
+            } else {
+              wpi::util::print(stderr, "Failed to update topic subscribers\n");
             }
           }
         } else if (auto typeStr = wpi::util::remove_prefix(entry->info.name,
@@ -1229,16 +1288,44 @@ NetworkTablesModel::Entry* NetworkTablesModel::GetEntry(std::string_view name) {
   return *entryIt;
 }
 
-NetworkTablesModel::Entry* NetworkTablesModel::AddEntry(NT_Topic topic) {
+NetworkTablesModel::Entry* NetworkTablesModel::AddEntryForUpdate(
+    NT_Topic topic) {
   auto& entry = m_entries[topic];
   if (!entry) {
     entry = std::make_unique<Entry>();
-    entry->info = wpi::nt::GetTopicInfo(topic);
-    entry->properties = entry->info.GetProperties();
+    entry->UpdateInfo(wpi::nt::GetTopicInfo(topic));
     m_sortedEntries.emplace_back(entry.get());
+    UpdateTopicMetadata(*entry);
   }
-  RebuildTree();
   return entry.get();
+}
+
+NetworkTablesModel::Entry* NetworkTablesModel::FindEntry(
+    std::string_view name) {
+  // The sorted entries may still contain pending additions and deletions.
+  auto topic = wpi::nt::GetTopic(m_inst.GetHandle(), name);
+  auto it = m_entries.find(topic);
+  return it == m_entries.end() ? nullptr : it->second.get();
+}
+
+void NetworkTablesModel::UpdateTopicMetadata(Entry& entry) {
+  if (wpi::util::starts_with(entry.info.name, '$')) {
+    return;
+  }
+
+  // Metadata values may arrive before the corresponding topic announcement.
+  if (auto* metadata = FindEntry(std::format("$pub${}", entry.info.name))) {
+    if (metadata->value.IsRaw() && metadata->info.type_str == "msgpack") {
+      entry.m_publishers =
+          wpi::nt::meta::DecodeTopicPublishers(metadata->value.GetRaw());
+    }
+  }
+  if (auto* metadata = FindEntry(std::format("$sub${}", entry.info.name))) {
+    if (metadata->value.IsRaw() && metadata->info.type_str == "msgpack") {
+      entry.m_subscribers =
+          wpi::nt::meta::DecodeTopicSubscribers(metadata->value.GetRaw());
+    }
+  }
 }
 
 NetworkTablesModel::Client::Subscriber::Subscriber(
@@ -1896,7 +1983,10 @@ static void EmitNTTopicDragDropPayload(const std::string& dragDropType,
 
 static void EmitValueName(DataSource* source, const char* name,
                           const char* path, NT_Type type,
-                          std::string_view typeStr) {
+                          std::string_view typeStr,
+                          NetworkTablesModel* model = nullptr,
+                          NetworkTablesFlags flags = NetworkTablesFlags_Default,
+                          NetworkTablesModel::Entry* entry = nullptr) {
   if (source) {
     ImGui::Selectable(name);
     source->EmitDrag();
@@ -1963,7 +2053,7 @@ static void EmitEntry(NetworkTablesModel* model,
   ImGui::TableNextRow();
   ImGui::TableNextColumn();
   EmitValueName(entry.source.get(), name, entry.info.name.c_str(),
-                entry.info.type, entry.info.type_str);
+                entry.info.type, entry.info.type_str, model, flags, &entry);
 
   ImGui::TableNextColumn();
   if (!entry.valueChildren.empty()) {
