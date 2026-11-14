@@ -178,6 +178,7 @@ bool Parser::ParseDeclaration(ParsedDeclaration* out) {
     if (!Expect(Token::RIGHT_BRACKET)) {
       [[unlikely]] return false;
     }
+    out->isArray = true;
     GetNextToken();
   } else if (m_token.Is(Token::COLON)) {
     GetNextToken();
