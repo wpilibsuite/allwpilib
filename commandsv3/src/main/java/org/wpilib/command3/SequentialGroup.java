@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A sequence of commands that run one after another. Each successive command only starts after its
@@ -25,30 +26,29 @@ public final class SequentialGroup implements Command {
   private final String m_name;
   private final List<Command> m_commands = new ArrayList<>();
   private final Set<Mechanism> m_requirements = new HashSet<>();
-  private final int m_priority;
+  private int m_priority;
 
   /**
    * Creates a new command sequence.
    *
-   * @param name the name of the sequence
    * @param commands the commands to execute within the sequence
    */
-  SequentialGroup(String name, List<Command> commands) {
-    requireNonNullParam(name, "name", "SequentialGroup");
+  SequentialGroup(Command... commands) {
     requireNonNullParam(commands, "commands", "SequentialGroup");
-    for (int i = 0; i < commands.size(); i++) {
-      requireNonNullParam(commands.get(i), "commands[" + i + "]", "SequentialGroup");
-    }
-
-    m_name = name;
-    m_commands.addAll(commands);
-
-    for (var command : commands) {
+    for (int i = 0; i < commands.length; i++) {
+      var command = commands[i];
+      requireNonNullParam(command, "commands[" + i + "]", "SequentialGroup");
+      if (command.priority() > m_priority) {
+        m_priority = command.priority();
+      }
+      if (command instanceof SequentialGroup s) {
+        m_commands.addAll(s.getCommands());
+      } else {
+        m_commands.add(command);
+      }
       m_requirements.addAll(command.requirements());
     }
-
-    m_priority =
-        commands.stream().mapToInt(Command::priority).max().orElse(Command.DEFAULT_PRIORITY);
+    m_name = m_commands.stream().map(Command::name).collect(Collectors.joining(" -> "));
   }
 
   @Override
