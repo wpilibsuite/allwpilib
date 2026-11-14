@@ -175,11 +175,13 @@ void HALSimHttpConnection::ProcessRequest() {
                             fs::path::format::generic_format};
     }
 
-    if (fs::is_directory(nativePath)) {
+    std::error_code ec;
+    if (fs::is_directory(nativePath, ec)) {
       nativePath.append("index.html");
     }
 
-    if (!fs::exists(nativePath) || fs::is_directory(nativePath)) {
+    if (ec || !fs::exists(nativePath, ec) || ec ||
+        fs::is_directory(nativePath, ec) || ec) {
       MySendError(404, std::format("Resource '{}' not found", path));
     } else {
       auto contentType = wpi::net::MimeTypeFromPath(nativePath.string());

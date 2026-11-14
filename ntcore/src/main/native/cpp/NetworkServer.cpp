@@ -308,12 +308,12 @@ void NetworkServer::LoadPersistent() {
   // check if SavePersistent was interrupted and left a backup file;
   // if so, try to restore it
   auto bak = std::format("{}.bck", m_persistentFilename);
-  if (!fs::exists(m_persistentFilename) && fs::exists(bak)) {
+  std::error_code ec;
+  if (!fs::exists(m_persistentFilename, ec) && fs::exists(bak, ec)) {
     INFO(
         "restoring persistent file from backup '{}', since original '{}' is "
         "missing",
         bak, m_persistentFilename);
-    std::error_code ec;
     fs::rename(bak, m_persistentFilename, ec);
     if (ec.value() != 0) {
       INFO("failed to restore backup: {}", ec.message());
@@ -357,7 +357,7 @@ void NetworkServer::SavePersistent(std::string_view filename,
   os << data;
   os.close();
   if (os.has_error()) {
-    fs::remove(tmp);
+    fs::remove(tmp, ec);
     return;
   }
 
