@@ -1,5 +1,6 @@
 # THIS FILE IS AUTO GENERATED
 
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
@@ -1510,12 +1511,13 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
             "//tunables/src/main/python",
             "//wpimath:robotpy-native-wpimath",
             "//wpiutil/src/main/python",
+            requirement("protobuf"),
         ],
         strip_path_prefixes = ["wpimath/src/main/python/"],
         summary = "Binary wrapper for WPILib Math library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-telemetry==0.0.0", "robotpy-tunables==0.0.0", "robotpy-wpiutil==0.0.0"],
+        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-telemetry==0.0.0", "robotpy-tunables==0.0.0", "robotpy-wpiutil==0.0.0", "protobuf>=7.36.2,<8"],
         python_requires = ">=3.12",
         entry_points = {
             "pkg_config": ["wpimath-casters = wpimath", "wpimath = wpimath"],

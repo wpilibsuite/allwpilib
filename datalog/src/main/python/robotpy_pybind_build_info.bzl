@@ -1,5 +1,6 @@
 # THIS FILE IS AUTO GENERATED
 
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
@@ -273,12 +274,13 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         deps = [
             "//datalog:robotpy-native-datalog",
             "//wpiutil/src/main/python",
+            requirement("protobuf"),
         ],
         strip_path_prefixes = ["datalog/src/main/python/"],
         summary = "Binary wrapper for WPILib logging library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = ["robotpy-native-datalog==0.0.0", "robotpy-wpiutil==0.0.0"],
+        requires = ["robotpy-native-datalog==0.0.0", "robotpy-wpiutil==0.0.0", "protobuf>=7.36.2,<8"],
         python_requires = ">=3.12",
         entry_points = {
             "pkg_config": ["wpilog = wpilog"],
