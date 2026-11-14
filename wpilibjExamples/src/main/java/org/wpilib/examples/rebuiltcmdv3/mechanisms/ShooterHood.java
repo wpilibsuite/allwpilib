@@ -31,7 +31,7 @@ public class ShooterHood implements Mechanism {
 
   @Override
   public Command idle() {
-    return runRepeatedly(hoodMotor::stopMotor).named("ShooterHood.Idle");
+    return runRepeatedly(() -> hoodMotor.setThrottle(0.0)).named("ShooterHood.Idle");
   }
 
   /**
