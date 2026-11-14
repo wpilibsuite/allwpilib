@@ -162,8 +162,8 @@ void OpModeRobotBase::LoopFunc() {
       m_currentOpMode->DisabledPeriodic();
       m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
     }
-  }
-  else if (m_currentOpMode) {  // Call EnabledPeriodic when enabled with a current opmode
+  } else if (m_currentOpMode) {  // Call EnabledPeriodic when enabled with a 
+                                 // current opmode
     EnabledPeriodic();
     m_watchdog.AddEpoch("EnabledPeriodic()");
   }
