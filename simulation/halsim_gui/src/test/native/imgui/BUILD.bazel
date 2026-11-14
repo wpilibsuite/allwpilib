@@ -16,7 +16,7 @@ wpilib_imgui_cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "imgui",
-    actual = ":halsim_gui_imgui_tests",
+    tests = [":halsim_gui_imgui_tests"],
 )

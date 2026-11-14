@@ -17,7 +17,7 @@ cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "native",
-    actual = ":commandsv2_tests",
+    tests = [":commandsv2_tests"],
 )

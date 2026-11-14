@@ -21,7 +21,7 @@ wpilib_imgui_cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "imgui",
-    actual = ":wpical_imgui_tests",
+    tests = [":wpical_imgui_tests"],
 )
