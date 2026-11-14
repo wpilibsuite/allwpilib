@@ -513,7 +513,7 @@ class Command(TelemetryLoggable, ComplexTunable):
     def get_telemetry_type(self) -> str:
         return "Command"
 
-    def publish_tunables(self, table: TunableTable) -> None:
+    def publish_tunable(self, table: TunableTable) -> None:
 
         def on_set(value: bool) -> None:
             if value:
