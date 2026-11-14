@@ -135,7 +135,7 @@ void PyComplexTunableAdapter::PublishTunable(
     publishTunable = std::move(*m_initialPublishTunable);
     m_initialPublishTunable.reset();
   } else {
-    publishTunable = GetValue().attr("publish_tunables");
+    publishTunable = GetValue().attr("publish_tunable");
   }
   // Revision identity is shared across aliases, but table validity belongs to
   // this publication. Removed table contexts must never be reused.
@@ -149,7 +149,7 @@ void PyComplexTunableAdapter::PublishTunable(
 void PyComplexTunableAdapter::UpdateTunable() const {
   py::gil_scoped_acquire gil;
   py::object updateTunable =
-      py::getattr(GetValue(), "update_tunables", py::none());
+      py::getattr(GetValue(), "update_tunable", py::none());
   if (!updateTunable.is_none()) {
     updateTunable();
   }

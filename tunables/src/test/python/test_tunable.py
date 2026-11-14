@@ -623,7 +623,7 @@ class Second:
         second_descriptor_seen.set()
         return "Second"
 
-    def publish_tunables(self, table):
+    def publish_tunable(self, table):
         raise AssertionError("rejected publisher callback must not run")
 
 
@@ -938,7 +938,7 @@ def test_tune_revision_propagates_from_complex_children(backend):
             self.dynamic = tunables.Tunable(2.0)
             self.table: tunables.TunableTable | None = None
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             self.table = table
             table.publish("initial", self.initial)
 
@@ -974,14 +974,14 @@ def test_tune_revision_finds_nested_python_complex_tunable(backend):
         def __init__(self) -> None:
             self.value = tunables.Tunable(1.0)
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("value", self.value)
 
     class ParentComplex:
         def __init__(self) -> None:
             self.child = ChildComplex()
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("child", self.child)
 
     parent = ParentComplex()
@@ -1005,7 +1005,7 @@ def test_tune_revision_is_shared_across_python_complex_aliases(backend):
         def __init__(self) -> None:
             self.value = tunables.Tunable(1.0)
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("value", self.value)
 
     value = AliasedComplex()
@@ -1033,7 +1033,7 @@ def test_tune_revision_survives_python_complex_unpublish_republish(backend):
         def __init__(self) -> None:
             self.value = tunables.Tunable(1.0)
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("value", self.value)
 
     value = RepublishedComplex()
@@ -1084,7 +1084,7 @@ class Complex:
     def __init__(self):
         self.value = tunables.Tunable(1.0)
 
-    def publish_tunables(self, table):
+    def publish_tunable(self, table):
         self.table = table
         table.publish("value", self.value)
 
@@ -1134,7 +1134,7 @@ def test_tune_revision_supports_non_weakrefable_python_complex(backend):
         def __init__(self) -> None:
             self.value = tunables.Tunable(1.0)
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("value", self.value)
 
     value = SlottedComplex()
@@ -1172,7 +1172,7 @@ def test_non_weakrefable_complex_is_released(backend, publication):
     class SlottedComplex:
         __slots__ = ()
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.add("value", 1.0)
 
         def __del__(self):
@@ -1182,7 +1182,7 @@ def test_non_weakrefable_complex_is_released(backend, publication):
         def __init__(self, child):
             self.child = child
 
-        def publish_tunables(self, table):
+        def publish_tunable(self, table):
             table.publish("child", self.child)
 
     value = SlottedComplex()
@@ -1672,10 +1672,10 @@ def test_complex_tunable_publishes_members_and_updates(backend):
             self.value = tunables.Tunable(0)
             self.update_count = 0
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("value", self.value)
 
-        def update_tunables(self) -> None:
+        def update_tunable(self) -> None:
             self.update_count += 1
             self.value.set(self.value.get() + 1)
 
@@ -1702,14 +1702,14 @@ def test_reentrant_global_complex_replacement_retains_newer_value(backend):
         def __init__(self) -> None:
             self.update_count = 0
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.add_int("value", 11)
 
-        def update_tunables(self) -> None:
+        def update_tunable(self) -> None:
             self.update_count += 1
 
     class ReentrantComplex:
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             replacement = Replacement()
             replacement_refs.append(weakref.ref(replacement))
             tunables.remove("same")
@@ -1738,24 +1738,24 @@ def test_reentrant_owner_scoped_complex_replacement_retains_newer_value(backend)
         def __init__(self) -> None:
             self.update_count = 0
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.add_int("value", 12)
 
-        def update_tunables(self) -> None:
+        def update_tunable(self) -> None:
             self.update_count += 1
 
     class ReentrantChild:
         def __init__(self, parent_table: tunables.TunableTable) -> None:
             self.parent_table = parent_table
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             replacement = Replacement()
             replacement_refs.append(weakref.ref(replacement))
             self.parent_table.remove("child")
             assert self.parent_table.publish("child", replacement) is True
 
     class Parent:
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             obsolete = ReentrantChild(table)
             obsolete_refs.append(weakref.ref(obsolete))
             assert table.publish("child", obsolete) is True
@@ -1777,10 +1777,10 @@ def test_remove_complex_tunable_removes_members(backend):
             self.value = tunables.Tunable(1)
             self.update_count = 0
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("value", self.value)
 
-        def update_tunables(self) -> None:
+        def update_tunable(self) -> None:
             self.update_count += 1
 
     value = RemovedComplex()
@@ -1800,10 +1800,10 @@ def test_registry_remove_complex_tunable_by_object(backend):
             self.value = tunables.Tunable(1)
             self.update_count = 0
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("value", self.value)
 
-        def update_tunables(self) -> None:
+        def update_tunable(self) -> None:
             self.update_count += 1
 
     value = RemovedComplex()
@@ -1842,7 +1842,7 @@ def test_table_remove_releases_complex_tunables(backend):
         def __init__(self) -> None:
             self.value = tunables.Tunable(1)
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("value", self.value)
 
     table = tunables.get_table("child")
@@ -1866,7 +1866,7 @@ def test_remove_normalized_complex_tunable_releases_storage(backend):
             self.value = 1
             self.calls = 0
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish_int("/value", self._get_value, self._set_value)
 
         def _get_value(self) -> int:
@@ -1899,7 +1899,7 @@ def test_retained_duck_complex_table_rejects_remove_after_parent_removal(backend
         def __init__(self) -> None:
             self.table: tunables.TunableTable | None = None
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             self.table = table
 
     value = RetainingComplex()
@@ -1931,7 +1931,7 @@ def test_manual_table_in_weakref_callback_does_not_inherit_owner(backend):
         def __init__(self) -> None:
             self.table: tunables.TunableTable | None = None
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             self.table = table
 
     owner = RetainingComplex()
@@ -1964,7 +1964,7 @@ def test_stale_duck_table_is_not_revived_by_path_reuse(backend):
         def __init__(self) -> None:
             self.table: tunables.TunableTable | None = None
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             self.table = table
 
     first = RetainingComplex()
@@ -1991,7 +1991,7 @@ def test_stale_duck_table_is_not_revived_by_path_reuse(backend):
 @pytest.mark.parametrize("nested", [False, True])
 def test_removed_complex_alias_table_stays_invalid(backend, publication, nested):
     class RetainingComplex:
-        def publish_tunables(self, table):
+        def publish_tunable(self, table):
             self.table = table
 
     parent = RetainingComplex()
@@ -2036,7 +2036,7 @@ def test_reentrant_complex_alias_removal_invalidates_its_table(backend):
         def __init__(self):
             self.tables = {}
 
-        def publish_tunables(self, table):
+        def publish_tunable(self, table):
             self.tables[table.get_path()] = table
             if table.get_path() == "/removed/":
                 tunables.remove("removed")
@@ -2070,7 +2070,7 @@ def test_complex_table_remove_releases_published_value_child(backend):
             self.child = ChildValue()
             self.table: tunables.TunableTable | None = None
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             self.table = table
             table.publish_int("value", self.child.get, self.child.set)
 
@@ -2111,7 +2111,7 @@ def test_complex_table_remove_releases_nested_complex_child(backend):
         def __init__(self) -> None:
             self.value = ChildValue()
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish_int("value", self.value.get, self.value.set)
 
     class RemovingComplex(tunables.ComplexTunable):
@@ -2119,7 +2119,7 @@ def test_complex_table_remove_releases_nested_complex_child(backend):
             self.child = NestedComplex()
             self.table: tunables.TunableTable | None = None
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             self.table = table
             table.publish("child", self.child)
 
@@ -2148,10 +2148,10 @@ def test_register_backend_migrates_complex_tunables(backend):
             self.value = tunables.Tunable(2)
             self.update_count = 0
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("value", self.value)
 
-        def update_tunables(self) -> None:
+        def update_tunable(self) -> None:
             self.update_count += 1
 
     value = MigratedComplex()
@@ -2178,7 +2178,7 @@ def test_migrated_complex_publish_value_refreshes_once(backend):
             self.value = 2
             self.getter_calls = 0
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish_int("value", self._get_value, self._set_value)
 
         def _get_value(self) -> int:
@@ -2209,7 +2209,7 @@ def test_more_specific_child_backend_keeps_migrated_complex_child(backend):
         def __init__(self) -> None:
             self.value = tunables.Tunable(2)
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("value", self.value)
 
     leaf_backend = tunables.MockTunableBackend()
@@ -2239,7 +2239,7 @@ def test_complex_tunable_publish_descriptor_is_reused_for_initial_publish(backen
             self.publish_count = 0
 
         @property
-        def publish_tunables(self):
+        def publish_tunable(self):
             self.lookup_count += 1
 
             def publish(table: tunables.TunableTable) -> None:
@@ -2260,7 +2260,7 @@ def test_complex_tunable_publish_descriptor_is_reused_for_initial_publish(backen
 def test_complex_tunable_publish_lookup_error_is_reported(backend):
     class BrokenLookup:
         def __getattr__(self, name: str):
-            if name == "publish_tunables":
+            if name == "publish_tunable":
                 raise RuntimeError("broken descriptor")
             raise AttributeError(name)
 
@@ -2356,7 +2356,7 @@ def test_complex_tunable_direct_struct_publish_value(backend):
         def __init__(self) -> None:
             self.point = TunablePoint(1, 2)
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish_value("point", lambda: self.point, self._set_point)
 
         def _set_point(self, value: TunablePoint) -> None:
@@ -2376,7 +2376,7 @@ def test_complex_tunable_direct_publish_value_refreshes_before_update(backend):
         def __init__(self) -> None:
             self.value = 1
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish_int("value", lambda: self.value, self._set_value)
 
         def _set_value(self, value: int) -> None:
@@ -2395,7 +2395,7 @@ def test_complex_tunable_getter_can_mutate_top_level_storage_during_refresh(
     backend,
 ):
     class EmptyComplex(tunables.ComplexTunable):
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             pass
 
     class MutatingComplex(tunables.ComplexTunable):
@@ -2404,7 +2404,7 @@ def test_complex_tunable_getter_can_mutate_top_level_storage_during_refresh(
             self.calls = 0
             self.value = 1
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish_int("value", self._get_value, self._set_value)
 
         def _get_value(self) -> int:
@@ -2439,7 +2439,7 @@ def test_complex_tunable_wrapped_struct_member(backend):
         def __init__(self) -> None:
             self.point = tunables.Tunable(TunablePoint(1, 2))
 
-        def publish_tunables(self, table: tunables.TunableTable) -> None:
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
             table.publish("point", self.point)
 
     value = WrappedStructComplex()

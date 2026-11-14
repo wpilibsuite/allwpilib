@@ -207,7 +207,7 @@ bool Publish(wpi::tunables::TunableTable& table, std::string_view name,
         detail::StoreNativeComplexValue(std::move(path), std::move(value));
       }
     }
-  } else if (auto publishTunable = GetOptionalAttr(value, "publish_tunables")) {
+  } else if (auto publishTunable = GetOptionalAttr(value, "publish_tunable")) {
     auto tunable = detail::GetOrCreateComplex(std::move(value),
                                               std::move(*publishTunable));
     std::string path = NormalizeTablePath(table, name);
