@@ -1,4 +1,4 @@
-load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
+load("//thirdparty/imgui_suite/imgui_test_engine:imgui_test.bzl", "wpilib_imgui_cc_test")
 
 wpilib_imgui_cc_test(
     name = "halsim_gui_imgui_tests",
@@ -10,7 +10,7 @@ wpilib_imgui_cc_test(
         "no-asan",
     ],
     deps = [
-        "//glass:glassnt_for_tests",
+        "//glass:glassnt",
         "//hal:wpiHal",
         "//simulation/halsim_gui:headers",
     ],
