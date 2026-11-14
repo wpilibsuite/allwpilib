@@ -85,9 +85,3 @@ class ExampleSmartMotorController:
 
     def get_inverted(self) -> bool:
         return self._inverted
-
-    def disable(self) -> None:
-        pass
-
-    def stop_motor(self) -> None:
-        pass

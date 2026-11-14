@@ -156,15 +156,13 @@ class MecanumDrive : public RobotDriveBase,
       double xVelocity, double yVelocity, double zRotation,
       wpi::math::Rotation2d gyroAngle = 0_rad);
 
-  /**
-   * @Common This is one of the commonly used methods for this class
-   */
-  void StopMotor() override;
-  std::string GetDescription() const override;
-
   void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
+
+ protected:
+  void StopMotor() override;
+  std::string GetDescription() const override;
 
  private:
   std::function<void(double)> m_frontLeftMotor;

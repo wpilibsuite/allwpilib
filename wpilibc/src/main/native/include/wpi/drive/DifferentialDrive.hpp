@@ -195,12 +195,13 @@ class DifferentialDrive : public RobotDriveBase,
   static WheelVelocities TankDriveIK(double leftVelocity, double rightVelocity,
                                      bool squareInputs = true);
 
-  void StopMotor() override;
-  std::string GetDescription() const override;
-
   void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
+
+ protected:
+  void StopMotor() override;
+  std::string GetDescription() const override;
 
  private:
   std::function<void(double)> m_leftMotor;

@@ -276,7 +276,7 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable {
   }
 
   @Override
-  public void stopMotor() {
+  protected void stopMotor() {
     m_frontLeftOutput = 0.0;
     m_frontRightOutput = 0.0;
     m_rearLeftOutput = 0.0;
@@ -291,7 +291,7 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable {
   }
 
   @Override
-  public String getDescription() {
+  protected String getDescription() {
     return "MecanumDrive";
   }
 

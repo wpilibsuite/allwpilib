@@ -193,7 +193,7 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   @Override
-  public void disable() {
+  protected void stopMotor() {
     m_pwm.setDisabled();
 
     if (m_simThrottle != null) {
@@ -201,17 +201,12 @@ public abstract class PWMMotorController extends MotorSafety
     }
 
     for (var follower : m_followers) {
-      follower.disable();
+      follower.stopMotor();
     }
   }
 
   @Override
-  public void stopMotor() {
-    disable();
-  }
-
-  @Override
-  public String getDescription() {
+  protected String getDescription() {
     return "PWM " + getChannel();
   }
 

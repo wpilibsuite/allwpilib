@@ -60,11 +60,6 @@ class MotorController {
    * @return The inversion state.
    */
   virtual bool GetInverted() const = 0;
-
-  /**
-   * Disables the motor controller.
-   */
-  virtual void Disable() = 0;
 };
 
 }  // namespace wpi
