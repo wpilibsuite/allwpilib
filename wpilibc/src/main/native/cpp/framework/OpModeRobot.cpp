@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <format>
 #include <memory>
+#include <ranges>
 #include <string>
 #include <utility>
 #include <vector>
@@ -20,6 +21,7 @@
 #include "wpi/hal/Notifier.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/opmode/OpMode.hpp"
+#include "wpi/opmode/OpModeListener.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
@@ -65,6 +67,16 @@ void OpModeRobotBase::AddPeriodic(std::function<void()> callback,
                                   wpi::units::second_t period,
                                   wpi::units::second_t offset) {
   m_callbacks.Add(std::move(callback), m_startTime, period, offset);
+}
+
+void OpModeRobotBase::RegisterListener(
+    std::shared_ptr<OpModeListener> listener) {
+  m_listeners.push_back(std::move(listener));
+}
+
+void OpModeRobotBase::RemoveListener(
+    const std::shared_ptr<OpModeListener>& listener) {
+  std::erase(m_listeners, listener);
 }
 
 void OpModeRobotBase::PrintWatchdogEpochs() {
@@ -117,6 +129,12 @@ void OpModeRobotBase::LoopFunc() {
         if (enabled) {
           m_currentOpMode->DisabledPeriodic();
           m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
+        }
+
+        // Iterate over a copy so listeners may register or remove listeners
+        auto listeners = m_listeners;
+        for (auto& listener : listeners) {
+          listener->OnOpModeSelect(m_currentOpModeName, *m_currentOpMode);
         }
       }
     } else {
@@ -290,6 +308,11 @@ void OpModeRobotBase::StartCurrentOpMode() {
 
   m_currentOpMode->Start();
   m_watchdog.AddEpoch("OpMode::Start()");
+
+  auto listeners = m_listeners;
+  for (auto& listener : listeners) {
+    listener->OnOpModeStart(m_currentOpModeName, *m_currentOpMode);
+  }
 }
 
 void OpModeRobotBase::EndCurrentOpMode() {
@@ -300,6 +323,11 @@ void OpModeRobotBase::EndCurrentOpMode() {
   // If the opmode was started, end it and remove its main periodic callback.
   if (m_opmodePeriodic) {
     std::print("********** Ending OpMode {} **********\n", m_currentOpModeName);
+
+    auto listeners = m_listeners;
+    for (auto& listener : std::views::reverse(listeners)) {
+      listener->OnOpModeStop(m_currentOpModeName, *m_currentOpMode);
+    }
 
     m_currentOpMode->End();
     m_watchdog.AddEpoch("OpMode::End()");
@@ -316,6 +344,11 @@ void OpModeRobotBase::EndCurrentOpMode() {
     m_callbacks.Remove(cb);
   }
   m_activeOpModeCallbacks.clear();
+
+  auto listeners = m_listeners;
+  for (auto& listener : std::views::reverse(listeners)) {
+    listener->OnOpModeClose(m_currentOpModeName, *m_currentOpMode);
+  }
 
   // Regardless of whether opmode was started, close it and release it
   std::print("********** Closing OpMode {} **********\n", m_currentOpModeName);

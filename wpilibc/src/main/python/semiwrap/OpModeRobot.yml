@@ -32,6 +32,8 @@ classes:
         param_override:
           offset:
             default: 0_s
+      RegisterListener:
+      RemoveListener:
       GetPeriod:
       PrintWatchdogEpochs:
       GetLoopStartTime:

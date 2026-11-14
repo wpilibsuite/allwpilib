@@ -15,6 +15,7 @@
 #include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/opmode/OpMode.hpp"
+#include "wpi/opmode/OpModeListener.hpp"
 #include "wpi/system/Watchdog.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
@@ -191,6 +192,26 @@ class OpModeRobotBase : public RobotBase {
                    wpi::units::second_t offset = 0_s);
 
   /**
+   * Register a listener to be notified of opmode lifecycle events.
+   *
+   * The robot shares ownership of the listener, so it stays alive until it is
+   * removed or the robot is destroyed. Select and start events are delivered in
+   * registration order; stop and close events are delivered in reverse
+   * registration order.
+   *
+   * @param listener The listener to register.
+   */
+  void RegisterListener(std::shared_ptr<OpModeListener> listener);
+
+  /**
+   * Remove a previously registered listener. Does nothing if the listener is
+   * not registered.
+   *
+   * @param listener The listener to remove.
+   */
+  void RemoveListener(const std::shared_ptr<OpModeListener>& listener);
+
+  /**
    * Gets time period between calls to Periodic() functions.
    */
   wpi::units::second_t GetPeriod() const { return m_period; }
@@ -327,6 +348,7 @@ class OpModeRobotBase : public RobotBase {
       m_activeOpModeCallbacks;
   std::optional<wpi::internal::PeriodicPriorityQueue::Callback>
       m_opmodePeriodic;
+  std::vector<std::shared_ptr<OpModeListener>> m_listeners;
 };
 
 /**

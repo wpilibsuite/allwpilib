@@ -12,9 +12,11 @@ import java.lang.reflect.Modifier;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -34,6 +36,7 @@ import org.wpilib.internal.PeriodicPriorityQueue.Callback;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.OpMode;
+import org.wpilib.opmode.OpModeListener;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 import org.wpilib.opmode.Utility;
@@ -109,6 +112,7 @@ public abstract class OpModeRobot extends RobotBase {
   private final Alert m_loopOverrunAlert;
   private final Watchdog m_opModeWatchdog;
   private final Alert m_opModePeriodicOverrunAlert;
+  private final List<OpModeListener> m_listeners = new ArrayList<>();
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
     DriverStationErrors.reportError(
@@ -616,6 +620,27 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   /**
+   * Register a listener to be notified of opmode lifecycle events.
+   *
+   * <p>Select and start events are delivered in registration order; stop and close events are
+   * delivered in reverse registration order.
+   *
+   * @param listener The listener to register.
+   */
+  public void registerListener(OpModeListener listener) {
+    m_listeners.add(listener);
+  }
+
+  /**
+   * Remove a previously registered listener. Does nothing if the listener is not registered.
+   *
+   * @param listener The listener to remove.
+   */
+  public void removeListener(OpModeListener listener) {
+    m_listeners.remove(listener);
+  }
+
+  /**
    * Get the period at which robot and opmode periodic callbacks are run.
    *
    * @return The period at which robot and opmode periodic callbacks are run.
@@ -727,6 +752,8 @@ public abstract class OpModeRobot extends RobotBase {
             m_currentOpMode.disabledPeriodic();
             m_watchdog.addEpoch("OpMode::DisabledPeriodic()");
           }
+          m_listeners.forEach(
+              listener -> listener.onOpModeSelect(m_currentOpModeName, m_currentOpMode));
         }
       } else {
         DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
@@ -820,6 +847,8 @@ public abstract class OpModeRobot extends RobotBase {
 
     m_currentOpMode.start();
     m_watchdog.addEpoch("opMode.start()");
+
+    m_listeners.forEach(listener -> listener.onOpModeStart(m_currentOpModeName, m_currentOpMode));
   }
 
   private void runOpModePeriodic(OpMode opMode) {
@@ -836,6 +865,10 @@ public abstract class OpModeRobot extends RobotBase {
     if (m_currentOpModePeriodic != null) {
       System.out.println("********** Ending OpMode " + m_currentOpModeName + " **********");
 
+      m_listeners
+          .reversed()
+          .forEach(listener -> listener.onOpModeStop(m_currentOpModeName, m_currentOpMode));
+
       m_currentOpMode.end();
       m_watchdog.addEpoch("opMode.end()");
 
@@ -848,6 +881,10 @@ public abstract class OpModeRobot extends RobotBase {
     // while disabled), so always remove them regardless of whether the opmode was started.
     m_callbacks.removeAll(m_activeOpModeCallbacks);
     m_activeOpModeCallbacks.clear();
+
+    m_listeners
+        .reversed()
+        .forEach(listener -> listener.onOpModeClose(m_currentOpModeName, m_currentOpMode));
 
     // regardless of whether opmode was started, close it and set to null
     System.out.println("********** Closing OpMode " + m_currentOpModeName + " **********");

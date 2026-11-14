@@ -1,0 +1,7 @@
+classes:
+  wpi::OpModeListener:
+    methods:
+      OnOpModeSelect:
+      OnOpModeStart:
+      OnOpModeStop:
+      OnOpModeClose:

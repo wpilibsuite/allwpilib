@@ -1728,3 +1728,100 @@ def test_robot_periodic(periodic_robot_test_fixture):
     # Additional time steps should continue calling robot_periodic
     wsim.step_timing(PERIOD)
     assert robot.periodic_count == 2
+
+
+class LoggingListener(wpilib.OpModeListener):
+    def __init__(self, tag: str, log: list[str]):
+        super().__init__()
+        self.tag = tag
+        self.log = log
+
+    def on_opmode_select(self, opmode_name, opmode):
+        self.log.append(f"{self.tag}:select:{opmode_name}")
+
+    def on_opmode_start(self, opmode_name, opmode):
+        self.log.append(f"{self.tag}:start:{opmode_name}")
+
+    def on_opmode_stop(self, opmode_name, opmode):
+        self.log.append(f"{self.tag}:stop:{opmode_name}")
+
+    def on_opmode_close(self, opmode_name, opmode):
+        self.log.append(f"{self.tag}:close:{opmode_name}")
+
+
+class ListenerOpMode(OpMode):
+    def start(self):
+        pass
+
+    def end(self):
+        pass
+
+
+def select_teleop(enabled: bool):
+    sim = wsim.DriverStationSim
+    sim.set_ds_attached(True)
+    sim.set_robot_mode(RobotMode.TELEOPERATED)
+    sim.set_opmode(sim.get_opmode_options()[0].id)
+    sim.set_enabled(enabled)
+    sim.notify_new_data()
+
+
+@pytest.fixture
+def listener_robot():
+    class ListenerRobot(MockRobot):
+        def __init__(self):
+            super().__init__()
+            self.add_opmode(ListenerOpMode, RobotMode.TELEOPERATED, "ListenerOpMode")
+            self.publish_opmodes()
+
+    robot = ListenerRobot()
+    robot_thread = threading.Thread(target=robot.start_competition)
+    robot_thread.start()
+    wsim.wait_for_program_start()
+
+    yield robot
+
+    robot.end_competition()
+    robot_thread.join()
+
+
+def test_listener_lifecycle_and_ordering(listener_robot):
+    PERIOD = 0.020  # 20 ms
+    log: list[str] = []
+    listener_robot.register_listener(LoggingListener("A", log))
+    listener_robot.register_listener(LoggingListener("B", log))
+
+    # Selected while disabled: only select fires, in registration order
+    select_teleop(False)
+    wsim.step_timing(PERIOD)
+    assert log == ["A:select:ListenerOpMode", "B:select:ListenerOpMode"]
+
+    # Enabled: start fires in registration order
+    log.clear()
+    select_teleop(True)
+    wsim.step_timing(PERIOD)
+    assert log == ["A:start:ListenerOpMode", "B:start:ListenerOpMode"]
+
+    # Disabled: stop then close fire in reverse registration order
+    log.clear()
+    select_teleop(False)
+    wsim.step_timing(PERIOD)
+    assert log[:4] == [
+        "B:stop:ListenerOpMode",
+        "A:stop:ListenerOpMode",
+        "B:close:ListenerOpMode",
+        "A:close:ListenerOpMode",
+    ]
+
+
+def test_remove_listener(listener_robot):
+    PERIOD = 0.020  # 20 ms
+    log: list[str] = []
+    removed = LoggingListener("removed", log)
+    listener_robot.register_listener(removed)
+    listener_robot.register_listener(LoggingListener("kept", log))
+    listener_robot.remove_listener(removed)
+
+    select_teleop(True)
+    wsim.step_timing(PERIOD)
+    assert log == ["kept:select:ListenerOpMode", "kept:start:ListenerOpMode"]

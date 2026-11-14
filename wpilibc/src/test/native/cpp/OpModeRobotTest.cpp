@@ -6,7 +6,13 @@
 
 #include <sys/types.h>
 
+#include <format>
 #include <memory>
+#include <mutex>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
@@ -108,6 +114,65 @@ int64_t GetOnlyOpModeId() {
   auto options = wpi::sim::DriverStationSim::GetOpModeOptions();
   REQUIRE(options.size() == 1u);
   return options[0].id;
+}
+
+// Shared event log written by the robot thread and read by the test thread.
+class EventLog {
+ public:
+  void Add(std::string event) {
+    std::scoped_lock lock{m_mutex};
+    m_events.push_back(std::move(event));
+  }
+
+  std::vector<std::string> Get() {
+    std::scoped_lock lock{m_mutex};
+    return m_events;
+  }
+
+  void Clear() {
+    std::scoped_lock lock{m_mutex};
+    m_events.clear();
+  }
+
+ private:
+  std::mutex m_mutex;
+  std::vector<std::string> m_events;
+};
+
+// Listener that appends "<tag>:<event>:<opModeName>" to a shared log.
+class LoggingListener : public wpi::OpModeListener {
+ public:
+  LoggingListener(std::string tag, EventLog& log)
+      : m_tag{std::move(tag)}, m_log{log} {}
+
+  void OnOpModeSelect(std::string_view name, wpi::OpMode&) override {
+    Log("select", name);
+  }
+  void OnOpModeStart(std::string_view name, wpi::OpMode&) override {
+    Log("start", name);
+  }
+  void OnOpModeStop(std::string_view name, wpi::OpMode&) override {
+    Log("stop", name);
+  }
+  void OnOpModeClose(std::string_view name, wpi::OpMode&) override {
+    Log("close", name);
+  }
+
+ private:
+  void Log(std::string_view event, std::string_view name) {
+    m_log.Add(std::format("{}:{}:{}", m_tag, event, name));
+  }
+
+  std::string m_tag;
+  EventLog& m_log;
+};
+
+void SelectTeleop(bool enabled) {
+  wpi::sim::DriverStationSim::SetDsAttached(true);
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
+  wpi::sim::DriverStationSim::SetOpMode(GetOnlyOpModeId());
+  wpi::sim::DriverStationSim::SetEnabled(enabled);
+  wpi::sim::DriverStationSim::NotifyNewData();
 }
 }  // namespace
 
@@ -328,6 +393,91 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest OpModeLifecycle",
   CHECK(robot.m_disabledInitCount.load() == 2u);
   CHECK(robot.m_disabledPeriodicCount.load() == 3u);
   CHECK(robot.m_disabledExitCount.load() == 1u);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest ListenerLifecycleEvents",
+                 "[wpilibc]") {
+  using Events = std::vector<std::string>;
+  EventLog log;
+  SingleOpModeRobot robot;
+  robot.RegisterListener(std::make_shared<LoggingListener>("A", log));
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  // Selected while disabled: only select fires
+  SelectTeleop(false);
+  wpi::sim::StepTiming(PERIOD);
+  CHECK(log.Get() == Events{"A:select:MockOpMode"});
+
+  // Enabled: start fires
+  SelectTeleop(true);
+  wpi::sim::StepTiming(PERIOD);
+  CHECK(log.Get() == Events{"A:select:MockOpMode", "A:start:MockOpMode"});
+
+  // Disabled: stop then close fire
+  log.Clear();
+  SelectTeleop(false);
+  wpi::sim::StepTiming(PERIOD);
+  auto events = log.Get();
+  REQUIRE(events.size() >= 2u);
+  CHECK(events[0] == "A:stop:MockOpMode");
+  CHECK(events[1] == "A:close:MockOpMode");
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest ListenerOrdering",
+                 "[wpilibc]") {
+  using Events = std::vector<std::string>;
+  EventLog log;
+  SingleOpModeRobot robot;
+  robot.RegisterListener(std::make_shared<LoggingListener>("A", log));
+  robot.RegisterListener(std::make_shared<LoggingListener>("B", log));
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  SelectTeleop(true);
+  wpi::sim::StepTiming(PERIOD);
+  // Select and start run in registration order
+  CHECK(log.Get() == Events{"A:select:MockOpMode", "B:select:MockOpMode",
+                            "A:start:MockOpMode", "B:start:MockOpMode"});
+
+  log.Clear();
+  SelectTeleop(false);
+  wpi::sim::StepTiming(PERIOD);
+  // Stop and close run in reverse registration order
+  auto events = log.Get();
+  REQUIRE(events.size() >= 4u);
+  CHECK(Events(events.begin(), events.begin() + 4) ==
+        Events{"B:stop:MockOpMode", "A:stop:MockOpMode", "B:close:MockOpMode",
+               "A:close:MockOpMode"});
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest RemoveListener",
+                 "[wpilibc]") {
+  using Events = std::vector<std::string>;
+  EventLog log;
+  SingleOpModeRobot robot;
+  auto removed = std::make_shared<LoggingListener>("removed", log);
+  robot.RegisterListener(removed);
+  robot.RegisterListener(std::make_shared<LoggingListener>("kept", log));
+  robot.RemoveListener(removed);
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  SelectTeleop(true);
+  wpi::sim::StepTiming(PERIOD);
+  CHECK(log.Get() == Events{"kept:select:MockOpMode", "kept:start:MockOpMode"});
 
   robot.EndCompetition();
   robotThread.join();

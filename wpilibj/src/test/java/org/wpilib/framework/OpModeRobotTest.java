@@ -11,14 +11,18 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.hardware.hal.OpModeOption;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.opmode.OpMode;
+import org.wpilib.opmode.OpModeListener;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.SimHooks;
 import org.wpilib.util.Color;
@@ -508,6 +512,136 @@ class OpModeRobotTest {
     assertEquals(1, teleop.m_startCount.get());
     // Only the single disabled loop before the first enable ran the robot's disabledPeriodic
     assertEquals(1, robot.m_disabledPeriodicCount.get());
+
+    robot.endCompetition();
+    robotThread.join();
+    robot.close();
+  }
+
+  /** Listener that appends {@code "<tag>:<event>:<opModeName>"} to a shared log. */
+  private static OpModeListener loggingListener(String tag, List<String> log) {
+    return new OpModeListener() {
+      @Override
+      public void onOpModeSelect(String opModeName, OpMode opMode) {
+        log.add(tag + ":select:" + opModeName);
+      }
+
+      @Override
+      public void onOpModeStart(String opModeName, OpMode opMode) {
+        log.add(tag + ":start:" + opModeName);
+      }
+
+      @Override
+      public void onOpModeStop(String opModeName, OpMode opMode) {
+        log.add(tag + ":stop:" + opModeName);
+      }
+
+      @Override
+      public void onOpModeClose(String opModeName, OpMode opMode) {
+        log.add(tag + ":close:" + opModeName);
+      }
+    };
+  }
+
+  private static void selectTeleop(String name, boolean enabled) {
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
+    DriverStationSim.setOpMode(OpModeOption.makeId(RobotMode.TELEOPERATED, name.hashCode()));
+    DriverStationSim.setEnabled(enabled);
+    DriverStationSim.notifyNewData();
+  }
+
+  @Test
+  void listenerLifecycleEvents() throws InterruptedException {
+    List<String> log = new CopyOnWriteArrayList<>();
+    MockRobot robot = new MockRobot();
+    robot.addOpMode(RobotMode.TELEOPERATED, "TestOpMode", MockOpMode::new);
+    robot.publishOpModes();
+    robot.registerListener(loggingListener("A", log));
+
+    DriverStationSim.setDsAttached(true);
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+    SimHooks.waitForProgramStart();
+
+    // Selected while disabled: only select fires
+    selectTeleop("TestOpMode", false);
+    SimHooks.stepTiming(PERIOD);
+    assertEquals(List.of("A:select:TestOpMode"), log);
+
+    // Enabled: start fires
+    selectTeleop("TestOpMode", true);
+    SimHooks.stepTiming(PERIOD);
+    assertEquals(List.of("A:select:TestOpMode", "A:start:TestOpMode"), log);
+
+    // Disabled: stop then close fire
+    log.clear();
+    selectTeleop("TestOpMode", false);
+    SimHooks.stepTiming(PERIOD);
+    assertEquals(List.of("A:stop:TestOpMode", "A:close:TestOpMode"), log.subList(0, 2));
+
+    robot.endCompetition();
+    robotThread.join();
+    robot.close();
+  }
+
+  @Test
+  void listenerOrdering() throws InterruptedException {
+    List<String> log = new CopyOnWriteArrayList<>();
+    MockRobot robot = new MockRobot();
+    robot.addOpMode(RobotMode.TELEOPERATED, "TestOpMode", MockOpMode::new);
+    robot.publishOpModes();
+    robot.registerListener(loggingListener("A", log));
+    robot.registerListener(loggingListener("B", log));
+
+    DriverStationSim.setDsAttached(true);
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+    SimHooks.waitForProgramStart();
+
+    selectTeleop("TestOpMode", true);
+    SimHooks.stepTiming(PERIOD);
+    // Select and start run in registration order
+    assertEquals(
+        List.of(
+            "A:select:TestOpMode",
+            "B:select:TestOpMode",
+            "A:start:TestOpMode",
+            "B:start:TestOpMode"),
+        log);
+
+    log.clear();
+    selectTeleop("TestOpMode", false);
+    SimHooks.stepTiming(PERIOD);
+    // Stop and close run in reverse registration order
+    assertEquals(
+        List.of(
+            "B:stop:TestOpMode", "A:stop:TestOpMode", "B:close:TestOpMode", "A:close:TestOpMode"),
+        log.subList(0, 4));
+
+    robot.endCompetition();
+    robotThread.join();
+    robot.close();
+  }
+
+  @Test
+  void removeListener() throws InterruptedException {
+    List<String> log = new CopyOnWriteArrayList<>();
+    MockRobot robot = new MockRobot();
+    robot.addOpMode(RobotMode.TELEOPERATED, "TestOpMode", MockOpMode::new);
+    robot.publishOpModes();
+    OpModeListener removed = loggingListener("removed", log);
+    robot.registerListener(removed);
+    robot.registerListener(loggingListener("kept", log));
+    robot.removeListener(removed);
+
+    DriverStationSim.setDsAttached(true);
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+    SimHooks.waitForProgramStart();
+
+    selectTeleop("TestOpMode", true);
+    SimHooks.stepTiming(PERIOD);
+    assertEquals(List.of("kept:select:TestOpMode", "kept:start:TestOpMode"), log);
 
     robot.endCompetition();
     robotThread.join();
