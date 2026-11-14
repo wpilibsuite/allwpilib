@@ -1,0 +1,54 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_test(
+    name = "aosnt_test",
+    size = "small",
+    srcs = glob(["cpp/*.cpp"]),
+    data = [
+        "//aosnt:aos_config",
+        "//aosnt:aos_duplicate_config",
+    ],
+    deps = [
+        "//aosnt",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_arrays_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_arrays_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_bad_attribute_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_clash_first_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_clash_second_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_conflict_first_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_conflict_second_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_defaults_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_defaults_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_enums_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_enums_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_recursive_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_recursive_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_scalars_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_scalars_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_spanning_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_spanning_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_test_schema",
+        "//aosnt/types:nt_types_fbs",
+        "//ntcore",
+        "//thirdparty/catch2",
+        "//wpiutil",
+        "//wpiutil/src/test/native:wpiutil-testlib",
+        "@aos//aos:configuration",
+        "@aos//aos:flatbuffer_merge",
+        "@aos//aos:init",
+        "@aos//aos:realtime",
+        "@aos//aos/events:simulated_event_loop",
+        "@aos//aos/flatbuffers:builder",
+        "@aos//aos/testing/ping_pong:ping_fbs",
+        "@aos_flatbuffers//:flatbuffers",
+        "@bazel_tools//tools/cpp/runfiles",
+    ],
+)
+
+test_suite(
+    name = "native",
+    tests = [
+        ":aosnt_test",
+    ],
+)
