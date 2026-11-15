@@ -27,20 +27,16 @@ import org.wpilib.simulation.testutils.EnumCallback;
 
 class DriverStationSimTest {
   @BeforeEach
-  void setUp() throws ReflectiveOperationException {
+  void setUp() {
     HAL.initialize();
-    resetUserProgramFlag();
+    resetDriverStation();
   }
 
   @AfterEach
-  @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
-  void resetUserProgramFlag() throws ReflectiveOperationException {
+  void resetDriverStation() {
     DriverStationSim.resetData();
     DriverStationSim.notifyNewData();
-
-    var field = DriverStationBackend.class.getDeclaredField("m_userProgramStarted");
-    field.setAccessible(true);
-    field.set(null, false);
+    DriverStationBackend.clearUserProgramStarted();
   }
 
   @Test
