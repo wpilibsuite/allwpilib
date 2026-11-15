@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -25,15 +26,12 @@ import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.EnumCallback;
 
 class DriverStationSimTest {
+  @BeforeEach
   @AfterEach
-  @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
-  void resetUserProgramFlag() throws ReflectiveOperationException {
+  void resetDriverStation() {
     DriverStationSim.resetData();
     DriverStationSim.notifyNewData();
-
-    var field = DriverStationBackend.class.getDeclaredField("m_userProgramStarted");
-    field.setAccessible(true);
-    field.set(null, false);
+    DriverStationBackend.clearUserProgramStarted();
   }
 
   @Test
