@@ -10,6 +10,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -345,13 +346,27 @@ std::optional<wpi::fields::Field> wpical::calibrate(
   std::map<int, Pose, std::less<int>> poses;
   std::vector<Constraint> constraints;
 
-  for (const auto& entry : std::filesystem::directory_iterator(inputDirPath)) {
-    if (entry.path().filename().string()[0] == '.') {
+  std::error_code ec;
+  auto entry = std::filesystem::directory_iterator(inputDirPath, ec);
+  if (ec) {
+    return std::nullopt;
+  }
+  const std::filesystem::directory_iterator end;
+  while (entry != end) {
+    if (entry->path().filename().string()[0] == '.') {
+      entry.increment(ec);
+      if (ec) {
+        return std::nullopt;
+      }
       continue;
     }
     if (!ProcessVideoFile(detector, cameraModel, tagSizeMeters,
-                          entry.path().string(), poses, constraints,
+                          entry->path().string(), poses, constraints,
                           showDebugWindow)) {
+      return std::nullopt;
+    }
+    entry.increment(ec);
+    if (ec) {
       return std::nullopt;
     }
   }

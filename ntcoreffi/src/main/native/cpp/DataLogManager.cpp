@@ -86,7 +86,8 @@ inline std::string GetOperatingDirectory() {
 #ifdef __FIRST_SYSTEMCORE__
   return "/home/systemcore";
 #else
-  return fs::current_path().string();
+  std::error_code ec;
+  return fs::current_path(ec).string();
 #endif
 }
 }  // namespace filesystem
@@ -340,7 +341,9 @@ void DeleteOldDataLogs(std::string_view logDir, uintmax_t freeSpace) {
   // Count all permanent logs toward the minimum, but only delete non-match
   // logs.
   std::vector<fs::directory_entry> entries;
-  for (auto&& entry : fs::directory_iterator{logDir, ec}) {
+  for (fs::directory_iterator it{logDir, ec}, end; !ec && it != end;
+       it.increment(ec)) {
+    auto&& entry = *it;
     auto filename = entry.path().filename().string();
     if (::wpi::util::starts_with(filename, "WPILIB_") &&
         entry.path().extension() == ".wpilog" &&
@@ -349,7 +352,8 @@ void DeleteOldDataLogs(std::string_view logDir, uintmax_t freeSpace) {
     }
   }
   std::sort(entries.begin(), entries.end(), [](const auto& a, const auto& b) {
-    return a.last_write_time() < b.last_write_time();
+    std::error_code ecA, ecB;
+    return a.last_write_time(ecA) < b.last_write_time(ecB);
   });
 
   int count = entries.size();
@@ -360,8 +364,9 @@ void DeleteOldDataLogs(std::string_view logDir, uintmax_t freeSpace) {
     if (IsMatchLog(entry.path().filename().string())) {
       continue;
     }
-    auto size = entry.file_size();
-    if (fs::remove(entry.path(), ec)) {
+    std::error_code ecSize;
+    auto size = entry.file_size(ecSize);
+    if (fs::remove(entry.path(), ec) && !ec && !ecSize) {
       --count;
       WPILIB_ReportError(warn::Warning, "DataLogManager: Deleted {}",
                          entry.path().string());
@@ -580,7 +585,9 @@ Instance::Instance(std::string_view dir, std::string_view filename,
   // have useful data and just clutter the filesystem.
   auto [logDir, internalStorage] = MakeLogDir(dir);
   std::error_code ec;
-  for (auto&& entry : fs::directory_iterator{logDir, ec}) {
+  for (fs::directory_iterator it{logDir, ec}, end; !ec && it != end;
+       it.increment(ec)) {
+    auto&& entry = *it;
     if (::wpi::util::starts_with(entry.path().stem().string(), "WPILIB_TBD_") &&
         entry.path().extension() == ".wpilog") {
       if (!fs::remove(entry, ec)) {
