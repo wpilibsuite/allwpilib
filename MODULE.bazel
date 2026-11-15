@@ -176,8 +176,8 @@ archive_override(
 bazel_dep(name = "bzlmodrio-opencv", version = "")
 archive_override(
     module_name = "bzlmodrio-opencv",
-    integrity = "sha256-WPeLraGmt9Fv8tYXvyzxDAGTZ1BW5qb6g95bXIk6otw=",
-    urls = ["https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-3.bcr1/bzlmodRio-opencv-2027.4.13.0-3.bcr1.tar.gz"],
+    integrity = "sha256-BG0kkai/sJuLFJ4wDWdz/IxKTpeR5DM0WcYlUvOJSk8=",
+    urls = ["https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-4/bzlmodRio-opencv-2027.4.13.0-4.tar.gz"],
 )
 
 bazel_dep(name = "protobuf", version = "35.1")
