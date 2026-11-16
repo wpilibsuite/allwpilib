@@ -99,6 +99,7 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     BooleanCallback callback = new BooleanCallback();
 
     try (PneumaticHub ph = new PneumaticHub(BUS);
@@ -118,6 +119,7 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     EnumCallback callback = new EnumCallback();
 
     try (PneumaticHub ph = new PneumaticHub(BUS);
@@ -138,6 +140,7 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     EnumCallback callback = new EnumCallback();
 
     try (PneumaticHub ph = new PneumaticHub(BUS);
@@ -158,6 +161,7 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     EnumCallback callback = new EnumCallback();
 
     try (PneumaticHub ph = new PneumaticHub(BUS);
@@ -178,6 +182,7 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     BooleanCallback callback = new BooleanCallback();
 
     try (PneumaticHub ph = new PneumaticHub(BUS);
@@ -197,6 +202,7 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     DoubleCallback callback = new DoubleCallback();
 
     try (PneumaticHub ph = new PneumaticHub(BUS);
