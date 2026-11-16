@@ -9,15 +9,19 @@ void Robot::RobotPeriodic() {}
 
 void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
+void Robot::AutonomousExit() {}
 
 void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {}
+void Robot::TeleopExit() {}
 
 void Robot::DisabledInit() {}
 void Robot::DisabledPeriodic() {}
+void Robot::DisabledExit() {}
 
 void Robot::UtilityInit() {}
 void Robot::UtilityPeriodic() {}
+void Robot::UtilityExit() {}
 
 void Robot::SimulationInit() {}
 void Robot::SimulationPeriodic() {}
