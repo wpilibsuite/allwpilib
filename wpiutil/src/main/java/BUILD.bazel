@@ -1,0 +1,25 @@
+load("@rules_jvm_external//:defs.bzl", "java_plugin_artifact")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_java_library")
+
+wpilib_jni_java_library(
+    name = "wpiutil-java",
+    srcs = glob(["**/*.java"]),
+    maven_artifact_name = "wpiutil-java",
+    maven_group_id = "org.wpilib.wpiutil",
+    native_libs = ["//wpiutil:shared/wpiutiljni"],
+    plugins = [
+        java_plugin_artifact("io.avaje:avaje-jsonb-generator", "io.avaje.jsonb.generator.JsonbProcessor"),
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":wpiutil-java",
+    visibility = ["//visibility:public"],
+)

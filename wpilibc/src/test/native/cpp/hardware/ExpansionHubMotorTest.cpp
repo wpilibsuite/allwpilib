@@ -4,14 +4,16 @@
 
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/hal/HAL.h"
 #include "wpi/system/Errors.hpp"
 
 namespace wpi {
-TEST(ExpansionHubMotorTest, FollowerLoopDetection) {
-  HAL_Initialize(500, 0);
+TEST_CASE("ExpansionHubMotorTest FollowerLoopDetection",
+          "[wpilibc][hardware]") {
+  HAL_Initialize();
 
   wpi::ExpansionHubMotor motor0{0, 0};
   wpi::ExpansionHubMotor motor1{0, 1};
@@ -20,12 +22,12 @@ TEST(ExpansionHubMotorTest, FollowerLoopDetection) {
   // Test that a simple loop is detected
   motor1.Follow(motor2, wpi::ExpansionHubMotor::FollowDirection::Opposed);
   motor2.Follow(motor0, wpi::ExpansionHubMotor::FollowDirection::Opposed);
-  EXPECT_THROW(
+  CHECK_THROWS_AS(
       motor0.Follow(motor1, wpi::ExpansionHubMotor::FollowDirection::Opposed),
       wpi::RuntimeError);
 }
-TEST(ExpansionHubMotorTest, Follower) {
-  HAL_Initialize(500, 0);
+TEST_CASE("ExpansionHubMotorTest Follower", "[wpilibc][hardware]") {
+  HAL_Initialize();
 
   wpi::ExpansionHubMotor motor0{0, 0};
   wpi::ExpansionHubMotor motor1{0, 1};

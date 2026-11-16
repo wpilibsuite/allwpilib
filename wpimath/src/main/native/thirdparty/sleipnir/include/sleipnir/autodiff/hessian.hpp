@@ -2,16 +2,21 @@
 
 #pragma once
 
+#include <cstddef>
 #include <utility>
 
+#include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <gch/small_vector.hpp>
 
+#include "sleipnir/autodiff/expression.hpp"
 #include "sleipnir/autodiff/expression_graph.hpp"
+#include "sleipnir/autodiff/expression_type.hpp"
 #include "sleipnir/autodiff/variable.hpp"
 #include "sleipnir/autodiff/variable_matrix.hpp"
 #include "sleipnir/util/assert.hpp"
 #include "sleipnir/util/concepts.hpp"
+#include "sleipnir/util/empty.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
 
 namespace slp {
@@ -45,7 +50,7 @@ class Hessian {
       : m_variables{detail::gradient_tree(
             detail::topological_sort(variable.expr), wrt)},
         m_wrt{std::move(wrt)} {
-    slp_assert(wrt.cols() == 1);
+    slp_assert(m_wrt.cols() == 1);
 
     for (auto& variable : m_variables) {
       m_top_lists.emplace_back(detail::topological_sort(variable.expr));
@@ -111,9 +116,9 @@ class Hessian {
       auto grad = detail::gradient_tree(m_top_lists[row], m_wrt);
       for (int col = 0; col < m_wrt.rows(); ++col) {
         if (grad[col].expr != nullptr) {
-          result(row, col) = std::move(grad[col]);
+          result[row, col] = std::move(grad[col]);
         } else {
-          result(row, col) = Variable{Scalar(0)};
+          result[row, col] = Variable{Scalar(0)};
         }
       }
     }

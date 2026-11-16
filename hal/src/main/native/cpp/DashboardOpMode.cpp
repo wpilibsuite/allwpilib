@@ -5,10 +5,9 @@
 #include "wpi/hal/DashboardOpMode.hpp"
 
 #include <atomic>
+#include <format>
 #include <string>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/nt/NetworkTableInstance.hpp"
@@ -26,11 +25,11 @@ namespace {
 class DashboardOpModeSender {
  public:
   void Start(nt::NetworkTableInstance inst, std::string_view tableName) {
-    m_typeTopic = inst.GetStringTopic(fmt::format("{}/.type", tableName));
+    m_typeTopic = inst.GetStringTopic(std::format("{}/.type", tableName));
     m_optionsTopic =
-        inst.GetStringArrayTopic(fmt::format("{}/options", tableName));
-    m_activeTopic = inst.GetStringTopic(fmt::format("{}/active", tableName));
-    m_selectedSub = inst.GetStringTopic(fmt::format("{}/selected", tableName))
+        inst.GetStringArrayTopic(std::format("{}/options", tableName));
+    m_activeTopic = inst.GetStringTopic(std::format("{}/active", tableName));
+    m_selectedSub = inst.GetStringTopic(std::format("{}/selected", tableName))
                         .Subscribe("");
     m_selectedListener = nt::NetworkTableListener::CreateListener(
         m_selectedSub, NT_EVENT_VALUE_ALL | NT_EVENT_IMMEDIATE,

@@ -4,38 +4,36 @@
 
 #pragma once
 
-#include <ostream>
 #include <span>
 #include <string>
-#include <string_view>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_tostring.hpp>
 
 #include "wpi/util/json.hpp"
 
-namespace wpi::util {
-
-inline void PrintTo(std::string_view str, ::std::ostream* os) {
-  ::testing::internal::PrintStringTo(std::string{str}, os);
-}
+namespace Catch {
 
 template <typename T>
-void PrintTo(std::span<T> val, ::std::ostream* os) {
-  *os << '{';
-  bool first = true;
-  for (auto v : val) {
-    if (first) {
-      first = false;
-    } else {
-      *os << ", ";
+struct StringMaker<std::span<T>> {
+  static std::string convert(std::span<T> val) {
+    std::string rv = "{";
+    bool first = true;
+    for (auto v : val) {
+      if (first) {
+        first = false;
+      } else {
+        rv += ", ";
+      }
+      rv += Detail::stringify(v);
     }
-    *os << ::testing::PrintToString(v);
+    rv += '}';
+    return rv;
   }
-  *os << '}';
-}
+};
 
-inline void PrintTo(const json& val, ::std::ostream* os) {
-  *os << val.to_string();
-}
+template <>
+struct StringMaker<wpi::json> {
+  static std::string convert(const wpi::json& val) { return val.to_string(); }
+};
 
-}  // namespace wpi::util
+}  // namespace Catch

@@ -5,12 +5,12 @@
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
 
 #include <chrono>
+#include <format>
 #include <memory>
 #include <string>
 #include <thread>
 
 #include "wpi/framework/RobotBase.hpp"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubCRServo.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubServo.hpp"
@@ -18,6 +18,7 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
 #include "wpi/system/Timer.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -30,7 +31,7 @@ class ExpansionHub::DataStore {
     auto systemServer = SystemServer::GetSystemServer();
 
     m_hubConnectedSubscriber =
-        systemServer.GetBooleanTopic(fmt::format("/rhsp/{}/connected", usbId))
+        systemServer.GetBooleanTopic(std::format("/rhsp/{}/connected", usbId))
             .Subscribe(false);
 
     // Wait up to half a second for connected to come up, using a poll loop to
@@ -137,19 +138,26 @@ void ExpansionHub::UnreserveMotor(int channel) {
 }
 
 void ExpansionHub::ReportUsage(std::string_view device, std::string_view data) {
-  HAL_ReportUsage(
-      fmt::format("ExpansionHub[{}]/{}", m_dataStore->m_usbId, device), data);
+  wpi::util::ReportUsage(
+      std::format("ExpansionHub[{}]/{}", m_dataStore->m_usbId, device), data);
+}
+
+void ExpansionHub::ReportUsage(std::string_view device, int instanceNumber,
+                               std::string_view data) {
+  wpi::util::ReportUsage(
+      std::format("ExpansionHub[{}]/{}", m_dataStore->m_usbId, device),
+      instanceNumber, data);
 }
 
 std::string ExpansionHub::DataStore::getFollowerStringCycle(
     int baseChannel, std::array<int, NumMotorPorts>& followerVisited) {
-  std::string result = fmt::format("{}", baseChannel);
+  std::string result = std::format("{}", baseChannel);
   int current = baseChannel;
   while (followerVisited[current] != baseChannel) {
     current = followerVisited[current];
-    result += fmt::format(" -> {}", current);
+    result += std::format(" -> {}", current);
   }
-  result += fmt::format(" -> {}", followerVisited[current]);
+  result += std::format(" -> {}", followerVisited[current]);
   return result;
 }
 

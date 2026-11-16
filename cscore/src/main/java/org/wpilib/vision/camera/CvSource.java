@@ -43,8 +43,8 @@ public class CvSource extends ImageSource {
    * Put an OpenCV image and notify sinks.
    *
    * <p>The image format is guessed from the number of channels. The channel mapping is as follows.
-   * 1: kGray 2: kYUYV 3: BGR 4: BGRA Any other channel numbers will throw an error. If your image
-   * is an in alternate format, use the overload that takes a PixelFormat.
+   * 1: GRAY 2: YUYV 3: BGR 4: BGRA Any other channel numbers will throw an error. If your image is
+   * an in alternate format, use the overload that takes a PixelFormat.
    *
    * @param image OpenCV Image
    */

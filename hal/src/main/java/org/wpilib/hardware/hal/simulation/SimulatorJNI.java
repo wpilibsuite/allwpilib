@@ -33,8 +33,18 @@ public class SimulatorJNI extends JNIWrapper {
 
   public static native boolean isTimingPaused();
 
+  /**
+   * Advances simulated timing by the given amount.
+   *
+   * @param delta amount to advance in nanoseconds
+   */
   public static native void stepTiming(long delta);
 
+  /**
+   * Advances simulated timing asynchronously by the given amount.
+   *
+   * @param delta amount to advance in nanoseconds
+   */
   public static native void stepTimingAsync(long delta);
 
   public static native void resetHandles();

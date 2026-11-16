@@ -26,7 +26,7 @@ def test_difference():
 
 def test_rotate_by():
     another = Translation2d(3.0, 0.0)
-    rotated = another.rotateBy(Rotation2d.fromDegrees(90))
+    rotated = another.rotate_by(Rotation2d.from_degrees(90))
 
     assert rotated.x == pytest.approx(0.0, abs=1e-9)
     assert rotated.y == pytest.approx(3.0, abs=1e-9)
@@ -35,7 +35,7 @@ def test_rotate_by():
 def test_rotate_around():
     translation = Translation2d(2.0, 1.0)
     other = Translation2d(3.0, 2.0)
-    rotated = translation.rotateAround(other, Rotation2d.fromDegrees(180))
+    rotated = translation.rotate_around(other, Rotation2d.from_degrees(180))
 
     assert rotated.x == pytest.approx(4.0, abs=1e-9)
     assert rotated.y == pytest.approx(3.0, abs=1e-9)
@@ -64,7 +64,7 @@ def test_norm():
 
 def test_squared_norm():
     one = Translation2d(3.0, 5.0)
-    assert one.squaredNorm() == pytest.approx(34.0)
+    assert one.squared_norm() == pytest.approx(34.0)
 
 
 def test_distance():
@@ -100,11 +100,11 @@ def test_inequality():
 
 
 def test_polar_constructor():
-    one = Translation2d(math.sqrt(2), Rotation2d.fromDegrees(45))
+    one = Translation2d(math.sqrt(2), Rotation2d.from_degrees(45))
     assert one.x == pytest.approx(1.0)
     assert one.y == pytest.approx(1.0)
 
-    two = Translation2d(2.0, Rotation2d.fromDegrees(60))
+    two = Translation2d(2.0, Rotation2d.from_degrees(60))
     assert two.x == pytest.approx(1.0)
     assert two.y == pytest.approx(math.sqrt(3.0))
 
@@ -112,11 +112,11 @@ def test_polar_constructor():
 def test_nearest():
     origin = Translation2d(0.0, 0.0)
 
-    translation1 = Translation2d(1.0, Rotation2d.fromDegrees(45))
-    translation2 = Translation2d(2.0, Rotation2d.fromDegrees(90))
-    translation3 = Translation2d(3.0, Rotation2d.fromDegrees(135))
-    translation4 = Translation2d(4.0, Rotation2d.fromDegrees(180))
-    translation5 = Translation2d(5.0, Rotation2d.fromDegrees(270))
+    translation1 = Translation2d(1.0, Rotation2d.from_degrees(45))
+    translation2 = Translation2d(2.0, Rotation2d.from_degrees(90))
+    translation3 = Translation2d(3.0, Rotation2d.from_degrees(135))
+    translation4 = Translation2d(4.0, Rotation2d.from_degrees(180))
+    translation5 = Translation2d(5.0, Rotation2d.from_degrees(270))
 
     assert origin.nearest([translation5, translation3, translation4]) == translation3
     assert origin.nearest([translation1, translation2, translation3]) == translation1

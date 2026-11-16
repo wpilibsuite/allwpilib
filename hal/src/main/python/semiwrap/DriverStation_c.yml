@@ -45,3 +45,4 @@ functions:
   HAL_SetOpModeOptions:
   HAL_ObserveUserProgram:
   HAL_GetGameData:
+  HAL_WriteDisplayAnsi:

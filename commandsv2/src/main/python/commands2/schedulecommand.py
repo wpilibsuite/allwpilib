@@ -15,17 +15,17 @@ class ScheduleCommand(Command):
         """
         Creates a new ScheduleCommand that schedules the given commands when initialized.
 
-        :param toSchedule: the commands to schedule
+        :param commands: the commands to schedule
         """
         super().__init__()
-        self._toSchedule = set(commands)
+        self._to_schedule = set(commands)
 
     def initialize(self):
-        for command in self._toSchedule:
+        for command in self._to_schedule:
             command.schedule()
 
-    def isFinished(self) -> bool:
+    def is_finished(self) -> bool:
         return True
 
-    def runsWhenDisabled(self) -> bool:
+    def runs_when_disabled(self) -> bool:
         return True

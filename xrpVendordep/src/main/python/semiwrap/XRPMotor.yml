@@ -6,7 +6,6 @@ classes:
       GetThrottle:
       SetInverted:
       GetInverted:
-      Disable:
       StopMotor:
       GetDescription:
       AddFollower:

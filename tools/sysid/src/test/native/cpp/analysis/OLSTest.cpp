@@ -4,39 +4,75 @@
 
 #include "wpi/sysid/analysis/OLS.hpp"
 
-#include <gtest/gtest.h>
+#ifndef NDEBUG
+#ifndef _WIN32
+#include <sys/wait.h>
+#include <unistd.h>
 
-TEST(OLSTest, TwoVariablesTwoPoints) {
+#include <csignal>
+#include <cstdio>
+#endif
+#endif
+
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+#ifndef NDEBUG
+#ifndef _WIN32
+namespace {
+
+template <typename F>
+bool Dies(F&& f) {
+  pid_t pid = fork();
+  REQUIRE(pid >= 0);
+
+  if (pid == 0) {
+    std::signal(SIGABRT, SIG_DFL);
+    std::freopen("/dev/null", "w", stderr);
+    f();
+    _exit(0);
+  }
+
+  int status = 0;
+  REQUIRE(waitpid(pid, &status, 0) == pid);
+  return WIFSIGNALED(status) || (WIFEXITED(status) && WEXITSTATUS(status) != 0);
+}
+
+}  // namespace
+#endif
+#endif
+
+TEST_CASE("OLSTest TwoVariablesTwoPoints", "[sysid]") {
   // (1, 3) and (2, 5). Should produce y = 2x + 1.
   Eigen::MatrixXd X{{1.0, 1.0}, {1.0, 2.0}};
   Eigen::VectorXd y{{3.0}, {5.0}};
 
   auto [coeffs, rSquared, rmse] = sysid::OLS(X, y);
-  EXPECT_EQ(coeffs.size(), 2u);
+  CHECK(coeffs.size() == 2u);
 
-  EXPECT_NEAR(coeffs[0], 1.0, 1e-12);
-  EXPECT_NEAR(coeffs[1], 2.0, 1e-12);
-  EXPECT_DOUBLE_EQ(rSquared, 1.0);
+  CHECK(coeffs[0] == Catch::Approx(1.0).margin(1e-12));
+  CHECK(coeffs[1] == Catch::Approx(2.0).margin(1e-12));
+  CHECK(rSquared == Catch::Approx(1.0).margin(1e-12));
 }
 
-TEST(OLSTest, TwoVariablesFivePoints) {
+TEST_CASE("OLSTest TwoVariablesFivePoints", "[sysid]") {
   // (2, 4), (3, 5), (5, 7), (7, 10), (9, 15)
   // Should produce 1.518x + 0.305.
   Eigen::MatrixXd X{{1, 2}, {1, 3}, {1, 5}, {1, 7}, {1, 9}};
   Eigen::VectorXd y{{4}, {5}, {7}, {10}, {15}};
 
   auto [coeffs, rSquared, rmse] = sysid::OLS(X, y);
-  EXPECT_EQ(coeffs.size(), 2u);
+  CHECK(coeffs.size() == 2u);
 
-  EXPECT_NEAR(coeffs[0], 0.30487804878048774, 1e-12);
-  EXPECT_NEAR(coeffs[1], 1.5182926829268293, 1e-12);
-  EXPECT_DOUBLE_EQ(rSquared, 0.91906029466386019);
+  CHECK(coeffs[0] == Catch::Approx(0.30487804878048774).margin(1e-12));
+  CHECK(coeffs[1] == Catch::Approx(1.5182926829268293).margin(1e-12));
+  CHECK(rSquared == Catch::Approx(0.91906029466386019).margin(1e-12));
 }
 
-#ifndef NDEBUG
-TEST(OLSTest, MalformedData) {
+#if !defined(NDEBUG) && !defined(_WIN32)
+TEST_CASE("OLSTest MalformedData", "[sysid]") {
   Eigen::MatrixXd X{{1, 2}, {1, 3}, {1, 4}};
   Eigen::VectorXd y{{4}, {5}};
-  EXPECT_DEATH(sysid::OLS(X, y), "");
+  CHECK(Dies([&] { sysid::OLS(X, y); }));
 }
 #endif

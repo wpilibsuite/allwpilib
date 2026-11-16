@@ -51,6 +51,8 @@ class InstanceImpl {
   void StopClient();
   void SetServers(
       std::span<const std::pair<std::string, unsigned int>> servers);
+  void SetServers(std::span<const std::pair<std::string, unsigned int>> servers,
+                  const INetworkClient::ServerResolver& resolver);
 
   std::shared_ptr<NetworkServer> GetServer();
   std::shared_ptr<INetworkClient> GetClient();
@@ -71,19 +73,29 @@ class InstanceImpl {
   static int AllocImpl();
 
   static std::atomic<int> s_default;
-  static constexpr int kNumInstances = 16;
-  static std::atomic<InstanceImpl*> s_instances[kNumInstances];
+  static constexpr int NUM_INSTANCES = 16;
+  static std::atomic<InstanceImpl*> s_instances[NUM_INSTANCES];
   static wpi::util::mutex s_mutex;
 
   struct Cleanup {
     ~Cleanup() {
+      // Keep instances alive for other global destructors, but stop their
+      // threads. Stop all listeners before shutting down any network threads.
       for (auto&& inst : s_instances) {
-        // don't actually destroy (due to undefined global destruction order),
-        // but stop all listener threads
         if (auto i = inst.load()) {
           i->listenerStorage.Reset();
         }
       }
+#ifndef _WIN32
+      // Stop network threads before libuv shuts down its global thread pool.
+      // Windows has already terminated threads when DLL destructors run.
+      for (auto&& inst : s_instances) {
+        if (auto i = inst.load()) {
+          i->StopServer();
+          i->StopClient();
+        }
+      }
+#endif
     }
   };
   static Cleanup s_cleanup;
@@ -92,6 +104,7 @@ class InstanceImpl {
   std::shared_ptr<NetworkServer> m_networkServer;
   std::shared_ptr<INetworkClient> m_networkClient;
   std::vector<std::pair<std::string, unsigned int>> m_servers;
+  std::optional<INetworkClient::ServerResolver> m_serverResolver;
   std::optional<int64_t> m_serverTimeOffset;
   int64_t m_rtt2 = 0;
   int m_inst;

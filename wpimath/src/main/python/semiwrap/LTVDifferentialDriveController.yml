@@ -8,4 +8,4 @@ classes:
         overloads:
           ? const Pose2d&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, const Pose2d&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t
           :
-          const Pose2d&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, const Trajectory::State&:
+          const Pose2d&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, const DifferentialSample&:

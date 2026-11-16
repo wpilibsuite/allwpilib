@@ -44,39 +44,38 @@ class HandleBase {
   static void ResetGlobalHandles();
 
  protected:
-  int16_t m_version;
+  int16_t m_version = 0;
 };
 
 constexpr int16_t INVALID_HANDLE_INDEX = -1;
 
 /**
- * Enum of HAL handle types. Vendors/Teams should use Vendor (12).
+ * Enum of HAL handle types. Vendors/Teams should use VENDOR.
  */
 enum class HAL_HandleEnum {
   UNDEFINED = 0,
   DIO = wpi::util::HANDLE_TYPE_HAL_BASE,
   PORT = 2,
-  NOTIFIER = 3,
-  ANALOG_INPUT = 4,
-  PWM = 5,
-  DIGITAL_PWM = 6,
-  COUNTER = 7,
-  FPGA_ENCODER = 8,
-  ENCODER = 9,
-  COMPRESSOR = 10,
-  SOLENOID = 11,
-  VENDOR = 12,
-  SIMULATION_JNI = 13,
-  CAN = 14,
-  SERIAL_PORT = 15,
-  DUTY_CYCLE = 16,
-  ADDRESSABLE_LED = 17,
-  CTRE_PCM = 18,
-  CTRE_PDP = 19,
-  REV_PDH = 20,
-  REV_PH = 21,
-  CAN_STREAM = 22,
-  ALERT = 23,
+  NOTIFIER,
+  ANALOG_INPUT,
+  PWM,
+  COUNTER,
+  FPGA_ENCODER,
+  ENCODER,
+  COMPRESSOR,
+  SOLENOID,
+  VENDOR,
+  SIMULATION_JNI,
+  CAN,
+  SERIAL_PORT,
+  DUTY_CYCLE,
+  ADDRESSABLE_LED,
+  CTRE_PCM,
+  CTRE_PDP,
+  REV_PDH,
+  REV_PH,
+  CAN_STREAM,
+  ALERT,
 };
 
 /**
@@ -115,7 +114,7 @@ static inline bool isHandleType(HAL_Handle handle, HAL_HandleEnum handleType) {
 /**
  * Get if the version of the handle is correct.
  *
- * Do not use on the roboRIO, used specifically for the sim to handle resets.
+ * Do not use on the Systemcore, used specifically for the sim to handle resets.
  *
  * @param handle  the handle
  * @param version the handle version to check
@@ -128,7 +127,7 @@ static inline bool isHandleCorrectVersion(HAL_Handle handle, int16_t version) {
 /**
  * Get if the handle is a correct type and version.
  *
- * Note the version is not checked on the roboRIO.
+ * Note the version is not checked on the Systemcore.
  *
  * @param handle     the handle
  * @param enumType   the type to check
@@ -161,7 +160,7 @@ inline int16_t getHandleTypedIndex(HAL_Handle handle, HAL_HandleEnum enumType,
 /**
  * Create a handle for a specific index, type and version.
  *
- * Note the version is not checked on the roboRIO.
+ * Note the version is not checked on the Systemcore.
  *
  * @param index      the index
  * @param handleType the handle type

@@ -14,7 +14,9 @@
 using namespace wpi::cmd;
 class ParallelRaceGroupTest : public CommandTestBase {};
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceSchedule) {
+TEST_CASE_METHOD(ParallelRaceGroupTest,
+                 "ParallelRaceGroupTest ParallelRaceSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -29,17 +31,17 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceSchedule) {
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
-  EXPECT_CALL(*command1, Initialize());
-  EXPECT_CALL(*command1, Execute()).Times(2);
-  EXPECT_CALL(*command1, End(true));
+  command1->ExpectInitialize(1);
+  command1->ExpectExecute(2);
+  command1->ExpectEnd(true, 1);
 
-  EXPECT_CALL(*command2, Initialize());
-  EXPECT_CALL(*command2, Execute()).Times(2);
-  EXPECT_CALL(*command2, End(false));
+  command2->ExpectInitialize(1);
+  command2->ExpectExecute(2);
+  command2->ExpectEnd(false, 1);
 
-  EXPECT_CALL(*command3, Initialize());
-  EXPECT_CALL(*command3, Execute()).Times(2);
-  EXPECT_CALL(*command3, End(true));
+  command3->ExpectInitialize(1);
+  command3->ExpectExecute(2);
+  command3->ExpectEnd(true, 1);
 
   scheduler.Schedule(&group);
 
@@ -47,10 +49,12 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceSchedule) {
   command2->SetFinished(true);
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  CHECK_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceInterrupt) {
+TEST_CASE_METHOD(ParallelRaceGroupTest,
+                 "ParallelRaceGroupTest ParallelRaceInterrupt",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -65,17 +69,17 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceInterrupt) {
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
-  EXPECT_CALL(*command1, Initialize());
-  EXPECT_CALL(*command1, Execute()).Times(1);
-  EXPECT_CALL(*command1, End(true));
+  command1->ExpectInitialize(1);
+  command1->ExpectExecute(1);
+  command1->ExpectEnd(true, 1);
 
-  EXPECT_CALL(*command2, Initialize());
-  EXPECT_CALL(*command2, Execute()).Times(1);
-  EXPECT_CALL(*command2, End(true));
+  command2->ExpectInitialize(1);
+  command2->ExpectExecute(1);
+  command2->ExpectEnd(true, 1);
 
-  EXPECT_CALL(*command3, Initialize());
-  EXPECT_CALL(*command3, Execute()).Times(1);
-  EXPECT_CALL(*command3, End(true));
+  command3->ExpectInitialize(1);
+  command3->ExpectExecute(1);
+  command3->ExpectEnd(true, 1);
 
   scheduler.Schedule(&group);
 
@@ -83,18 +87,22 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceInterrupt) {
   scheduler.Cancel(&group);
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  CHECK_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancel) {
+TEST_CASE_METHOD(ParallelRaceGroupTest,
+                 "ParallelRaceGroupTest ParallelRaceNotScheduledCancel",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   auto group = Race(None(), None());
 
-  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(group));
+  CHECK_NOTHROW(scheduler.Cancel(group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceCopy) {
+TEST_CASE_METHOD(ParallelRaceGroupTest,
+                 "ParallelRaceGroupTest ParallelRaceCopy",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
@@ -104,13 +112,15 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceCopy) {
   auto group = Race(std::move(command));
   scheduler.Schedule(group);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(group));
+  CHECK(scheduler.IsScheduled(group));
   finished = true;
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(group));
+  CHECK_FALSE(scheduler.IsScheduled(group));
 }
 
-TEST_F(ParallelRaceGroupTest, RaceGroupRequirement) {
+TEST_CASE_METHOD(ParallelRaceGroupTest,
+                 "ParallelRaceGroupTest RaceGroupRequirement",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement1;
@@ -127,11 +137,13 @@ TEST_F(ParallelRaceGroupTest, RaceGroupRequirement) {
   scheduler.Schedule(group);
   scheduler.Schedule(command3);
 
-  EXPECT_TRUE(scheduler.IsScheduled(command3));
-  EXPECT_FALSE(scheduler.IsScheduled(group));
+  CHECK(scheduler.IsScheduled(command3));
+  CHECK_FALSE(scheduler.IsScheduled(group));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnce) {
+TEST_CASE_METHOD(ParallelRaceGroupTest,
+                 "ParallelRaceGroupTest ParallelRaceOnlyCallsEndOnce",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished1 = false;
@@ -147,15 +159,17 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceOnlyCallsEndOnce) {
 
   scheduler.Schedule(group2);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(group2));
+  CHECK(scheduler.IsScheduled(group2));
   finished1 = true;
   scheduler.Run();
   finished2 = true;
-  EXPECT_NO_FATAL_FAILURE(scheduler.Run());
-  EXPECT_FALSE(scheduler.IsScheduled(group2));
+  CHECK_NOTHROW(scheduler.Run());
+  CHECK_FALSE(scheduler.IsScheduled(group2));
 }
 
-TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTwice) {
+TEST_CASE_METHOD(ParallelRaceGroupTest,
+                 "ParallelRaceGroupTest ParallelRaceScheduleTwice",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -170,17 +184,17 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTwice) {
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
-  EXPECT_CALL(*command1, Initialize()).Times(2);
-  EXPECT_CALL(*command1, Execute()).Times(5);
-  EXPECT_CALL(*command1, End(true)).Times(2);
+  command1->ExpectInitialize(2);
+  command1->ExpectExecute(5);
+  command1->ExpectEnd(true, 2);
 
-  EXPECT_CALL(*command2, Initialize()).Times(2);
-  EXPECT_CALL(*command2, Execute()).Times(5);
-  EXPECT_CALL(*command2, End(false)).Times(2);
+  command2->ExpectInitialize(2);
+  command2->ExpectExecute(5);
+  command2->ExpectEnd(false, 2);
 
-  EXPECT_CALL(*command3, Initialize()).Times(2);
-  EXPECT_CALL(*command3, Execute()).Times(5);
-  EXPECT_CALL(*command3, End(true)).Times(2);
+  command3->ExpectInitialize(2);
+  command3->ExpectExecute(5);
+  command3->ExpectEnd(true, 2);
 
   scheduler.Schedule(&group);
 
@@ -188,22 +202,22 @@ TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTwice) {
   command2->SetFinished(true);
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  CHECK_FALSE(scheduler.IsScheduled(&group));
 
   command2->SetFinished(false);
 
   scheduler.Schedule(&group);
 
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&group));
+  CHECK(scheduler.IsScheduled(&group));
 
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&group));
+  CHECK(scheduler.IsScheduled(&group));
 
   command2->SetFinished(true);
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  CHECK_FALSE(scheduler.IsScheduled(&group));
 }
 
 INSTANTIATE_MULTI_COMMAND_COMPOSITION_TEST_SUITE(ParallelRaceGroupTest,

@@ -1,0 +1,4 @@
+classes:
+  wpi::PWMVenom:
+    methods:
+      PWMVenom:

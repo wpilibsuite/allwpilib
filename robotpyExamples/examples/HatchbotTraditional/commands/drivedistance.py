@@ -4,6 +4,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import commands2
 
 from subsystems.drivesubsystem import DriveSubsystem
@@ -14,17 +16,21 @@ class DriveDistance(commands2.Command):
         self.distance = inches
         self.velocity = velocity
         self.drive = drive
-        self.addRequirements(drive)
+        self.add_requirements(drive)
 
+    @override
     def initialize(self) -> None:
-        self.drive.resetEncoders()
-        self.drive.arcadeDrive(self.velocity, 0)
+        self.drive.reset_encoders()
+        self.drive.arcade_drive(self.velocity, 0)
 
+    @override
     def execute(self) -> None:
-        self.drive.arcadeDrive(self.velocity, 0)
+        self.drive.arcade_drive(self.velocity, 0)
 
+    @override
     def end(self, interrupted: bool) -> None:
-        self.drive.arcadeDrive(0, 0)
+        self.drive.arcade_drive(0, 0)
 
-    def isFinished(self) -> bool:
-        return abs(self.drive.getAverageEncoderDistance()) >= self.distance
+    @override
+    def is_finished(self) -> bool:
+        return abs(self.drive.get_average_encoder_distance()) >= self.distance

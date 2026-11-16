@@ -26,7 +26,7 @@ def cfg_logging(caplog):
 @pytest.fixture(scope="function")
 def nt(cfg_logging):
     instance = NetworkTableInstance.create()
-    instance.startLocal()
+    instance.start_local()
 
     try:
         yield instance
@@ -51,8 +51,8 @@ class NtTestBase:
 
     def reset(self):
         self._impl = NetworkTableInstance.create()
-        self.getTable = self._impl.getTable
-        self.isConnected = self._impl.isConnected
+        self.get_table = self._impl.get_table
+        self.is_connected = self._impl.is_connected
 
     def shutdown(self):
         logger.info("shutting down %s", self.__class__.__name__)
@@ -84,7 +84,7 @@ class NtTestBase:
         self._wait = 0
 
         self.msub = MultiSubscriber(self._impl, [""])
-        self.vl = self._impl.addListener(
+        self.vl = self._impl.add_listener(
             self.msub, EventFlags.VALUE_REMOTE, self._wait_cb
         )
 
@@ -130,7 +130,7 @@ def nt_server(request, cfg_logging):
             if self._test_saved_port is not None:
                 self.port = self._test_saved_port
 
-            self._impl.startServer(listen_address="127.0.0.1", port=self.port)
+            self._impl.start_server(listen_address="127.0.0.1", port=self.port)
 
             self._test_saved_port = self.port
 
@@ -146,8 +146,8 @@ def nt_server(request, cfg_logging):
 def nt_client(request, nt_server):
     class NtClient(NtTestBase):
         def start_test(self):
-            self._impl.startClient("C4")
-            self._impl.setServer("127.0.0.1", nt_server.port)
+            self._impl.start_client("C4")
+            self._impl.set_server("127.0.0.1", nt_server.port)
 
     client = NtClient()
     client._init_client()

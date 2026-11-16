@@ -13,37 +13,29 @@
 using namespace wpi::glass;
 
 static void LabelSimDevice(const char* name, const char* simDeviceName) {
-  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+  ImGui::PushStyleColor(ImGuiCol_Text,
+                        ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
   ImGui::LabelText(name, "%s", simDeviceName);
   ImGui::PopStyleColor();
 }
 
 void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
-  auto dpwm = model->GetDPWM();
   auto dutyCycle = model->GetDutyCycle();
   auto encoder = model->GetEncoder();
 
   auto dioData = model->GetValueData();
-  auto dpwmData = dpwm ? dpwm->GetValueData() : nullptr;
   auto dutyCycleData = dutyCycle ? dutyCycle->GetValueData() : nullptr;
 
   bool exists = model->Exists();
   NameSetting dioName{dioData->GetName()};
   char label[128];
-  if (exists && dpwmData) {
-    NameSetting{dpwmData->GetName()}.GetLabel(label, sizeof(label), "PWM",
-                                              index);
-    if (auto simDevice = dpwm->GetSimDevice()) {
-      LabelSimDevice(label, simDevice);
-    } else {
-      dpwmData->LabelText(label, "%0.3f", dpwmData->GetValue());
-    }
-  } else if (exists && encoder) {
+  if (exists && encoder) {
     dioName.GetLabel(label, sizeof(label), " In", index);
     if (auto simDevice = encoder->GetSimDevice()) {
       LabelSimDevice(label, simDevice);
     } else {
-      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+      ImGui::PushStyleColor(ImGuiCol_Text,
+                            ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
       ImGui::LabelText(label, "Encoder[%d,%d]", encoder->GetChannelA(),
                        encoder->GetChannelB());
       ImGui::PopStyleColor();
@@ -60,18 +52,14 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
       }
     }
   } else {
-    const char* name = model->GetName();
-    if (name[0] != '\0') {
-      dioName.GetLabel(label, sizeof(label), name);
-    } else {
-      dioName.GetLabel(label, sizeof(label), model->IsInput() ? " In" : "Out",
-                       index);
-    }
+    dioName.GetLabel(label, sizeof(label), model->IsInput() ? " In" : "Out",
+                     index);
     if (auto simDevice = model->GetSimDevice()) {
       LabelSimDevice(label, simDevice);
     } else {
       if (!exists) {
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+        ImGui::PushStyleColor(ImGuiCol_Text,
+                              ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
         dioData->LabelText(label, "unknown");
         ImGui::PopStyleColor();
       } else if (model->IsReadOnly()) {
@@ -90,9 +78,6 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
     }
   }
   if (dioName.PopupEditName(index)) {
-    if (dpwmData) {
-      dpwmData->SetName(dioName.GetName());
-    }
     if (dutyCycleData) {
       dutyCycleData->SetName(dioName.GetName());
     }

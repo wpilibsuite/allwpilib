@@ -12,7 +12,7 @@ classes:
           Translation3d, Rotation3d:
           wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, Rotation3d:
           const Eigen::Matrix4d&:
-            rename: fromMatrix
+            rename: from_matrix
             keepalive: []
           '':
           const wpi::math::Transform2d&:

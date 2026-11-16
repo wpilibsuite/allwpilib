@@ -45,6 +45,17 @@ class Handle {
     return *this;
   }
 
+  /**
+   * Releases ownership of the handle without freeing it.
+   *
+   * @return The released handle.
+   */
+  CType Release() {
+    CType handle = m_handle;
+    m_handle = static_cast<CType>(CInvalid);
+    return handle;
+  }
+
   ~Handle() {
     if constexpr (std::invocable<decltype(FreeFunction), CType>) {
       if (m_handle != static_cast<CType>(CInvalid)) {

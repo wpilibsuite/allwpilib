@@ -4,6 +4,7 @@
 
 package org.wpilib.command3.button;
 
+import java.util.Objects;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DriverStation;
@@ -30,6 +31,16 @@ public class CommandGamepad {
   }
 
   /**
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the {@link Scheduler#getDefault() default scheduler} using its default event loop.
+   *
+   * @param gamepad The Gamepad object to use for this controller.
+   */
+  public CommandGamepad(Gamepad gamepad) {
+    this(Scheduler.getDefault(), gamepad);
+  }
+
+  /**
    * Construct an instance of a controller.
    *
    * @param scheduler The scheduler that should execute the triggered commands.
@@ -38,6 +49,18 @@ public class CommandGamepad {
   public CommandGamepad(Scheduler scheduler, int port) {
     m_hid = CommandGenericHID.getCommandGenericHID(scheduler, port);
     m_gamepad = DriverStation.getGamepad(port);
+  }
+
+  /**
+   * Construct an instance of a controller. Commands bound to buttons on the controller will be
+   * scheduled on the given scheduler using its default event loop.
+   *
+   * @param scheduler The scheduler that should execute the triggered commands.
+   * @param gamepad The Gamepad object to use for this controller.
+   */
+  public CommandGamepad(Scheduler scheduler, Gamepad gamepad) {
+    m_gamepad = Objects.requireNonNull(gamepad, "Provided gamepad cannot be null");
+    m_hid = new CommandGenericHID(scheduler, m_gamepad.getHID());
   }
 
   /**

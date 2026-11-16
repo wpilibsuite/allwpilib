@@ -6,7 +6,7 @@
 #define UNICODE
 #endif
 
-#include "wpi/net/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceResolver.hpp"
 
 #include <Windows.h>
 #include <WinDNS.h>

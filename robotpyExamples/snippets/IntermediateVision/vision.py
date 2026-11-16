@@ -24,14 +24,14 @@ from cscore import CameraServer as CS
 
 def main():
     # Get the UsbCamera from CameraServer
-    camera = CS.startAutomaticCapture()
+    camera = CS.start_automatic_capture()
     # Set the resolution
-    camera.setResolution(640, 480)
+    camera.set_resolution(640, 480)
 
     # Get a CvSink. This will capture images from the camera
-    cvSink = CS.getVideo()
+    cv_sink = CS.get_video()
     # Setup a CvSource. This will send images back to the Dashboard
-    outputStream = CS.putVideo("Rectangle", 640, 480)
+    output_stream = CS.put_video("Rectangle", 640, 480)
 
     # Mats are very memory expensive. Lets reuse this Mat.
     mat = np.zeros(shape=(480, 640, 3), dtype=np.uint8)
@@ -39,10 +39,10 @@ def main():
     while True:
         # Tell the CvSink to grab a frame from the camera and put it
         # in the source image.  If there is an error notify the output.
-        time, mat = cvSink.grabFrame(mat)
+        time, mat = cv_sink.grab_frame(mat)
         if time == 0:
             # Send the output the error.
-            outputStream.notifyError(cvSink.getError())
+            output_stream.notify_error(cv_sink.get_error())
             # skip the rest of the current iteration
             continue
 
@@ -50,4 +50,4 @@ def main():
         cv2.rectangle(mat, (100, 100), (400, 400), (255, 255, 255), 5)
 
         # Give the output stream a new image to display
-        outputStream.putFrame(mat)
+        output_stream.put_frame(mat)

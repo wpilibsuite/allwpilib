@@ -28,15 +28,15 @@ classes:
 
 inline_code: |-
   cls_Rectangle2d
-    .def_static("fromFeet", [](const Pose2d& center, wpi::units::foot_t xWidth, wpi::units::foot_t yWidth) {
+    .def_static("from_feet", [](const Pose2d& center, wpi::units::foot_t xWidth, wpi::units::foot_t yWidth) {
       return std::make_unique<Rectangle2d>(center, xWidth, yWidth);
-    }, py::arg("center"), py::arg("xWidth"), py::arg("yWidth"))
-    .def_property_readonly("xwidth", &Rectangle2d::XWidth)
-    .def_property_readonly("ywidth", &Rectangle2d::YWidth)
-    .def_property_readonly("xwidth_feet", [](Rectangle2d &self) -> wpi::units::foot_t {
+    }, py::arg("center"), py::arg("x_width"), py::arg("y_width"))
+    .def_property_readonly("x_width", &Rectangle2d::XWidth)
+    .def_property_readonly("y_width", &Rectangle2d::YWidth)
+    .def_property_readonly("x_width_feet", [](Rectangle2d &self) -> wpi::units::foot_t {
       return self.XWidth();
     })
-    .def_property_readonly("ywidth_feet", [](Rectangle2d &self) -> wpi::units::foot_t {
+    .def_property_readonly("y_width_feet", [](Rectangle2d &self) -> wpi::units::foot_t {
       return self.YWidth();
     })
     .def("__repr__", py::overload_cast<const Rectangle2d&>(&rpy::toString));

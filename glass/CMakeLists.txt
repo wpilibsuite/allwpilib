@@ -1,13 +1,14 @@
 project(glass)
 
 include(CompileWarnings)
+include(AddTest)
 include(GenResources)
 include(LinkMacOSGUI)
 
 #
 # libglass
 #
-file(GLOB_RECURSE libglass_src src/lib/native/cpp/*.cpp)
+file(GLOB_RECURSE libglass_src src/lib/native/cpp/*.cpp src/lib/native/thirdparty/mrccomm/src/*.cpp)
 
 add_library(libglass STATIC ${libglass_src})
 set_target_properties(libglass PROPERTIES DEBUG_POSTFIX "d")
@@ -19,18 +20,47 @@ endif()
 set_property(TARGET libglass PROPERTY FOLDER "libraries")
 
 wpilib_target_warnings(libglass)
-target_link_libraries(libglass PUBLIC wpigui wpimath wpiutil fields)
+target_link_libraries(
+    libglass
+    PUBLIC wpigui wpimath wpiutil fields fieldimages
+)
 
 target_include_directories(
     libglass
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/thirdparty/mrccomm/include>
         $<INSTALL_INTERFACE:${include_dest}/glass>
 )
 
 install(TARGETS libglass EXPORT libglass)
 export(TARGETS libglass FILE libglass.cmake NAMESPACE libglass::)
-install(DIRECTORY src/lib/native/include/ DESTINATION "${include_dest}/glass")
+install(
+    DIRECTORY src/lib/native/include/ src/lib/native/thirdparty/mrccomm/include/
+    DESTINATION "${include_dest}/glass"
+)
+
+if(WPILIB_WITH_IMGUI_TESTS)
+    add_library(libglass_for_tests STATIC ${libglass_src})
+    set_target_properties(libglass_for_tests PROPERTIES DEBUG_POSTFIX "d")
+    set_property(TARGET libglass_for_tests PROPERTY FOLDER "tests")
+    wpilib_target_warnings(libglass_for_tests)
+    target_link_libraries(
+        libglass_for_tests
+        PUBLIC wpigui_for_tests wpimath wpiutil fields fieldimages
+    )
+    target_include_directories(
+        libglass_for_tests
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/thirdparty/mrccomm/include>
+    )
+endif()
+
+if(WPILIB_WITH_TESTS)
+    wpilib_add_test(glass src/test/native/cpp)
+    target_link_libraries(glass_test libglass)
+endif()
 
 #
 # libglassnt
@@ -59,30 +89,63 @@ install(TARGETS libglassnt EXPORT libglassnt)
 export(TARGETS libglassnt FILE libglassnt.cmake NAMESPACE libglassnt::)
 install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 
+if(WPILIB_WITH_IMGUI_TESTS)
+    add_library(libglassnt_for_tests STATIC ${libglassnt_src})
+    set_target_properties(libglassnt_for_tests PROPERTIES DEBUG_POSTFIX "d")
+    set_property(TARGET libglassnt_for_tests PROPERTY FOLDER "tests")
+    wpilib_target_warnings(libglassnt_for_tests)
+    target_link_libraries(libglassnt_for_tests PUBLIC ntcore libglass_for_tests)
+    target_include_directories(
+        libglassnt_for_tests
+        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/libnt/native/include>
+    )
+endif()
+
 #
 # glass application
 #
 
-configure_file(src/app/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
-generate_resources(src/app/native/resources generated/app/cpp GLASS wpi::glass glass_resources_src)
+if(WPILIB_WITH_EXECUTABLES)
+    configure_file(src/app/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
+    generate_resources(
+        src/app/native/resources
+        generated/app/cpp
+        GLASS
+        wpi::glass
+        glass_resources_src
+    )
 
-file(GLOB glass_src src/app/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
+    file(GLOB glass_src src/app/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 
-if(WIN32)
-    set(glass_rc src/app/native/win/glass.rc)
-elseif(APPLE)
-    set(MACOSX_BUNDLE_ICON_FILE glass.icns)
-    set(APP_ICON_MACOSX src/app/native/mac/glass.icns)
-    set_source_files_properties(${APP_ICON_MACOSX} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-endif()
+    if(WIN32)
+        set(glass_rc src/app/native/win/glass.rc)
+    elseif(APPLE)
+        set(MACOSX_BUNDLE_ICON_FILE glass.icns)
+        set(APP_ICON_MACOSX src/app/native/mac/glass.icns)
+        set_source_files_properties(
+            ${APP_ICON_MACOSX}
+            PROPERTIES MACOSX_PACKAGE_LOCATION "Resources"
+        )
+    endif()
 
-add_executable(glass ${glass_src} ${glass_resources_src} ${glass_rc} ${APP_ICON_MACOSX})
-wpilib_link_macos_gui(glass)
-wpilib_target_warnings(glass)
-target_link_libraries(glass libglassnt libglass)
+    add_executable(glass ${glass_src} ${glass_resources_src} ${glass_rc} ${APP_ICON_MACOSX})
+    wpilib_link_macos_gui(glass)
+    wpilib_target_warnings(glass)
+    target_link_libraries(glass libglassnt libglass)
 
-if(WIN32)
-    set_target_properties(glass PROPERTIES WIN32_EXECUTABLE YES)
-elseif(APPLE)
-    set_target_properties(glass PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "Glass")
+    if(WIN32)
+        set_target_properties(glass PROPERTIES WIN32_EXECUTABLE YES)
+    elseif(APPLE)
+        set_target_properties(glass PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "Glass")
+    endif()
+
+    if(WPILIB_WITH_IMGUI_TESTS)
+        wpilib_add_imgui_test(glass src/test/native/imgui)
+        wpilib_link_macos_gui(glass_imgui_test)
+        target_sources(
+            glass_imgui_test
+            PRIVATE ${glass_src} ${glass_resources_src} ${glass_rc} ${APP_ICON_MACOSX}
+        )
+        target_link_libraries(glass_imgui_test libglassnt_for_tests libglass_for_tests)
+    endif()
 endif()

@@ -3,12 +3,14 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <atomic>
+#include <chrono>
 #include <cstdio>
 #include <cstring>
+#include <format>
 #include <functional>
+#include <iterator>
 #include <string>
-
-#include <fmt/format.h>
+#include <vector>
 
 #include "wpi/hal/DashboardOpMode.hpp"
 #include "wpi/hal/cpp/MrcLibDs.hpp"
@@ -68,15 +70,15 @@ int32_t DefaultSendErrorImpl(bool isError, int32_t errorCode,
     }
 
     if (printMsg) {
-      fmt::memory_buffer buf;
+      std::vector<char> buf;
       if (!locationView.empty() && locationView[0] != '\0') {
-        fmt::format_to(fmt::appender{buf},
+        std::format_to(std::back_inserter(buf),
                        "{} at {}: ", isError ? "Error" : "Warning",
                        locationView);
       }
-      fmt::format_to(fmt::appender{buf}, "{}\n", detailsView);
+      std::format_to(std::back_inserter(buf), "{}\n", detailsView);
       if (!callStackView.empty() && callStackView[0] != '\0') {
-        fmt::format_to(fmt::appender{buf}, "{}\n", callStackView);
+        std::format_to(std::back_inserter(buf), "{}\n", callStackView);
       }
       auto printError = gPrintErrorImpl.load();
       struct WPI_String line = {buf.data(), buf.size()};
@@ -210,12 +212,10 @@ int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum) {
 
 void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
-  const char* cName = joystickDesc.name;
-  if (mrcLibDs->getJoystickDescriptor(joystickNum, &joystickDesc) == 0) {
-    cName = joystickDesc.name;
-  } else {
-    cName = "";
-  }
+  const char* cName =
+      mrcLibDs->getJoystickDescriptor(joystickNum, &joystickDesc) == 0
+          ? joystickDesc.name
+          : "";
   auto len = std::strlen(cName);
   auto write = WPI_AllocateString(name, len);
   std::memcpy(write, cName, len);
@@ -277,6 +277,10 @@ HAL_Bool HAL_GetSystemTimeValid(int32_t* status) {
   bool systemTimeValid;
   *status = mrcLibDs->getSystemTimeValid(&systemTimeValid);
   return systemTimeValid;
+}
+
+void HAL_WriteDisplayAnsi(const struct WPI_String* data) {
+  mrcLibDs->writeDisplayAnsi(data);
 }
 
 }  // extern "C"

@@ -1,5 +1,5 @@
 from traceback import extract_stack, format_list
-from ._wpiutil import getStackTraceDefault, _setup_stack_trace_hook
+from ._wpiutil import get_stack_trace_default, _setup_stack_trace_hook
 from os.path import join
 
 _start_py = join("wpilib", "_impl", "start.py")
@@ -11,7 +11,7 @@ def _stack_trace_hook(offset: int) -> str:
 
     stack = extract_stack()[:-1]
     if not stack:
-        return "\tat <no python frames>\n" + getStackTraceDefault(offset)
+        return "\tat <no python frames>\n" + get_stack_trace_default(offset)
 
     # filter out any frames before start.py (except for one of them) to
     # make stack frames more useful for users

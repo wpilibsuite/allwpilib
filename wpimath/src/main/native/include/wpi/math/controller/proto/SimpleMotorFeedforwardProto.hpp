@@ -6,16 +6,18 @@
 
 #include "pb.h"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/protobuf/controller.npb.h"
 #include "wpi/units/length.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/controller.npb.h"
 
 // Everything is converted into units for
 // wpi::math::SimpleMotorFeedforward<wpi::units::meters> or
 // wpi::math::SimpleMotorFeedforward<wpi::units::radians>
 
 template <class Distance>
-  requires wpi::units::length_unit<Distance> || wpi::units::angle_unit<Distance>
+  requires wpi::units::length_unit<Distance> ||
+           wpi::units::angle_unit<Distance> ||
+           wpi::units::dimensionless_unit<Distance>
 struct wpi::util::Protobuf<wpi::math::SimpleMotorFeedforward<Distance>> {
   using MessageStruct = wpi_proto_ProtobufSimpleMotorFeedforward;
   using InputStream =

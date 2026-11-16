@@ -6,6 +6,7 @@
 
 package org.wpilib.command2.button;
 
+import java.util.Objects;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.DualSenseController;
 import org.wpilib.event.EventLoop;
@@ -31,6 +32,17 @@ public class CommandDualSenseController {
   }
 
   /**
+   * Construct an instance of a controller with a DualSenseController object.
+   *
+   * @param controller The DualSenseController object to use for this controller.
+   */
+  public CommandDualSenseController(DualSenseController controller) {
+    m_controller =
+        Objects.requireNonNull(controller, "Provided DualSenseController cannot be null");
+    m_hid = new CommandGenericHID(m_controller.getHID());
+  }
+
+  /**
    * Get the underlying CommandGenericHID object.
    *
    * @return the wrapped CommandGenericHID object
@@ -46,6 +58,29 @@ public class CommandDualSenseController {
    */
   public DualSenseController getController() {
     return m_controller;
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @see #button(DualSenseController.Button, EventLoop)
+   */
+  public Trigger button(DualSenseController.Button button) {
+    return button(button, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button(DualSenseController.Button button, EventLoop loop) {
+    return m_hid.button(button.value, loop);
   }
 
   /**
@@ -67,7 +102,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger cross(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.CROSS.value, loop);
+    return button(DualSenseController.Button.CROSS, loop);
   }
 
   /**
@@ -89,7 +124,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger circle(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.CIRCLE.value, loop);
+    return button(DualSenseController.Button.CIRCLE, loop);
   }
 
   /**
@@ -111,7 +146,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger square(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.SQUARE.value, loop);
+    return button(DualSenseController.Button.SQUARE, loop);
   }
 
   /**
@@ -133,7 +168,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger triangle(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.TRIANGLE.value, loop);
+    return button(DualSenseController.Button.TRIANGLE, loop);
   }
 
   /**
@@ -155,7 +190,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger create(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.CREATE.value, loop);
+    return button(DualSenseController.Button.CREATE, loop);
   }
 
   /**
@@ -177,7 +212,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger PS(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.PS.value, loop);
+    return button(DualSenseController.Button.PS, loop);
   }
 
   /**
@@ -199,7 +234,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger options(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.OPTIONS.value, loop);
+    return button(DualSenseController.Button.OPTIONS, loop);
   }
 
   /**
@@ -221,7 +256,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger L3(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.L3.value, loop);
+    return button(DualSenseController.Button.L3, loop);
   }
 
   /**
@@ -243,7 +278,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger R3(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.R3.value, loop);
+    return button(DualSenseController.Button.R3, loop);
   }
 
   /**
@@ -265,7 +300,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger L1(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.L1.value, loop);
+    return button(DualSenseController.Button.L1, loop);
   }
 
   /**
@@ -287,7 +322,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger R1(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.R1.value, loop);
+    return button(DualSenseController.Button.R1, loop);
   }
 
   /**
@@ -309,7 +344,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.DPAD_UP.value, loop);
+    return button(DualSenseController.Button.DPAD_UP, loop);
   }
 
   /**
@@ -331,7 +366,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.DPAD_DOWN.value, loop);
+    return button(DualSenseController.Button.DPAD_DOWN, loop);
   }
 
   /**
@@ -353,7 +388,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.DPAD_LEFT.value, loop);
+    return button(DualSenseController.Button.DPAD_LEFT, loop);
   }
 
   /**
@@ -375,7 +410,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.DPAD_RIGHT.value, loop);
+    return button(DualSenseController.Button.DPAD_RIGHT, loop);
   }
 
   /**
@@ -397,7 +432,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger microphone(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.MICROPHONE.value, loop);
+    return button(DualSenseController.Button.MICROPHONE, loop);
   }
 
   /**
@@ -419,7 +454,7 @@ public class CommandDualSenseController {
    *     to the given loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return m_hid.button(DualSenseController.Button.TOUCHPAD.value, loop);
+    return button(DualSenseController.Button.TOUCHPAD, loop);
   }
 
   /**
@@ -433,8 +468,8 @@ public class CommandDualSenseController {
    *     threshold, attached to the given event loop
    */
   public Trigger L2(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        DualSenseController.Axis.L2.value, threshold, loop);
+    return axisGreaterThan(
+        DualSenseController.Axis.L2, threshold, loop);
   }
 
   /**
@@ -464,6 +499,7 @@ public class CommandDualSenseController {
     return L2(0.5);
   }
 
+
   /**
    * Constructs a Trigger instance around the axis value of the R 2. The returned
    * trigger will be true when the axis value is greater than {@code threshold}.
@@ -475,8 +511,8 @@ public class CommandDualSenseController {
    *     threshold, attached to the given event loop
    */
   public Trigger R2(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        DualSenseController.Axis.R2.value, threshold, loop);
+    return axisGreaterThan(
+        DualSenseController.Axis.R2, threshold, loop);
   }
 
   /**
@@ -505,6 +541,104 @@ public class CommandDualSenseController {
   public Trigger R2() {
     return R2(0.5);
   }
+
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(DualSenseController.Axis axis, double threshold) {
+    return m_hid.axisLessThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(
+      DualSenseController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisLessThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(DualSenseController.Axis axis, double threshold) {
+    return m_hid.axisGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(
+      DualSenseController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the
+   *     provided threshold.
+   */
+  public Trigger axisMagnitudeGreaterThan(
+      DualSenseController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisMagnitudeGreaterThan(DualSenseController.Axis axis, double threshold) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read
+   * @return The value of the axis.
+   */
+  public double getAxis(DualSenseController.Axis axis) {
+    return m_hid.getRawAxis(axis.value);
+  }
+
 
   /**
    * Get the Left X value of the controller.

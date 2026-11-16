@@ -21,7 +21,8 @@ void wpi::glass::DisplaySubsystem(SubsystemModel* m) {
     ImGui::Text("%s", ("Default Command: " + defaultCommand).c_str());
     ImGui::Text("%s", ("Current Command: " + currentCommand).c_str());
   } else {
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::Text("Unknown Subsystem");
     ImGui::PopStyleColor();
   }

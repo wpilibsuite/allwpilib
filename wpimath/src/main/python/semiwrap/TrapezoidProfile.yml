@@ -1,3 +1,6 @@
+extra_includes:
+- format
+
 classes:
   wpi::math::TrapezoidProfile:
     force_type_casters:
@@ -6,31 +9,15 @@ classes:
     - wpi::units::radians_per_second_squared
     template_params:
     - Distance
-    doc: |
-      A trapezoid-shaped velocity profile.
-
-      While this class can be used for a profiled movement from start to finish,
-      the intended usage is to filter a reference's dynamics based on trapezoidal
-      velocity constraints. To compute the reference obeying this constraint, do
-      the following.
-
-      Initialization::
-
-        constraints = TrapezoidProfile.Constraints(kMaxV, kMaxA)
-        previousProfiledReference = initialReference
-
-      Run on update::
-
-        profile = TrapezoidProfile(constraints, unprofiledReference, previousProfiledReference)
-        previousProfiledReference = profile.calculate(timeSincePreviousUpdate)
-
-      where ``unprofiledReference`` is free to change between calls. Note that
-      when the unprofiled reference is within the constraints,
-      :meth:`calculate` returns the unprofiled reference unchanged.
-
-      Otherwise, a timer can be started to provide monotonic values for
-      ``calculate()`` and to determine when the profile has completed via
-      :meth:`isFinished`.
+    doc_code_blocks:
+    - |
+      constraints = TrapezoidProfile.Constraints(MAX_V, MAX_A)
+      previous_profiled_reference = TrapezoidProfile.State(initial_reference, 0.0)
+      profile = TrapezoidProfile(constraints)
+    - |
+      previous_profiled_reference = profile.calculate(
+          time_since_previous_update, previous_profiled_reference, unprofiled_reference
+      )
     methods:
       TrapezoidProfile:
         param_override:
@@ -42,18 +29,13 @@ classes:
             x_type: typename TrapezoidProfile<Distance>::State
       Calculate:
       TimeLeftUntil:
-      TotalTime:
+      Duration:
       IsFinished:
     template_inline_code: |
       {
       std::string clsNameCopy = clsName;
 
-      cls_Constraints
-        .def("__repr__", [clsNameCopy](const Constraints &self) {
-          return clsNameCopy + ".Constraints("
-            "maxVelocity=" + std::to_string(self.maxVelocity()) + ", "
-            "maxAcceleration=" + std::to_string(self.maxAcceleration()) + ")";
-        });
+      cls_TrapezoidProfile.attr("Constraints") = py::type::of<Constraints>();
 
       cls_State
         .def(
@@ -62,26 +44,38 @@ classes:
           py::arg("velocity") = 0
         )
         .def("__repr__", [clsNameCopy](const State &self) {
-          return clsNameCopy + ".State("
-            "position=" + std::to_string(self.position()) + ", "
-            "velocity=" + std::to_string(self.velocity()) + ")";
+          return std::format("{}.State(position={}, velocity={})",
+            clsNameCopy,
+            self.position(),
+            self.velocity());
         });
       }
-  wpi::math::TrapezoidProfile::Constraints:
+  wpi::math::detail::TrapezoidProfileConstraints:
+    template_params:
+    - Distance
     attributes:
       maxVelocity:
       maxAcceleration:
     methods:
-      Constraints:
+      TrapezoidProfileConstraints:
         overloads:
           '':
-            ignore: true
           Velocity_t, Acceleration_t:
             param_override:
               maxVelocity:
                 default: '0'
               maxAcceleration:
                 default: '0'
+    template_inline_code: |
+      std::string clsNameCopy = clsName;
+
+      cls_TrapezoidProfileConstraints
+        .def("__repr__", [clsNameCopy](const wpi::math::detail::TrapezoidProfileConstraints<Distance>& self) {
+          return std::format("{}(max_velocity={}, max_acceleration={})",
+            clsNameCopy,
+            self.maxVelocity(),
+            self.maxAcceleration());
+        });
   wpi::math::TrapezoidProfile::State:
     force_no_default_constructor: true
     attributes:
@@ -90,7 +84,25 @@ classes:
     methods:
       operator==:
         cpp_code: py::self == State()
+  wpi::math::TrapezoidProfile::ProfileTiming:
+    attributes:
+      t_1:
+      t_2:
+      t_3:
+    methods:
+      operator==:
+
 templates:
+  TrapezoidProfileConstraints:
+    qualname: wpi::math::detail::TrapezoidProfileConstraints
+    params:
+    - wpi::units::dimensionless::scalar
+
+  TrapezoidProfileRadiansConstraints:
+    qualname: wpi::math::detail::TrapezoidProfileConstraints
+    params:
+    - wpi::units::radian
+
   TrapezoidProfile:
     qualname: wpi::math::TrapezoidProfile
     params:

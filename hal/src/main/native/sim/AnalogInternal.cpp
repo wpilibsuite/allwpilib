@@ -9,14 +9,14 @@
 
 namespace wpi::hal {
 IndexedHandleResource<HAL_AnalogInputHandle, wpi::hal::AnalogPort,
-                      kNumAnalogInputs, HAL_HandleEnum::ANALOG_INPUT>*
+                      NUM_ANALOG_INPUTS, HAL_HandleEnum::ANALOG_INPUT>*
     analogInputHandles;
 }  // namespace wpi::hal
 
 namespace wpi::hal::init {
 void InitializeAnalogInternal() {
   static IndexedHandleResource<HAL_AnalogInputHandle, wpi::hal::AnalogPort,
-                               kNumAnalogInputs, HAL_HandleEnum::ANALOG_INPUT>
+                               NUM_ANALOG_INPUTS, HAL_HandleEnum::ANALOG_INPUT>
       aiH;
   analogInputHandles = &aiH;
 }

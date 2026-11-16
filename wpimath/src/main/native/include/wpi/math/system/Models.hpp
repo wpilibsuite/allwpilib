@@ -6,15 +6,21 @@
 
 #include <stdexcept>
 
+#include <Eigen/Core>
 #include <gcem.hpp>
 
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/base.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -36,18 +42,21 @@ class WPILIB_DLLEXPORT Models {
       wpi::units::inverse<wpi::units::seconds>>>;
 
   /**
-   * Creates a flywheel state-space model from physical constants.
+   * Creates an angular velocity state-space model from physical constants.
+   *
+   * This model applies to rotating mechanisms whose angular velocity is
+   * controlled, such as flywheels, shooter wheels, and rollers.
    *
    * The states are [angular velocity], the inputs are [voltage], and the
    * outputs are [angular velocity].
    *
-   * @param motor The motor (or gearbox) attached to the flywheel.
-   * @param J The moment of inertia J of the flywheel.
-   * @param gearing Gear ratio from motor to flywheel (greater than 1 is a
+   * @param motor The motor (or gearbox) attached to the mechanism.
+   * @param J The moment of inertia J of the mechanism.
+   * @param gearing Gear ratio from motor to mechanism (greater than 1 is a
    *     reduction).
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
-  static constexpr LinearSystem<1, 1, 1> FlywheelFromPhysicalConstants(
+  static constexpr LinearSystem<1, 1, 1> AngularVelocityFromPhysicalConstants(
       DCMotor motor, wpi::units::kilogram_square_meter_t J, double gearing) {
     if (J <= 0_kg_sq_m) {
       throw std::domain_error("J must be greater than zero.");
@@ -67,11 +76,14 @@ class WPILIB_DLLEXPORT Models {
   }
 
   /**
-   * Creates a flywheel state-space model from SysId constants kᵥ (V/(rad/s))
-   * and kₐ (V/(rad/s²)) from the feedforward model u = kᵥv + kₐa.
+   * Creates an angular velocity state-space model from SysId constants kᵥ
+   * (V/(rad/s)) and kₐ (V/(rad/s²)) from the feedforward model u = kᵥv + kₐa.
    *
-   * The states are [velocity], the inputs are [voltage], and the outputs are
-   * [velocity].
+   * This model applies to rotating mechanisms whose angular velocity is
+   * controlled, such as flywheels, shooter wheels, and rollers.
+   *
+   * The states are [angular velocity], the inputs are [voltage], and the
+   * outputs are [angular velocity].
    *
    * @param kV The velocity gain, in V/(rad/s).
    * @param kA The acceleration gain, in V/(rad/s²).
@@ -79,7 +91,7 @@ class WPILIB_DLLEXPORT Models {
    * @see <a
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
-  static constexpr LinearSystem<1, 1, 1> FlywheelFromSysId(
+  static constexpr LinearSystem<1, 1, 1> AngularVelocityFromSysId(
       decltype(1_V / 1_rad_per_s) kV, decltype(1_V / 1_rad_per_s_sq) kA) {
     if (kV < decltype(kV){0}) {
       throw std::domain_error("Kv must be greater than or equal to zero.");
@@ -97,19 +109,24 @@ class WPILIB_DLLEXPORT Models {
   }
 
   /**
-   * Creates an elevator state-space model from physical constants.
+   * Creates a linear position state-space model from physical constants.
+   *
+   * This model applies to mechanisms whose linear position is controlled, such
+   * as elevators, linear slides, and telescoping arms. Gravity is not modeled;
+   * compensate for it with a feedforward (e.g., kG) if needed.
    *
    * The states are [position, velocity], the inputs are [voltage], and the
    * outputs are [position, velocity].
    *
    * @param motor The motor (or gearbox) attached to the carriage.
-   * @param mass The mass of the elevator carriage, in kilograms.
-   * @param radius The radius of the elevator's driving drum, in meters.
+   * @param mass The mass of the carriage, in kilograms.
+   * @param radius The radius of the driving drum, pulley, or sprocket, in
+   *     meters.
    * @param gearing Gear ratio from motor to carriage (greater than 1 is a
    *     reduction).
    * @throws std::domain_error if mass <= 0, radius <= 0, or gearing <= 0.
    */
-  static constexpr LinearSystem<2, 1, 2> ElevatorFromPhysicalConstants(
+  static constexpr LinearSystem<2, 1, 2> LinearPositionFromPhysicalConstants(
       DCMotor motor, wpi::units::kilogram_t mass, wpi::units::meter_t radius,
       double gearing) {
     if (mass <= 0_kg) {
@@ -136,8 +153,12 @@ class WPILIB_DLLEXPORT Models {
   }
 
   /**
-   * Creates an elevator state-space model from SysId constants kᵥ (V/(m/s)) and
-   * kₐ (V/(m/s²)) from the feedforward model u = kᵥv + kₐa.
+   * Creates a linear position state-space model from SysId constants kᵥ
+   * (V/(m/s)) and kₐ (V/(m/s²)) from the feedforward model u = kᵥv + kₐa.
+   *
+   * This model applies to mechanisms whose linear position is controlled, such
+   * as elevators, linear slides, and telescoping arms. Gravity is not modeled;
+   * compensate for it with a feedforward (e.g., kG) if needed.
    *
    * The states are [position, velocity], the inputs are [voltage], and the
    * outputs are [position, velocity].
@@ -149,7 +170,7 @@ class WPILIB_DLLEXPORT Models {
    * @see <a
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
-  static constexpr LinearSystem<2, 1, 2> ElevatorFromSysId(
+  static constexpr LinearSystem<2, 1, 2> LinearPositionFromSysId(
       decltype(1_V / 1_mps) kV, decltype(1_V / 1_mps_sq) kA) {
     if (kV < decltype(kV){0}) {
       throw std::domain_error("Kv must be greater than or equal to zero.");
@@ -167,18 +188,22 @@ class WPILIB_DLLEXPORT Models {
   }
 
   /**
-   * Create a single-jointed arm state-space model from physical constants.
+   * Creates an angular position state-space model from physical constants.
+   *
+   * This model applies to rotating mechanisms whose angle is controlled, such
+   * as single-jointed arms, wrists, and turrets. Gravity is not modeled;
+   * compensate for it with a feedforward (e.g., kG cos(θ)) if needed.
    *
    * The states are [angle, angular velocity], the inputs are [voltage], and the
    * outputs are [angle, angular velocity].
    *
-   * @param motor The motor (or gearbox) attached to the arm.
-   * @param J The moment of inertia J of the arm.
-   * @param gearing Gear ratio from motor to arm (greater than 1 is a
+   * @param motor The motor (or gearbox) attached to the mechanism.
+   * @param J The moment of inertia J of the mechanism.
+   * @param gearing Gear ratio from motor to mechanism (greater than 1 is a
    *     reduction).
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
-  static constexpr LinearSystem<2, 1, 2> SingleJointedArmFromPhysicalConstants(
+  static constexpr LinearSystem<2, 1, 2> AngularPositionFromPhysicalConstants(
       DCMotor motor, wpi::units::kilogram_square_meter_t J, double gearing) {
     if (J <= 0_kg_sq_m) {
       throw std::domain_error("J must be greater than zero.");
@@ -199,20 +224,24 @@ class WPILIB_DLLEXPORT Models {
   }
 
   /**
-   * Creates a single-jointed arm state-space model from SysId constants kᵥ
+   * Creates an angular position state-space model from SysId constants kᵥ
    * (V/(rad/s)) and kₐ (V/(rad/s²)) from the feedforward model u = kᵥv + kₐa.
    *
-   * The states are [position, velocity], the inputs are [voltage], and the
-   * outputs are [position, velocity].
+   * This model applies to rotating mechanisms whose angle is controlled, such
+   * as single-jointed arms, wrists, and turrets. Gravity is not modeled;
+   * compensate for it with a feedforward (e.g., kG cos(θ)) if needed.
    *
-   * @param kV The velocity gain, in volts/(unit/sec).
-   * @param kA The acceleration gain, in volts/(unit/sec²).
+   * The states are [angle, angular velocity], the inputs are [voltage], and the
+   * outputs are [angle, angular velocity].
+   *
+   * @param kV The velocity gain, in V/(rad/s).
+   * @param kA The acceleration gain, in V/(rad/s²).
    *
    * @throws std::domain_error if kV < 0 or kA <= 0.
    * @see <a
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
-  static constexpr LinearSystem<2, 1, 2> SingleJointedArmFromSysId(
+  static constexpr LinearSystem<2, 1, 2> AngularPositionFromSysId(
       decltype(1_V / 1_rad_per_s) kV, decltype(1_V / 1_rad_per_s_sq) kA) {
     if (kV < decltype(kV){0}) {
       throw std::domain_error("Kv must be greater than or equal to zero.");
@@ -295,40 +324,41 @@ class WPILIB_DLLEXPORT Models {
    * voltage, right voltage], and the outputs are [left velocity, right
    * velocity].
    *
-   * @param kVLinear  The linear velocity gain in volts per (meters per second).
-   * @param kALinear  The linear acceleration gain in volts per (meters per
+   * @param kvLinear  The linear velocity gain in volts per (meters per
+   * second).
+   * @param kaLinear  The linear acceleration gain in volts per (meters per
    *                  second squared).
-   * @param kVAngular The angular velocity gain in volts per (meters per
+   * @param kvAngular The angular velocity gain in volts per (meters per
    *                  second).
-   * @param kAAngular The angular acceleration gain in volts per (meters per
+   * @param kaAngular The angular acceleration gain in volts per (meters per
    *                  second squared).
-   * @throws domain_error if kVLinear <= 0, kALinear <= 0, kVAngular <= 0,
-   *         or kAAngular <= 0.
+   * @throws domain_error if kvLinear <= 0, kaLinear <= 0, kvAngular <= 0,
+   *         or kaAngular <= 0.
    * @see <a
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   static constexpr LinearSystem<2, 2, 2> DifferentialDriveFromSysId(
-      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
-      decltype(1_V / 1_mps) kVAngular, decltype(1_V / 1_mps_sq) kAAngular) {
-    if (kVLinear <= decltype(kVLinear){0}) {
+      decltype(1_V / 1_mps) kvLinear, decltype(1_V / 1_mps_sq) kaLinear,
+      decltype(1_V / 1_mps) kvAngular, decltype(1_V / 1_mps_sq) kaAngular) {
+    if (kvLinear <= decltype(kvLinear){0}) {
       throw std::domain_error("Kv,linear must be greater than zero.");
     }
-    if (kALinear <= decltype(kALinear){0}) {
+    if (kaLinear <= decltype(kaLinear){0}) {
       throw std::domain_error("Ka,linear must be greater than zero.");
     }
-    if (kVAngular <= decltype(kVAngular){0}) {
+    if (kvAngular <= decltype(kvAngular){0}) {
       throw std::domain_error("Kv,angular must be greater than zero.");
     }
-    if (kAAngular <= decltype(kAAngular){0}) {
+    if (kaAngular <= decltype(kaAngular){0}) {
       throw std::domain_error("Ka,angular must be greater than zero.");
     }
 
-    double A1 = -0.5 * (kVLinear.value() / kALinear.value() +
-                        kVAngular.value() / kAAngular.value());
-    double A2 = -0.5 * (kVLinear.value() / kALinear.value() -
-                        kVAngular.value() / kAAngular.value());
-    double B1 = 0.5 / kALinear.value() + 0.5 / kAAngular.value();
-    double B2 = 0.5 / kALinear.value() - 0.5 / kAAngular.value();
+    double A1 = -0.5 * (kvLinear.value() / kaLinear.value() +
+                        kvAngular.value() / kaAngular.value());
+    double A2 = -0.5 * (kvLinear.value() / kaLinear.value() -
+                        kvAngular.value() / kaAngular.value());
+    double B1 = 0.5 / kaLinear.value() + 0.5 / kaAngular.value();
+    double B2 = 0.5 / kaLinear.value() - 0.5 / kaAngular.value();
 
     Matrixd<2, 2> A{{A1, A2}, {A2, A1}};
     Matrixd<2, 2> B{{B1, B2}, {B2, B1}};
@@ -347,36 +377,36 @@ class WPILIB_DLLEXPORT Models {
    * voltage, right voltage], and the outputs are [left velocity, right
    * velocity].
    *
-   * @param kVLinear   The linear velocity gain in volts per (meters per
+   * @param kvLinear   The linear velocity gain in volts per (meters per
    * second).
-   * @param kALinear   The linear acceleration gain in volts per (meters per
+   * @param kaLinear   The linear acceleration gain in volts per (meters per
    *                   second squared).
-   * @param kVAngular  The angular velocity gain in volts per (radians per
+   * @param kvAngular  The angular velocity gain in volts per (radians per
    *                   second).
-   * @param kAAngular  The angular acceleration gain in volts per (radians per
+   * @param kaAngular  The angular acceleration gain in volts per (radians per
    *                   second squared).
    * @param trackwidth The distance between the differential drive's left and
    *                   right wheels, in meters.
-   * @throws domain_error if kVLinear <= 0, kALinear <= 0, kVAngular <= 0,
-   *         kAAngular <= 0, or trackwidth <= 0.
+   * @throws domain_error if kvLinear <= 0, kaLinear <= 0, kvAngular <= 0,
+   *         kaAngular <= 0, or trackwidth <= 0.
    * @see <a
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   static constexpr LinearSystem<2, 2, 2> DifferentialDriveFromSysId(
-      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
-      decltype(1_V / 1_rad_per_s) kVAngular,
-      decltype(1_V / 1_rad_per_s_sq) kAAngular,
+      decltype(1_V / 1_mps) kvLinear, decltype(1_V / 1_mps_sq) kaLinear,
+      decltype(1_V / 1_rad_per_s) kvAngular,
+      decltype(1_V / 1_rad_per_s_sq) kaAngular,
       wpi::units::meter_t trackwidth) {
-    if (kVLinear <= decltype(kVLinear){0}) {
+    if (kvLinear <= decltype(kvLinear){0}) {
       throw std::domain_error("Kv,linear must be greater than zero.");
     }
-    if (kALinear <= decltype(kALinear){0}) {
+    if (kaLinear <= decltype(kaLinear){0}) {
       throw std::domain_error("Ka,linear must be greater than zero.");
     }
-    if (kVAngular <= decltype(kVAngular){0}) {
+    if (kvAngular <= decltype(kvAngular){0}) {
       throw std::domain_error("Kv,angular must be greater than zero.");
     }
-    if (kAAngular <= decltype(kAAngular){0}) {
+    if (kaAngular <= decltype(kaAngular){0}) {
       throw std::domain_error("Ka,angular must be greater than zero.");
     }
     if (trackwidth <= 0_m) {
@@ -394,9 +424,9 @@ class WPILIB_DLLEXPORT Models {
     //
     // So multiplying by 2/trackwidth converts the angular gains from V/(rad/s)
     // to V/(m/s).
-    return DifferentialDriveFromSysId(kVLinear, kALinear,
-                                      kVAngular * 2.0 / trackwidth * 1_rad,
-                                      kAAngular * 2.0 / trackwidth * 1_rad);
+    return DifferentialDriveFromSysId(kvLinear, kaLinear,
+                                      kvAngular * 2.0 / trackwidth * 1_rad,
+                                      kaAngular * 2.0 / trackwidth * 1_rad);
   }
 };
 

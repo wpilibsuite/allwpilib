@@ -6,6 +6,7 @@
 
 package org.wpilib.command2.button;
 
+import java.util.Objects;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.XboxController;
 import org.wpilib.event.EventLoop;
@@ -31,6 +32,17 @@ public class CommandXboxController {
   }
 
   /**
+   * Construct an instance of a controller with a XboxController object.
+   *
+   * @param controller The XboxController object to use for this controller.
+   */
+  public CommandXboxController(XboxController controller) {
+    m_controller =
+        Objects.requireNonNull(controller, "Provided XboxController cannot be null");
+    m_hid = new CommandGenericHID(m_controller.getHID());
+  }
+
+  /**
    * Get the underlying CommandGenericHID object.
    *
    * @return the wrapped CommandGenericHID object
@@ -46,6 +58,29 @@ public class CommandXboxController {
    */
   public XboxController getController() {
     return m_controller;
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     CommandScheduler#getDefaultButtonLoop() default scheduler button loop}.
+   * @see #button(XboxController.Button, EventLoop)
+   */
+  public Trigger button(XboxController.Button button) {
+    return button(button, CommandScheduler.getInstance().getDefaultButtonLoop());
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button(XboxController.Button button, EventLoop loop) {
+    return m_hid.button(button.value, loop);
   }
 
   /**
@@ -67,7 +102,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return m_hid.button(XboxController.Button.A.value, loop);
+    return button(XboxController.Button.A, loop);
   }
 
   /**
@@ -89,7 +124,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return m_hid.button(XboxController.Button.B.value, loop);
+    return button(XboxController.Button.B, loop);
   }
 
   /**
@@ -111,7 +146,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return m_hid.button(XboxController.Button.X.value, loop);
+    return button(XboxController.Button.X, loop);
   }
 
   /**
@@ -133,7 +168,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return m_hid.button(XboxController.Button.Y.value, loop);
+    return button(XboxController.Button.Y, loop);
   }
 
   /**
@@ -155,7 +190,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger view(EventLoop loop) {
-    return m_hid.button(XboxController.Button.VIEW.value, loop);
+    return button(XboxController.Button.VIEW, loop);
   }
 
   /**
@@ -177,7 +212,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger xbox(EventLoop loop) {
-    return m_hid.button(XboxController.Button.XBOX.value, loop);
+    return button(XboxController.Button.XBOX, loop);
   }
 
   /**
@@ -199,7 +234,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger menu(EventLoop loop) {
-    return m_hid.button(XboxController.Button.MENU.value, loop);
+    return button(XboxController.Button.MENU, loop);
   }
 
   /**
@@ -221,7 +256,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return m_hid.button(XboxController.Button.LEFT_STICK.value, loop);
+    return button(XboxController.Button.LEFT_STICK, loop);
   }
 
   /**
@@ -243,7 +278,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return m_hid.button(XboxController.Button.RIGHT_STICK.value, loop);
+    return button(XboxController.Button.RIGHT_STICK, loop);
   }
 
   /**
@@ -265,7 +300,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return m_hid.button(XboxController.Button.LEFT_BUMPER.value, loop);
+    return button(XboxController.Button.LEFT_BUMPER, loop);
   }
 
   /**
@@ -287,7 +322,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return m_hid.button(XboxController.Button.RIGHT_BUMPER.value, loop);
+    return button(XboxController.Button.RIGHT_BUMPER, loop);
   }
 
   /**
@@ -309,7 +344,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger dpadUp(EventLoop loop) {
-    return m_hid.button(XboxController.Button.DPAD_UP.value, loop);
+    return button(XboxController.Button.DPAD_UP, loop);
   }
 
   /**
@@ -331,7 +366,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger dpadDown(EventLoop loop) {
-    return m_hid.button(XboxController.Button.DPAD_DOWN.value, loop);
+    return button(XboxController.Button.DPAD_DOWN, loop);
   }
 
   /**
@@ -353,7 +388,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger dpadLeft(EventLoop loop) {
-    return m_hid.button(XboxController.Button.DPAD_LEFT.value, loop);
+    return button(XboxController.Button.DPAD_LEFT, loop);
   }
 
   /**
@@ -375,7 +410,7 @@ public class CommandXboxController {
    *     to the given loop.
    */
   public Trigger dpadRight(EventLoop loop) {
-    return m_hid.button(XboxController.Button.DPAD_RIGHT.value, loop);
+    return button(XboxController.Button.DPAD_RIGHT, loop);
   }
 
   /**
@@ -389,8 +424,8 @@ public class CommandXboxController {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        XboxController.Axis.LEFT_TRIGGER.value, threshold, loop);
+    return axisGreaterThan(
+        XboxController.Axis.LEFT_TRIGGER, threshold, loop);
   }
 
   /**
@@ -420,6 +455,7 @@ public class CommandXboxController {
     return leftTrigger(0.5);
   }
 
+
   /**
    * Constructs a Trigger instance around the axis value of the Right Trigger. The returned
    * trigger will be true when the axis value is greater than {@code threshold}.
@@ -431,8 +467,8 @@ public class CommandXboxController {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(
-        XboxController.Axis.RIGHT_TRIGGER.value, threshold, loop);
+    return axisGreaterThan(
+        XboxController.Axis.RIGHT_TRIGGER, threshold, loop);
   }
 
   /**
@@ -461,6 +497,104 @@ public class CommandXboxController {
   public Trigger rightTrigger() {
     return rightTrigger(0.5);
   }
+
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(XboxController.Axis axis, double threshold) {
+    return m_hid.axisLessThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(
+      XboxController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisLessThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link CommandScheduler#getDefaultButtonLoop() the default command scheduler button
+   * loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(XboxController.Axis axis, double threshold) {
+    return m_hid.axisGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(
+      XboxController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the
+   *     provided threshold.
+   */
+  public Trigger axisMagnitudeGreaterThan(
+      XboxController.Axis axis, double threshold, EventLoop loop) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to {@link CommandScheduler#getDefaultButtonLoop() the default command
+   * scheduler button loop}.
+   *
+   * @param axis The axis to read
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the deadbanded axis value is active (non-zero).
+   */
+  public Trigger axisMagnitudeGreaterThan(XboxController.Axis axis, double threshold) {
+    return m_hid.axisMagnitudeGreaterThan(axis.value, threshold);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read
+   * @return The value of the axis.
+   */
+  public double getAxis(XboxController.Axis axis) {
+    return m_hid.getRawAxis(axis.value);
+  }
+
 
   /**
    * Get the Left X value of the controller.

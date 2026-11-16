@@ -4,10 +4,10 @@
 
 #include "wpi/hal/HAL.h"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 namespace wpi::hal {
-TEST(HALTest, RuntimeType) {
-  EXPECT_EQ(HAL_RuntimeType::HAL_RUNTIME_SIMULATION, HAL_GetRuntimeType());
+TEST_CASE("HALTest RuntimeType", "[hal]") {
+  CHECK(HAL_RuntimeType::HAL_RUNTIME_SIMULATION == HAL_GetRuntimeType());
 }
 }  // namespace wpi::hal

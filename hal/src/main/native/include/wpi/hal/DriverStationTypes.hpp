@@ -10,6 +10,26 @@
 namespace wpi::hal {
 
 /**
+ * The alliance station ID.
+ */
+enum class AllianceStationID {
+  /// Unknown.
+  UNKNOWN = HAL_ALLIANCE_STATION_UNKNOWN,
+  /// Red Alliance Station 1.
+  RED_1 = HAL_ALLIANCE_STATION_RED_1,
+  /// Red Alliance Station 2.
+  RED_2 = HAL_ALLIANCE_STATION_RED_2,
+  /// Red Alliance Station 3.
+  RED_3 = HAL_ALLIANCE_STATION_RED_3,
+  /// Blue Alliance Station 1.
+  BLUE_1 = HAL_ALLIANCE_STATION_BLUE_1,
+  /// Blue Alliance Station 2.
+  BLUE_2 = HAL_ALLIANCE_STATION_BLUE_2,
+  /// Blue Alliance Station 3.
+  BLUE_3 = HAL_ALLIANCE_STATION_BLUE_3,
+};
+
+/**
  * The overall robot mode (not including enabled state).
  */
 enum class RobotMode {

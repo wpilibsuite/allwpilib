@@ -1,32 +1,33 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:37:34 -0400
-Subject: [PATCH 06/34] Explicitly use std::
+Subject: [PATCH 06/32] Explicitly use std::
 
 ---
- llvm/include/llvm/ADT/DenseMap.h       | 11 ++++++-----
- llvm/include/llvm/ADT/SmallSet.h       |  2 +-
- llvm/lib/Support/ErrorHandling.cpp     |  2 +-
- llvm/lib/Support/SmallPtrSet.cpp       |  7 +++----
- llvm/unittests/ADT/SmallPtrSetTest.cpp |  2 +-
- llvm/unittests/ADT/SmallSetTest.cpp    | 10 +++++-----
- 6 files changed, 17 insertions(+), 17 deletions(-)
+ llvm/include/llvm/ADT/DenseMap.h            | 11 ++++----
+ llvm/include/llvm/ADT/SmallSet.h            |  2 +-
+ llvm/lib/Support/ErrorHandling.cpp          |  2 +-
+ llvm/lib/Support/SmallPtrSet.cpp            |  7 +++--
+ llvm/unittests/ADT/STLForwardCompatTest.cpp | 29 +++++++++++----------
+ llvm/unittests/ADT/SmallPtrSetTest.cpp      |  2 +-
+ llvm/unittests/ADT/SmallSetTest.cpp         | 10 +++----
+ 7 files changed, 32 insertions(+), 31 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index d207a515ef05425f924920a8d06d7c65d33e0909..37d8970209dcedf8840324a376ab27b3ba3bdf6a 100644
+index 21a72afd18e463a7b75adf2dc1be2e9c58995675..ef6895b8d90958604c121df0fafe00aa8cf4d77b 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -17,8 +17,8 @@
+@@ -24,8 +24,8 @@
  #include "llvm/ADT/ADL.h"
  #include "llvm/ADT/DenseMapInfo.h"
  #include "llvm/ADT/EpochTracker.h"
 -#include "llvm/ADT/STLExtras.h"
  #include "llvm/ADT/STLForwardCompat.h"
 +#include "llvm/ADT/iterator_range.h"
- #include "llvm/Support/AlignOf.h"
  #include "llvm/Support/Compiler.h"
  #include "llvm/Support/MathExtras.h"
-@@ -32,6 +32,7 @@
+ #include "llvm/Support/MemAlloc.h"
+@@ -38,6 +38,7 @@
  #include <initializer_list>
  #include <iterator>
  #include <new>
@@ -34,7 +35,7 @@ index d207a515ef05425f924920a8d06d7c65d33e0909..37d8970209dcedf8840324a376ab27b3
  #include <type_traits>
  #include <utility>
  
-@@ -90,20 +91,20 @@ public:
+@@ -152,20 +153,20 @@ public:
  
    // Return an iterator to iterate over keys in the map.
    [[nodiscard]] inline auto keys() {
@@ -60,10 +61,10 @@ index d207a515ef05425f924920a8d06d7c65d33e0909..37d8970209dcedf8840324a376ab27b3
  
    [[nodiscard]] bool empty() const { return getNumEntries() == 0; }
 diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
-index 3ca833f15eed37a4df2f8de37bcc4582d30581c4..2bc8ed01ff84671b5246a0dee42a76f086bb4687 100644
+index efbd66bb4d5b2bfb25720514d779e1d2316e7017..38918175ea68dc4c67b6bf6cfd5bed1da200a512 100644
 --- a/llvm/include/llvm/ADT/SmallSet.h
 +++ b/llvm/include/llvm/ADT/SmallSet.h
-@@ -287,7 +287,7 @@ template <typename T, unsigned LN, unsigned RN, typename C>
+@@ -288,7 +288,7 @@ template <typename T, unsigned LN, unsigned RN, typename C>
      return false;
  
    // All elements in LHS must also be in RHS
@@ -86,7 +87,7 @@ index 7ab8a97bb85929615fc751a1eda1fee62004a26f..fcbc70535bf9869f72d001ec214d7046
  std::error_code llvm::mapWindowsError(unsigned EV) {
    switch (EV) {
 diff --git a/llvm/lib/Support/SmallPtrSet.cpp b/llvm/lib/Support/SmallPtrSet.cpp
-index e377dbf4a6999173ee0d04644ec5ee07e204d14d..9a8f99e4df164920d646909e614734894010047b 100644
+index 265b8eba4076de152e1c2318a3ead49a8ed7dcc6..ce009f35b4d206eb0b4f4e8a30749d014fb34794 100644
 --- a/llvm/lib/Support/SmallPtrSet.cpp
 +++ b/llvm/lib/Support/SmallPtrSet.cpp
 @@ -13,7 +13,6 @@
@@ -97,7 +98,7 @@ index e377dbf4a6999173ee0d04644ec5ee07e204d14d..9a8f99e4df164920d646909e61473489
  #include "llvm/Support/MathExtras.h"
  #include "llvm/Support/MemAlloc.h"
  #include <algorithm>
-@@ -191,7 +190,7 @@ void SmallPtrSetImplBase::copyHelper(const SmallPtrSetImplBase &RHS) {
+@@ -179,7 +178,7 @@ void SmallPtrSetImplBase::copyHelper(const SmallPtrSetImplBase &RHS) {
    CurArraySize = RHS.CurArraySize;
  
    // Copy over the contents from the other set
@@ -105,8 +106,8 @@ index e377dbf4a6999173ee0d04644ec5ee07e204d14d..9a8f99e4df164920d646909e61473489
 +  std::ranges::copy(RHS.buckets(), CurArray);
  
    NumEntries = RHS.NumEntries;
-   NumTombstones = RHS.NumTombstones;
-@@ -215,7 +214,7 @@ void SmallPtrSetImplBase::moveHelper(const void **SmallStorage,
+ }
+@@ -202,7 +201,7 @@ void SmallPtrSetImplBase::moveHelper(const void **SmallStorage,
    if (RHS.isSmall()) {
      // Copy a small RHS rather than moving.
      CurArray = SmallStorage;
@@ -115,7 +116,7 @@ index e377dbf4a6999173ee0d04644ec5ee07e204d14d..9a8f99e4df164920d646909e61473489
    } else {
      CurArray = RHS.CurArray;
      RHS.CurArray = RHSSmallStorage;
-@@ -273,7 +272,7 @@ void SmallPtrSetImplBase::swap(const void **SmallStorage,
+@@ -256,7 +255,7 @@ void SmallPtrSetImplBase::swap(const void **SmallStorage,
    SmallPtrSetImplBase &LargeSide = this->isSmall() ? RHS : *this;
    const void **LargeSideInlineStorage =
        this->isSmall() ? RHSSmallStorage : SmallStorage;
@@ -123,9 +124,66 @@ index e377dbf4a6999173ee0d04644ec5ee07e204d14d..9a8f99e4df164920d646909e61473489
 +  std::ranges::copy(SmallSide.small_buckets(), LargeSideInlineStorage);
    std::swap(LargeSide.CurArraySize, SmallSide.CurArraySize);
    std::swap(LargeSide.NumEntries, SmallSide.NumEntries);
-   std::swap(LargeSide.NumTombstones, SmallSide.NumTombstones);
+   SmallSide.CurArray = LargeSide.CurArray;
+diff --git a/llvm/unittests/ADT/STLForwardCompatTest.cpp b/llvm/unittests/ADT/STLForwardCompatTest.cpp
+index 7a152af104801e0447fb134c40cc825856ea4134..f23d5b7ce7cc762fb6d1b8e5053eeac5d926e7e9 100644
+--- a/llvm/unittests/ADT/STLForwardCompatTest.cpp
++++ b/llvm/unittests/ADT/STLForwardCompatTest.cpp
+@@ -12,6 +12,7 @@
+ 
+ #include <iterator>
+ #include <optional>
++#include <ranges>
+ #include <type_traits>
+ #include <utility>
+ 
+@@ -636,30 +637,30 @@ TEST(STLForwardCompatTest, BindFrontBindBack) {
+   auto MulL = llvm::bind_front(MulAdd1, 2, 4);
+   auto Mul20 = llvm::bind_back(MulAdd, 4);
+   auto Mul21 = llvm::bind_front(MulAdd1, 2);
+-  EXPECT_TRUE(all_of(V, Mul0));
+-  EXPECT_TRUE(all_of(V, MulL));
++  EXPECT_TRUE(std::ranges::all_of(V, Mul0));
++  EXPECT_TRUE(std::ranges::all_of(V, MulL));
+ 
+   V.push_back(2);
+-  EXPECT_TRUE(all_of(V, Mul0));
+-  EXPECT_TRUE(all_of(V, MulL));
++  EXPECT_TRUE(std::ranges::all_of(V, Mul0));
++  EXPECT_TRUE(std::ranges::all_of(V, MulL));
+ 
+   V.push_back(2);
+   V.push_back(2);
+-  EXPECT_TRUE(all_of(V, Mul0));
+-  EXPECT_TRUE(all_of(V, MulL));
++  EXPECT_TRUE(std::ranges::all_of(V, Mul0));
++  EXPECT_TRUE(std::ranges::all_of(V, MulL));
+ 
+   auto Spec0 = llvm::bind_front(Mul20, 2);
+   auto Spec1 = llvm::bind_back(Mul21, 4);
+-  EXPECT_TRUE(all_of(V, Spec0));
+-  EXPECT_TRUE(all_of(V, Spec1));
++  EXPECT_TRUE(std::ranges::all_of(V, Spec0));
++  EXPECT_TRUE(std::ranges::all_of(V, Spec1));
+ 
+   V.push_back(3);
+-  EXPECT_FALSE(all_of(V, Mul0));
+-  EXPECT_FALSE(all_of(V, MulL));
+-  EXPECT_FALSE(all_of(V, Spec0));
+-  EXPECT_FALSE(all_of(V, Spec1));
+-  EXPECT_TRUE(any_of(V, Spec0));
+-  EXPECT_TRUE(any_of(V, Spec1));
++  EXPECT_FALSE(std::ranges::all_of(V, Mul0));
++  EXPECT_FALSE(std::ranges::all_of(V, MulL));
++  EXPECT_FALSE(std::ranges::all_of(V, Spec0));
++  EXPECT_FALSE(std::ranges::all_of(V, Spec1));
++  EXPECT_TRUE(std::ranges::any_of(V, Spec0));
++  EXPECT_TRUE(std::ranges::any_of(V, Spec1));
+ }
+ 
+ // Compile-time tests for llvm::is_sorted_constexpr
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index a25c07c08bbbba7b9edaa36adc5f9eaec14ea98d..bbe18dffdcf32d1bd71e756bccca74f1fcee5d0c 100644
+index 14cc88510556903db60f5c538cf34cdb3bab6ae4..b43475d6ea92ae827a37725b5bb344ec50342007 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -261,7 +261,7 @@ TEST(SmallPtrSetTest, dereferenceAndIterate) {
@@ -138,7 +196,7 @@ index a25c07c08bbbba7b9edaa36adc5f9eaec14ea98d..bbe18dffdcf32d1bd71e756bccca74f1
      EXPECT_EQ(F - Found + 1, *F);
  }
 diff --git a/llvm/unittests/ADT/SmallSetTest.cpp b/llvm/unittests/ADT/SmallSetTest.cpp
-index 1d1e84ba7fcfd7aa528239a809fce5ede78618c1..7cb7e6c9d8482ed185845c6b09e4b91355d9b413 100644
+index 0aa2c9c4b125a2abfddce651e1468b72d07beef7..9b7d22653bc880f5f3f02269452cbc9934cb7b5c 100644
 --- a/llvm/unittests/ADT/SmallSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallSetTest.cpp
 @@ -11,9 +11,9 @@
@@ -150,9 +208,9 @@ index 1d1e84ba7fcfd7aa528239a809fce5ede78618c1..7cb7e6c9d8482ed185845c6b09e4b913
  #include "gtest/gtest.h"
 +#include <algorithm>
  #include <string>
+ #include <type_traits>
  
- using namespace llvm;
-@@ -186,7 +186,7 @@ TEST(SmallSetTest, IteratorInt) {
+@@ -187,7 +187,7 @@ TEST(SmallSetTest, IteratorInt) {
  
    std::vector<int> V(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.
@@ -161,7 +219,7 @@ index 1d1e84ba7fcfd7aa528239a809fce5ede78618c1..7cb7e6c9d8482ed185845c6b09e4b913
    for (int i = 0; i < 3; i++)
      EXPECT_EQ(i, V[i]);
  
-@@ -197,7 +197,7 @@ TEST(SmallSetTest, IteratorInt) {
+@@ -198,7 +198,7 @@ TEST(SmallSetTest, IteratorInt) {
  
    V.assign(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.
@@ -170,7 +228,7 @@ index 1d1e84ba7fcfd7aa528239a809fce5ede78618c1..7cb7e6c9d8482ed185845c6b09e4b913
    for (int i = 0; i < 6; i++)
      EXPECT_EQ(i, V[i]);
  }
-@@ -212,7 +212,7 @@ TEST(SmallSetTest, IteratorString) {
+@@ -213,7 +213,7 @@ TEST(SmallSetTest, IteratorString) {
    s1.insert("str 1");
  
    std::vector<std::string> V(s1.begin(), s1.end());
@@ -179,7 +237,7 @@ index 1d1e84ba7fcfd7aa528239a809fce5ede78618c1..7cb7e6c9d8482ed185845c6b09e4b913
    EXPECT_EQ(2u, s1.size());
    EXPECT_EQ("str 1", V[0]);
    EXPECT_EQ("str 2", V[1]);
-@@ -223,7 +223,7 @@ TEST(SmallSetTest, IteratorString) {
+@@ -224,7 +224,7 @@ TEST(SmallSetTest, IteratorString) {
  
    V.assign(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.

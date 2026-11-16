@@ -1,20 +1,17 @@
 {
-  "game": "2021 FRC Infinite Recharge",
-  "field-image": "2021-infiniterecharge.png",
-  "field-corners": {
-    "top-left": [
-      133,
-      35
-    ],
-    "bottom-right": [
-      1329,
-      650
-    ]
+  "name": "2021 FRC Infinite Recharge",
+  "season": "2021",
+  "game": "Infinite Recharge",
+  "field-image": {
+    "path": "2021-infiniterecharge.png",
+    "top": 35,
+    "left": 133,
+    "bottom": 650,
+    "right": 1329
   },
-  "field-size": [
-    52.4375,
-    26.9375
-  ],
-  "field-unit": "foot",
+  "field-dimensions": {
+    "length": 15.98295,
+    "width": 8.21055
+  },
   "program": "frc"
 }

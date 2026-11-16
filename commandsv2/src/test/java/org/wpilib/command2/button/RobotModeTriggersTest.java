@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.command2.CommandTestBase;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.simulation.DriverStationSim;
 
@@ -18,6 +19,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
+    DriverStationBackend.observeUserProgramStarting();
     Trigger auto = RobotModeTriggers.autonomous();
     assertTrue(auto.getAsBoolean());
   }
@@ -28,6 +30,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
+    DriverStationBackend.observeUserProgramStarting();
     Trigger teleop = RobotModeTriggers.teleop();
     assertTrue(teleop.getAsBoolean());
   }
@@ -38,6 +41,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.setRobotMode(RobotMode.UTILITY);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
+    DriverStationBackend.observeUserProgramStarting();
     Trigger test = RobotModeTriggers.utility();
     assertTrue(test.getAsBoolean());
   }
@@ -47,6 +51,7 @@ class RobotModeTriggersTest extends CommandTestBase {
     DriverStationSim.resetData();
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
+    DriverStationBackend.observeUserProgramStarting();
     Trigger disabled = RobotModeTriggers.disabled();
     assertTrue(disabled.getAsBoolean());
   }

@@ -4,8 +4,10 @@
 
 #include <algorithm>
 #include <concepts>
+#include <cstddef>
 #include <initializer_list>
 #include <source_location>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -14,6 +16,7 @@
 
 #include "sleipnir/autodiff/expression.hpp"
 #include "sleipnir/autodiff/expression_graph.hpp"
+#include "sleipnir/autodiff/expression_type.hpp"
 #include "sleipnir/autodiff/sleipnir_base.hpp"
 #include "sleipnir/util/assert.hpp"
 #include "sleipnir/util/concepts.hpp"
@@ -58,7 +61,7 @@ class Variable : public SleipnirBase {
   Variable() = default;
 
   /// Constructs an empty Variable.
-  explicit Variable(std::nullptr_t) : expr{nullptr} {}
+  explicit constexpr Variable(std::nullptr_t) : expr{nullptr} {}
 
   /// Constructs a Variable from a scalar type.
   ///
@@ -73,7 +76,7 @@ class Variable : public SleipnirBase {
   ///
   /// @param value The value of the Variable.
   // NOLINTNEXTLINE (google-explicit-constructor)
-  Variable(SleipnirMatrixLike<Scalar> auto value) : expr{value(0, 0).expr} {
+  Variable(SleipnirMatrixLike<Scalar> auto value) : expr{value[0, 0].expr} {
     slp_assert(value.rows() == 1 && value.cols() == 1);
   }
 
@@ -101,7 +104,7 @@ class Variable : public SleipnirBase {
   /// Constructs a Variable pointing to the specified expression.
   ///
   /// @param expr The autodiff variable.
-  explicit Variable(detail::ExpressionPtr<Scalar>&& expr)
+  explicit constexpr Variable(detail::ExpressionPtr<Scalar>&& expr)
       : expr{std::move(expr)} {}
 
   /// Assignment operator for scalar.
@@ -733,7 +736,11 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
   for (int row = 0; row < rhs.rows(); ++row) {
     for (int col = 0; col < rhs.cols(); ++col) {
       // Make right-hand side zero
-      constraints.emplace_back(lhs - rhs(row, col));
+      if constexpr (EigenMatrixLike<RHS>) {
+        constraints.emplace_back(lhs - rhs(row, col));
+      } else {
+        constraints.emplace_back(lhs - rhs[row, col]);
+      }
     }
   }
 
@@ -749,7 +756,11 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
   for (int row = 0; row < lhs.rows(); ++row) {
     for (int col = 0; col < lhs.cols(); ++col) {
       // Make right-hand side zero
-      constraints.emplace_back(lhs(row, col) - rhs);
+      if constexpr (EigenMatrixLike<LHS>) {
+        constraints.emplace_back(lhs(row, col) - rhs);
+      } else {
+        constraints.emplace_back(lhs[row, col] - rhs);
+      }
     }
   }
 
@@ -767,7 +778,13 @@ auto make_constraints(LHS&& lhs, RHS&& rhs) {
   for (int row = 0; row < lhs.rows(); ++row) {
     for (int col = 0; col < lhs.cols(); ++col) {
       // Make right-hand side zero
-      constraints.emplace_back(lhs(row, col) - rhs(row, col));
+      if constexpr (!EigenMatrixLike<LHS> && !EigenMatrixLike<RHS>) {
+        constraints.emplace_back(lhs[row, col] - rhs[row, col]);
+      } else if constexpr (!EigenMatrixLike<LHS> && EigenMatrixLike<RHS>) {
+        constraints.emplace_back(lhs[row, col] - rhs(row, col));
+      } else if constexpr (EigenMatrixLike<LHS> && !EigenMatrixLike<RHS>) {
+        constraints.emplace_back(lhs(row, col) - rhs[row, col]);
+      }
     }
   }
 
@@ -843,7 +860,7 @@ struct InequalityConstraints {
   ///
   /// @param inequality_constraints The list of InequalityConstraints to
   ///     concatenate.
-  InequalityConstraints(  // NOLINT
+  InequalityConstraints(
       std::initializer_list<InequalityConstraints> inequality_constraints) {
     for (const auto& elem : inequality_constraints) {
       constraints.insert(constraints.end(), elem.constraints.begin(),
@@ -1025,6 +1042,8 @@ struct NumTraits<slp::Variable<Scalar>> : NumTraits<Scalar> {
   using NonInteger = slp::Variable<Scalar>;
   /// Nested type.
   using Nested = slp::Variable<Scalar>;
+  /// Literal type.
+  using Literal = slp::Variable<Scalar>;
 
   /// Is complex.
   static constexpr int IsComplex = 0;

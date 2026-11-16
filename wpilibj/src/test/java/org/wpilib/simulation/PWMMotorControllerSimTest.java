@@ -8,23 +8,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.hardware.motor.Spark;
 
 class PWMMotorControllerSimTest {
   @Test
   void testMotor() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
-    try (Spark spark = new Spark(0)) {
-      PWMMotorControllerSim sim = new PWMMotorControllerSim(spark);
+    try (var motor = new TestPWMMotorController(0)) {
+      PWMMotorControllerSim sim = new PWMMotorControllerSim(motor);
 
-      spark.setThrottle(0);
+      motor.setThrottle(0);
       assertEquals(0, sim.getThrottle());
 
-      spark.setThrottle(0.354);
+      motor.setThrottle(0.354);
       assertEquals(0.354, sim.getThrottle());
 
-      spark.setThrottle(-0.785);
+      motor.setThrottle(-0.785);
       assertEquals(-0.785, sim.getThrottle());
     }
   }

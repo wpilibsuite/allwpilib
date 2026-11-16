@@ -21,7 +21,7 @@
 
 using namespace wpi::cs;
 
-static constexpr size_t kMaxImagesAvail = 32;
+static constexpr size_t MAX_IMAGES_AVAIL = 32;
 
 SourceImpl::SourceImpl(std::string_view name, wpi::util::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry)
@@ -66,7 +66,7 @@ void SourceImpl::SetConnected(bool connected) {
   }
 }
 
-uint64_t SourceImpl::GetCurFrameTime() {
+int64_t SourceImpl::GetCurFrameTime() {
   std::unique_lock lock{m_frameMutex};
   return m_frame.GetTime();
 }
@@ -347,7 +347,7 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
 std::string SourceImpl::GetConfigJson(CS_Status* status) {
   std::string rv;
   wpi::util::raw_string_ostream os(rv);
-  GetConfigJsonObject(status).marshal(os, true, 4);
+  GetConfigJsonObject(status).marshal(os, true);
   return rv;
 }
 
@@ -474,8 +474,9 @@ void SourceImpl::PutFrame(wpi::util::PixelFormat pixelFormat, int width,
   auto image = AllocImage(pixelFormat, width, height, data.size());
 
   // Copy in image data
-  SDEBUG4("Copying data to {} from {} ({} bytes)", fmt::ptr(image->data()),
-          fmt::ptr(data.data()), data.size());
+  SDEBUG4("Copying data to {} from {} ({} bytes)",
+          static_cast<void*>(image->data()),
+          static_cast<const void*>(data.data()), data.size());
   std::memcpy(image->data(), data.data(), data.size());
 
   PutFrame(std::move(image), time, timeSrc);
@@ -551,7 +552,7 @@ void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
   auto it = std::find(m_imagesAvail.begin(), m_imagesAvail.end(), nullptr);
   if (it != m_imagesAvail.end()) {
     *it = std::move(image);
-  } else if (m_imagesAvail.size() > kMaxImagesAvail) {
+  } else if (m_imagesAvail.size() > MAX_IMAGES_AVAIL) {
     // Replace smallest buffer; don't need to check for null because the above
     // find would have found it.
     auto it2 = std::min_element(

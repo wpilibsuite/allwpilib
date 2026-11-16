@@ -1,0 +1,23 @@
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_java_library")
+
+wpilib_jni_java_library(
+    name = "apriltag-java",
+    srcs = glob(["**/*.java"]),
+    maven_artifact_name = "apriltag-java",
+    maven_group_id = "org.wpilib.apriltag",
+    native_libs = ["//apriltag:shared/apriltagjni"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//telemetry/src/main/java",
+        "//tunables/src/main/java",
+        "//wpimath/src/main/java",
+        "//wpiutil/src/main/java",
+        "@bzlmodrio-opencv//libraries/java/opencv",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":apriltag-java",
+    visibility = ["//visibility:public"],
+)

@@ -8,8 +8,7 @@
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -22,10 +21,7 @@ class EventLoop;
  * This class handles DualSense input that comes from the Driver Station.
  * Each time a value is requested the most recent value is returned.
  */
-class DualSenseController
-    : public HIDDevice,
-      public wpi::util::Sendable,
-      public wpi::util::SendableHelper<DualSenseController> {
+class DualSenseController : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /** The number of touchpads supported by this controller. */
   static constexpr int TOUCHPAD_COUNT = 1;
@@ -45,6 +41,60 @@ class DualSenseController
   /** Supported outputs expected for this controller type. */
   static constexpr GenericHID::SupportedOutputs SUPPORTED_OUTPUTS =
       static_cast<GenericHID::SupportedOutputs>(26);
+
+  /** Represents a digital button on a DualSenseController. */
+  enum class Button {
+    /// Cross button.
+    CROSS = 0,
+    /// Circle button.
+    CIRCLE = 1,
+    /// Square button.
+    SQUARE = 2,
+    /// Triangle button.
+    TRIANGLE = 3,
+    /// Create button.
+    CREATE = 4,
+    /// PS button.
+    PS = 5,
+    /// Options button.
+    OPTIONS = 6,
+    /// L 3 button.
+    L3 = 7,
+    /// R 3 button.
+    R3 = 8,
+    /// L 1 button.
+    L1 = 9,
+    /// R 1 button.
+    R1 = 10,
+    /// Dpad Up button.
+    DPAD_UP = 11,
+    /// Dpad Down button.
+    DPAD_DOWN = 12,
+    /// Dpad Left button.
+    DPAD_LEFT = 13,
+    /// Dpad Right button.
+    DPAD_RIGHT = 14,
+    /// Microphone button.
+    MICROPHONE = 15,
+    /// Touchpad button.
+    TOUCHPAD = 20,
+  };
+
+  /** Represents an axis on a DualSenseController. */
+  enum class Axis {
+    /// Left X.
+    LEFT_X = 0,
+    /// Left Y.
+    LEFT_Y = 1,
+    /// Right X.
+    RIGHT_X = 2,
+    /// Right Y.
+    RIGHT_Y = 3,
+    /// L 2.
+    L2 = 4,
+    /// R 2.
+    R2 = 5,
+  };
 
   /**
    * Construct an instance of a controller.
@@ -99,44 +149,116 @@ class DualSenseController
   /**
    * Get the Left X value of the controller.
    *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftXDeadband() to change it.
+   *
    * @return the axis value.
    */
   double GetLeftX() const;
 
   /**
+   * Set the deadband for the Left X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftXDeadband(double deadband);
+
+  /**
    * Get the Left Y value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftYDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetLeftY() const;
 
   /**
+   * Set the deadband for the Left Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftYDeadband(double deadband);
+
+  /**
    * Get the Right X value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetRightXDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetRightX() const;
 
   /**
+   * Set the deadband for the Right X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightXDeadband(double deadband);
+
+  /**
    * Get the Right Y value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetRightYDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetRightY() const;
 
   /**
+   * Set the deadband for the Right Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightYDeadband(double deadband);
+
+  /**
    * Get the L 2 value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetL2Deadband() to change it.
    *
    * @return the axis value.
    */
   double GetL2() const;
 
   /**
+   * Set the deadband for the L 2 axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetL2Deadband(double deadband);
+
+  /**
    * Get the R 2 value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetR2Deadband() to change it.
    *
    * @return the axis value.
    */
   double GetR2() const;
+
+  /**
+   * Set the deadband for the R 2 axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetR2Deadband(double deadband);
 
   /**
    * Get the value of the axis.
@@ -144,7 +266,7 @@ class DualSenseController
    * @param axis The axis to read
    * @return the axis value.
    */
-  double GetAxis(int axis) const;
+  double GetAxis(Axis axis) const;
 
   /**
    * Constructs an event instance that is true when the axis value is less than
@@ -156,7 +278,7 @@ class DualSenseController
    * @return an event instance that is true when the axis value is less than the
    * provided threshold.
    */
-  BooleanEvent AxisLessThan(int axis, double threshold, EventLoop* loop) const;
+  BooleanEvent AxisLessThan(Axis axis, double threshold, EventLoop* loop) const;
 
   /**
    * Constructs an event instance that is true when the axis value is greater
@@ -168,7 +290,7 @@ class DualSenseController
    * @return an event instance that is true when the axis value is greater than
    * the provided threshold.
    */
-  BooleanEvent AxisGreaterThan(int axis, double threshold,
+  BooleanEvent AxisGreaterThan(Axis axis, double threshold,
                                EventLoop* loop) const;
 
   /**
@@ -704,7 +826,7 @@ class DualSenseController
    * @param button The button to read
    * @return The state of the button.
    */
-  bool GetButton(int button) const;
+  bool GetButton(Button button) const;
 
   /**
    * Whether the button was pressed since the last check.
@@ -712,7 +834,7 @@ class DualSenseController
    * @param button The button to read
    * @return Whether the button was pressed since the last check.
    */
-  bool GetButtonPressed(int button);
+  bool GetButtonPressed(Button button);
 
   /**
    * Whether the button was released since the last check.
@@ -720,7 +842,7 @@ class DualSenseController
    * @param button The button to read
    * @return Whether the button was released since the last check.
    */
-  bool GetButtonReleased(int button);
+  bool GetButtonReleased(Button button);
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -730,7 +852,7 @@ class DualSenseController
    * @return an event instance representing the button's digital signal attached
    * to the given loop.
    */
-  BooleanEvent ButtonEvent(int button, EventLoop* loop) const;
+  BooleanEvent ButtonEvent(Button button, EventLoop* loop) const;
 
   /**
    * Set leds on the controller.
@@ -762,63 +884,16 @@ class DualSenseController
    */
   TouchpadFinger GetTouchpadFinger(int finger) const;
 
-  /** Represents a digital button on a DualSenseController. */
-  struct Button {
-    /// Cross button.
-    static constexpr int CROSS = 0;
-    /// Circle button.
-    static constexpr int CIRCLE = 1;
-    /// Square button.
-    static constexpr int SQUARE = 2;
-    /// Triangle button.
-    static constexpr int TRIANGLE = 3;
-    /// Create button.
-    static constexpr int CREATE = 4;
-    /// PS button.
-    static constexpr int PS = 5;
-    /// Options button.
-    static constexpr int OPTIONS = 6;
-    /// L 3 button.
-    static constexpr int L3 = 7;
-    /// R 3 button.
-    static constexpr int R3 = 8;
-    /// L 1 button.
-    static constexpr int L1 = 9;
-    /// R 1 button.
-    static constexpr int R1 = 10;
-    /// Dpad Up button.
-    static constexpr int DPAD_UP = 11;
-    /// Dpad Down button.
-    static constexpr int DPAD_DOWN = 12;
-    /// Dpad Left button.
-    static constexpr int DPAD_LEFT = 13;
-    /// Dpad Right button.
-    static constexpr int DPAD_RIGHT = 14;
-    /// Microphone button.
-    static constexpr int MICROPHONE = 15;
-    /// Touchpad button.
-    static constexpr int TOUCHPAD = 20;
-  };
-
-  /** Represents an axis on a DualSenseController. */
-  struct Axis {
-    /// Left X.
-    static constexpr int LEFT_X = 0;
-    /// Left Y.
-    static constexpr int LEFT_Y = 1;
-    /// Right X.
-    static constexpr int RIGHT_X = 2;
-    /// Right Y.
-    static constexpr int RIGHT_Y = 3;
-    /// L 2.
-    static constexpr int L2 = 4;
-    /// R 2.
-    static constexpr int R2 = 5;
-  };
-
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  std::string_view GetTelemetryType() const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
+  double m_leftXDeadband = 0.1;
+  double m_leftYDeadband = 0.1;
+  double m_rightXDeadband = 0.1;
+  double m_rightYDeadband = 0.1;
+  double m_L2Deadband = 0.01;
+  double m_R2Deadband = 0.01;
   GenericHID* m_hid;
 };
 

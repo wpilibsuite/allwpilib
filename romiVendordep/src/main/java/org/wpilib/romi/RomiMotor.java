@@ -71,11 +71,6 @@ public class RomiMotor implements MotorController {
     return m_inverted;
   }
 
-  @Override
-  public void disable() {
-    setThrottle(0.0);
-  }
-
   /**
    * Make the given Romi motor follow the output of this one.
    *

@@ -1,0 +1,53 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+package_group(
+    name = "tests",
+    packages = [
+        "//wpilibcExamples/src/test/cpp/examples/ArmSimulation",
+    ],
+)
+
+cc_library(
+    name = "ArmSimulation_lib",
+    srcs = glob(["cpp/subsystems/*.cpp"]),
+    hdrs = glob(["include/**/*.hpp"]),
+    linkstatic = True,
+    strip_include_prefix = "include",
+    visibility = [
+        ":tests",
+    ],
+    deps = [
+        "//drivers",
+        "//wpilibc",
+        "//wpimath",
+    ],
+)
+
+cc_binary(
+    name = "ArmSimulation",
+    srcs = ["cpp/Robot.cpp"],
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        ":ArmSimulation_lib",
+    ],
+)
+
+exports_files(
+    ["cpp/Robot.cpp"],
+    visibility = [":tests"],
+)
+
+# For allwpilib packaging
+filegroup(
+    name = "sources",
+    srcs = glob([
+        "cpp/**/*.cpp",
+        "include/**/*.hpp",
+    ]),
+    visibility = [
+        "//wpilibcExamples/src/main/cpp/examples:__pkg__",
+    ],
+)

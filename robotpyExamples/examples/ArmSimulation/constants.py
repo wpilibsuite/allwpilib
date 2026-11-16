@@ -10,24 +10,24 @@ from wpimath import units
 
 
 class Constants:
-    kMotorPort = 0
-    kEncoderAChannel = 0
-    kEncoderBChannel = 1
-    kJoystickPort = 0
+    MOTOR_PORT = 0
+    ENCODER_A_CHANNEL = 0
+    ENCODER_B_CHANNEL = 1
+    JOYSTICK_PORT = 0
 
-    kArmPositionKey = "ArmPosition"
-    kArmPKey = "ArmP"
+    ARM_POSITION_KEY = "ArmPosition"
+    ARM_P_KEY = "ArmP"
 
     # The P gain for the PID controller that drives this arm.
-    kDefaultArmKp = 50.0
-    kDefaultArmSetpointDegrees = 75.0
+    DEFAULT_ARM_KP = 50.0
+    DEFAULT_ARM_SETPOINT_DEGREES = 75.0
 
     # distance per pulse = (angle per revolution) / (pulses per revolution)
     #  = (2 * PI rads) / (4096 pulses)
-    kArmEncoderDistPerPulse = 2.0 * math.pi / 4096
+    ARM_ENCODER_DIST_PER_PULSE = 2.0 * math.pi / 4096
 
-    kArmReduction = 200
-    kArmMass = 8.0  # Kilograms
-    kArmLength = units.inchesToMeters(30)
-    kMinAngleRads = units.degreesToRadians(-75)
-    kMaxAngleRads = units.degreesToRadians(255)
+    ARM_REDUCTION = 200
+    ARM_MASS = 8.0  # Kilograms
+    ARM_LENGTH = units.inches_to_meters(30)
+    MIN_ANGLE_RADS = units.degrees_to_radians(-75)
+    MAX_ANGLE_RADS = units.degrees_to_radians(255)

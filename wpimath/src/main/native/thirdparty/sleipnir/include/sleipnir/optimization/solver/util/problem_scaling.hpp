@@ -3,6 +3,7 @@
 #pragma once
 
 #include <algorithm>
+#include <utility>
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -42,8 +43,8 @@ struct ProblemScaling {
   /// @param f Cost scaling factor d_f.
   /// @param c_e Equality constraint scaling factors d_cₑ.
   /// @param c_i Inequality constraint scaling factors d_cᵢ.
-  ProblemScaling(Scalar f, const DenseVector& c_e, const DenseVector& c_i)
-      : f{f}, c_e{c_e}, c_i{c_i} {}
+  ProblemScaling(Scalar f, DenseVector c_e, DenseVector c_i)
+      : f{f}, c_e{std::move(c_e)}, c_i{std::move(c_i)} {}
 
   /// Computes Newton problem scaling.
   ///
@@ -52,7 +53,7 @@ struct ProblemScaling {
   ///
   ///   d_f = min(1, gₘₐₓ / ‖∇f(x₀)‖_∞)
   ///
-  /// See §3.8 Automatic Scaling of the Problem Statement in [2].
+  /// See section 3.8 of [2].
   ///
   /// @param g Cost gradient ∇f, evaluated at the starting point.
   explicit ProblemScaling(const DenseVector& g) {
@@ -69,7 +70,7 @@ struct ProblemScaling {
   ///   d_f     = min(1, gₘₐₓ / ‖∇f(x₀)‖_∞)
   ///   d_cₑ[j] = min(1, gₘₐₓ / ‖∇cₑⱼ(x₀)‖_∞)
   ///
-  /// See §3.8 Automatic Scaling of the Problem Statement in [2].
+  /// See section 3.8 of [2].
   ///
   /// @param g Cost gradient ∇f, evaluated at the starting point.
   /// @param A_e Equality constraint Jacobian Aₑ, evaluated at the starting
@@ -89,7 +90,7 @@ struct ProblemScaling {
   ///   d_f    = min(1, gₘₐₓ / ‖∇f(x₀)‖_∞)
   ///   d_c[j] = min(1, gₘₐₓ / ‖∇cⱼ(x₀)‖_∞)
   ///
-  /// See §3.8 Automatic Scaling of the Problem Statement in [2].
+  /// See section 3.8 of [2].
   ///
   /// @param g Cost gradient ∇f, evaluated at the starting point.
   /// @param A_e Equality constraint Jacobian Aₑ, evaluated at the starting

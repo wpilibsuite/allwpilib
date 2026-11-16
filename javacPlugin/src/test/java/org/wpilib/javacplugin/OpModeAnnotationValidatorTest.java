@@ -7,7 +7,7 @@ package org.wpilib.javacplugin;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.javacplugin.CompileTestUtils.kJavaVersionOptions;
+import static org.wpilib.javacplugin.CompileTestUtils.JAVA_VERSION_OPTIONS;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -53,7 +53,7 @@ class OpModeAnnotationValidatorTest {
 
       @Retention(RetentionPolicy.RUNTIME)
       @Target(ElementType.TYPE)
-      public @interface TestOpMode {
+      public @interface Utility {
         String name() default "";
         String description() default "";
         String group() default "";
@@ -70,21 +70,21 @@ class OpModeAnnotationValidatorTest {
 
         @Autonomous(name = "Short Name", description = "Short Description", group = "Short Group")
         @Teleop(name = "Short Name", description = "Short Description", group = "Short Group")
-        @TestOpMode(name = "Short Name", description = "Short Description", group = "Short Group")
+        @Utility(name = "Short Name", description = "Short Description", group = "Short Group")
         class Example {
         }
         """;
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
                 JavaFileObjects.forSourceString(
                     "org.wpilib.opmode.Autonomous", AUTONOMOUS_ANNOTATION_SOURCE),
                 JavaFileObjects.forSourceString(
                     "org.wpilib.opmode.Teleop", TELEOP_ANNOTATION_SOURCE),
                 JavaFileObjects.forSourceString(
-                    "org.wpilib.opmode.TestOpMode", TEST_OPMODE_ANNOTATION_SOURCE),
+                    "org.wpilib.opmode.Utility", TEST_OPMODE_ANNOTATION_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -108,7 +108,7 @@ class OpModeAnnotationValidatorTest {
           description = "This is significantly longer than sixty four characters (it's ninety nine, if you bother to count!)",
           group = "More than twelve characters long"
         )
-        @TestOpMode(
+        @Utility(
           name = "This is much longer than thirty six characters (I counted them all myself)",
           description = "This is significantly longer than sixty four characters (it's ninety nine, if you bother to count!)",
           group = "More than twelve characters long"
@@ -119,14 +119,14 @@ class OpModeAnnotationValidatorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
                 JavaFileObjects.forSourceString(
                     "org.wpilib.opmode.Autonomous", AUTONOMOUS_ANNOTATION_SOURCE),
                 JavaFileObjects.forSourceString(
                     "org.wpilib.opmode.Teleop", TELEOP_ANNOTATION_SOURCE),
                 JavaFileObjects.forSourceString(
-                    "org.wpilib.opmode.TestOpMode", TEST_OPMODE_ANNOTATION_SOURCE),
+                    "org.wpilib.opmode.Utility", TEST_OPMODE_ANNOTATION_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -135,33 +135,35 @@ class OpModeAnnotationValidatorTest {
 
     // Autonomous
     assertEquals(
-        "@Autonomous opmode name must be <= 32 characters (was 74)",
+        "[WPILib] @Autonomous opmode name must be <= 32 characters (was 74).",
         errors.get(0).getMessage(null));
     assertEquals(
-        "@Autonomous opmode group must be <= 12 characters (was 32)",
+        "[WPILib] @Autonomous opmode group must be <= 12 characters (was 32).",
         errors.get(1).getMessage(null));
     assertEquals(
-        "@Autonomous opmode description must be <= 64 characters (was 99)",
+        "[WPILib] @Autonomous opmode description must be <= 64 characters (was 99).",
         errors.get(2).getMessage(null));
 
     // Teleop
     assertEquals(
-        "@Teleop opmode name must be <= 32 characters (was 74)", errors.get(3).getMessage(null));
+        "[WPILib] @Teleop opmode name must be <= 32 characters (was 74).",
+        errors.get(3).getMessage(null));
     assertEquals(
-        "@Teleop opmode group must be <= 12 characters (was 32)", errors.get(4).getMessage(null));
+        "[WPILib] @Teleop opmode group must be <= 12 characters (was 32).",
+        errors.get(4).getMessage(null));
     assertEquals(
-        "@Teleop opmode description must be <= 64 characters (was 99)",
+        "[WPILib] @Teleop opmode description must be <= 64 characters (was 99).",
         errors.get(5).getMessage(null));
 
-    // TestOpMode
+    // Utility
     assertEquals(
-        "@TestOpMode opmode name must be <= 32 characters (was 74)",
+        "[WPILib] @Utility opmode name must be <= 32 characters (was 74).",
         errors.get(6).getMessage(null));
     assertEquals(
-        "@TestOpMode opmode group must be <= 12 characters (was 32)",
+        "[WPILib] @Utility opmode group must be <= 12 characters (was 32).",
         errors.get(7).getMessage(null));
     assertEquals(
-        "@TestOpMode opmode description must be <= 64 characters (was 99)",
+        "[WPILib] @Utility opmode description must be <= 64 characters (was 99).",
         errors.get(8).getMessage(null));
   }
 }

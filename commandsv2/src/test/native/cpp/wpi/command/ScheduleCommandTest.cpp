@@ -13,7 +13,9 @@
 using namespace wpi::cmd;
 class ScheduleCommandTest : public CommandTestBase {};
 
-TEST_F(ScheduleCommandTest, ScheduleCommandSchedule) {
+TEST_CASE_METHOD(ScheduleCommandTest,
+                 "ScheduleCommandTest ScheduleCommandSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   bool scheduled = false;
@@ -25,6 +27,6 @@ TEST_F(ScheduleCommandTest, ScheduleCommandSchedule) {
   scheduler.Schedule(&command);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduled);
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  CHECK(scheduled);
+  CHECK_FALSE(scheduler.IsScheduled(&command));
 }

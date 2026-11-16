@@ -72,7 +72,7 @@ class WPILIB_DLLEXPORT AprilTagDetector {
      * Debug mode. When true, the decoder writes a variety of debugging images
      * to the current working directory at various stages through the detection
      * process. This is slow and should *not* be used on space-limited systems
-     * such as the RoboRIO. Default is disabled (false).
+     * such as the Systemcore. Default is disabled (false).
      */
     bool debug = false;
   };

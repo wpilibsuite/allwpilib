@@ -4,16 +4,18 @@
 
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
 
+#include <format>
+
 #include "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
 
-static constexpr int kPercentageMode = 0;
-static constexpr int kVoltageMode = 1;
-static constexpr int kPositionMode = 2;
-static constexpr int kVelocityMode = 3;
-static constexpr int kFollowerMode = 4;
+static constexpr int PERCENTAGE_MODE = 0;
+static constexpr int VOLTAGE_MODE = 1;
+static constexpr int POSITION_MODE = 2;
+static constexpr int VELOCITY_MODE = 3;
+static constexpr int FOLLOWER_MODE = 4;
 
 using namespace wpi;
 
@@ -30,7 +32,7 @@ ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
                            channel);
   }
 
-  m_hub.ReportUsage(fmt::format("ExHubMotor[{}]", channel), "ExHubMotor");
+  m_hub.ReportUsage("ExHubMotor", channel, "ExHubMotor");
 
   auto systemServer = SystemServer::GetSystemServer();
 
@@ -40,53 +42,53 @@ ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
   options.periodic = 0.005;
 
   m_encoderSubscriber = systemServer
-                            .GetDoubleTopic(fmt::format(
+                            .GetDoubleTopic(std::format(
                                 "/rhsp/{}/motor{}/encoder", usbId, channel))
                             .Subscribe(0, options);
   m_encoderVelocitySubscriber =
       systemServer
           .GetDoubleTopic(
-              fmt::format("/rhsp/{}/motor{}/encoderVelocity", usbId, channel))
+              std::format("/rhsp/{}/motor{}/encoderVelocity", usbId, channel))
           .Subscribe(0, options);
   m_currentSubscriber = systemServer
-                            .GetDoubleTopic(fmt::format(
+                            .GetDoubleTopic(std::format(
                                 "/rhsp/{}/motor{}/current", usbId, channel))
                             .Subscribe(0, options);
 
   m_setpointPublisher = systemServer
-                            .GetDoubleTopic(fmt::format(
+                            .GetDoubleTopic(std::format(
                                 "/rhsp/{}/motor{}/setpoint", usbId, channel))
                             .Publish(options);
 
   m_distancePerCountPublisher =
       systemServer
           .GetDoubleTopic(
-              fmt::format("/rhsp/{}/motor{}/distancePerCount", usbId, channel))
+              std::format("/rhsp/{}/motor{}/distancePerCount", usbId, channel))
           .Publish(options);
 
   m_floatOn0Publisher = systemServer
-                            .GetBooleanTopic(fmt::format(
+                            .GetBooleanTopic(std::format(
                                 "/rhsp/{}/motor{}/floatOn0", usbId, channel))
                             .Publish(options);
   m_enabledPublisher = systemServer
-                           .GetBooleanTopic(fmt::format(
+                           .GetBooleanTopic(std::format(
                                "/rhsp/{}/motor{}/enabled", usbId, channel))
                            .Publish(options);
 
   m_modePublisher =
       systemServer
-          .GetIntegerTopic(fmt::format("/rhsp/{}/motor{}/mode", usbId, channel))
+          .GetIntegerTopic(std::format("/rhsp/{}/motor{}/mode", usbId, channel))
           .Publish(options);
 
   m_reversedPublisher = systemServer
-                            .GetBooleanTopic(fmt::format(
+                            .GetBooleanTopic(std::format(
                                 "/rhsp/{}/motor{}/reversed", usbId, channel))
                             .Publish(options);
 
   m_resetEncoderPublisher =
       systemServer
           .GetBooleanTopic(
-              fmt::format("/rhsp/{}/motor{}/resetEncoder", usbId, channel))
+              std::format("/rhsp/{}/motor{}/resetEncoder", usbId, channel))
           .Publish(options);
 }
 
@@ -96,25 +98,25 @@ ExpansionHubMotor::~ExpansionHubMotor() noexcept {
 
 void ExpansionHubMotor::SetThrottle(double throttle) {
   SetEnabled(true);
-  m_modePublisher.Set(kPercentageMode);
+  m_modePublisher.Set(PERCENTAGE_MODE);
   m_setpointPublisher.Set(throttle);
 }
 
 void ExpansionHubMotor::SetVoltage(wpi::units::volt_t voltage) {
   SetEnabled(true);
-  m_modePublisher.Set(kVoltageMode);
+  m_modePublisher.Set(VOLTAGE_MODE);
   m_setpointPublisher.Set(voltage.value());
 }
 
 void ExpansionHubMotor::SetPositionSetpoint(double setpoint) {
   SetEnabled(true);
-  m_modePublisher.Set(kPositionMode);
+  m_modePublisher.Set(POSITION_MODE);
   m_setpointPublisher.Set(setpoint);
 }
 
 void ExpansionHubMotor::SetVelocitySetpoint(double setpoint) {
   SetEnabled(true);
-  m_modePublisher.Set(kVelocityMode);
+  m_modePublisher.Set(VELOCITY_MODE);
   m_setpointPublisher.Set(setpoint);
 }
 
@@ -122,8 +124,8 @@ void ExpansionHubMotor::SetEnabled(bool enabled) {
   m_enabledPublisher.Set(enabled);
 }
 
-void ExpansionHubMotor::SetFloatOn0(bool floatOn0) {
-  m_floatOn0Publisher.Set(floatOn0);
+void ExpansionHubMotor::SetNeutralMode(NeutralMode mode) {
+  m_floatOn0Publisher.Set(mode == NeutralMode::COAST);
 }
 
 wpi::units::ampere_t ExpansionHubMotor::GetCurrent() const {
@@ -143,7 +145,7 @@ double ExpansionHubMotor::GetEncoderPosition() const {
 }
 
 void ExpansionHubMotor::SetReversed(bool reversed) {
-  m_reversedPublisher.Set(true);
+  m_reversedPublisher.Set(reversed);
 }
 
 void ExpansionHubMotor::ResetEncoder() {
@@ -169,7 +171,7 @@ void ExpansionHubMotor::Follow(const ExpansionHubMotor& leader,
   }
   m_hub.AddFollower(leader.m_channel, m_channel);
   SetEnabled(true);
-  m_modePublisher.Set(kFollowerMode);
+  m_modePublisher.Set(FOLLOWER_MODE);
   if (direction == FollowDirection::Opposed) {
     m_setpointPublisher.Set(leader.m_channel + 4);
   } else {
@@ -180,6 +182,6 @@ void ExpansionHubMotor::Follow(const ExpansionHubMotor& leader,
 void ExpansionHubMotor::Unfollow() {
   m_hub.RemoveFollower(m_channel);
   SetEnabled(false);
-  m_modePublisher.Set(kPercentageMode);
+  m_modePublisher.Set(PERCENTAGE_MODE);
   m_setpointPublisher.Set(0);
 }

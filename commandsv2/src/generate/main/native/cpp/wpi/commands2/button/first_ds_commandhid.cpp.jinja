@@ -8,8 +8,17 @@
 using namespace wpi::cmd;
 
 Command{{ ClassName }}Controller::Command{{ ClassName }}Controller(int port)
-    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
-      m_controller{m_hid->GetHID()} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)} {
+  m_ownedController =
+      std::make_unique<wpi::{{ ClassName }}Controller>(m_hid->GetHID());
+  m_controller = m_ownedController.get();
+}
+
+Command{{ ClassName }}Controller::Command{{ ClassName }}Controller(
+    wpi::{{ ClassName }}Controller* controller)
+    : m_ownedHid{std::make_unique<CommandGenericHID>(controller->GetHID())},
+      m_hid{m_ownedHid.get()},
+      m_controller{controller} {}
 
 CommandGenericHID& Command{{ ClassName }}Controller::GetHID() {
   return *m_hid;
@@ -17,30 +26,56 @@ CommandGenericHID& Command{{ ClassName }}Controller::GetHID() {
 
 wpi::{{ ClassName }}Controller&
 Command{{ ClassName }}Controller::GetController() {
-  return m_controller;
+  return *m_controller;
 }
 
 const wpi::{{ ClassName }}Controller&
 Command{{ ClassName }}Controller::GetController() const {
-  return m_controller;
+  return *m_controller;
 }
+
+Trigger Command{{ ClassName }}Controller::Button(
+    enum wpi::{{ ClassName }}Controller::Button button,
+    wpi::EventLoop* loop) const {
+  return m_hid->Button(static_cast<int>(button), loop);
+}
+
 {% for button in buttons %}
 Trigger Command{{ ClassName }}Controller::{{ button.MethodName }}(
     wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::{{ ClassName }}Controller::Button::{{ button.ConstantName }},
-                       loop);
+  return Button(wpi::{{ ClassName }}Controller::Button::{{ button.ConstantName }},
+                loop);
 }
 {% endfor -%}
 {% for trigger in triggerAxes %}
 Trigger Command{{ ClassName }}Controller::{{ trigger.MethodName }}(
     double threshold, wpi::EventLoop* loop) const {
-  return m_hid->AxisGreaterThan(
+  return AxisGreaterThan(
       wpi::{{ ClassName }}Controller::Axis::{{ trigger.AxisConstantName }},
       threshold, loop);
 }
-{% endfor -%}
+{% endfor %}
+Trigger Command{{ ClassName }}Controller::AxisLessThan(
+    wpi::{{ ClassName }}Controller::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
+}
+
+Trigger Command{{ ClassName }}Controller::AxisGreaterThan(
+    wpi::{{ ClassName }}Controller::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
+}
+
+Trigger Command{{ ClassName }}Controller::AxisMagnitudeGreaterThan(
+    wpi::{{ ClassName }}Controller::Axis axis, double threshold,
+    wpi::EventLoop* loop) const {
+  return m_hid->AxisMagnitudeGreaterThan(static_cast<int>(axis), threshold,
+                                         loop);
+}
+
 {% for axis in axes %}
 double Command{{ ClassName }}Controller::Get{{ axis.MethodName }}() const {
-  return m_controller.Get{{ axis.MethodName }}();
+  return m_controller->Get{{ axis.MethodName }}();
 }
 {% endfor -%}

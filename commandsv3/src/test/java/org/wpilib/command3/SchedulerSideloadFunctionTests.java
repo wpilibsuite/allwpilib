@@ -40,6 +40,21 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
   }
 
   @Test
+  void multiplePeriodicSideloads() {
+    int periodicCount = 4;
+    AtomicInteger count = new AtomicInteger(0);
+    for (int i = 0; i < periodicCount; i++) {
+      m_scheduler.addPeriodic(count::incrementAndGet);
+    }
+    assertEquals(0, count.get());
+
+    m_scheduler.run();
+    assertEquals(periodicCount, count.get());
+    m_scheduler.run();
+    assertEquals(periodicCount * 2, count.get());
+  }
+
+  @Test
   void sideloadSchedulingCommand() {
     var command = Command.noRequirements(Coroutine::park).named("Command");
     // one-shot sideload forks a command and immediately exits
@@ -106,5 +121,29 @@ class SchedulerSideloadFunctionTests extends CommandTestBase {
     m_scheduler.run();
     assertTrue(signal.get(), "Sideload should have run and set the signal");
     assertTrue(m_scheduler.isRunning(command), "Command should have started");
+  }
+
+  @Test
+  void sideloadFailingToForkDoesNotCancel() {
+    var mech = new DummyMechanism("Mech", m_scheduler);
+    Command highPriority = new PriorityCommand(100, mech);
+    Command lowPriority = new PriorityCommand(0, mech);
+
+    AtomicBoolean reached = new AtomicBoolean(false);
+
+    m_scheduler.sideload(
+        coroutine -> {
+          var result = coroutine.fork(lowPriority);
+          reached.set(true);
+          assertTrue(result.failed(), "Fork result should be a failure");
+          var fails = result.getFailedCommands();
+          assertEquals(1, fails.size(), "Failed forks should show 1 command");
+          assertEquals(
+              lowPriority, fails.getFirst().command(), "Failed fork should be lowPriority");
+        });
+
+    m_scheduler.schedule(highPriority);
+    m_scheduler.run();
+    assertTrue(reached.get(), "sideload function was terminated before it reached assertions");
   }
 }

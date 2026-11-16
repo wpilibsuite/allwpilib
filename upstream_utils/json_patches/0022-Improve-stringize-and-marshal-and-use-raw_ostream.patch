@@ -9,7 +9,7 @@ Subject: [PATCH 22/25] Improve stringize and marshal and use raw_ostream
  2 files changed, 131 insertions(+), 87 deletions(-)
 
 diff --git a/json.cpp b/json.cpp
-index 2307536b15be9aae19da4ec9370a5aa17d5150d1..1beec7cc30e90ab2e31bc488ee15cedf9a9f32e5 100644
+index a800ce44ab28117b957a2f7507908cbd4c730de9..b4a6689c2cf501abd884db0a8588e1042d2bac12 100644
 --- a/json.cpp
 +++ b/json.cpp
 @@ -27,6 +27,7 @@
@@ -291,7 +291,7 @@ index 2307536b15be9aae19da4ec9370a5aa17d5150d1..1beec7cc30e90ab2e31bc488ee15cedf
                  break;
              default:
 diff --git a/json.h b/json.h
-index ef3ea13b7cb147f0b383ff1ead496d495cfece32..e42ee96ac8697eaf17fd9d5298e877a45a4644a0 100644
+index 2dbf2cd9f8cc150c8f1dcfa7ef7ecd523b14d6ca..a6a459fcda6015c2195b0a32611fc61525d5483c 100644
 --- a/json.h
 +++ b/json.h
 @@ -31,6 +31,7 @@

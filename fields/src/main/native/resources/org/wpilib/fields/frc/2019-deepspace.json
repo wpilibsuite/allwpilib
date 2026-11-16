@@ -1,20 +1,17 @@
 {
-  "game": "2019 FRC Destination: Deep Space",
-  "field-image": "2019-deepspace.jpg",
-  "field-corners": {
-    "top-left": [
-      220,
-      41
-    ],
-    "bottom-right": [
-      1375,
-      616
-    ]
+  "name": "2019 FRC Destination: Deep Space",
+  "season": "2019",
+  "game": "Destination: Deep Space",
+  "field-image": {
+    "path": "2019-deepspace.jpg",
+    "top": 41,
+    "left": 220,
+    "bottom": 616,
+    "right": 1375
   },
-  "field-size": [
-    54,
-    27
-  ],
-  "field-unit": "foot",
+  "field-dimensions": {
+    "length": 16.4592,
+    "width": 8.2296
+  },
   "program": "frc"
 }

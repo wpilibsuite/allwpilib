@@ -5,6 +5,7 @@
 package org.wpilib.math.linalg;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,6 +16,7 @@ import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N4;
 import org.wpilib.math.util.Nat;
+import org.wpilib.math.util.Num;
 
 class MatrixTest {
   @Test
@@ -75,6 +77,49 @@ class MatrixTest {
   }
 
   @Test
+  void testExp() {
+    var A1 = MatBuilder.fill(Nat.N1(), Nat.N1(), 4.0);
+    assertTrue(A1.exp().isEqual(MatBuilder.fill(Nat.N1(), Nat.N1(), Math.exp(4.0)), 1E-14));
+
+    var A2 = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 1.0, 0.0, -0.5);
+    assertTrue(A2.exp().times(A2.times(-1).exp()).isEqual(Matrix.eye(Nat.N2()), 1E-15));
+
+    var A3 = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 1.0, 0.0, 10.0);
+    assertTrue(A3.exp().times(A3.times(-1).exp()).isEqual(Matrix.eye(Nat.N2()), 1E-14));
+
+    var A4 = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 10.0, 0.0, 0.0);
+    assertTrue(A4.exp().times(A4.times(-1).exp()).isEqual(Matrix.eye(Nat.N2()), 2.5E-14));
+
+    var A5 = MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 3.0, 4.0, 5.0);
+    assertTrue(A5.exp().times(A5.times(-1).exp()).isEqual(Matrix.eye(Nat.N2()), 1E-12));
+
+    // Pascal matrix
+    //
+    //    ([0  0  0  0  0  0  0])   [1  0   0   0   0  0  0]
+    //    ([1  0  0  0  0  0  0])   [1  1   0   0   0  0  0]
+    //    ([0  2  0  0  0  0  0])   [1  2   1   0   0  0  0]
+    // exp([0  0  3  0  0  0  0]) = [1  3   3   1   0  0  0]
+    //    ([0  0  0  4  0  0  0])   [1  4   6   4   1  0  0]
+    //    ([0  0  0  0  5  0  0])   [1  5  10  10   5  1  0]
+    //    ([0  0  0  0  0  6  0])   [1  6  15  20  15  6  1]
+    var pascal = new Matrix<>(Nat.N7(), Nat.N7());
+    for (int col = 0; col < 6; ++col) {
+      pascal.set(col + 1, col, col + 1);
+    }
+    var expectedPascal = new Matrix<>(Nat.N7(), Nat.N7());
+    for (int row = 0; row < 7; ++row) {
+      expectedPascal.set(row, 0, 1.0);
+    }
+    for (int col = 1; col < 7; ++col) {
+      for (int row = col; row < 7; ++row) {
+        expectedPascal.set(
+            row, col, expectedPascal.get(row - 1, col - 1) + expectedPascal.get(row - 1, col));
+      }
+    }
+    assertTrue(pascal.exp().isEqual(expectedPascal, 1E-14));
+  }
+
+  @Test
   void testInverse() {
     var mat = MatBuilder.fill(Nat.N3(), Nat.N3(), 1.0, 3.0, 2.0, 5.0, 2.0, 1.5, 0.0, 1.3, 2.5);
 
@@ -83,6 +128,38 @@ class MatrixTest {
     assertTrue(Matrix.eye(Nat.N3()).isEqual(mat.times(inv), 1E-9));
 
     assertTrue(Matrix.eye(Nat.N3()).isEqual(inv.times(mat), 1E-9));
+  }
+
+  @Test
+  void testPseudoInverse() {
+    // Check the four Moore-Penrose conditions:
+    // https://en.wikipedia.org/wiki/Moore-Penrose_inverse#Definition
+
+    // Invertible non-square matrix
+    var A1 = MatBuilder.fill(Nat.N2(), Nat.N3(), 1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+    var A1_pinv = A1.pseudoInverse();
+
+    // AA⁺ maps all column vectors of A to themselves: AA⁺A = A
+    assertTrue(A1.isEqual(A1.times(A1_pinv).times(A1), 1E-9));
+    // A⁺ acts like a weak inverse: A⁺AA⁺ = A⁺
+    assertTrue(A1.pseudoInverse().isEqual(A1_pinv.times(A1).times(A1_pinv), 1E-9));
+    // AA⁺ is symmetric: (AA⁺)ᵀ = AA⁺
+    assertTrue(A1.times(A1_pinv).isEqual(A1.times(A1_pinv).transpose(), 1E-9));
+    // A⁺A is symmetric: (A⁺A)ᵀ = A⁺A
+    assertTrue(A1_pinv.times(A1).isEqual(A1_pinv.times(A1).transpose(), 1E-9));
+
+    // Singular square matrix
+    var A2 = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 2.0, 2.0, 4.0);
+    var A2_pinv = A2.pseudoInverse();
+
+    // AA⁺ maps all column vectors of A to themselves: AA⁺A = A
+    assertTrue(A2.isEqual(A2.times(A2_pinv).times(A2), 1E-9));
+    // A⁺ acts like a weak inverse: A⁺AA⁺ = A⁺
+    assertTrue(A2.pseudoInverse().isEqual(A2_pinv.times(A2).times(A2_pinv), 1E-9));
+    // AA⁺ is symmetric: (AA⁺)ᵀ = AA⁺
+    assertTrue(A2.times(A2_pinv).isEqual(A2.times(A2_pinv).transpose(), 1E-9));
+    // A⁺A is symmetric: (A⁺A)ᵀ = A⁺A
+    assertTrue(A2_pinv.times(A2).isEqual(A2_pinv.times(A2).transpose(), 1E-9));
   }
 
   @Test
@@ -116,19 +193,60 @@ class MatrixTest {
     assertEquals(MatBuilder.fill(Nat.N2(), Nat.N2(), 6.0, 8.0, 10.0, 12.0), mat1.plus(mat2));
   }
 
+  <R extends Num> void assertRankUpdatePass(Matrix<R, R> L, Matrix<R, N1> v, double sigma) {
+    var U = L.transpose();
+
+    // Lower triangular
+    var new_L = L.copy();
+    assertTrue(new_L.rankUpdate(v, sigma, true));
+    var new_A = new_L.times(new_L.transpose());
+    var expected_new_A = L.times(U).plus(v.times(v.transpose()).times(sigma));
+    assertTrue(expected_new_A.isEqual(new_A, 1E-9));
+
+    // Upper triangular
+    var new_U = U.copy();
+    assertTrue(new_U.rankUpdate(v, sigma, false));
+    new_A = new_U.transpose().times(new_U);
+    assertTrue(expected_new_A.isEqual(new_A, 1E-9));
+  }
+
+  <R extends Num> void assertRankUpdateFail(Matrix<R, R> L, Matrix<R, N1> v, double sigma) {
+    var U = L.transpose();
+
+    // Lower triangular
+    var updated_L = L.copy();
+    assertFalse(updated_L.rankUpdate(v, sigma, true));
+
+    // Upper triangular
+    var updated_U = U.copy();
+    assertFalse(updated_U.rankUpdate(v, sigma, false));
+  }
+
   @Test
-  void testMatrixExponential() {
-    var matrix = Matrix.eye(Nat.N2());
-    var result = matrix.exp();
+  void testRankUpdate() {
+    // No-op
+    assertRankUpdatePass(Matrix.eye(Nat.N2()), VecBuilder.fill(0.0, 0.0), 1.0);
+    assertRankUpdatePass(Matrix.eye(Nat.N2()), VecBuilder.fill(1.0, 2.0), 0.0);
 
-    assertTrue(result.isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), Math.E, 0, 0, Math.E), 1E-9));
+    // Update
+    assertRankUpdatePass(
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 0.0, 1.0, 1.0), VecBuilder.fill(2.0, 3.0), 2.0);
 
-    matrix = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 2, 3, 4);
-    result = matrix.times(0.01).exp();
+    // Downdate
+    assertRankUpdatePass(
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 0.0, 2.0, 2.0), VecBuilder.fill(1.0, 0.5), -1.0);
 
-    assertTrue(
-        result.isEqual(
-            MatBuilder.fill(Nat.N2(), Nat.N2(), 1.01035625, 0.02050912, 0.03076368, 1.04111993),
-            1E-8));
+    // Failed downdate
+    assertRankUpdateFail(
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 2.0, 0.0, 2.0, 2.0), VecBuilder.fill(1.0, 1.0), -4.0);
+
+    // Semidefinite update
+    assertRankUpdatePass(new Matrix<>(Nat.N2(), Nat.N2()), VecBuilder.fill(1.0, 2.0), 1.0);
+
+    // Semidefinite downdate (has a valid downdate, but our algorithm can't recover it)
+    assertRankUpdateFail(
+        MatBuilder.fill(Nat.N2(), Nat.N2(), 1.0, 0.0, 0.0, 0.0),
+        VecBuilder.fill(Math.sqrt(0.5), 0.0),
+        -1.0);
   }
 }

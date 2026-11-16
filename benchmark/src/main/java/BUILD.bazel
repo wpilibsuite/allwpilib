@@ -1,0 +1,27 @@
+load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_jvm_external//:defs.bzl", "java_plugin_artifact")
+
+java_binary(
+    name = "benchmark",
+    testonly = True,
+    srcs = glob(["wpilib/robot/*.java"]),
+    main_class = "wpilib.robot.Main",
+    plugins = [
+        java_plugin_artifact("org.openjdk.jmh:jmh-generator-annprocess", "org.openjdk.jmh.generators.BenchmarkProcessor"),
+    ],
+    deps = [
+        "//ntcore/src/main/java",
+        "//telemetry/src/main/java",
+        "//tunables/src/main/java",
+        "//wpilibj/src/main/java",
+        "//wpimath/src/main/java",
+        "//wpiutil/src/main/java",
+        "@maven//:org_ejml_ejml_java9module",
+        "@maven//:org_openjdk_jmh_jmh_core",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":benchmark",
+)

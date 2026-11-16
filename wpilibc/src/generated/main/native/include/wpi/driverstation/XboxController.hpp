@@ -8,8 +8,7 @@
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -22,10 +21,7 @@ class EventLoop;
  * This class handles Xbox input that comes from the Driver Station.
  * Each time a value is requested the most recent value is returned.
  */
-class XboxController
-    : public HIDDevice,
-      public wpi::util::Sendable,
-      public wpi::util::SendableHelper<XboxController> {
+class XboxController : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /** The number of touchpads supported by this controller. */
   static constexpr int TOUCHPAD_COUNT = 0;
@@ -45,6 +41,56 @@ class XboxController
   /** Supported outputs expected for this controller type. */
   static constexpr GenericHID::SupportedOutputs SUPPORTED_OUTPUTS =
       static_cast<GenericHID::SupportedOutputs>(24);
+
+  /** Represents a digital button on a XboxController. */
+  enum class Button {
+    /// A button.
+    A = 0,
+    /// B button.
+    B = 1,
+    /// X button.
+    X = 2,
+    /// Y button.
+    Y = 3,
+    /// View button.
+    VIEW = 4,
+    /// Xbox button.
+    XBOX = 5,
+    /// Menu button.
+    MENU = 6,
+    /// Left Stick button.
+    LEFT_STICK = 7,
+    /// Right Stick button.
+    RIGHT_STICK = 8,
+    /// Left Bumper button.
+    LEFT_BUMPER = 9,
+    /// Right Bumper button.
+    RIGHT_BUMPER = 10,
+    /// Dpad Up button.
+    DPAD_UP = 11,
+    /// Dpad Down button.
+    DPAD_DOWN = 12,
+    /// Dpad Left button.
+    DPAD_LEFT = 13,
+    /// Dpad Right button.
+    DPAD_RIGHT = 14,
+  };
+
+  /** Represents an axis on a XboxController. */
+  enum class Axis {
+    /// Left X.
+    LEFT_X = 0,
+    /// Left Y.
+    LEFT_Y = 1,
+    /// Right X.
+    RIGHT_X = 2,
+    /// Right Y.
+    RIGHT_Y = 3,
+    /// Left Trigger.
+    LEFT_TRIGGER = 4,
+    /// Right Trigger.
+    RIGHT_TRIGGER = 5,
+  };
 
   /**
    * Construct an instance of a controller.
@@ -99,44 +145,116 @@ class XboxController
   /**
    * Get the Left X value of the controller.
    *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftXDeadband() to change it.
+   *
    * @return the axis value.
    */
   double GetLeftX() const;
 
   /**
+   * Set the deadband for the Left X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftXDeadband(double deadband);
+
+  /**
    * Get the Left Y value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftYDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetLeftY() const;
 
   /**
+   * Set the deadband for the Left Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftYDeadband(double deadband);
+
+  /**
    * Get the Right X value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetRightXDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetRightX() const;
 
   /**
+   * Set the deadband for the Right X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightXDeadband(double deadband);
+
+  /**
    * Get the Right Y value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetRightYDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetRightY() const;
 
   /**
+   * Set the deadband for the Right Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightYDeadband(double deadband);
+
+  /**
    * Get the Left Trigger value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetLeftTriggerDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetLeftTrigger() const;
 
   /**
+   * Set the deadband for the Left Trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftTriggerDeadband(double deadband);
+
+  /**
    * Get the Right Trigger value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetRightTriggerDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetRightTrigger() const;
+
+  /**
+   * Set the deadband for the Right Trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightTriggerDeadband(double deadband);
 
   /**
    * Get the value of the axis.
@@ -144,7 +262,7 @@ class XboxController
    * @param axis The axis to read
    * @return the axis value.
    */
-  double GetAxis(int axis) const;
+  double GetAxis(Axis axis) const;
 
   /**
    * Constructs an event instance that is true when the axis value is less than
@@ -156,7 +274,7 @@ class XboxController
    * @return an event instance that is true when the axis value is less than the
    * provided threshold.
    */
-  BooleanEvent AxisLessThan(int axis, double threshold, EventLoop* loop) const;
+  BooleanEvent AxisLessThan(Axis axis, double threshold, EventLoop* loop) const;
 
   /**
    * Constructs an event instance that is true when the axis value is greater
@@ -168,7 +286,7 @@ class XboxController
    * @return an event instance that is true when the axis value is greater than
    * the provided threshold.
    */
-  BooleanEvent AxisGreaterThan(int axis, double threshold,
+  BooleanEvent AxisGreaterThan(Axis axis, double threshold,
                                EventLoop* loop) const;
 
   /**
@@ -642,7 +760,7 @@ class XboxController
    * @param button The button to read
    * @return The state of the button.
    */
-  bool GetButton(int button) const;
+  bool GetButton(Button button) const;
 
   /**
    * Whether the button was pressed since the last check.
@@ -650,7 +768,7 @@ class XboxController
    * @param button The button to read
    * @return Whether the button was pressed since the last check.
    */
-  bool GetButtonPressed(int button);
+  bool GetButtonPressed(Button button);
 
   /**
    * Whether the button was released since the last check.
@@ -658,7 +776,7 @@ class XboxController
    * @param button The button to read
    * @return Whether the button was released since the last check.
    */
-  bool GetButtonReleased(int button);
+  bool GetButtonReleased(Button button);
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -668,7 +786,7 @@ class XboxController
    * @return an event instance representing the button's digital signal attached
    * to the given loop.
    */
-  BooleanEvent ButtonEvent(int button, EventLoop* loop) const;
+  BooleanEvent ButtonEvent(Button button, EventLoop* loop) const;
 
   /**
    * Set leds on the controller.
@@ -687,59 +805,16 @@ class XboxController
    */
   void SetRumble(GenericHID::RumbleType type, double value);
 
-  /** Represents a digital button on a XboxController. */
-  struct Button {
-    /// A button.
-    static constexpr int A = 0;
-    /// B button.
-    static constexpr int B = 1;
-    /// X button.
-    static constexpr int X = 2;
-    /// Y button.
-    static constexpr int Y = 3;
-    /// View button.
-    static constexpr int VIEW = 4;
-    /// Xbox button.
-    static constexpr int XBOX = 5;
-    /// Menu button.
-    static constexpr int MENU = 6;
-    /// Left Stick button.
-    static constexpr int LEFT_STICK = 7;
-    /// Right Stick button.
-    static constexpr int RIGHT_STICK = 8;
-    /// Left Bumper button.
-    static constexpr int LEFT_BUMPER = 9;
-    /// Right Bumper button.
-    static constexpr int RIGHT_BUMPER = 10;
-    /// Dpad Up button.
-    static constexpr int DPAD_UP = 11;
-    /// Dpad Down button.
-    static constexpr int DPAD_DOWN = 12;
-    /// Dpad Left button.
-    static constexpr int DPAD_LEFT = 13;
-    /// Dpad Right button.
-    static constexpr int DPAD_RIGHT = 14;
-  };
-
-  /** Represents an axis on a XboxController. */
-  struct Axis {
-    /// Left X.
-    static constexpr int LEFT_X = 0;
-    /// Left Y.
-    static constexpr int LEFT_Y = 1;
-    /// Right X.
-    static constexpr int RIGHT_X = 2;
-    /// Right Y.
-    static constexpr int RIGHT_Y = 3;
-    /// Left Trigger.
-    static constexpr int LEFT_TRIGGER = 4;
-    /// Right Trigger.
-    static constexpr int RIGHT_TRIGGER = 5;
-  };
-
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  std::string_view GetTelemetryType() const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
+  double m_leftXDeadband = 0.1;
+  double m_leftYDeadband = 0.1;
+  double m_rightXDeadband = 0.1;
+  double m_rightYDeadband = 0.1;
+  double m_leftTriggerDeadband = 0.01;
+  double m_rightTriggerDeadband = 0.01;
   GenericHID* m_hid;
 };
 

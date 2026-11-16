@@ -4,8 +4,10 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib
 import enum
+from typing import override
+
+import wpilib
 
 
 class ExampleSmartMotorController(wpilib.MotorController):
@@ -14,9 +16,9 @@ class ExampleSmartMotorController(wpilib.MotorController):
     """
 
     class PIDMode(enum.Enum):
-        kPosition = enum.auto()
-        kVelocity = enum.auto()
-        kMovementWitchcraft = enum.auto()
+        POSITION = enum.auto()
+        VELOCITY = enum.auto()
+        MOVEMENT_WITCHCRAFT = enum.auto()
 
     def __init__(self, port: int) -> None:
         """Creates a new ExampleSmartMotorController.
@@ -29,7 +31,7 @@ class ExampleSmartMotorController(wpilib.MotorController):
         self._inverted = False
         self._leader = None
 
-    def setPID(self, kp: float, ki: float, kd: float) -> None:
+    def set_pid(self, kp: float, ki: float, kd: float) -> None:
         """Example method for setting the PID gains of the smart controller.
 
         Args:
@@ -39,15 +41,15 @@ class ExampleSmartMotorController(wpilib.MotorController):
         """
         pass
 
-    def setSetPoint(
-        self, mode: PIDMode, setpoint: float, arbfeedforward: float
+    def set_setpoint(
+        self, mode: PIDMode, setpoint: float, arb_feedforward: float
     ) -> None:
         """Example method for setting the setpoint of the smart controller in PID mode.
 
         Args:
             mode: The mode of the PID controller.
             setpoint: The controller setpoint.
-            arbfeedforward: An arbitrary feedforward output (from -1 to 1).
+            arb_feedforward: An arbitrary feedforward output (from -1 to 1).
         """
         pass
 
@@ -59,7 +61,7 @@ class ExampleSmartMotorController(wpilib.MotorController):
         """
         self._leader = leader
 
-    def getEncoderDistance(self) -> float:
+    def get_encoder_distance(self) -> float:
         """Returns the encoder distance.
 
         Returns:
@@ -67,7 +69,7 @@ class ExampleSmartMotorController(wpilib.MotorController):
         """
         return 0
 
-    def getEncoderRate(self) -> float:
+    def get_encoder_rate(self) -> float:
         """Returns the encoder rate.
 
         Returns:
@@ -75,24 +77,22 @@ class ExampleSmartMotorController(wpilib.MotorController):
         """
         return 0
 
-    def resetEncoder(self) -> None:
+    def reset_encoder(self) -> None:
         """Resets the encoder to zero distance."""
         pass
 
-    def set(self, velocity: float) -> None:
-        self._velocity = -velocity if self._inverted else velocity
+    @override
+    def set_throttle(self, throttle: float) -> None:
+        self._velocity = -throttle if self._inverted else throttle
 
-    def get(self) -> float:
+    @override
+    def get_throttle(self) -> float:
         return self._velocity
 
-    def setInverted(self, isInverted: bool) -> None:
-        self._inverted = isInverted
+    @override
+    def set_inverted(self, is_inverted: bool) -> None:
+        self._inverted = is_inverted
 
-    def getInverted(self) -> bool:
+    @override
+    def get_inverted(self) -> bool:
         return self._inverted
-
-    def disable(self) -> None:
-        self._velocity = 0.0
-
-    def stopMotor(self) -> None:
-        self._velocity = 0.0

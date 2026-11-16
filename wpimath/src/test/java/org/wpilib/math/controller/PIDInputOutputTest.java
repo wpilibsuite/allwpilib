@@ -7,8 +7,39 @@ package org.wpilib.math.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.telemetry.MockTelemetryBackend;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryRegistry;
 
 class PIDInputOutputTest {
+  @Test
+  void logsTelemetry() {
+    var backend = new MockTelemetryBackend();
+    TelemetryRegistry.reset();
+    TelemetryRegistry.registerBackend("", backend);
+
+    try {
+      var controller = new PIDController(0.5, 0.1, 0.01);
+      controller.setIZone(5.0);
+      controller.calculate(7.0, 10.0);
+
+      Telemetry.log("pid", controller);
+
+      assertEquals(
+          "PIDController",
+          backend.getLastValue("/pid/.type", MockTelemetryBackend.LogStringValue.class).value());
+      assertEquals(0.5, backend.getLastValue("/pid/p", Double.class));
+      assertEquals(0.1, backend.getLastValue("/pid/i", Double.class));
+      assertEquals(0.01, backend.getLastValue("/pid/d", Double.class));
+      assertEquals(5.0, backend.getLastValue("/pid/izone", Double.class));
+      assertEquals(10.0, backend.getLastValue("/pid/setpoint", Double.class));
+      assertEquals(7.0, backend.getLastValue("/pid/measurement", Double.class));
+      assertEquals(3.0, backend.getLastValue("/pid/error", Double.class));
+    } finally {
+      TelemetryRegistry.reset();
+    }
+  }
+
   @Test
   void continuousInputTest() {
     var controller = new PIDController(0.0, 0.0, 0.0);

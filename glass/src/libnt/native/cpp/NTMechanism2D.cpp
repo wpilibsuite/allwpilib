@@ -5,12 +5,12 @@
 #include "wpi/glass/networktables/NTMechanism2D.hpp"
 
 #include <algorithm>
+#include <format>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include <fmt/format.h>
 #include <imgui.h>
 
 #include "wpi/glass/other/Mechanism2D.hpp"
@@ -58,7 +58,7 @@ void NTMechanism2DModel::NTMechanismGroupImpl::NTUpdate(
       if (!match) {
         it = m_objects.emplace(
             it, std::make_unique<NTMechanismObjectModel>(
-                    m_inst, fmt::format("{}/{}", m_path, name), name));
+                    m_inst, std::format("{}/{}", m_path, name), name));
         match = true;
       }
     }
@@ -119,8 +119,7 @@ bool NTMechanism2DModel::NTMechanismObjectModel::NTUpdate(
 bool NTMechanism2DModel::RootModel::NTUpdate(const wpi::nt::Event& event,
                                              std::string_view childName) {
   if (auto info = event.GetTopicInfo()) {
-    if (info->topic == m_xTopic.GetHandle() ||
-        info->topic == m_yTopic.GetHandle()) {
+    if (info->topic == m_positionTopic.GetHandle()) {
       if (event.flags & wpi::nt::EventFlags::UNPUBLISH) {
         return true;
       }
@@ -128,15 +127,13 @@ bool NTMechanism2DModel::RootModel::NTUpdate(const wpi::nt::Event& event,
       m_group.NTUpdate(event, childName);
     }
   } else if (auto valueData = event.GetValueEventData()) {
-    if (valueData->topic == m_xTopic.GetHandle()) {
-      if (valueData->value && valueData->value.IsDouble()) {
-        m_pos = wpi::math::Translation2d{
-            wpi::units::meter_t{valueData->value.GetDouble()}, m_pos.Y()};
-      }
-    } else if (valueData->topic == m_yTopic.GetHandle()) {
-      if (valueData->value && valueData->value.IsDouble()) {
-        m_pos = wpi::math::Translation2d{
-            m_pos.X(), wpi::units::meter_t{valueData->value.GetDouble()}};
+    if (valueData->topic == m_positionTopic.GetHandle()) {
+      if (valueData->value && valueData->value.IsDoubleArray()) {
+        auto arr = valueData->value.GetDoubleArray();
+        if (arr.size() == 2) {
+          m_pos = wpi::math::Translation2d{wpi::units::meter_t{arr[0]},
+                                           wpi::units::meter_t{arr[1]}};
+        }
       }
     } else {
       m_group.NTUpdate(event, childName);
@@ -151,11 +148,11 @@ NTMechanism2DModel::NTMechanism2DModel(std::string_view path)
 NTMechanism2DModel::NTMechanism2DModel(wpi::nt::NetworkTableInstance inst,
                                        std::string_view path)
     : m_inst{inst},
-      m_path{fmt::format("{}/", path)},
+      m_path{std::format("{}/", path)},
       m_tableSub{inst, {{m_path}}, {.periodic = 0.05, .sendAll = true}},
-      m_nameTopic{m_inst.GetTopic(fmt::format("{}/.name", path))},
-      m_dimensionsTopic{m_inst.GetTopic(fmt::format("{}/dims", path))},
-      m_bgColorTopic{m_inst.GetTopic(fmt::format("{}/backgroundColor", path))},
+      m_typeTopic{m_inst.GetTopic(std::format("{}/.type", path))},
+      m_dimensionsTopic{m_inst.GetTopic(std::format("{}/dims", path))},
+      m_bgColorTopic{m_inst.GetTopic(std::format("{}/backgroundColor", path))},
       m_poller{m_inst},
       m_dimensionsValue{1_m, 1_m} {
   m_poller.AddListener(m_tableSub, wpi::nt::EventFlags::TOPIC |
@@ -188,7 +185,7 @@ void NTMechanism2DModel::Update() {
         if (!match) {
           it = m_roots.emplace(
               it, std::make_unique<RootModel>(
-                      m_inst, fmt::format("{}{}", m_path, name), name));
+                      m_inst, std::format("{}{}", m_path, name), name));
           match = true;
         }
       }
@@ -198,12 +195,7 @@ void NTMechanism2DModel::Update() {
         }
       }
     } else if (auto valueData = event.GetValueEventData()) {
-      if (valueData->topic == m_nameTopic.GetHandle()) {
-        // .name
-        if (valueData->value && valueData->value.IsString()) {
-          m_nameValue = valueData->value.GetString();
-        }
-      } else if (valueData->topic == m_dimensionsTopic.GetHandle()) {
+      if (valueData->topic == m_dimensionsTopic.GetHandle()) {
         // dims
         if (valueData->value && valueData->value.IsDoubleArray()) {
           auto arr = valueData->value.GetDoubleArray();
@@ -244,7 +236,7 @@ void NTMechanism2DModel::Update() {
 }
 
 bool NTMechanism2DModel::Exists() {
-  return m_nameTopic.Exists();
+  return m_typeTopic.Exists();
 }
 
 bool NTMechanism2DModel::IsReadOnly() {

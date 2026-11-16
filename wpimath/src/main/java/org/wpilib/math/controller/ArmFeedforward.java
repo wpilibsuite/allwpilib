@@ -96,6 +96,9 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   /**
    * Sets the static gain.
    *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
+   *
    * @param ks The static gain in volts.
    */
   public void setKs(double ks) {
@@ -104,6 +107,9 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
 
   /**
    * Sets the gravity gain.
+   *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
    *
    * @param kg The gravity gain in volts.
    */
@@ -114,6 +120,9 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   /**
    * Sets the velocity gain.
    *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
+   *
    * @param kv The velocity gain in V/(rad/s).
    */
   public void setKv(double kv) {
@@ -122,6 +131,9 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
 
   /**
    * Sets the acceleration gain.
+   *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
    *
    * @param ka The acceleration gain in V/(rad/s²).
    */
@@ -175,13 +187,13 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Calculates the feedforward from the gains and velocity setpoint assuming continuous control
+   * Calculates the feedforward from the gains and velocity reference assuming continuous control
    * (acceleration is assumed to be zero).
    *
-   * @param position The position setpoint in radians. This angle should be measured from the
+   * @param position The position reference in radians. This angle should be measured from the
    *     horizontal (i.e. if the provided angle is 0, the arm should be parallel with the floor). If
    *     your encoder does not follow this convention, an offset should be added.
-   * @param velocity The velocity setpoint in radians per second.
+   * @param velocity The velocity reference in radians per second.
    * @return The computed feedforward.
    */
   public double calculate(double position, double velocity) {
@@ -189,13 +201,13 @@ public class ArmFeedforward implements ProtobufSerializable, StructSerializable 
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming continuous control.
+   * Calculates the feedforward from the gains and references assuming continuous control.
    *
    * @param currentAngle The current angle in radians. This angle should be measured from the
    *     horizontal (i.e. if the provided angle is 0, the arm should be parallel to the floor). If
    *     your encoder does not follow this convention, an offset should be added.
-   * @param currentVelocity The current velocity setpoint in radians per second.
-   * @param nextVelocity The next velocity setpoint in radians per second.
+   * @param currentVelocity The current velocity reference in radians per second.
+   * @param nextVelocity The next velocity reference in radians per second.
    * @return The computed feedforward in volts.
    */
   public double calculate(double currentAngle, double currentVelocity, double nextVelocity) {

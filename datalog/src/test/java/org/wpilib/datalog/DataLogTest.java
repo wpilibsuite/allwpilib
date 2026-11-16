@@ -5,8 +5,10 @@
 package org.wpilib.datalog;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
@@ -380,6 +382,31 @@ class DataLogTest {
     entry.append(new byte[] {5}, 7);
     log.flush();
     assertEquals(42, data.size());
+  }
+
+  @Test
+  void testRawByteBufferBounds() {
+    ByteBuffer direct = ByteBuffer.allocateDirect(1);
+    ByteBuffer arrayBacked = ByteBuffer.wrap(new byte[1]);
+
+    assertDoesNotThrow(() -> log.appendRaw(0, direct, 1, 0, 1));
+    assertDoesNotThrow(() -> log.appendRaw(0, arrayBacked, 1, 0, 1));
+    assertThrows(
+        IndexOutOfBoundsException.class, () -> log.appendRaw(0, direct, 1, Integer.MAX_VALUE, 1));
+    assertThrows(
+        IndexOutOfBoundsException.class,
+        () -> log.appendRaw(0, arrayBacked, 1, Integer.MAX_VALUE, 1));
+    assertThrows(IndexOutOfBoundsException.class, () -> log.appendRaw(0, direct, 2, 0, 1));
+    assertThrows(IndexOutOfBoundsException.class, () -> log.appendRaw(0, direct, -1, 0, 1));
+    assertThrows(IndexOutOfBoundsException.class, () -> log.appendRaw(0, direct, 0, -1, 1));
+  }
+
+  @Test
+  void testRawDirectByteBufferNativeBounds() {
+    ByteBuffer direct = ByteBuffer.allocateDirect(1);
+    assertThrows(
+        IndexOutOfBoundsException.class,
+        () -> DataLogJNI.appendRawBuffer(log.getImpl(), 0, direct, 2, 0, 1));
   }
 
   @Test

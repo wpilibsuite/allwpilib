@@ -18,7 +18,6 @@
 #include "wpi/halsim/ws_core/WSProvider_RoboRIO.hpp"
 #include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
 #include "wpi/halsim/ws_core/WSProvider_Solenoid.hpp"
-#include "wpi/halsim/ws_core/WSProvider_dPWM.hpp"
 
 using namespace wpilibws;
 
@@ -39,7 +38,6 @@ bool HALSimWSServer::Initialize() {
     HALSimWSProviderAddressableLED::Initialize(registerFunc);
     HALSimWSProviderAnalogIn::Initialize(registerFunc);
     HALSimWSProviderDIO::Initialize(registerFunc);
-    HALSimWSProviderDigitalPWM::Initialize(registerFunc);
     HALSimWSProviderDriverStation::Initialize(registerFunc);
     HALSimWSProviderEncoder::Initialize(registerFunc);
     HALSimWSProviderJoystick::Initialize(registerFunc);

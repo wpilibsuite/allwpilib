@@ -2,14 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <format>
 #include <memory>
 #include <string>
 
-#include <GLFW/glfw3.h>
-#include <fmt/format.h>
+#define SDL_MAIN_HANDLED
+#include <SDL3/SDL.h>
 #include <imgui.h>
 
 #include "wpi/glass/Context.hpp"
+#include "wpi/glass/ContextInternal.hpp"
 #include "wpi/glass/MainMenuBar.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/View.hpp"
@@ -20,14 +22,16 @@
 #include "wpi/glass/other/Plot.hpp"
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
+#ifdef RUNNING_IMGUI_TESTS
+#include "wpi/gui/test/GuiTestEngineRunner.hpp"
+#endif
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/timestamp.hpp"
 
 namespace gui = wpi::gui;
 
 const char* GetWPILibVersion();
-
-extern ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int keycode, int scancode);
 
 namespace wpi::glass {
 std::string_view GetResource_glass_16_png();
@@ -57,23 +61,50 @@ static bool gSetEnterKey = false;
 static bool gKeyEdit = false;
 static int* gEnterKey;
 static int* gEnterScancode;
-static void (*gPrevKeyCallback)(GLFWwindow*, int, int, int, int);
 static bool gNetworkTablesDebugLog = false;
 static unsigned int gPrevMode = NT_NET_MODE_NONE;
 
-static void RemapEnterKeyCallback(GLFWwindow* window, int key, int scancode,
-                                  int action, int mods) {
-  if (action == GLFW_PRESS || action == GLFW_RELEASE) {
-    if (gKeyEdit) {
-      *gEnterKey = key;
-      gKeyEdit = false;
-    } else if (*gEnterKey == key || *gEnterScancode == scancode) {
-      key = GLFW_KEY_ENTER;
+static void DisplayTimestampMenu() {
+  if (ImGui::BeginMenu("Timestamp Display")) {
+    auto ctx = wpi::glass::gContext;
+    wpi::glass::TimestampDisplayMode mode = ctx->timestampDisplayMode;
+    bool selected = mode == wpi::glass::TimestampDisplayMode::LOCAL;
+    if (ImGui::MenuItem("Local Time", nullptr, &selected)) {
+      ctx->timestampDisplayMode = wpi::glass::TimestampDisplayMode::LOCAL;
+      ctx->timestampDisplayModeStorage =
+          wpi::glass::TIMESTAMP_DISPLAY_MODE_LOCAL;
     }
+    selected = mode == wpi::glass::TimestampDisplayMode::SERVER;
+    if (ImGui::MenuItem("Server Time", nullptr, &selected)) {
+      ctx->timestampDisplayMode = wpi::glass::TimestampDisplayMode::SERVER;
+      ctx->timestampDisplayModeStorage =
+          wpi::glass::TIMESTAMP_DISPLAY_MODE_SERVER;
+    }
+    selected = mode == wpi::glass::TimestampDisplayMode::SERVER_ZERO_START;
+    if (ImGui::MenuItem("Server Time (Program Start = 0)", nullptr,
+                        &selected)) {
+      ctx->timestampDisplayMode =
+          wpi::glass::TimestampDisplayMode::SERVER_ZERO_START;
+      ctx->timestampDisplayModeStorage =
+          wpi::glass::TIMESTAMP_DISPLAY_MODE_SERVER_ZERO_START;
+    }
+    ImGui::EndMenu();
+  }
+}
+
+static void RemapEnterKeyEvent(SDL_Event& event) {
+  if (event.type != SDL_EVENT_KEY_DOWN && event.type != SDL_EVENT_KEY_UP) {
+    return;
   }
 
-  if (gPrevKeyCallback) {
-    gPrevKeyCallback(window, key, scancode, action, mods);
+  if (gKeyEdit && event.type == SDL_EVENT_KEY_DOWN) {
+    *gEnterKey = static_cast<int>(event.key.key);
+    *gEnterScancode = event.key.scancode;
+    gKeyEdit = false;
+  } else if (static_cast<SDL_Keycode>(*gEnterKey) == event.key.key ||
+             *gEnterScancode == event.key.scancode) {
+    event.key.key = SDLK_RETURN;
+    event.key.scancode = SDL_SCANCODE_RETURN;
   }
 }
 
@@ -85,11 +116,11 @@ static std::string MakeTitle(NT_Inst inst, wpi::nt::Event event) {
   auto mode = wpi::nt::GetNetworkMode(inst);
   if (mode & NT_NET_MODE_SERVER) {
     auto numClients = wpi::nt::GetConnections(inst).size();
-    return fmt::format("Glass - {} Client{} Connected", numClients,
+    return std::format("Glass - {} Client{} Connected", numClients,
                        (numClients == 1 ? "" : "s"));
   } else if (mode & NT_NET_MODE_CLIENT) {
     if (event.Is(NT_EVENT_CONNECTED)) {
-      return fmt::format("Glass - Connected ({})",
+      return std::format("Glass - Connected ({})",
                          event.GetConnectionInfo()->remote_ip);
     }
   }
@@ -129,19 +160,19 @@ static void NtInitialize() {
         } else if (msg->level < NT_LOG_INFO && !gNetworkTablesDebugLog) {
           continue;
         }
-        gNetworkTablesLog.Append(fmt::format(
+        gNetworkTablesLog.Append(std::format(
             "{}{} ({}:{})\n", level, msg->message, msg->filename, msg->line));
       }
     }
 
     if (updateTitle) {
-      glfwSetWindowTitle(win, MakeTitle(inst, connectionEvent).c_str());
+      SDL_SetWindowTitle(win, MakeTitle(inst, connectionEvent).c_str());
     }
   });
 
   gNetworkTablesLogWindow = std::make_unique<wpi::glass::Window>(
       wpi::glass::GetStorageRoot().GetChild("NetworkTables Log"),
-      "NetworkTables Log", wpi::glass::Window::kHide);
+      "NetworkTables Log", wpi::glass::Window::HIDE);
   gNetworkTablesLogWindow->SetView(
       std::make_unique<wpi::glass::LogView>(&gNetworkTablesLog));
   gNetworkTablesLogWindow->SetDefaultPos(250, 615);
@@ -172,7 +203,7 @@ static void NtInitialize() {
   }));
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
-  gNetworkTablesInfoWindow->SetDefaultVisibility(wpi::glass::Window::kHide);
+  gNetworkTablesInfoWindow->SetDefaultVisibility(wpi::glass::Window::HIDE);
   gNetworkTablesInfoWindow->DisableRenamePopup();
   gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
 
@@ -199,21 +230,12 @@ static void NtInitialize() {
   });
 }
 
-#ifdef _WIN32
-int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
-                      int nCmdShow) {
-  int argc = __argc;
-  char** argv = __argv;
-#else
-int main(int argc, char** argv) {
-#endif
-  std::string_view saveDir;
-  if (argc == 2) {
-    saveDir = argv[1];
-  }
-
+void Application(std::string_view saveDir) {
   gui::CreateContext();
   wpi::glass::CreateContext();
+#ifdef RUNNING_IMGUI_TESTS
+  wpi::gui::test::InstallTestEngineHooks();
+#endif
 
   gui::AddIcon(wpi::glass::GetResource_glass_16_png());
   gui::AddIcon(wpi::glass::GetResource_glass_32_png());
@@ -237,7 +259,11 @@ int main(int argc, char** argv) {
   wpi::glass::SetStorageDir(saveDir.empty() ? gui::GetPlatformSaveFileDir()
                                             : saveDir);
   gPlotProvider->GlobalInit();
-  gui::AddInit([] { wpi::glass::ResetTime(); });
+  gui::AddInit([] {
+    auto ctx = wpi::glass::gContext;
+    ctx->timestampDisplayStartTime = wpi::util::Now();
+    ctx->timestampDisplayStartTimeOverride = true;
+  });
   gNtProvider->GlobalInit();
   NtInitialize();
 
@@ -247,11 +273,9 @@ int main(int argc, char** argv) {
 
   gMainMenu.AddMainMenu([] {
     if (ImGui::BeginMenu("View")) {
+      DisplayTimestampMenu();
       if (ImGui::MenuItem("Set Enter Key")) {
         gSetEnterKey = true;
-      }
-      if (ImGui::MenuItem("Reset Time")) {
-        wpi::glass::ResetTime();
       }
       ImGui::EndMenu();
     }
@@ -310,6 +334,7 @@ int main(int argc, char** argv) {
       ImGui::Text("Glass: A different kind of dashboard");
       ImGui::Separator();
       ImGui::Text("v%s", GetWPILibVersion());
+      gui::EmitRendererInfo();
       ImGui::Separator();
       ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
       ImGui::Text("%.3f ms/frame (%.1f FPS)",
@@ -333,12 +358,11 @@ int main(int argc, char** argv) {
       ImGui::SameLine();
       char editLabel[40];
       char nameBuf[32];
-      const char* name = glfwGetKeyName(*gEnterKey, *gEnterScancode);
-      if (!name) {
-        name = ImGui::GetKeyName(
-            ImGui_ImplGlfw_KeyToImGuiKey(*gEnterKey, *gEnterScancode));
+      const char* name = SDL_GetKeyName(static_cast<SDL_Keycode>(*gEnterKey));
+      if (!name || name[0] == '\0') {
+        name = SDL_GetScancodeName(static_cast<SDL_Scancode>(*gEnterScancode));
       }
-      if (!name) {
+      if (!name || name[0] == '\0') {
         wpi::util::format_to_n_c_str(nameBuf, sizeof(nameBuf), "{}",
                                      *gEnterKey);
 
@@ -352,8 +376,8 @@ int main(int argc, char** argv) {
       }
       ImGui::SameLine();
       if (ImGui::SmallButton("Reset")) {
-        *gEnterKey = GLFW_KEY_ENTER;
-        *gEnterScancode = glfwGetKeyScancode(GLFW_KEY_ENTER);
+        *gEnterKey = SDLK_RETURN;
+        *gEnterScancode = SDL_SCANCODE_RETURN;
       }
 
       if (ImGui::Button("Close")) {
@@ -365,13 +389,12 @@ int main(int argc, char** argv) {
   });
 
   gui::Initialize("Glass - DISCONNECTED", 1024, 768,
+                  gui::RendererPreference::PREFER_3D,
                   ImGuiConfigFlags_DockingEnable);
-  gEnterKey = &wpi::glass::GetStorageRoot().GetInt("enterKey", GLFW_KEY_ENTER);
-  gEnterScancode = &wpi::glass::GetStorageRoot().GetInt(
-      "enterScancode", glfwGetKeyScancode(GLFW_KEY_ENTER));
-  if (auto win = gui::GetSystemWindow()) {
-    gPrevKeyCallback = glfwSetKeyCallback(win, RemapEnterKeyCallback);
-  }
+  gEnterKey = &wpi::glass::GetStorageRoot().GetInt("enterKey", SDLK_RETURN);
+  gEnterScancode = &wpi::glass::GetStorageRoot().GetInt("enterScancode",
+                                                        SDL_SCANCODE_RETURN);
+  gui::AddEventHandler(RemapEnterKeyEvent);
   gui::Main();
 
   gNetworkTablesSettingsWindow.reset();
@@ -383,6 +406,23 @@ int main(int argc, char** argv) {
 
   wpi::glass::DestroyContext();
   gui::DestroyContext();
+}
 
+#ifndef RUNNING_IMGUI_TESTS
+#ifdef _WIN32
+int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
+                      int nCmdShow) {
+  int argc = __argc;
+  char** argv = __argv;
+#else
+int main(int argc, char** argv) {
+#endif
+  std::string_view saveDir;
+  if (argc == 2) {
+    saveDir = argv[1];
+  }
+
+  Application(saveDir);
   return 0;
 }
+#endif

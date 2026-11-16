@@ -1,0 +1,383 @@
+#include "TunableStorage.h"
+
+#include <algorithm>
+#include <cstdint>
+#include <memory>
+#include <optional>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+#include "PyComplexTunableAdapter.h"
+#include "PyTunable.h"
+#include "PyTunableTable.h"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/TunableTable.hpp"
+#include "wpi/tunables/detail/PathUtil.hpp"
+#include "wpi/tunables/detail/TunableDetail.hpp"
+
+namespace py = pybind11;
+
+namespace wpi::tunables::python {
+namespace {
+
+template <typename T>
+std::vector<std::unique_ptr<std::vector<std::shared_ptr<T>>>>&
+GetSnapshotStorage() {
+  static thread_local std::vector<
+      std::unique_ptr<std::vector<std::shared_ptr<T>>>>
+      storage;
+  return storage;
+}
+
+template <typename T>
+size_t& GetSnapshotDepth() {
+  static thread_local size_t depth = 0;
+  return depth;
+}
+
+template <typename T>
+class RetainedValueSnapshot {
+ public:
+  template <typename Range>
+  explicit RetainedValueSnapshot(const Range& values)
+      : m_depth{GetSnapshotDepth<T>()},
+        m_values{GetSnapshotValueStorage(m_depth)} {
+    m_values.clear();
+    m_values.reserve(values.size());
+    for (const auto& entry : values) {
+      m_values.emplace_back(entry.second);
+    }
+    ++GetSnapshotDepth<T>();
+  }
+
+  RetainedValueSnapshot(const RetainedValueSnapshot&) = delete;
+  RetainedValueSnapshot& operator=(const RetainedValueSnapshot&) = delete;
+  RetainedValueSnapshot(RetainedValueSnapshot&&) = delete;
+  RetainedValueSnapshot& operator=(RetainedValueSnapshot&&) = delete;
+
+  ~RetainedValueSnapshot() {
+    --GetSnapshotDepth<T>();
+    m_values.clear();
+  }
+
+  auto begin() const { return m_values.begin(); }
+  auto end() const { return m_values.end(); }
+
+ private:
+  static std::vector<std::shared_ptr<T>>& GetSnapshotValueStorage(
+      size_t depth) {
+    auto& storage = GetSnapshotStorage<T>();
+    while (storage.size() <= depth) {
+      storage.emplace_back(std::make_unique<std::vector<std::shared_ptr<T>>>());
+    }
+    return *storage[depth];
+  }
+
+  size_t m_depth;
+  std::vector<std::shared_ptr<T>>& m_values;
+};
+
+template <typename T, typename Range>
+RetainedValueSnapshot<T> SnapshotRetainedValues(const Range& values) {
+  return RetainedValueSnapshot<T>{values};
+}
+
+std::string MakeChildPrefix(std::string_view path) {
+  std::string prefix{path};
+  if (prefix.empty() || prefix.back() != '/') {
+    prefix.push_back('/');
+  }
+  return prefix;
+}
+
+bool IsPathOrDescendant(std::string_view candidate, std::string_view path,
+                        std::string_view childPrefix) {
+  return candidate == path || candidate.starts_with(childPrefix);
+}
+
+bool IsPathOrDescendant(std::string_view candidate, std::string_view path) {
+  return IsPathOrDescendant(candidate, path, MakeChildPrefix(path));
+}
+
+std::unordered_map<std::string, std::shared_ptr<PyTunable>>& GetValues() {
+  static std::unordered_map<std::string, std::shared_ptr<PyTunable>> values;
+  return values;
+}
+
+std::unordered_map<std::string, std::shared_ptr<PyTunable>>&
+GetRefreshValues() {
+  static std::unordered_map<std::string, std::shared_ptr<PyTunable>> values;
+  return values;
+}
+
+std::unordered_map<std::string, std::shared_ptr<PyComplexTunableAdapter>>&
+GetComplexValues() {
+  static std::unordered_map<std::string,
+                            std::shared_ptr<PyComplexTunableAdapter>>
+      values;
+  return values;
+}
+
+struct ComplexIdentityEntry {
+  std::shared_ptr<PyComplexTunableAdapter> tunable;
+  std::weak_ptr<PyComplexTunableAdapter> publishedTunable;
+  std::optional<py::weakref> valueRef;
+  uint64_t generation;
+};
+
+uint64_t NextComplexIdentityGeneration() {
+  static uint64_t generation = 0;
+  return ++generation;
+}
+
+std::unordered_map<PyObject*, ComplexIdentityEntry>&
+GetComplexValuesByObject() {
+  static std::unordered_map<PyObject*, ComplexIdentityEntry> values;
+  return values;
+}
+
+std::unordered_map<std::string, py::object>& GetNativeComplexValues() {
+  static std::unordered_map<std::string, py::object> values;
+  return values;
+}
+
+std::optional<py::weakref> TryCreateWeakref(py::handle value,
+                                            py::object callback = py::none()) {
+  PyObject* callbackPtr = callback.is_none() ? nullptr : callback.ptr();
+  PyObject* ref = PyWeakref_NewRef(value.ptr(), callbackPtr);
+  if (!ref) {
+    if (PyErr_ExceptionMatches(PyExc_TypeError)) {
+      PyErr_Clear();
+      return std::nullopt;
+    }
+    throw py::error_already_set();
+  }
+  return py::reinterpret_steal<py::weakref>(ref);
+}
+
+std::shared_ptr<PyComplexTunableAdapter> GetComplexValueByObject(
+    py::handle value) {
+  auto& values = GetComplexValuesByObject();
+  auto it = values.find(value.ptr());
+  if (it == values.end()) {
+    return nullptr;
+  }
+
+  auto retained = it->second.tunable ? it->second.tunable
+                                     : it->second.publishedTunable.lock();
+  if (!retained ||
+      (it->second.valueRef && (*it->second.valueRef)().is_none()) ||
+      !retained->IsValue(value)) {
+    values.erase(it);
+    return nullptr;
+  }
+
+  return retained;
+}
+
+void RefreshValues() {
+  py::gil_scoped_acquire gil;
+  auto values = SnapshotRetainedValues<PyTunable>(GetRefreshValues());
+  for (auto&& value : values) {
+    value->Refresh();
+  }
+}
+
+}  // namespace
+
+namespace detail {
+
+void StoreValue(std::string path, std::shared_ptr<PyTunable> value) {
+  GetValues().insert_or_assign(std::move(path), std::move(value));
+}
+
+std::shared_ptr<PyComplexTunableAdapter> GetOrCreateComplex(
+    py::object value, py::object initialPublishTunable) {
+  if (auto retained = GetComplexValueByObject(value)) {
+    retained->RetainValue(std::move(value), std::move(initialPublishTunable));
+    return retained;
+  }
+
+  PyObject* key = value.ptr();
+  uint64_t generation = NextComplexIdentityGeneration();
+  py::cpp_function cleanup{[key, generation](py::handle) {
+    auto& values = GetComplexValuesByObject();
+    auto it = values.find(key);
+    if (it != values.end() && it->second.generation == generation) {
+      values.erase(it);
+    }
+  }};
+  auto valueRef = TryCreateWeakref(value, std::move(cleanup));
+  auto tunable = std::make_shared<PyComplexTunableAdapter>(
+      std::move(value), std::move(initialPublishTunable));
+  // Without a Python weak reference, retaining the adapter here would keep
+  // the Python object alive forever. Keep its identity only while published.
+  GetComplexValuesByObject().insert_or_assign(
+      key, ComplexIdentityEntry{valueRef ? tunable : nullptr, tunable,
+                                std::move(valueRef), generation});
+  return tunable;
+}
+
+void ForgetComplex(py::handle value, const PyComplexTunableAdapter* tunable) {
+  auto& values = GetComplexValuesByObject();
+  auto it = values.find(value.ptr());
+  if (it != values.end() && !it->second.valueRef &&
+      it->second.publishedTunable.lock().get() == tunable) {
+    values.erase(it);
+  }
+}
+
+void StoreComplex(std::string path,
+                  std::shared_ptr<PyComplexTunableAdapter> value) {
+  auto& values = GetComplexValues();
+  auto it = values.find(path);
+  if (it != values.end()) {
+    if (it->second != value) {
+      it->second->ReleasePublication();
+      value->RetainPublication();
+      it->second = std::move(value);
+    }
+  } else {
+    value->RetainPublication();
+    values.emplace(std::move(path), std::move(value));
+  }
+}
+
+void StoreNativeComplexValue(std::string path, py::object value) {
+  GetNativeComplexValues().insert_or_assign(std::move(path), std::move(value));
+}
+
+}  // namespace detail
+
+void StoreRefreshValue(std::string_view path,
+                       const std::shared_ptr<PyTunable>& tunable) {
+  auto& values = GetRefreshValues();
+  if (tunable->NeedsRefresh()) {
+    values.insert_or_assign(std::string{path}, tunable);
+  } else {
+    values.erase(std::string{path});
+  }
+}
+
+void RemoveRefreshPath(std::string_view path) {
+  std::string childPrefix = MakeChildPrefix(path);
+  std::erase_if(GetRefreshValues(), [&](auto&& child) {
+    return IsPathOrDescendant(child.first, path, childPrefix);
+  });
+}
+
+void ClearValues() {
+  // Break cycles between aliased adapters before discarding their identities.
+  RemoveRetainedPath("");
+  GetValues().clear();
+  GetRefreshValues().clear();
+  GetComplexValues().clear();
+  GetComplexValuesByObject().clear();
+  GetNativeComplexValues().clear();
+}
+
+void RegisterPreUpdateCallback() {
+  wpi::tunables::detail::SetTunableRegistryPreUpdateCallback(
+      [] { RefreshValues(); });
+}
+
+void CleanupPythonStorage() {
+  wpi::tunables::detail::SetTunableRegistryPreUpdateCallback(nullptr);
+  table::ClearContexts();
+  ClearValues();
+}
+
+std::string NormalizePath(std::string_view path) {
+  std::string buf;
+  return std::string{wpi::tunables::detail::NormalizeName(path, buf)};
+}
+
+std::string NormalizeTablePath(const wpi::tunables::TunableTable& table,
+                               std::string_view name) {
+  return NormalizePath(table.GetPath() + std::string{name});
+}
+
+void RemoveRetainedPath(std::string_view path) {
+  RemoveRefreshPath(path);
+  std::string childPrefix = MakeChildPrefix(path);
+  std::erase_if(GetValues(), [&](auto&& child) {
+    return IsPathOrDescendant(child.first, path, childPrefix);
+  });
+  auto& complexValues = GetComplexValues();
+  for (auto it = complexValues.begin(); it != complexValues.end();) {
+    if (IsPathOrDescendant(it->first, path, childPrefix)) {
+      it->second->RemoveRetainedPath(path);
+      it->second->ReleasePublication();
+      it = complexValues.erase(it);
+    } else if (IsPathOrDescendant(path, it->first)) {
+      it->second->RemoveRetainedPath(path);
+      ++it;
+    } else {
+      ++it;
+    }
+  }
+  std::erase_if(GetNativeComplexValues(), [&](auto&& child) {
+    return IsPathOrDescendant(child.first, path, childPrefix);
+  });
+}
+
+void RemovePath(std::string_view path) {
+  std::string normalized = NormalizePath(path);
+  table::InvalidatePublications(normalized);
+  {
+    py::gil_scoped_release release;
+    wpi::tunables::TunableRegistry::Remove(normalized);
+  }
+  RemoveRetainedPath(normalized);
+}
+
+void RemoveValue(py::handle value) {
+  std::vector<std::string> paths;
+
+  if (py::isinstance<PyTunable>(value)) {
+    auto tunable = value.cast<std::shared_ptr<PyTunable>>();
+    for (auto&& [path, retained] : GetValues()) {
+      if (retained == tunable) {
+        paths.emplace_back(path);
+      }
+    }
+  }
+
+  for (auto&& [path, retained] : GetComplexValues()) {
+    if (retained->IsValue(value)) {
+      paths.emplace_back(path);
+    }
+  }
+
+  for (auto&& [path, retained] : GetNativeComplexValues()) {
+    if (retained.is(value)) {
+      paths.emplace_back(path);
+    }
+  }
+
+  for (auto&& path : paths) {
+    RemovePath(path);
+  }
+}
+
+std::optional<uint64_t> GetRetainedTuneRevision(py::handle value) {
+  if (auto retained = GetComplexValueByObject(value)) {
+    return wpi::tunables::TunableRegistry::GetTuneRevision(*retained);
+  }
+  return std::nullopt;
+}
+
+void InitializeTunablePython(py::module_& module) {
+  RegisterPreUpdateCallback();
+
+  static int unused;
+  py::capsule cleanup(&unused, [](void*) {
+    py::gil_scoped_acquire gil;
+    CleanupPythonStorage();
+  });
+  module.add_object("_tunable_cleanup", cleanup);
+}
+
+}  // namespace wpi::tunables::python

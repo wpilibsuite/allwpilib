@@ -6,7 +6,5 @@ classes:
       CounterBase:
       Get:
       Reset:
-      GetPeriod:
-      SetMaxPeriod:
       GetStopped:
       GetDirection:

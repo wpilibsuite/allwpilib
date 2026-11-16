@@ -28,85 +28,85 @@ XboxControllerSim::XboxControllerSim(int port) : GenericHIDSim{port} {
 }
 
 void XboxControllerSim::SetLeftX(double value) {
-  SetRawAxis(XboxController::Axis::LEFT_X, value);
+  SetRawAxis(static_cast<int>(XboxController::Axis::LEFT_X), value);
 }
 
 void XboxControllerSim::SetLeftY(double value) {
-  SetRawAxis(XboxController::Axis::LEFT_Y, value);
+  SetRawAxis(static_cast<int>(XboxController::Axis::LEFT_Y), value);
 }
 
 void XboxControllerSim::SetRightX(double value) {
-  SetRawAxis(XboxController::Axis::RIGHT_X, value);
+  SetRawAxis(static_cast<int>(XboxController::Axis::RIGHT_X), value);
 }
 
 void XboxControllerSim::SetRightY(double value) {
-  SetRawAxis(XboxController::Axis::RIGHT_Y, value);
+  SetRawAxis(static_cast<int>(XboxController::Axis::RIGHT_Y), value);
 }
 
 void XboxControllerSim::SetLeftTrigger(double value) {
-  SetRawAxis(XboxController::Axis::LEFT_TRIGGER, value);
+  SetRawAxis(static_cast<int>(XboxController::Axis::LEFT_TRIGGER), value);
 }
 
 void XboxControllerSim::SetRightTrigger(double value) {
-  SetRawAxis(XboxController::Axis::RIGHT_TRIGGER, value);
+  SetRawAxis(static_cast<int>(XboxController::Axis::RIGHT_TRIGGER), value);
 }
 
 void XboxControllerSim::SetAButton(bool value) {
-  SetRawButton(XboxController::Button::A, value);
+  SetRawButton(static_cast<int>(XboxController::Button::A), value);
 }
 
 void XboxControllerSim::SetBButton(bool value) {
-  SetRawButton(XboxController::Button::B, value);
+  SetRawButton(static_cast<int>(XboxController::Button::B), value);
 }
 
 void XboxControllerSim::SetXButton(bool value) {
-  SetRawButton(XboxController::Button::X, value);
+  SetRawButton(static_cast<int>(XboxController::Button::X), value);
 }
 
 void XboxControllerSim::SetYButton(bool value) {
-  SetRawButton(XboxController::Button::Y, value);
+  SetRawButton(static_cast<int>(XboxController::Button::Y), value);
 }
 
 void XboxControllerSim::SetViewButton(bool value) {
-  SetRawButton(XboxController::Button::VIEW, value);
+  SetRawButton(static_cast<int>(XboxController::Button::VIEW), value);
 }
 
 void XboxControllerSim::SetXboxButton(bool value) {
-  SetRawButton(XboxController::Button::XBOX, value);
+  SetRawButton(static_cast<int>(XboxController::Button::XBOX), value);
 }
 
 void XboxControllerSim::SetMenuButton(bool value) {
-  SetRawButton(XboxController::Button::MENU, value);
+  SetRawButton(static_cast<int>(XboxController::Button::MENU), value);
 }
 
 void XboxControllerSim::SetLeftStickButton(bool value) {
-  SetRawButton(XboxController::Button::LEFT_STICK, value);
+  SetRawButton(static_cast<int>(XboxController::Button::LEFT_STICK), value);
 }
 
 void XboxControllerSim::SetRightStickButton(bool value) {
-  SetRawButton(XboxController::Button::RIGHT_STICK, value);
+  SetRawButton(static_cast<int>(XboxController::Button::RIGHT_STICK), value);
 }
 
 void XboxControllerSim::SetLeftBumperButton(bool value) {
-  SetRawButton(XboxController::Button::LEFT_BUMPER, value);
+  SetRawButton(static_cast<int>(XboxController::Button::LEFT_BUMPER), value);
 }
 
 void XboxControllerSim::SetRightBumperButton(bool value) {
-  SetRawButton(XboxController::Button::RIGHT_BUMPER, value);
+  SetRawButton(static_cast<int>(XboxController::Button::RIGHT_BUMPER), value);
 }
 
 void XboxControllerSim::SetDpadUpButton(bool value) {
-  SetRawButton(XboxController::Button::DPAD_UP, value);
+  SetRawButton(static_cast<int>(XboxController::Button::DPAD_UP), value);
 }
 
 void XboxControllerSim::SetDpadDownButton(bool value) {
-  SetRawButton(XboxController::Button::DPAD_DOWN, value);
+  SetRawButton(static_cast<int>(XboxController::Button::DPAD_DOWN), value);
 }
 
 void XboxControllerSim::SetDpadLeftButton(bool value) {
-  SetRawButton(XboxController::Button::DPAD_LEFT, value);
+  SetRawButton(static_cast<int>(XboxController::Button::DPAD_LEFT), value);
 }
 
 void XboxControllerSim::SetDpadRightButton(bool value) {
-  SetRawButton(XboxController::Button::DPAD_RIGHT, value);
+  SetRawButton(static_cast<int>(XboxController::Button::DPAD_RIGHT), value);
 }

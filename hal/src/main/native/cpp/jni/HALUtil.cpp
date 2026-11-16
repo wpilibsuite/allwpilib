@@ -10,9 +10,8 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <format>
 #include <string>
-
-#include <fmt/format.h>
 
 #include "org_wpilib_hardware_hal_HALUtil.h"
 #include "wpi/hal/DriverStation.h"
@@ -85,13 +84,13 @@ void ThrowUncleanStatusException(JNIEnv* env, std::string_view msg,
 void ThrowAllocationException(JNIEnv* env, const char* lastError,
                               int32_t status) {
   allocationExCls.Throw(env,
-                        fmt::format("Code: {}\n{}", status, lastError).c_str());
+                        std::format("Code: {}\n{}", status, lastError).c_str());
 }
 
 void ThrowHalHandleException(JNIEnv* env, int32_t status) {
   const char* message = HAL_GetLastError(&status);
   halHandleExCls.Throw(env,
-                       fmt::format(" Code: {}. {}", status, message).c_str());
+                       std::format(" Code: {}. {}", status, message).c_str());
 }
 
 void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
@@ -105,7 +104,7 @@ void ReportError(JNIEnv* env, int32_t status, bool doThrow) {
   }
   if (doThrow && status < 0) {
     ThrowUncleanStatusException(
-        env, fmt::format(" Code: {}. {}", status, message).c_str(), status);
+        env, std::format(" Code: {}. {}", status, message).c_str(), status);
   } else {
     std::string func;
     auto stack = GetJavaStackTrace(env, &func, "org.wpilib");
@@ -137,7 +136,7 @@ void ThrowError(JNIEnv* env, int32_t status, int32_t minRange, int32_t maxRange,
     return;
   }
   ThrowUncleanStatusException(
-      env, fmt::format(" Code: {}. {}", status, lastError).c_str(), status);
+      env, std::format(" Code: {}. {}", status, lastError).c_str(), status);
 }
 
 void ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
@@ -148,7 +147,7 @@ void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
                                      jint length) {
   static jmethodID constructor =
       env->GetMethodID(canStreamOverflowExCls, "<init>",
-                       "([Lorg/wpilib/hardware/hal/CANStreamMessage;I)V");
+                       "([Lorg/wpilib/hardware/hal/can/CANStreamMessage;I)V");
   jobject exception =
       env->NewObject(canStreamOverflowExCls, constructor, messages, length);
   env->Throw(static_cast<jthrowable>(exception));
@@ -287,7 +286,7 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
 
 jbyteArray SetCANReceiveMessageObject(JNIEnv* env, jobject canData,
                                       int32_t length, int32_t flags,
-                                      uint64_t timestamp) {
+                                      int64_t timestamp) {
   static jmethodID func =
       env->GetMethodID(canReceiveMessageCls, "setReceiveData", "(IIJ)[B");
 
@@ -299,7 +298,7 @@ jbyteArray SetCANReceiveMessageObject(JNIEnv* env, jobject canData,
 
 jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
                               int32_t length, int32_t flags, uint32_t messageId,
-                              uint64_t timestamp) {
+                              int64_t timestamp) {
   static jmethodID func =
       env->GetMethodID(canStreamMessageCls, "setStreamData", "(IIIJ)[B");
 
@@ -432,22 +431,6 @@ Java_org_wpilib_hardware_hal_HALUtil_getSerialNumber
   HAL_GetSerialNumber(&serialNum);
   jstring ret = MakeJString(env, wpi::util::to_string_view(&serialNum));
   WPI_FreeString(&serialNum);
-  return ret;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_HALUtil
- * Method:    getComments
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL
-Java_org_wpilib_hardware_hal_HALUtil_getComments
-  (JNIEnv* env, jclass)
-{
-  WPI_String comments;
-  HAL_GetComments(&comments);
-  jstring ret = MakeJString(env, wpi::util::to_string_view(&comments));
-  WPI_FreeString(&comments);
   return ret;
 }
 

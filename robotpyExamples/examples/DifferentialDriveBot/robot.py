@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpimath
 import wpilib
 
@@ -15,23 +17,25 @@ class MyRobot(wpilib.TimedRobot):
     def __init__(self) -> None:
         super().__init__()
 
-        self.controller = wpilib.NiDsXboxController(0)
+        self.controller = wpilib.XboxController(0)
         self.drive = Drivetrain()
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-        self.velocityLimiter = wpimath.SlewRateLimiter(3)
-        self.rotLimiter = wpimath.SlewRateLimiter(3)
+        self.velocity_limiter = wpimath.SlewRateLimiter(3)
+        self.rot_limiter = wpimath.SlewRateLimiter(3)
 
-    def autonomousPeriodic(self) -> None:
-        self.teleopPeriodic()
-        self.drive.updateOdometry()
+    @override
+    def autonomous_periodic(self) -> None:
+        self.teleop_periodic()
+        self.drive.update_odometry()
 
-    def teleopPeriodic(self) -> None:
+    @override
+    def teleop_periodic(self) -> None:
         # Get the x velocity. We are inverting this because Xbox controllers return
         # negative values when we push forward.
-        xVelocity = (
-            -self.velocityLimiter.calculate(self.controller.getLeftY())
-            * Drivetrain.kMaxVelocity
+        x_velocity = (
+            -self.velocity_limiter.calculate(self.controller.get_left_y())
+            * Drivetrain.MAX_VELOCITY
         )
 
         # Get the rate of angular rotation. We are inverting this because we want a
@@ -39,8 +43,8 @@ class MyRobot(wpilib.TimedRobot):
         # mathematics). Xbox controllers return positive values when you pull to
         # the right by default.
         rot = (
-            -self.rotLimiter.calculate(self.controller.getRightX())
-            * Drivetrain.kMaxAngularVelocity
+            -self.rot_limiter.calculate(self.controller.get_right_x())
+            * Drivetrain.MAX_ANGULAR_VELOCITY
         )
 
-        self.drive.drive(xVelocity, rot)
+        self.drive.drive(x_velocity, rot)

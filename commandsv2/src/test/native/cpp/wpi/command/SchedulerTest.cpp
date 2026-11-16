@@ -11,7 +11,8 @@
 using namespace wpi::cmd;
 class SchedulerTest : public CommandTestBase {};
 
-TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
+TEST_CASE_METHOD(SchedulerTest, "SchedulerTest SchedulerLambdaTestNoInterrupt",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   auto command = None();
@@ -25,10 +26,11 @@ TEST_F(SchedulerTest, SchedulerLambdaTestNoInterrupt) {
   scheduler.Schedule(command);
   scheduler.Run();
 
-  EXPECT_EQ(counter, 3);
+  CHECK(counter == 3);
 }
 
-TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
+TEST_CASE_METHOD(SchedulerTest, "SchedulerTest SchedulerLambdaInterrupt",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   auto command = Idle();
@@ -41,17 +43,18 @@ TEST_F(SchedulerTest, SchedulerLambdaInterrupt) {
   scheduler.Run();
   scheduler.Cancel(command);
 
-  EXPECT_EQ(counter, 1);
+  CHECK(counter == 1);
 }
 
-TEST_F(SchedulerTest, SchedulerLambdaInterruptNoCause) {
+TEST_CASE_METHOD(SchedulerTest, "SchedulerTest SchedulerLambdaInterruptNoCause",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
 
   scheduler.OnCommandInterrupt(
       [&counter](const Command&, const std::optional<Command*>& interruptor) {
-        EXPECT_FALSE(interruptor);
+        CHECK_FALSE(interruptor);
         counter++;
       });
 
@@ -60,10 +63,11 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptNoCause) {
   scheduler.Schedule(command);
   scheduler.Cancel(command);
 
-  EXPECT_EQ(1, counter);
+  CHECK(1 == counter);
 }
 
-TEST_F(SchedulerTest, SchedulerLambdaInterruptCause) {
+TEST_CASE_METHOD(SchedulerTest, "SchedulerTest SchedulerLambdaInterruptCause",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
@@ -74,18 +78,20 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCause) {
 
   scheduler.OnCommandInterrupt(
       [&](const Command&, const std::optional<Command*>& cause) {
-        ASSERT_TRUE(cause);
-        EXPECT_EQ(&interruptor, *cause);
+        REQUIRE(cause);
+        CHECK(&interruptor == *cause);
         counter++;
       });
 
   scheduler.Schedule(command);
   scheduler.Schedule(&interruptor);
 
-  EXPECT_EQ(1, counter);
+  CHECK(1 == counter);
 }
 
-TEST_F(SchedulerTest, SchedulerLambdaInterruptCauseInRunLoop) {
+TEST_CASE_METHOD(SchedulerTest,
+                 "SchedulerTest SchedulerLambdaInterruptCauseInRunLoop",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
@@ -99,8 +105,8 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCauseInRunLoop) {
 
   scheduler.OnCommandInterrupt(
       [&](const Command&, const std::optional<Command*>& cause) {
-        ASSERT_TRUE(cause);
-        EXPECT_EQ(&interruptor, *cause);
+        REQUIRE(cause);
+        CHECK(&interruptor == *cause);
         counter++;
       });
 
@@ -109,22 +115,24 @@ TEST_F(SchedulerTest, SchedulerLambdaInterruptCauseInRunLoop) {
 
   scheduler.Run();
 
-  EXPECT_EQ(1, counter);
+  CHECK(1 == counter);
 }
 
-TEST_F(SchedulerTest, RegisterSubsystem) {
+TEST_CASE_METHOD(SchedulerTest, "SchedulerTest RegisterSubsystem",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
   TestSubsystem system{[&counter] { counter++; }};
 
-  EXPECT_NO_FATAL_FAILURE(scheduler.RegisterSubsystem(&system));
+  CHECK_NOTHROW(scheduler.RegisterSubsystem(&system));
 
   scheduler.Run();
-  EXPECT_EQ(counter, 1);
+  CHECK(counter == 1);
 }
 
-TEST_F(SchedulerTest, UnregisterSubsystem) {
+TEST_CASE_METHOD(SchedulerTest, "SchedulerTest UnregisterSubsystem",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
@@ -132,13 +140,14 @@ TEST_F(SchedulerTest, UnregisterSubsystem) {
 
   scheduler.RegisterSubsystem(&system);
 
-  EXPECT_NO_FATAL_FAILURE(scheduler.UnregisterSubsystem(&system));
+  CHECK_NOTHROW(scheduler.UnregisterSubsystem(&system));
 
   scheduler.Run();
-  ASSERT_EQ(counter, 0);
+  REQUIRE(counter == 0);
 }
 
-TEST_F(SchedulerTest, SchedulerCancelAll) {
+TEST_CASE_METHOD(SchedulerTest, "SchedulerTest SchedulerCancelAll",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   auto command1 = Idle();
@@ -149,7 +158,7 @@ TEST_F(SchedulerTest, SchedulerCancelAll) {
   scheduler.OnCommandInterrupt([&counter](const Command&) { counter++; });
   scheduler.OnCommandInterrupt(
       [](const Command&, const std::optional<Command*>& interruptor) {
-        EXPECT_FALSE(interruptor);
+        CHECK_FALSE(interruptor);
       });
 
   scheduler.Schedule(command1);
@@ -157,10 +166,11 @@ TEST_F(SchedulerTest, SchedulerCancelAll) {
   scheduler.Run();
   scheduler.CancelAll();
 
-  EXPECT_EQ(counter, 2);
+  CHECK(counter == 2);
 }
 
-TEST_F(SchedulerTest, ScheduleScheduledNoOp) {
+TEST_CASE_METHOD(SchedulerTest, "SchedulerTest ScheduleScheduledNoOp",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
@@ -170,7 +180,7 @@ TEST_F(SchedulerTest, ScheduleScheduledNoOp) {
   scheduler.Schedule(command);
   scheduler.Schedule(command);
 
-  EXPECT_EQ(counter, 1);
+  CHECK(counter == 1);
 }
 
 class TrackDestroyCommand
@@ -190,7 +200,8 @@ class TrackDestroyCommand
   wpi::util::unique_function<void()> m_deleteFunc;
 };
 
-TEST_F(SchedulerTest, ScheduleCommandPtr) {
+TEST_CASE_METHOD(SchedulerTest, "SchedulerTest ScheduleCommandPtr",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   int destructionCounter = 0;
   int runCounter = 0;
@@ -202,21 +213,17 @@ TEST_F(SchedulerTest, ScheduleCommandPtr) {
         TrackDestroyCommand([&destructionCounter] { destructionCounter++; })
             .AlongWith(InstantCommand([&runCounter] { runCounter++; }).ToPtr())
             .Until([&finish] { return finish; });
-    EXPECT_EQ(destructionCounter, 0) << "Composition should not delete command";
+    CHECK(destructionCounter == 0);
 
     scheduler.Schedule(std::move(commandPtr));
-    EXPECT_EQ(destructionCounter, 0)
-        << "Scheduling should not delete CommandPtr";
+    CHECK(destructionCounter == 0);
   }
-  EXPECT_EQ(destructionCounter, 0)
-      << "Scheduler should own CommandPtr after scheduling";
+  CHECK(destructionCounter == 0);
   scheduler.Run();
-  EXPECT_EQ(runCounter, 1);
-  EXPECT_EQ(destructionCounter, 0) << "Scheduler should not destroy CommandPtr "
-                                      "until command lifetime is complete";
+  CHECK(runCounter == 1);
+  CHECK(destructionCounter == 0);
   finish = true;
   scheduler.Run();
-  EXPECT_EQ(runCounter, 1);
-  EXPECT_EQ(destructionCounter, 1)
-      << "Scheduler should delete command after command completes";
+  CHECK(runCounter == 1);
+  CHECK(destructionCounter == 1);
 }

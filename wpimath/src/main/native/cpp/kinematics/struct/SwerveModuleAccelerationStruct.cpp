@@ -10,18 +10,18 @@
 wpi::math::SwerveModuleAcceleration
 wpi::util::Struct<wpi::math::SwerveModuleAcceleration>::Unpack(
     std::span<const uint8_t> data) {
-  constexpr size_t kAccelerationOff = 0;
-  constexpr size_t kAngleOff = kAccelerationOff + 8;
+  constexpr size_t ACCELERATION_OFF = 0;
+  constexpr size_t ANGLE_OFF = ACCELERATION_OFF + 8;
   return wpi::math::SwerveModuleAcceleration{
       units::meters_per_second_squared_t{
-          wpi::util::UnpackStruct<double, kAccelerationOff>(data)},
-      wpi::util::UnpackStruct<wpi::math::Rotation2d, kAngleOff>(data)};
+          wpi::util::UnpackStruct<double, ACCELERATION_OFF>(data)},
+      wpi::util::UnpackStruct<wpi::math::Rotation2d, ANGLE_OFF>(data)};
 }
 
 void wpi::util::Struct<wpi::math::SwerveModuleAcceleration>::Pack(
     std::span<uint8_t> data, const wpi::math::SwerveModuleAcceleration& value) {
-  constexpr size_t kAccelerationOff = 0;
-  constexpr size_t kAngleOff = kAccelerationOff + 8;
-  wpi::util::PackStruct<kAccelerationOff>(data, value.acceleration.value());
-  wpi::util::PackStruct<kAngleOff>(data, value.angle);
+  constexpr size_t ACCELERATION_OFF = 0;
+  constexpr size_t ANGLE_OFF = ACCELERATION_OFF + 8;
+  wpi::util::PackStruct<ACCELERATION_OFF>(data, value.acceleration.value());
+  wpi::util::PackStruct<ANGLE_OFF>(data, value.angle);
 }

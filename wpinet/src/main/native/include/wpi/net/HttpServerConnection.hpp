@@ -10,6 +10,7 @@
 
 #include "wpi/net/HttpParser.hpp"
 #include "wpi/net/uv/Stream.hpp"
+#include "wpi/net/uv/Timer.hpp"
 
 namespace wpi::util {
 class raw_ostream;
@@ -19,8 +20,9 @@ namespace wpi::net {
 
 class HttpServerConnection {
  public:
-  explicit HttpServerConnection(std::shared_ptr<uv::Stream> stream);
-  virtual ~HttpServerConnection() = default;
+  explicit HttpServerConnection(std::shared_ptr<uv::Stream> stream,
+                                uv::Timer::Time requestTimeout = {});
+  virtual ~HttpServerConnection();
 
  protected:
   /**
@@ -31,6 +33,9 @@ class HttpServerConnection {
    * appropriate Send() functions to send a response back to the client.
    */
   virtual void ProcessRequest() = 0;
+
+  /** Cancel the timeout for receiving the initial request. */
+  void CancelRequestTimeout();
 
   /**
    * Build common response headers.
@@ -147,6 +152,9 @@ class HttpServerConnection {
 
   /** The message complete connection. */
   wpi::util::sig::Connection m_messageCompleteConn;
+
+ private:
+  std::shared_ptr<uv::Timer> m_requestTimer;
 };
 
 }  // namespace wpi::net

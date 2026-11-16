@@ -11,7 +11,7 @@ import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.DriverStationJNI;
-import org.wpilib.math.util.Pair;
+import org.wpilib.util.Pair;
 
 /**
  * Handle input from standard HID devices connected to the Driver Station.
@@ -23,13 +23,13 @@ import org.wpilib.math.util.Pair;
 public final class GenericHID implements HIDDevice {
   /** Represents a rumble output on the Joystick. */
   public enum RumbleType {
-    /** Left rumble motor. */
+    /** Left rumble motor. On most controllers, this is the low-frequency motor. */
     LEFT_RUMBLE,
-    /** Right rumble motor. */
+    /** Right rumble motor. On most controllers, this is the high-frequency motor. */
     RIGHT_RUMBLE,
-    /** Left trigger rumble motor. */
+    /** Left trigger rumble motor, on controllers that have one. */
     LEFT_TRIGGER_RUMBLE,
-    /** Right trigger rumble motor. */
+    /** Right trigger rumble motor, on controllers that have one. */
     RIGHT_TRIGGER_RUMBLE,
   }
 
@@ -87,7 +87,11 @@ public final class GenericHID implements HIDDevice {
     /** Switch Joycon Right. */
     SWITCH_JOYCON_RIGHT(9),
     /** Switch Joycon Pair. */
-    SWITCH_JOYCON_PAIR(10);
+    SWITCH_JOYCON_PAIR(10),
+    /** GameCube controller. */
+    GAMECUBE(11),
+    /** Steam Controller. */
+    STEAM(12);
 
     /** HIDType value. */
     public final int value;
@@ -111,7 +115,7 @@ public final class GenericHID implements HIDDevice {
      * @return HIDType with the given value.
      */
     public static HIDType of(int value) {
-      return map.get(value);
+      return map.getOrDefault(value, UNKNOWN);
     }
   }
 
@@ -525,12 +529,23 @@ public final class GenericHID implements HIDDevice {
    */
   public void setRumble(RumbleType type, double value) {
     value = Math.clamp(value, 0, 1);
-    int rumbleValue = (int) (value * 65535);
+    setRawRumble(type, (int) (value * 65535));
+  }
+
+  /**
+   * Set the raw rumble output for the HID. The DS currently supports 4 rumble values: left rumble,
+   * right rumble, left trigger rumble, and right trigger rumble.
+   *
+   * @param type Which rumble value to set
+   * @param value The raw value (0 to 65535) to set the rumble to
+   */
+  public void setRawRumble(RumbleType type, int value) {
+    value = Math.clamp(value, 0, 65535);
     switch (type) {
-      case LEFT_RUMBLE -> this.m_leftRumble = rumbleValue;
-      case RIGHT_RUMBLE -> this.m_rightRumble = rumbleValue;
-      case LEFT_TRIGGER_RUMBLE -> this.m_leftTriggerRumble = rumbleValue;
-      case RIGHT_TRIGGER_RUMBLE -> this.m_rightTriggerRumble = rumbleValue;
+      case LEFT_RUMBLE -> this.m_leftRumble = value;
+      case RIGHT_RUMBLE -> this.m_rightRumble = value;
+      case LEFT_TRIGGER_RUMBLE -> this.m_leftTriggerRumble = value;
+      case RIGHT_TRIGGER_RUMBLE -> this.m_rightTriggerRumble = value;
       default -> {
         // no-op
       }

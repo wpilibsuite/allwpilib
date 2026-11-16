@@ -6,13 +6,11 @@ from util import *  # type: ignore
 if TYPE_CHECKING:
     from .util import *
 
-import pytest
 
-
-def test_runCommandSchedule(scheduler: commands2.CommandScheduler):
+def test_run_command_schedule(scheduler: commands2.CommandScheduler):
     counter = OOInteger(0)
 
-    command = commands2.RunCommand(counter.incrementAndGet)
+    command = commands2.RunCommand(counter.increment_and_get)
 
     scheduler.schedule(command)
     scheduler.run()

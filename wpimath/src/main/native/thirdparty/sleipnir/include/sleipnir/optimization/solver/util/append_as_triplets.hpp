@@ -2,8 +2,10 @@
 
 #pragma once
 
+#include <cstddef>
 #include <initializer_list>
 
+#include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <gch/small_vector.hpp>
 

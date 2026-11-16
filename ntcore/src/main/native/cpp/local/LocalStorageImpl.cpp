@@ -4,12 +4,12 @@
 
 #include "LocalStorageImpl.hpp"
 
+#include <format>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#include <fmt/ranges.h>
 
 #include "IListenerStorage.hpp"
 #include "Log.hpp"
@@ -21,10 +21,10 @@ using namespace wpi::nt;
 using namespace wpi::nt::local;
 
 // maximum number of local publishers / subscribers to any given topic
-static constexpr size_t kMaxPublishers = 512;
-static constexpr size_t kMaxSubscribers = 512;
-static constexpr size_t kMaxMultiSubscribers = 512;
-static constexpr size_t kMaxListeners = 512;
+static constexpr size_t MAX_PUBLISHERS = 512;
+static constexpr size_t MAX_SUBSCRIBERS = 512;
+static constexpr size_t MAX_MULTI_SUBSCRIBERS = 512;
+static constexpr size_t MAX_LISTENERS = 512;
 
 StorageImpl::StorageImpl(int inst, IListenerStorage& listenerStorage,
                          wpi::util::Logger& logger)
@@ -304,7 +304,7 @@ bool StorageImpl::SetDefaultEntryValue(NT_Handle pubsubentryHandle,
 LocalSubscriber* StorageImpl::Subscribe(LocalTopic* topic, NT_Type type,
                                         std::string_view typeStr,
                                         const PubSubOptions& options) {
-  if (topic->localSubscribers.size() >= kMaxSubscribers) {
+  if (topic->localSubscribers.size() >= MAX_SUBSCRIBERS) {
     ERR("reached maximum number of subscribers to '{}', not subscribing",
         topic->name);
     return nullptr;
@@ -324,7 +324,7 @@ LocalPublisher* StorageImpl::Publish(LocalTopic* topic, NT_Type type,
     return nullptr;
   }
 
-  if (topic->localPublishers.size() >= kMaxPublishers) {
+  if (topic->localPublishers.size() >= MAX_PUBLISHERS) {
     ERR("reached maximum number of publishers to '{}', not publishing",
         topic->name);
     return nullptr;
@@ -337,7 +337,7 @@ LocalPublisher* StorageImpl::Publish(LocalTopic* topic, NT_Type type,
 LocalEntry* StorageImpl::GetEntry(LocalTopic* topic, NT_Type type,
                                   std::string_view typeStr,
                                   const PubSubOptions& options) {
-  if (topic->localSubscribers.size() >= kMaxSubscribers) {
+  if (topic->localSubscribers.size() >= MAX_SUBSCRIBERS) {
     ERR("reached maximum number of subscribers to '{}', not creating entry",
         topic->name);
     return nullptr;
@@ -360,7 +360,7 @@ LocalEntry* StorageImpl::GetEntry(std::string_view name) {
   auto* topic = GetOrCreateTopic(name);
 
   if (!topic->entry) {
-    if (topic->localSubscribers.size() >= kMaxSubscribers) {
+    if (topic->localSubscribers.size() >= MAX_SUBSCRIBERS) {
       ERR("reached maximum number of subscribers to '{}', not creating entry",
           topic->name);
       return nullptr;
@@ -406,14 +406,28 @@ void StorageImpl::Unpublish(NT_Handle pubentryHandle) {
   }
 }
 
+// FIXME: Remove when GCC 15 is available and pass span directly
+static std::string join(std::span<const std::string_view> values) {
+  std::string ret;
+  bool isFirst = true;
+  for (auto value : values) {
+    if (isFirst) {
+      isFirst = false;
+      ret += std::format("\"{}\"", value);
+    } else {
+      ret += std::format(", \"{}\"", value);
+    }
+  }
+  return ret;
+}
 //
 // Multi-subscriber functions
 //
 
 LocalMultiSubscriber* StorageImpl::AddMultiSubscriber(
     std::span<const std::string_view> prefixes, const PubSubOptions& options) {
-  DEBUG4("AddMultiSubscriber({})", fmt::join(prefixes, ","));
-  if (m_multiSubscribers.size() >= kMaxMultiSubscribers) {
+  DEBUG4("AddMultiSubscriber({})", join(prefixes));
+  if (m_multiSubscribers.size() >= MAX_MULTI_SUBSCRIBERS) {
     ERR("reached maximum number of multi-subscribers, not subscribing");
     return nullptr;
   }
@@ -504,7 +518,7 @@ LocalSubscriber* StorageImpl::GetSubEntry(NT_Handle subentryHandle) {
 
 void StorageImpl::AddListenerImpl(NT_Listener listenerHandle, LocalTopic* topic,
                                   unsigned int eventMask) {
-  if (topic->localSubscribers.size() >= kMaxSubscribers) {
+  if (topic->localSubscribers.size() >= MAX_SUBSCRIBERS) {
     ERR("reached maximum number of subscribers to '{}', ignoring listener add",
         topic->name);
     return;
@@ -528,7 +542,7 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
   auto topic = subscriber->topic;
 
   if ((eventMask & NT_EVENT_TOPIC) != 0) {
-    if (topic->listeners.size() >= kMaxListeners) {
+    if (topic->listeners.size() >= MAX_LISTENERS) {
       ERR("reached maximum number of listeners to '{}', not adding listener",
           topic->name);
       return;
@@ -550,7 +564,7 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
   }
 
   if ((eventMask & NT_EVENT_VALUE_ALL) != 0) {
-    if (subscriber->valueListeners.size() >= kMaxListeners) {
+    if (subscriber->valueListeners.size() >= MAX_LISTENERS) {
       ERR("reached maximum number of listeners to '{}', not adding listener",
           topic->name);
       return;
@@ -600,7 +614,7 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
   }
 
   if ((eventMask & NT_EVENT_TOPIC) != 0) {
-    if (m_topicPrefixListeners.size() >= kMaxListeners) {
+    if (m_topicPrefixListeners.size() >= MAX_LISTENERS) {
       ERR("reached maximum number of listeners, not adding listener");
       return;
     }
@@ -626,7 +640,7 @@ void StorageImpl::AddListenerImpl(NT_Listener listenerHandle,
   }
 
   if ((eventMask & NT_EVENT_VALUE_ALL) != 0) {
-    if (subscriber->valueListeners.size() >= kMaxListeners) {
+    if (subscriber->valueListeners.size() >= MAX_LISTENERS) {
       ERR("reached maximum number of listeners, not adding listener");
       return;
     }
@@ -743,7 +757,7 @@ void StorageImpl::AddSchema(std::string_view name, std::string_view type,
 
   auto topic = GetOrCreateTopic(fullName);
 
-  if (topic->localPublishers.size() >= kMaxPublishers) {
+  if (topic->localPublishers.size() >= MAX_PUBLISHERS) {
     ERR("reached maximum number of publishers to '{}', not publishing",
         topic->name);
     return;
@@ -846,7 +860,9 @@ void StorageImpl::NotifyValue(LocalTopic* topic, const Value& value,
         (!publisher || (publisher && (subscriber->config.excludePublisher !=
                                       publisher->handle)))) {
       subscriber->pollStorage.emplace_back(value);
-      subscriber->handle.Set();
+      if (!subscriber->config.disableSignal) {
+        subscriber->handle.Set();
+      }
       if (!subscriber->valueListeners.empty()) {
         m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
                                  topic->handle, 0, value);
@@ -856,7 +872,9 @@ void StorageImpl::NotifyValue(LocalTopic* topic, const Value& value,
 
   for (auto&& subscriber : topic->multiSubscribers) {
     if (subscriber->options.keepDuplicates || !isDuplicate) {
-      subscriber->handle.Set();
+      if (!subscriber->options.disableSignal) {
+        subscriber->handle.Set();
+      }
       if (!subscriber->valueListeners.empty()) {
         m_listenerStorage.Notify(subscriber->valueListeners, eventFlags,
                                  topic->handle, 0, value);
@@ -1011,10 +1029,14 @@ LocalSubscriber* StorageImpl::AddLocalSubscriber(LocalTopic* topic,
   if (subscriber->active) {
     if (!topic->lastValueFromNetwork && !config.disableLocal) {
       subscriber->pollStorage.emplace_back(topic->lastValue);
-      subscriber->handle.Set();
+      if (!subscriber->config.disableSignal) {
+        subscriber->handle.Set();
+      }
     } else if (topic->lastValueFromNetwork && !config.disableRemote) {
       subscriber->pollStorage.emplace_back(topic->lastValueNetwork);
-      subscriber->handle.Set();
+      if (!subscriber->config.disableSignal) {
+        subscriber->handle.Set();
+      }
     }
   }
   return subscriber;

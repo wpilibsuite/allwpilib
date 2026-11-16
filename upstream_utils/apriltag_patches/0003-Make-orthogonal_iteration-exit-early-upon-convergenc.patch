@@ -86,7 +86,7 @@ index f0003a2d187df13236992026ee6ff7f9d6f7aff9..782729225c3555edcfebb7d8a21f847a
          pose->R = pose1.R;
          pose->t = pose1.t;
 diff --git a/apriltag_pose.h b/apriltag_pose.h
-index 07ee37b2cb4185bcbdb46d1c9ccec306f0f2e96d..6bbe4a4e000402f990b0a13b8b87e6becc8c48a8 100644
+index 8120502f887bf6c6b55eaeeb15b6f808e29c7689..f905e9d085feaa56ef9ddd297be2d2696ffb218f 100644
 --- a/apriltag_pose.h
 +++ b/apriltag_pose.h
 @@ -63,7 +63,8 @@ void estimate_tag_pose_orthogonal_iteration(
@@ -100,7 +100,7 @@ index 07ee37b2cb4185bcbdb46d1c9ccec306f0f2e96d..6bbe4a4e000402f990b0a13b8b87e6be
  /**
   * Estimate tag pose.
 diff --git a/example/apriltag_demo.c b/example/apriltag_demo.c
-index 6de90540fe2f22f5160f725bce03d50bb3967c74..ccd55cdceeaf46712891a7fab971b8b3c6afa950 100644
+index 37c31b63e0e8bcff00232cf834344989f92bae54..f8745bb2db8cd3dce1d27b3afb83b9d82eca5881 100644
 --- a/example/apriltag_demo.c
 +++ b/example/apriltag_demo.c
 @@ -42,6 +42,7 @@ either expressed or implied, of the Regents of The University of Michigan.
@@ -111,7 +111,7 @@ index 6de90540fe2f22f5160f725bce03d50bb3967c74..ccd55cdceeaf46712891a7fab971b8b3
  #include "tag36h11.h"
  #include "tag25h9.h"
  #include "tag16h5.h"
-@@ -218,6 +219,27 @@ int main(int argc, char *argv[])
+@@ -269,6 +270,27 @@ int main(int argc, char *argv[])
  
                  hamm_hist[det->hamming]++;
                  total_hamm_hist[det->hamming]++;

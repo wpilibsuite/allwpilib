@@ -6,6 +6,7 @@ package org.wpilib.internal;
 
 import java.util.Collection;
 import java.util.PriorityQueue;
+import java.util.concurrent.atomic.AtomicLong;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.system.RobotController;
 import org.wpilib.util.WPIUtilJNI;
@@ -24,7 +25,7 @@ public class PeriodicPriorityQueue {
   /** Internal priority queue ordered by callback expiration times. */
   private final PriorityQueue<Callback> m_queue;
 
-  private long m_loopStartTimeMicros;
+  private long m_loopStartTimeNanos;
 
   /** Constructs an empty callback queue. */
   public PeriodicPriorityQueue() {
@@ -36,7 +37,7 @@ public class PeriodicPriorityQueue {
    *
    * @param func The function to call periodically.
    * @param timestamp The common starting point for callback scheduling in monotonic timestamp
-   *     microseconds.
+   *     nanoseconds.
    * @param periodSeconds The callback period in seconds.
    * @param offsetSeconds The offset from the common starting time in seconds.
    * @return the callback object
@@ -52,7 +53,7 @@ public class PeriodicPriorityQueue {
    *
    * @param func The function to call periodically.
    * @param timestamp The common starting point for callback scheduling in monotonic timestamp
-   *     microseconds.
+   *     nanoseconds.
    * @param periodSeconds The callback period in seconds.
    * @return the callback object
    */
@@ -171,28 +172,28 @@ public class PeriodicPriorityQueue {
       return false;
     }
 
-    m_loopStartTimeMicros = RobotController.getMonotonicTime();
+    m_loopStartTimeNanos = RobotController.getMonotonicTime();
 
     callback.func.run();
 
     // Increment the expiration time by the number of full periods it's behind
     // plus one to avoid rapid repeat fires from a large loop overrun. We
-    // assume m_loopStartTime ≥ expirationTime rather than checking for it since
+    // assume m_loopStartTime >= expirationTime rather than checking for it since
     // the callback wouldn't be running otherwise.
     callback.expirationTime +=
         callback.period
-            + (m_loopStartTimeMicros - callback.expirationTime) / callback.period * callback.period;
+            + (m_loopStartTimeNanos - callback.expirationTime) / callback.period * callback.period;
     m_queue.add(callback);
 
     // Process all other callbacks that are ready to run
-    while (m_queue.peek().expirationTime <= m_loopStartTimeMicros) {
+    while (m_queue.peek().expirationTime <= m_loopStartTimeNanos) {
       callback = m_queue.poll();
 
       callback.func.run();
 
       callback.expirationTime +=
           callback.period
-              + (m_loopStartTimeMicros - callback.expirationTime)
+              + (m_loopStartTimeNanos - callback.expirationTime)
                   / callback.period
                   * callback.period;
       m_queue.add(callback);
@@ -202,14 +203,14 @@ public class PeriodicPriorityQueue {
   }
 
   /**
-   * Return the system clock time in microseconds for the start of the current periodic loop. This
-   * is in the same time base as Timer.getMonotonicTimeStamp(), but is stable through a loop. It is
+   * Return the system clock time in nanoseconds for the start of the current periodic loop. This is
+   * in the same time base as Timer.getMonotonicTimeStamp(), but is stable through a loop. It is
    * updated at the beginning of every periodic callback (including the normal periodic loop).
    *
-   * @return Robot running time in microseconds, as of the start of the current periodic function.
+   * @return Robot running time in nanoseconds, as of the start of the current periodic function.
    */
   public long getLoopStartTime() {
-    return m_loopStartTimeMicros;
+    return m_loopStartTimeNanos;
   }
 
   /**
@@ -220,22 +221,31 @@ public class PeriodicPriorityQueue {
    * when execution is delayed.
    */
   public static class Callback implements Comparable<Callback> {
+    /** Source of unique callback ids. */
+    private static final AtomicLong s_nextId = new AtomicLong(1);
+
     /** The function to execute when the callback fires. */
     public final Runnable func;
 
-    /** The period at which to run the callback in microseconds. */
+    /** The period at which to run the callback in nanoseconds. */
     public final long period;
 
-    /** The next scheduled execution time in monotonic timestamp microseconds. */
+    /** The next scheduled execution time in monotonic timestamp nanoseconds. */
     public long expirationTime;
+
+    /**
+     * The unique id for this callback to allow callbacks to be tracked and removed from the queue
+     * throughout robot operation.
+     */
+    public final long id;
 
     /**
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param startTime The common starting point for all callback scheduling in microseconds.
-     * @param period The period at which to run the callback in microseconds.
-     * @param offset The offset from the common starting time in microseconds.
+     * @param startTime The common starting point for all callback scheduling in nanoseconds.
+     * @param period The period at which to run the callback in nanoseconds.
+     * @param offset The offset from the common starting time in nanoseconds.
      */
     public Callback(Runnable func, long startTime, long period, long offset) {
       this.func = func;
@@ -245,50 +255,51 @@ public class PeriodicPriorityQueue {
               + offset
               + (1 + (RobotController.getMonotonicTime() - startTime - offset) / this.period)
                   * this.period;
+      this.id = s_nextId.getAndIncrement();
     }
 
     /**
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param timestamp The common starting point for all callback scheduling in microseconds.
+     * @param timestamp The common starting point for all callback scheduling in nanoseconds.
      * @param periodSeconds The period at which to run the callback in seconds.
      * @param offsetSeconds The offset from the common starting time in seconds.
      */
     public Callback(Runnable func, long timestamp, double periodSeconds, double offsetSeconds) {
-      this(func, timestamp, (long) (periodSeconds * 1e6), (long) (offsetSeconds * 1e6));
+      this(func, timestamp, (long) (periodSeconds * 1e9), (long) (offsetSeconds * 1e9));
     }
 
     /**
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param timestamp The common starting point for all callback scheduling in microseconds.
+     * @param timestamp The common starting point for all callback scheduling in nanoseconds.
      * @param periodSeconds The period at which to run the callback in seconds.
      */
     public Callback(Runnable func, long timestamp, double periodSeconds) {
-      this(func, timestamp, (long) (periodSeconds * 1e6), 0);
+      this(func, timestamp, (long) (periodSeconds * 1e9), 0);
     }
 
     /**
-     * Compares callbacks based on expiration time for equality.
+     * Compares callbacks based on their stable identity.
      *
      * @param rhs The object to compare against.
-     * @return true if rhs is a Callback with the same expiration time.
+     * @return true if rhs is the same Callback (same id).
      */
     @Override
     public boolean equals(Object rhs) {
-      return rhs instanceof Callback callback && expirationTime == callback.expirationTime;
+      return rhs instanceof Callback callback && id == callback.id;
     }
 
     /**
-     * Returns a hash code based on the expiration time.
+     * Returns a hash code based on the stable identity.
      *
      * @return hash code for this callback.
      */
     @Override
     public int hashCode() {
-      return Long.hashCode(expirationTime);
+      return Long.hashCode(id);
     }
 
     /**
@@ -304,7 +315,8 @@ public class PeriodicPriorityQueue {
     public int compareTo(Callback rhs) {
       // Elements with sooner expiration times are sorted as lesser. The head of
       // Java's PriorityQueue is the least element.
-      return Long.compare(expirationTime, rhs.expirationTime);
+      int expTimeDiff = Long.compare(expirationTime, rhs.expirationTime);
+      return expTimeDiff != 0 ? expTimeDiff : Long.compare(id, rhs.id);
     }
   }
 }

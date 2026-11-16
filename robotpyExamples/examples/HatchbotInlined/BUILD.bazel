@@ -1,0 +1,11 @@
+load("//robotpyExamples:project.bzl", "robotpy_project")
+
+robotpy_project(
+    name = "HatchbotInlined",
+    srcs = glob(["**/*.py"]),
+    main = "robot.py",
+    deps = [
+        "//commandsv2/src/main/python",
+        "//drivers/src/main/python",
+    ],
+)

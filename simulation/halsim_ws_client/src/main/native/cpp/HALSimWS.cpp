@@ -14,7 +14,7 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/print.hpp"
 
-static constexpr int kTcpConnectAttemptTimeout = 1000;
+static constexpr int TCP_CONNECT_ATTEMPT_TIMEOUT = 1000;
 
 namespace uv = wpi::net::uv;
 
@@ -98,7 +98,7 @@ void HALSimWS::Start() {
         }
 
         // If we weren't previously connected, attempt a reconnection
-        m_connect_timer->Start(uv::Timer::Time(kTcpConnectAttemptTimeout));
+        m_connect_timer->Start(uv::Timer::Time(TCP_CONNECT_ATTEMPT_TIMEOUT));
       });
 
   m_tcp_client->closed.connect([]() { std::puts("TCP connection closed"); });

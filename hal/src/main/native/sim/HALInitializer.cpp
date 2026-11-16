@@ -9,6 +9,6 @@
 namespace wpi::hal::init {
 std::atomic_bool HAL_IsInitialized{false};
 void RunInitialize() {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
 }
 }  // namespace wpi::hal::init

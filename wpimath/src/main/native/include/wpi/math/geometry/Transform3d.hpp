@@ -4,10 +4,18 @@
 
 #pragma once
 
+#include <stdexcept>
 #include <utility>
 
+#include <Eigen/Core>
+#include <gcem.hpp>
+
+#include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/math/linalg/ct_matrix.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -19,6 +27,10 @@ struct Twist3d;
  * Represents a transformation for a Pose3d in the pose's frame. Translation is
  * applied before rotation. (The translation is applied in the pose's original
  * frame, not the transformed frame.)
+ *
+ * Transforms are applied intrinsically, i.e. relative to the pose's own frame
+ * rather than the global frame. This is in contrast to the rotation classes,
+ * which apply rotations extrinsically.
  */
 class WPILIB_DLLEXPORT Transform3d final {
  public:
@@ -79,7 +91,7 @@ class WPILIB_DLLEXPORT Transform3d final {
 
   /**
    * Constructs a 3D transform from a 2D transform in the X-Y plane.
-   **
+   *
    * @param transform The 2D transform.
    * @see Rotation3d(Rotation2d)
    * @see Translation3d(Translation2d)
@@ -244,9 +256,9 @@ constexpr Twist3d Transform3d::Log() const {
       // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5BDivide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2C2Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
       C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
     } else {
-      // A = std::sin(θ)/θ
-      // B = (1 - std::cos(θ)) / θ²
-      // C = (1 - A/(2*B)) / θ²
+      // A = sinθ/θ
+      // B = (1 - cosθ)/θ²
+      // C = (1 - A/(2B))/θ²
       double A = gcem::sin(theta) / theta;
       double B = (1 - gcem::cos(theta)) / thetaSq;
       C = (1 - A / (2 * B)) / thetaSq;
@@ -264,7 +276,7 @@ constexpr Twist3d Transform3d::Log() const {
                    wpi::units::radian_t{rvec(2)}};
   };
 
-  if (std::is_constant_evaluated()) {
+  if consteval {
     return impl.template operator()<ct_matrix3d, ct_vector3d>();
   }
   return impl.template operator()<Eigen::Matrix3d, Eigen::Vector3d>();

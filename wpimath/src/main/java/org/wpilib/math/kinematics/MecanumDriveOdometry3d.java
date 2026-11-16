@@ -10,7 +10,7 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class for mecanum drive odometry. Odometry allows you to track the robot's position on the field
@@ -29,7 +29,8 @@ public class MecanumDriveOdometry3d extends Odometry3d<MecanumDriveWheelPosition
    * Constructs a MecanumDriveOdometry3d object.
    *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The distances driven by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
@@ -39,20 +40,21 @@ public class MecanumDriveOdometry3d extends Odometry3d<MecanumDriveWheelPosition
       MecanumDriveWheelPositions wheelPositions,
       Pose3d initialPose) {
     super(kinematics, gyroAngle, wheelPositions, initialPose);
-    MathSharedStore.reportUsage("MecanumDriveOdometry3d", "");
+    UsageReporting.reportUsage("MecanumDriveOdometry3d", "");
   }
 
   /**
    * Constructs a MecanumDriveOdometry3d object with the default pose at the origin.
    *
    * @param kinematics The mecanum drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The distances driven by each wheel.
    */
   public MecanumDriveOdometry3d(
       MecanumDriveKinematics kinematics,
       Rotation3d gyroAngle,
       MecanumDriveWheelPositions wheelPositions) {
-    this(kinematics, gyroAngle, wheelPositions, Pose3d.kZero);
+    this(kinematics, gyroAngle, wheelPositions, Pose3d.ZERO);
   }
 }

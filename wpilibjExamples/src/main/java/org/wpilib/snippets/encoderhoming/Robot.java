@@ -4,9 +4,9 @@
 
 package org.wpilib.snippets.encoderhoming;
 
+import org.wpilib.drivers.motor.Spark;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.discrete.DigitalInput;
-import org.wpilib.hardware.motor.Spark;
 import org.wpilib.hardware.rotation.Encoder;
 
 /**

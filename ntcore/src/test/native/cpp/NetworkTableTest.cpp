@@ -7,104 +7,102 @@
 #include <string>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "TestPrinters.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 
-class NetworkTableTest : public ::testing::Test {};
-
-TEST_F(NetworkTableTest, BasenameKey) {
-  EXPECT_EQ("simple", wpi::nt::NetworkTable::BasenameKey("simple"));
-  EXPECT_EQ("simple",
-            wpi::nt::NetworkTable::BasenameKey("one/two/many/simple"));
-  EXPECT_EQ("simple", wpi::nt::NetworkTable::BasenameKey(
-                          "//////an/////awful/key////simple"));
+TEST_CASE("NetworkTableTest BasenameKey", "[ntcore][network-table]") {
+  CHECK("simple" == wpi::nt::NetworkTable::BasenameKey("simple"));
+  CHECK("simple" == wpi::nt::NetworkTable::BasenameKey("one/two/many/simple"));
+  CHECK("simple" ==
+        wpi::nt::NetworkTable::BasenameKey("//////an/////awful/key////simple"));
 }
 
-TEST_F(NetworkTableTest, NormalizeKeySlash) {
-  EXPECT_EQ("/", wpi::nt::NetworkTable::NormalizeKey("///"));
-  EXPECT_EQ("/no/normal/req",
-            wpi::nt::NetworkTable::NormalizeKey("/no/normal/req"));
-  EXPECT_EQ("/no/leading/slash",
-            wpi::nt::NetworkTable::NormalizeKey("no/leading/slash"));
-  EXPECT_EQ("/what/an/awful/key/", wpi::nt::NetworkTable::NormalizeKey(
-                                       "//////what////an/awful/////key///"));
+TEST_CASE("NetworkTableTest NormalizeKeySlash", "[ntcore][network-table]") {
+  CHECK("/" == wpi::nt::NetworkTable::NormalizeKey("///"));
+  CHECK("/no/normal/req" ==
+        wpi::nt::NetworkTable::NormalizeKey("/no/normal/req"));
+  CHECK("/no/leading/slash" ==
+        wpi::nt::NetworkTable::NormalizeKey("no/leading/slash"));
+  CHECK("/what/an/awful/key/" == wpi::nt::NetworkTable::NormalizeKey(
+                                     "//////what////an/awful/////key///"));
 }
 
-TEST_F(NetworkTableTest, NormalizeKeyNoSlash) {
-  EXPECT_EQ("a", wpi::nt::NetworkTable::NormalizeKey("a", false));
-  EXPECT_EQ("a", wpi::nt::NetworkTable::NormalizeKey("///a", false));
-  EXPECT_EQ("leading/slash",
-            wpi::nt::NetworkTable::NormalizeKey("/leading/slash", false));
-  EXPECT_EQ("no/leading/slash",
-            wpi::nt::NetworkTable::NormalizeKey("no/leading/slash", false));
-  EXPECT_EQ("what/an/awful/key/",
-            wpi::nt::NetworkTable::NormalizeKey(
-                "//////what////an/awful/////key///", false));
+TEST_CASE("NetworkTableTest NormalizeKeyNoSlash", "[ntcore][network-table]") {
+  CHECK("a" == wpi::nt::NetworkTable::NormalizeKey("a", false));
+  CHECK("a" == wpi::nt::NetworkTable::NormalizeKey("///a", false));
+  CHECK("leading/slash" ==
+        wpi::nt::NetworkTable::NormalizeKey("/leading/slash", false));
+  CHECK("no/leading/slash" ==
+        wpi::nt::NetworkTable::NormalizeKey("no/leading/slash", false));
+  CHECK("what/an/awful/key/" ==
+        wpi::nt::NetworkTable::NormalizeKey("//////what////an/awful/////key///",
+                                            false));
 }
 
-TEST_F(NetworkTableTest, GetHierarchyEmpty) {
+TEST_CASE("NetworkTableTest GetHierarchyEmpty", "[ntcore][network-table]") {
   std::vector<std::string> expected{"/"};
-  ASSERT_EQ(expected, wpi::nt::NetworkTable::GetHierarchy(""));
+  REQUIRE(expected == wpi::nt::NetworkTable::GetHierarchy(""));
 }
 
-TEST_F(NetworkTableTest, GetHierarchyRoot) {
+TEST_CASE("NetworkTableTest GetHierarchyRoot", "[ntcore][network-table]") {
   std::vector<std::string> expected{"/"};
-  ASSERT_EQ(expected, wpi::nt::NetworkTable::GetHierarchy("/"));
+  REQUIRE(expected == wpi::nt::NetworkTable::GetHierarchy("/"));
 }
 
-TEST_F(NetworkTableTest, GetHierarchyNormal) {
+TEST_CASE("NetworkTableTest GetHierarchyNormal", "[ntcore][network-table]") {
   std::vector<std::string> expected{"/", "/foo", "/foo/bar", "/foo/bar/baz"};
-  ASSERT_EQ(expected, wpi::nt::NetworkTable::GetHierarchy("/foo/bar/baz"));
+  REQUIRE(expected == wpi::nt::NetworkTable::GetHierarchy("/foo/bar/baz"));
 }
 
-TEST_F(NetworkTableTest, GetHierarchyTrailingSlash) {
+TEST_CASE("NetworkTableTest GetHierarchyTrailingSlash",
+          "[ntcore][network-table]") {
   std::vector<std::string> expected{"/", "/foo", "/foo/bar", "/foo/bar/"};
-  ASSERT_EQ(expected, wpi::nt::NetworkTable::GetHierarchy("/foo/bar/"));
+  REQUIRE(expected == wpi::nt::NetworkTable::GetHierarchy("/foo/bar/"));
 }
 
-TEST_F(NetworkTableTest, ContainsKey) {
+TEST_CASE("NetworkTableTest ContainsKey", "[ntcore][network-table]") {
   auto inst = wpi::nt::NetworkTableInstance::Create();
   auto nt = inst.GetTable("containskey");
-  ASSERT_FALSE(nt->ContainsKey("testkey"));
+  REQUIRE_FALSE(nt->ContainsKey("testkey"));
   nt->PutNumber("testkey", 5);
-  ASSERT_TRUE(nt->ContainsKey("testkey"));
-  ASSERT_TRUE(inst.GetEntry("/containskey/testkey").Exists());
-  ASSERT_FALSE(inst.GetEntry("containskey/testkey").Exists());
+  REQUIRE(nt->ContainsKey("testkey"));
+  REQUIRE(inst.GetEntry("/containskey/testkey").Exists());
+  REQUIRE_FALSE(inst.GetEntry("containskey/testkey").Exists());
   wpi::nt::NetworkTableInstance::Destroy(inst);
 }
 
-TEST_F(NetworkTableTest, LeadingSlash) {
+TEST_CASE("NetworkTableTest LeadingSlash", "[ntcore][network-table]") {
   auto inst = wpi::nt::NetworkTableInstance::Create();
   auto nt = inst.GetTable("leadingslash");
   auto nt2 = inst.GetTable("/leadingslash");
-  ASSERT_FALSE(nt->ContainsKey("testkey"));
+  REQUIRE_FALSE(nt->ContainsKey("testkey"));
   nt2->PutNumber("testkey", 5);
-  ASSERT_TRUE(nt->ContainsKey("testkey"));
-  ASSERT_TRUE(inst.GetEntry("/leadingslash/testkey").Exists());
+  REQUIRE(nt->ContainsKey("testkey"));
+  REQUIRE(inst.GetEntry("/leadingslash/testkey").Exists());
   wpi::nt::NetworkTableInstance::Destroy(inst);
 }
 
-TEST_F(NetworkTableTest, EmptyOrNoSlash) {
+TEST_CASE("NetworkTableTest EmptyOrNoSlash", "[ntcore][network-table]") {
   auto inst = wpi::nt::NetworkTableInstance::Create();
   auto nt = inst.GetTable("/");
   auto nt2 = inst.GetTable("");
-  ASSERT_FALSE(nt->ContainsKey("testkey"));
+  REQUIRE_FALSE(nt->ContainsKey("testkey"));
   nt2->PutNumber("testkey", 5);
-  ASSERT_TRUE(nt->ContainsKey("testkey"));
-  ASSERT_TRUE(inst.GetEntry("/testkey").Exists());
+  REQUIRE(nt->ContainsKey("testkey"));
+  REQUIRE(inst.GetEntry("/testkey").Exists());
   wpi::nt::NetworkTableInstance::Destroy(inst);
 }
 
-TEST_F(NetworkTableTest, ResetInstance) {
+TEST_CASE("NetworkTableTest ResetInstance", "[ntcore][network-table]") {
   auto inst = wpi::nt::NetworkTableInstance::Create();
   auto nt = inst.GetTable("containskey");
-  ASSERT_FALSE(nt->ContainsKey("testkey"));
+  REQUIRE_FALSE(nt->ContainsKey("testkey"));
   nt->PutNumber("testkey", 5);
-  ASSERT_TRUE(nt->ContainsKey("testkey"));
-  ASSERT_TRUE(inst.GetEntry("/containskey/testkey").Exists());
+  REQUIRE(nt->ContainsKey("testkey"));
+  REQUIRE(inst.GetEntry("/containskey/testkey").Exists());
   wpi::nt::ResetInstance(inst.GetHandle());
-  ASSERT_FALSE(nt->ContainsKey("testkey"));
+  REQUIRE_FALSE(nt->ContainsKey("testkey"));
   wpi::nt::NetworkTableInstance::Destroy(inst);
 }

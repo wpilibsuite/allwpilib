@@ -5,6 +5,9 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
+import telemetry
 import wpilib
 
 
@@ -12,7 +15,7 @@ class MyRobot(wpilib.TimedRobot):
     """
     This is a sample program showing how to retrieve information from the Power
     Distribution Panel via CAN. The information will be displayed under variables
-    through the SmartDashboard.
+    through telemetry.
     """
 
     def __init__(self):
@@ -20,37 +23,38 @@ class MyRobot(wpilib.TimedRobot):
         super().__init__()
 
         # Object for dealing with the Power Distribution Panel (PDP).
-        self.pdp = wpilib.PowerDistribution(0)
+        self.pdp = wpilib.PowerDistribution(wpilib.CANPort.CAN_S0)
 
+    @override
+    def robot_periodic(self):
         # Put the PDP itself to the dashboard
-        wpilib.SmartDashboard.putData("PDP", self.pdp)
+        telemetry.log("PDP", self.pdp)
 
-    def robotPeriodic(self):
         # Get the current going through channel 7, in Amperes.
         # The PDP returns the current in increments of 0.125A.
         # At low currents the current readings tend to be less accurate.
-        current7 = self.pdp.getCurrent(7)
-        wpilib.SmartDashboard.putNumber("Current Channel 7", current7)
+        current7 = self.pdp.get_current(7)
+        telemetry.log("Current Channel 7", current7)
 
         # Get the voltage going into the PDP, in Volts.
         # The PDP returns the voltage in increments of 0.05 Volts.
-        voltage = self.pdp.getVoltage()
-        wpilib.SmartDashboard.putNumber("Voltage", voltage)
+        voltage = self.pdp.get_voltage()
+        telemetry.log("Voltage", voltage)
 
         # Retrieves the temperature of the PDP, in degrees Celsius.
-        temperatureCelsius = self.pdp.getTemperature()
-        wpilib.SmartDashboard.putNumber("Temperature", temperatureCelsius)
+        temperature_celsius = self.pdp.get_temperature()
+        telemetry.log("Temperature", temperature_celsius)
 
         # Get the total current of all channels.
-        totalCurrent = self.pdp.getTotalCurrent()
-        wpilib.SmartDashboard.putNumber("Total Current", totalCurrent)
+        total_current = self.pdp.get_total_current()
+        telemetry.log("Total Current", total_current)
 
         # Get the total power of all channels.
         # Power is the bus voltage multiplied by the current with the units Watts.
-        totalPower = self.pdp.getTotalPower()
-        wpilib.SmartDashboard.putNumber("Total Power", totalPower)
+        total_power = self.pdp.get_total_power()
+        telemetry.log("Total Power", total_power)
 
         # Get the total energy of all channels.
         # Energy is the power summed over time with units Joules.
-        totalEnergy = self.pdp.getTotalEnergy()
-        wpilib.SmartDashboard.putNumber("Total Energy", totalEnergy)
+        total_energy = self.pdp.get_total_energy()
+        telemetry.log("Total Energy", total_energy)

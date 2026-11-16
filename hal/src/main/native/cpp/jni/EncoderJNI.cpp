@@ -121,35 +121,6 @@ Java_org_wpilib_hardware_hal_EncoderJNI_resetEncoder
 
 /*
  * Class:     org_wpilib_hardware_hal_EncoderJNI
- * Method:    getEncoderPeriod
- * Signature: (I)D
- */
-JNIEXPORT jdouble JNICALL
-Java_org_wpilib_hardware_hal_EncoderJNI_getEncoderPeriod
-  (JNIEnv* env, jclass, jint id)
-{
-  int32_t status = 0;
-  double returnValue = HAL_GetEncoderPeriod((HAL_EncoderHandle)id, &status);
-  CheckStatus(env, status);
-  return returnValue;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_EncoderJNI
- * Method:    setEncoderMaxPeriod
- * Signature: (ID)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_EncoderJNI_setEncoderMaxPeriod
-  (JNIEnv* env, jclass, jint id, jdouble value)
-{
-  int32_t status = 0;
-  HAL_SetEncoderMaxPeriod((HAL_EncoderHandle)id, value, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_EncoderJNI
  * Method:    getEncoderStopped
  * Signature: (I)Z
  */
@@ -211,15 +182,15 @@ Java_org_wpilib_hardware_hal_EncoderJNI_getEncoderRate
 
 /*
  * Class:     org_wpilib_hardware_hal_EncoderJNI
- * Method:    setEncoderMinRate
- * Signature: (ID)V
+ * Method:    setEncoderRateWindow
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_EncoderJNI_setEncoderMinRate
-  (JNIEnv* env, jclass, jint id, jdouble value)
+Java_org_wpilib_hardware_hal_EncoderJNI_setEncoderRateWindow
+  (JNIEnv* env, jclass, jint id, jint windowMilliseconds)
 {
   int32_t status = 0;
-  HAL_SetEncoderMinRate((HAL_EncoderHandle)id, value, &status);
+  HAL_SetEncoderRateWindow((HAL_EncoderHandle)id, windowMilliseconds, &status);
   CheckStatus(env, status);
 }
 
@@ -249,36 +220,6 @@ Java_org_wpilib_hardware_hal_EncoderJNI_setEncoderReverseDirection
   int32_t status = 0;
   HAL_SetEncoderReverseDirection((HAL_EncoderHandle)id, value, &status);
   CheckStatus(env, status);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_EncoderJNI
- * Method:    setEncoderSamplesToAverage
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_EncoderJNI_setEncoderSamplesToAverage
-  (JNIEnv* env, jclass, jint id, jint value)
-{
-  int32_t status = 0;
-  HAL_SetEncoderSamplesToAverage((HAL_EncoderHandle)id, value, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_EncoderJNI
- * Method:    getEncoderSamplesToAverage
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL
-Java_org_wpilib_hardware_hal_EncoderJNI_getEncoderSamplesToAverage
-  (JNIEnv* env, jclass, jint id)
-{
-  int32_t status = 0;
-  jint returnValue =
-      HAL_GetEncoderSamplesToAverage((HAL_EncoderHandle)id, &status);
-  CheckStatus(env, status);
-  return returnValue;
 }
 
 /*

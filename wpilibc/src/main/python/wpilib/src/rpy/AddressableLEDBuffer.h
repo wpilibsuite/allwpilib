@@ -7,6 +7,7 @@
 #include <span>
 #include <stdexcept>
 #include <vector>
+
 #include "pybind11/pytypes.h"
 #include "wpi/hardware/led/AddressableLED.hpp"
 #include "wpi/util/Color.hpp"
@@ -151,8 +152,9 @@ class AddressableLEDBuffer {
   auto end() { return m_buffer.end(); }
 
   /**
-   * A view of another addressable LED buffer. Views provide an easy way to split a large LED
-   * strip into smaller sections that can be animated individually.
+   * A view of another addressable LED buffer. Views provide an easy way to
+   * split a large LED strip into smaller sections that can be animated
+   * individually.
    */
   class View {
    public:
@@ -251,9 +253,7 @@ class AddressableLEDBuffer {
     /**
      * Implicit conversion to span of LED data
      */
-    operator std::span<wpi::AddressableLED::LEDData>() {
-      return m_data;
-    }
+    operator std::span<wpi::AddressableLED::LEDData>() { return m_data; }
 
     /**
      * Implicit conversion to span of const LED data
@@ -272,7 +272,8 @@ class AddressableLEDBuffer {
   /**
    * Creates a read/write view of this buffer.
    *
-   * @param slice the desired slice of the buffer (e.g. 2:4), step must be unspecified or 1
+   * @param slice the desired slice of the buffer (e.g. 2:4), step must be
+   * unspecified or 1
    * @return View object representing the view
    * @throws std::out_of_range if the view would exceed buffer bounds
    */
@@ -282,4 +283,4 @@ class AddressableLEDBuffer {
   std::vector<wpi::AddressableLED::LEDData> m_buffer;
 };
 
-}  // namespace frc
+}  // namespace wpi

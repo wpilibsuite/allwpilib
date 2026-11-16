@@ -1,7 +1,6 @@
 project(apriltag)
 
 include(CompileWarnings)
-include(GenResources)
 
 file(
     GLOB_RECURSE apriltaglib_src
@@ -31,17 +30,9 @@ else()
     )
 endif()
 
-generate_resources(
-    src/main/native/resources/org/wpilib/vision/apriltag
-    generated/main/cpp
-    APRILTAG
-    wpi::apriltag
-    apriltag_resources_src
-)
-
 file(GLOB apriltag_native_src src/main/native/cpp/*.cpp)
 
-add_library(apriltag ${apriltag_native_src} ${apriltag_resources_src} ${apriltaglib_src})
+add_library(apriltag ${apriltag_native_src} ${apriltaglib_src})
 set_target_properties(apriltag PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET apriltag PROPERTY FOLDER "libraries")
@@ -76,8 +67,8 @@ configure_file(apriltag-config.cmake.in ${WPILIB_BINARY_DIR}/apriltag-config.cma
 install(FILES ${WPILIB_BINARY_DIR}/apriltag-config.cmake DESTINATION share/apriltag)
 install(EXPORT apriltag DESTINATION share/apriltag)
 
-if(WITH_TESTS)
+if(WPILIB_WITH_TESTS)
     wpilib_add_test(apriltag src/test/native/cpp)
     target_include_directories(apriltag_test PRIVATE src/test/native/include)
-    target_link_libraries(apriltag_test apriltag googletest)
+    target_link_libraries(apriltag_test apriltag)
 endif()

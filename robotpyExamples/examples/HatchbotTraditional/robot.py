@@ -5,7 +5,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import typing
+from typing import override
 
 import commands2
 import wpilib
@@ -16,10 +16,10 @@ from robotcontainer import RobotContainer
 class MyRobot(commands2.TimedCommandRobot):
     """
     Command v2 robots are encouraged to inherit from TimedCommandRobot, which
-    has an implementation of robotPeriodic which runs the scheduler for you
+    has an implementation of robot_periodic which runs the scheduler for you
     """
 
-    autonomousCommand: typing.Optional[commands2.Command] = None
+    autonomous_command: commands2.Command | None = None
 
     def __init__(self) -> None:
         """
@@ -37,35 +37,47 @@ class MyRobot(commands2.TimedCommandRobot):
 
         # Record DS control and joystick data.
         # Change to `false` to not record joystick data.
-        wpilib.DriverStation.startDataLog(wpilib.DataLogManager.getLog(), True)
+        wpilib.DriverStation.start_data_log(wpilib.DataLogManager.get_log(), True)
 
-    def disabledInit(self) -> None:
+    @override
+    def robot_periodic(self) -> None:
+        super().robot_periodic()
+        self.container.update_telemetry()
+
+    @override
+    def disabled_init(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
 
-    def disabledPeriodic(self) -> None:
+    @override
+    def disabled_periodic(self) -> None:
         """This function is called periodically when disabled"""
 
-    def autonomousInit(self) -> None:
+    @override
+    def autonomous_init(self) -> None:
         """This autonomous runs the autonomous command selected by your RobotContainer class."""
-        self.autonomousCommand = self.container.getAutonomousCommand()
+        self.autonomous_command = self.container.get_autonomous_command()
 
-        if self.autonomousCommand:
-            self.autonomousCommand.schedule()
+        if self.autonomous_command:
+            self.autonomous_command.schedule()
 
-    def autonomousPeriodic(self) -> None:
+    @override
+    def autonomous_periodic(self) -> None:
         """This function is called periodically during autonomous"""
 
-    def teleopInit(self) -> None:
+    @override
+    def teleop_init(self) -> None:
         # This makes sure that the autonomous stops running when
         # teleop starts running. If you want the autonomous to
         # continue until interrupted by another command, remove
         # this line or comment it out.
-        if self.autonomousCommand:
-            self.autonomousCommand.cancel()
+        if self.autonomous_command:
+            self.autonomous_command.cancel()
 
-    def teleopPeriodic(self) -> None:
+    @override
+    def teleop_periodic(self) -> None:
         """This function is called periodically during operator control"""
 
-    def utilityInit(self) -> None:
+    @override
+    def utility_init(self) -> None:
         # Cancels all running commands at the start of utility mode
-        commands2.CommandScheduler.getInstance().cancelAll()
+        commands2.CommandScheduler.get_instance().cancel_all()

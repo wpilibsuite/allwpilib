@@ -105,11 +105,6 @@ public class XRPMotor implements MotorController {
     return m_simInverted != null && m_simInverted.get();
   }
 
-  @Override
-  public void disable() {
-    setThrottle(0.0);
-  }
-
   /**
    * Make the given XRP motor follow the output of this one.
    *

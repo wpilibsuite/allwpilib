@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 
 import constants
@@ -16,25 +18,29 @@ class MyRobot(wpilib.TimedRobot):
 
     def __init__(self) -> None:
         super().__init__()
-        self.joystick = wpilib.Joystick(constants.kJoystickPort)
+        self.joystick = wpilib.Joystick(constants.JOYSTICK_PORT)
         self.elevator = Elevator()
 
-    def robotPeriodic(self) -> None:
+    @override
+    def robot_periodic(self) -> None:
         # Update the telemetry, including mechanism visualization, regardless of mode.
-        self.elevator.updateTelemetry()
+        self.elevator.update_telemetry()
 
-    def simulationPeriodic(self) -> None:
+    @override
+    def simulation_periodic(self) -> None:
         # Update the simulation model.
-        self.elevator.simulationPeriodic()
+        self.elevator.simulation_periodic()
 
-    def teleopPeriodic(self) -> None:
-        if self.joystick.getTrigger():
+    @override
+    def teleop_periodic(self) -> None:
+        if self.joystick.get_trigger():
             # Here, we set the constant setpoint of 0.75 meters.
-            self.elevator.reachGoal(constants.kSetpoint)
+            self.elevator.reach_goal(constants.SETPOINT)
         else:
             # Otherwise, we update the setpoint to 0.
-            self.elevator.reachGoal(0.0)
+            self.elevator.reach_goal(0.0)
 
-    def disabledInit(self) -> None:
+    @override
+    def disabled_init(self) -> None:
         # This just makes sure that our simulation code knows that the motor's off.
         self.elevator.stop()
