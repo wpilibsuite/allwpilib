@@ -31,7 +31,14 @@ class Robot : public wpi::TimedRobot {
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    auto next = profile.Calculate(DT, goal, setpoint);
+    auto sample =
+        wpi::math::ExponentialProfile<wpi::units::meters,
+                                      wpi::units::volts>::Generate(constraints,
+                                                                   setpoint,
+                                                                   goal)
+            .SampleAt(DT);
+    wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
+        next{sample.position, sample.velocity};
 
     // Send setpoint to offboard controller PID
     motor.SetSetpoint(
@@ -49,10 +56,12 @@ class Robot : public wpi::TimedRobot {
       // Note: These gains are fake, and will have to be tuned for your robot.
       1_V, 1_V / 1_mps, 1_V / 1_mps_sq};
 
-  // Create a motion profile with the given maximum velocity and maximum
-  // acceleration constraints for the next setpoint.
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts> profile{
-      {10_V, 1_V / 1_mps, 1_V / 1_mps_sq}};
+  // Create motion profile constraints with the given maximum voltage and
+  // characteristics kV, kA. These gains should match your feedforward kV, kA
+  // for best results.
+  wpi::math::ExponentialProfile<wpi::units::meters,
+                                wpi::units::volts>::Constraints constraints{
+      10_V, 1_V / 1_mps, 1_V / 1_mps_sq};
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
       goal;
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
