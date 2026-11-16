@@ -114,6 +114,20 @@ def validate_tags(entry: dict, index: int, enforce_allowlist: bool) -> None:
             raise ValueError(f"Entry {index}: unknown tags: {invalid}")
 
 
+def unittests_error(entry: dict, index: int) -> str | None:
+    has_tag = "UnitTests" in entry["tags"]
+    has_flag = entry.get("hasunittests")
+    if has_flag is not None and not isinstance(has_flag, bool):
+        raise TypeError(f"Entry {index}: 'hasunittests' is not bool")
+    has_tests = has_flag is True
+    folder = entry.get("foldername", "<unknown>")
+    if has_tag and not has_tests:
+        return f"Entry {index} ({folder}): 'UnitTests' tag requires hasunittests: true"
+    if has_tests and not has_tag:
+        return f"Entry {index} ({folder}): hasunittests is true without 'UnitTests' tag"
+    return None
+
+
 def file_check(parsed_json: list[dict], folder: Path) -> None:
     folder_names: set[str] = {entry["foldername"] for entry in parsed_json}
     folders = {
@@ -136,6 +150,7 @@ def file_check(parsed_json: list[dict], folder: Path) -> None:
 
 
 def validate_entries(parsed_json: list[dict], kind: str, is_cpp_commands: bool) -> None:
+    unittests_errors: list[str] = []
     for idx, entry in enumerate(parsed_json):
         if not isinstance(entry, dict):
             raise TypeError(f"Entry {idx}: expected object, got {type(entry).__name__}")
@@ -146,12 +161,18 @@ def validate_entries(parsed_json: list[dict], kind: str, is_cpp_commands: bool) 
         match kind:
             case "templates" | "examples":
                 validate_tags(entry, idx, enforce_allowlist=True)
+                error = unittests_error(entry, idx)
+                if error:
+                    unittests_errors.append(error)
                 require_key(entry, "gradlebase", idx, str)
                 require_key(entry, "commandversion", idx, int)
                 if entry["gradlebase"] == "java":
                     require_key(entry, "robotclass", idx, str)
             case "snippets":
                 validate_tags(entry, idx, enforce_allowlist=True)
+                error = unittests_error(entry, idx)
+                if error:
+                    unittests_errors.append(error)
                 require_key(entry, "gradlebase", idx, str)
                 if entry["gradlebase"] == "java":
                     require_key(entry, "robotclass", idx, str)
@@ -171,6 +192,9 @@ def validate_entries(parsed_json: list[dict], kind: str, is_cpp_commands: bool) 
                     f"Unknown EXAMPLECHECK_KIND '{kind}'. "
                     "Expected one of: templates, examples, snippets, commands."
                 )
+
+    if unittests_errors:
+        raise ValueError("\n".join(unittests_errors))
 
 
 def main(args: list[str]) -> None:
