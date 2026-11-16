@@ -29,7 +29,6 @@ class PyMotorControllerGroup : public MotorController,
   double GetThrottle() const override;
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
-  void Disable() override;
 
   void LogTo(wpi::telemetry::TelemetryTable& table) const override;
   std::string_view GetTelemetryType() const override;

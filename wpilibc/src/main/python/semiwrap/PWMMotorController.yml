@@ -8,7 +8,6 @@ classes:
       GetVoltage:
       SetInverted:
       GetInverted:
-      Disable:
       StopMotor:
       GetDescription:
       GetChannel:

@@ -55,7 +55,7 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 - Raspberry Pi toolchain (optional)
     - Run `./gradlew installArm64Toolchain` after cloning this repository
 - Systemcore toolchain (required for Systemcore development)
-    - Run `./gradlew installSystemCoreToolchain` after cloning this repository
+    - Run `./gradlew installSystemcoreToolchain` after cloning this repository
     - If the WPILib installer was used, this toolchain is already installed
 
 On linux, run `sudo apt install libx11-dev libgl-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev` to be able to build things depending on glfw.

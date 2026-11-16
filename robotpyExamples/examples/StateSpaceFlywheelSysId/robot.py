@@ -42,7 +42,7 @@ class MyRobot(wpilib.TimedRobot):
         # Outputs (what we can measure): [velocity], in radians per second.
         #
         # The Kv and Ka constants are found using the SysID tool.
-        self.flywheel_plant = wpimath.Models.flywheel_from_sys_id(
+        self.flywheel_plant = wpimath.Models.angular_velocity_from_sys_id(
             FLYWHEEL_KV, FLYWHEEL_KA
         )
 

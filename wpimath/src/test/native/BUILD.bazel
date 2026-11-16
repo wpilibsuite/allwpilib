@@ -23,7 +23,7 @@ cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "native",
-    actual = ":wpimath_tests",
+    tests = [":wpimath_tests"],
 )

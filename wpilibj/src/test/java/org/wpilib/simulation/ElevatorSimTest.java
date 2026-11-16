@@ -106,7 +106,8 @@ class ElevatorSimTest {
     }
 
     var system =
-        Models.elevatorFromPhysicalConstants(DCMotor.getVex775Pro(4), 4, inchesToMeters(0.5), 100);
+        Models.linearPositionFromPhysicalConstants(
+            DCMotor.getVex775Pro(4), 4, inchesToMeters(0.5), 100);
     assertEquals(
         system.calculateX(VecBuilder.fill(0, 0), VecBuilder.fill(12), 0.02 * 50.0).get(0, 0),
         sim.getPosition(),

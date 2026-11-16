@@ -27,7 +27,7 @@ class LinearQuadraticRegulatorTest {
     var r = 0.0181864;
     var G = 1.0;
 
-    var plant = Models.elevatorFromPhysicalConstants(motors, m, r, G);
+    var plant = Models.linearPositionFromPhysicalConstants(motors, m, r, G);
 
     var qElms = VecBuilder.fill(0.02, 0.4);
     var rElms = VecBuilder.fill(12.0);
@@ -44,7 +44,7 @@ class LinearQuadraticRegulatorTest {
     var dt = 0.020;
 
     var plant =
-        Models.elevatorFromPhysicalConstants(
+        Models.linearPositionFromPhysicalConstants(
             DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
 
     var K =
@@ -63,7 +63,7 @@ class LinearQuadraticRegulatorTest {
     var r = 0.4;
     var G = 100.0;
 
-    var plant = Models.singleJointedArmFromPhysicalConstants(motors, 1d / 3d * m * r * r, G);
+    var plant = Models.angularPositionFromPhysicalConstants(motors, 1d / 3d * m * r * r, G);
 
     var qElms = VecBuilder.fill(0.01745, 0.08726);
     var rElms = VecBuilder.fill(12.0);
@@ -163,7 +163,7 @@ class LinearQuadraticRegulatorTest {
     var dt = 0.02;
 
     var plant =
-        Models.elevatorFromPhysicalConstants(
+        Models.linearPositionFromPhysicalConstants(
             DCMotor.getVex775Pro(4), 8.0, 0.75 * 25.4 / 1000.0, 14.67);
 
     var regulator =
@@ -183,7 +183,7 @@ class LinearQuadraticRegulatorTest {
     var r = 0.0181864;
     var G = 1.0;
 
-    var plant = Models.elevatorFromPhysicalConstants(motors, m, r, G);
+    var plant = Models.linearPositionFromPhysicalConstants(motors, m, r, G);
 
     var qElms = VecBuilder.fill(0.02, 0.4);
     var rElms = VecBuilder.fill(12.0);

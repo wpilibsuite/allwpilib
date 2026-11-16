@@ -87,36 +87,6 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
 void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
 }
 
-HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return HAL_INVALID_HANDLE;
-}
-
-void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator) {}
-
-void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
-                                double dutyCycle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-void HAL_SetDigitalPWMPPS(HAL_DigitalPWMHandle pwmGenerator, double dutyCycle,
-                          int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
-                                    int32_t channel, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
 void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
                 int32_t* status) {
   auto port = smartIoHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
@@ -167,28 +137,6 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
       *status = HAL_INCOMPATIBLE_STATE;
       return false;
   }
-}
-
-void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
-               int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-void HAL_PulseMultiple(uint32_t channelMask, double pulseLength,
-                       int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
-
-HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return false;
-}
-
-HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return false;
 }
 
 }  // extern "C"

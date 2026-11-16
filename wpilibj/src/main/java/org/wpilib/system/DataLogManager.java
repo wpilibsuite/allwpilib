@@ -50,7 +50,7 @@ import org.wpilib.util.concurrent.Event;
  * until there is 200 MB free OR there are 10 files remaining, including match logs. Competition
  * match logs and their rotated segments are not deleted. An alert is active while less than 400 MB
  * is available, checked every 5 seconds. An informational alert indicates when automatic directory
- * selection falls back to SystemCore internal storage.
+ * selection falls back to Systemcore internal storage.
  *
  * <p>By default, all NetworkTables value changes are stored to the data log.
  */
@@ -438,7 +438,7 @@ public final class DataLogManager {
             new Alert(
                 "DataLogManager",
                 "internalStorage",
-                "DataLogManager: Logging to SystemCore internal storage. Attach a USB "
+                "DataLogManager: Logging to Systemcore internal storage. Attach a USB "
                     + "drive to store logs externally.",
                 Alert.Level.LOW);
         var freeSpaceAlert = new Alert("DataLogManager", "lowSpace", "", Alert.Level.MEDIUM)) {

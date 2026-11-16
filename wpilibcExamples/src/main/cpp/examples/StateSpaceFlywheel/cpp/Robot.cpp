@@ -40,7 +40,7 @@ class Robot : public wpi::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [velocity], in radians per second.
   wpi::math::LinearSystem<1, 1, 1> flywheelPlant =
-      wpi::math::Models::FlywheelFromPhysicalConstants(
+      wpi::math::Models::AngularVelocityFromPhysicalConstants(
           wpi::math::DCMotor::NEO(2), FLYWHEEL_MOMENT_OF_INERTIA,
           FLYWHEEL_GEARING);
 

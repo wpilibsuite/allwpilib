@@ -31,9 +31,6 @@ int32_t HAL_GetNumDigitalChannels(void) {
 int32_t HAL_GetNumPWMChannels(void) {
   return NUM_PWM_CHANNELS;
 }
-int32_t HAL_GetNumDigitalPWMOutputs(void) {
-  return NUM_DIGITAL_PWM_OUTPUTS;
-}
 int32_t HAL_GetNumEncoders(void) {
   return NUM_ENCODERS;
 }

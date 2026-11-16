@@ -35,6 +35,5 @@ classes:
       GetThrottle:
       SetInverted:
       GetInverted:
-      Disable:
       LogTo:
       GetTelemetryType:

@@ -10,7 +10,7 @@ cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "native",
-    actual = ":halsim_ds_socket_tests",
+    tests = [":halsim_ds_socket_tests"],
 )

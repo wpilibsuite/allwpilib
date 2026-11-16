@@ -8,7 +8,6 @@
 #include "wpi/hal/simulation/CTREPCMData.h"
 #include "wpi/hal/simulation/CanData.h"
 #include "wpi/hal/simulation/DIOData.h"
-#include "wpi/hal/simulation/DigitalPWMData.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/DutyCycleData.h"
 #include "wpi/hal/simulation/EncoderData.h"
@@ -33,10 +32,6 @@ extern "C" void HALSIM_ResetAllSimData(void) {
 
   for (int32_t i = 0; i < wpi::hal::NUM_CTREPCM_MODULES; i++) {
     HALSIM_ResetCTREPCMData(i);
-  }
-
-  for (int32_t i = 0; i < wpi::hal::NUM_DIGITAL_PWM_OUTPUTS; i++) {
-    HALSIM_ResetDigitalPWMData(i);
   }
 
   for (int32_t i = 0; i < wpi::hal::NUM_DIGITAL_CHANNELS; i++) {

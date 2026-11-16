@@ -46,7 +46,7 @@ class Robot : public wpi::TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   wpi::math::LinearSystem<2, 1, 1> armPlant =
-      wpi::math::Models::SingleJointedArmFromPhysicalConstants(
+      wpi::math::Models::AngularPositionFromPhysicalConstants(
           wpi::math::DCMotor::NEO(2), ARM_MOI, ARM_GEARING)
           .Slice(0);
 

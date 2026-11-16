@@ -23,7 +23,7 @@
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/MulticastResolverClient.hpp"
 #include "wpi/net/ParallelTcpConnector.hpp"
-#include "wpi/net/SystemCoreResolverClient.hpp"
+#include "wpi/net/SystemcoreResolverClient.hpp"
 #include "wpi/net/WebSocket.hpp"
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Timer.hpp"
@@ -68,8 +68,8 @@ class NetworkClientBase : public INetworkClient {
   virtual void DoDisconnect(std::string_view reason);
   void ProcessResolverData(const ServerResolver& resolver,
                            wpi::net::MulticastResolverClient::ServiceData data);
-  void ProcessSystemCoreData(
-      wpi::net::SystemCoreResolverClient::ServerData data);
+  void ProcessSystemcoreData(
+      wpi::net::SystemcoreResolverClient::ServerData data);
   bool AddResolvedServer(std::pair<std::string, unsigned int> server);
   void StartResolvers();
   void StopResolvers();
@@ -96,7 +96,7 @@ class NetworkClientBase : public INetworkClient {
   std::optional<ServerResolver> m_serverResolver;
   std::vector<std::pair<std::string, unsigned int>> m_resolvedServers;
   std::shared_ptr<wpi::net::MulticastResolverClient> m_mdnsResolver;
-  std::shared_ptr<wpi::net::SystemCoreResolverClient> m_systemCoreResolver;
+  std::shared_ptr<wpi::net::SystemcoreResolverClient> m_systemCoreResolver;
 
   std::pair<std::string, unsigned int> m_dsClientServer{"", 0};
   std::shared_ptr<wpi::net::DsClient> m_dsClient;

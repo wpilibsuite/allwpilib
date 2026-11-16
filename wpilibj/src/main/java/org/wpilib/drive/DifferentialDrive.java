@@ -336,7 +336,7 @@ public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggab
   }
 
   @Override
-  public void stopMotor() {
+  protected void stopMotor() {
     m_leftOutput = 0.0;
     m_rightOutput = 0.0;
 
@@ -347,7 +347,7 @@ public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggab
   }
 
   @Override
-  public String getDescription() {
+  protected String getDescription() {
     return "DifferentialDrive";
   }
 

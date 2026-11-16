@@ -39,7 +39,7 @@ class Robot : public wpi::TimedRobot {
   //
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
   wpi::math::LinearSystem<1, 1, 1> flywheelPlant =
-      wpi::math::Models::FlywheelFromSysId(FLYWHEEL_KV, FLYWHEEL_KA);
+      wpi::math::Models::AngularVelocityFromSysId(FLYWHEEL_KV, FLYWHEEL_KA);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   wpi::math::KalmanFilter<1, 1, 1> observer{

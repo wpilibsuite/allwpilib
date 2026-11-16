@@ -731,7 +731,7 @@ static void AddTeamServer(
       port);
 }
 
-static INetworkClient::ServerResolver MakeSystemCoreResolver(
+static INetworkClient::ServerResolver MakeSystemcoreResolver(
     unsigned int port) {
   INetworkClient::ServerResolver resolver;
   resolver.kind = INetworkClient::ServerResolver::Kind::SYSTEMCORE;
@@ -739,9 +739,9 @@ static INetworkClient::ServerResolver MakeSystemCoreResolver(
   return resolver;
 }
 
-static INetworkClient::ServerResolver MakeSystemCoreResolver(
+static INetworkClient::ServerResolver MakeSystemcoreResolver(
     std::string_view team, unsigned int port) {
-  auto resolver = MakeSystemCoreResolver(port);
+  auto resolver = MakeSystemcoreResolver(port);
   resolver.team = std::string{wpi::util::trim(team)};
   return resolver;
 }
@@ -758,7 +758,7 @@ void SetServerTeam(NT_Inst inst, std::string_view team, unsigned int port) {
     AddWifiServer(servers, port);
 
     INetworkClient::ServerResolver resolver =
-        MakeSystemCoreResolver(team, port);
+        MakeSystemcoreResolver(team, port);
 
     ii->SetServers(servers, resolver);
   }
@@ -778,7 +778,7 @@ void SetServerFixed(NT_Inst inst, std::string_view team, unsigned int port) {
     // robot.local
     servers.emplace_back("robot.local", port);
 
-    INetworkClient::ServerResolver resolver = MakeSystemCoreResolver(port);
+    INetworkClient::ServerResolver resolver = MakeSystemcoreResolver(port);
 
     ii->SetServers(servers, resolver);
   }

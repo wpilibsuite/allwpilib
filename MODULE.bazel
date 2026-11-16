@@ -5,7 +5,7 @@ module(
 
 include("//docs:doxygen.MODULE.bazel")
 include("//shared/bazel/thirdparty/ceres:ceres.MODULE.bazel")
-include("//shared/bazel/thirdparty/imgui_test_engine:imgui_test_engine.MODULE.bazel")
+include("//thirdparty/imgui_suite/imgui_test_engine:imgui_test_engine.MODULE.bazel")
 include("//shared/bazel/thirdparty/libssh:libssh.MODULE.bazel")
 include("//shared/bazel/thirdparty/libsdlgpu:libsdlgpu.MODULE.bazel")
 include("//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel")
@@ -26,6 +26,17 @@ bazel_dep(name = "platforms", version = "1.1.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
 bazel_dep(name = "rules_java", version = "9.9.0")
 bazel_dep(name = "rules_python", version = "2.4.6")
+
+# rules_python 2.x symlinks each py_binary's venv into place when it runs, which
+# fails on Windows without Developer Mode or admin rights:
+# https://github.com/bazel-contrib/rules_python/issues/3792
+single_version_override(
+    module_name = "rules_python",
+    patch_strip = 1,
+    patches = ["shared/bazel/patches/rules_python/0001-Fall-back-when-Windows-denies-symlinks.patch"],
+    version = "2.4.6",
+)
+
 bazel_dep(name = "rules_pycross", version = "2.0.0")
 bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 single_version_override(
@@ -64,7 +75,7 @@ pip.parse(
 )
 use_repo(pip, "allwpilib_pip_deps")
 
-bazel_dep(name = "rules_jvm_external", version = "6.8")
+bazel_dep(name = "rules_jvm_external", version = "6.10")
 
 register_toolchains("//:java_toolchain_definition")
 
@@ -121,10 +132,17 @@ bazel_dep(name = "rules_license", version = "1.0.0")
 http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 http_file(
-    name = "quickbuffer_protoc_linux",
+    name = "quickbuffer_protoc_linux_x86-64",
     executable = True,
     sha256 = "641f66130f048571ae44b7afb7756a46a69fa6d5c64c26bc39ce0cb385c2e8f8",
     urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.4/protoc-gen-quickbuf-1.4-linux-x86_64.exe"],
+)
+
+http_file(
+    name = "quickbuffer_protoc_linux_aarch64",
+    executable = True,
+    sha256 = "77dfb9a0e2b0350a5dd0059f0506712de1931e4ee52ccb3ad4b0524507e7b7cc",
+    urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.4/protoc-gen-quickbuf-1.4-linux-aarch_64.exe"],
 )
 
 http_file(
@@ -158,11 +176,20 @@ archive_override(
 bazel_dep(name = "bzlmodrio-opencv", version = "")
 archive_override(
     module_name = "bzlmodrio-opencv",
-    integrity = "sha256-WPeLraGmt9Fv8tYXvyzxDAGTZ1BW5qb6g95bXIk6otw=",
-    urls = ["https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-3.bcr1/bzlmodRio-opencv-2027.4.13.0-3.bcr1.tar.gz"],
+    integrity = "sha256-BG0kkai/sJuLFJ4wDWdz/IxKTpeR5DM0WcYlUvOJSk8=",
+    urls = ["https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-4/bzlmodRio-opencv-2027.4.13.0-4.tar.gz"],
 )
 
-bazel_dep(name = "protobuf", version = "34.0.bcr.1")
+bazel_dep(name = "protobuf", version = "35.1")
+
+# protobuf's crate extension has no lockfile, which rules_rust 0.71 (from AOS)
+# rejects in a non-root module. Fixed in protobuf 37.
+single_version_override(
+    module_name = "protobuf",
+    patch_strip = 1,
+    patches = ["shared/bazel/patches/protobuf/0001-Make-the-crate-extension-a-dev-dependency.patch"],
+    version = "35.1",
+)
 
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
@@ -172,13 +199,7 @@ http_jar(
     urls = ["https://github.com/google/copybara/releases/download/v20251027/copybara_deploy.jar"],
 )
 
-bazel_dep(name = "aos")
-archive_override(
-    module_name = "aos",
-    integrity = "sha256-xc4s+K3WMYXWsQM4A5UdxiQ1yBBwA8gdws1pVWLW7yg=",
-    strip_prefix = "aos-86726cddc274d56d3d1d1dc33527a552f16f3897",
-    urls = ["https://github.com/AustinSchuh/aos/archive/86726cddc274d56d3d1d1dc33527a552f16f3897.tar.gz"],
-)
+bazel_dep(name = "aos", version = "1.0.0")
 
 # The flatbuffers AOS is built against, which aosnt reads reflection schemas
 # with. AOS patches it, so it is not the registry's flatbuffers.

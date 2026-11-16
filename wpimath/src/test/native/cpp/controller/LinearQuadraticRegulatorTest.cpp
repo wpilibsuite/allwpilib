@@ -30,7 +30,8 @@ TEST_CASE("LinearQuadraticRegulatorTest ElevatorGains", "[wpimath]") {
     // Gear ratio
     constexpr double G = 40.0 / 40.0;
 
-    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+    return wpi::math::Models::LinearPositionFromPhysicalConstants(motors, m, r,
+                                                                  G)
         .Slice(0);
   }();
   Matrixd<1, 2> K =
@@ -53,7 +54,7 @@ TEST_CASE("LinearQuadraticRegulatorTest ArmGains", "[wpimath]") {
     // Gear ratio
     constexpr double G = 100.0;
 
-    return wpi::math::Models::SingleJointedArmFromPhysicalConstants(
+    return wpi::math::Models::AngularPositionFromPhysicalConstants(
                motors, 1.0 / 3.0 * m * r * r, G)
         .Slice(0);
   }();
@@ -79,7 +80,8 @@ TEST_CASE("LinearQuadraticRegulatorTest FourMotorElevator", "[wpimath]") {
     // Gear ratio
     constexpr double G = 14.67;
 
-    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+    return wpi::math::Models::LinearPositionFromPhysicalConstants(motors, m, r,
+                                                                  G)
         .Slice(0);
   }();
   Matrixd<1, 2> K =
@@ -186,7 +188,8 @@ TEST_CASE("LinearQuadraticRegulatorTest LatencyCompensate", "[wpimath]") {
     // Gear ratio
     constexpr double G = 14.67;
 
-    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+    return wpi::math::Models::LinearPositionFromPhysicalConstants(motors, m, r,
+                                                                  G)
         .Slice(0);
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.1, 0.2}, {12.0}, 20_ms};
@@ -210,7 +213,8 @@ TEST_CASE("LinearQuadraticRegulatorTest AtReference", "[wpimath]") {
     // Gear ratio
     constexpr double G = 40.0 / 40.0;
 
-    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+    return wpi::math::Models::LinearPositionFromPhysicalConstants(motors, m, r,
+                                                                  G)
         .Slice(0);
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, 5_ms};

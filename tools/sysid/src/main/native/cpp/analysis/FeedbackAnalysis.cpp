@@ -44,7 +44,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
     return {Kv * controller.K(0, 0) * preset.outputConversionFactor, 0.0};
   }
 
-  auto system = wpi::math::Models::ElevatorFromSysId(Kv_t{Kv}, Ka_t{Ka});
+  auto system = wpi::math::Models::LinearPositionFromSysId(Kv_t{Kv}, Ka_t{Ka});
 
   wpi::math::LinearQuadraticRegulator<2, 1> controller{
       system, {params.qp, params.qv}, {params.r}, preset.period};
@@ -74,7 +74,7 @@ FeedbackGains sysid::CalculateVelocityFeedbackGains(
     return {0.0, 0.0};
   }
 
-  auto system = wpi::math::Models::FlywheelFromSysId(Kv_t{Kv}, Ka_t{Ka});
+  auto system = wpi::math::Models::AngularVelocityFromSysId(Kv_t{Kv}, Ka_t{Ka});
   wpi::math::LinearQuadraticRegulator<1, 1> controller{
       system, {params.qv}, {params.r}, preset.period};
   controller.LatencyCompensate(system, preset.period, preset.measurementDelay);

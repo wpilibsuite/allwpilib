@@ -29,7 +29,9 @@ namespace wpi {
  *
  * - DisabledPeriodic() called periodically as long as DS is disabled. Note
  *   this is not called on a set time interval (it does not use the same time
- *   interval as Periodic())
+ *   interval as Periodic()). If the opmode is selected while the DS is already
+ *   enabled, DisabledPeriodic() is called exactly once, immediately after
+ *   construction and before Start()
  *
  * - When DS transitions from disabled to enabled, Start() is called once
  *

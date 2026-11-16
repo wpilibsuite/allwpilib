@@ -10,7 +10,7 @@ cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "native",
-    actual = ":cscore_tests",
+    tests = [":cscore_tests"],
 )

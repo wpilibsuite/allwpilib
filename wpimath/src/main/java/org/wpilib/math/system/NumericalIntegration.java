@@ -293,6 +293,26 @@ public final class NumericalIntegration {
   }
 
   /**
+   * Performs adaptive Dormand-Prince integration of dx/dt = f(t, y) for dt. By default, the max
+   * error is 1e-6.
+   *
+   * @param <Rows> Rows in y.
+   * @param <Cols> Columns in y.
+   * @param f The function to integrate. It must take two arguments t and y.
+   * @param t The initial value of t.
+   * @param y The initial value of y.
+   * @param dt The time over which to integrate in seconds.
+   * @return the integration of dx/dt = f(x, u) for dt.
+   */
+  public static <Rows extends Num, Cols extends Num> Matrix<Rows, Cols> rkdp(
+      BiFunction<Double, Matrix<Rows, Cols>, Matrix<Rows, Cols>> f,
+      double t,
+      Matrix<Rows, Cols> y,
+      double dt) {
+    return rkdp(f, t, y, dt, 1e-6);
+  }
+
+  /**
    * Performs adaptive Dormand-Prince integration of dx/dt = f(t, y) for dt.
    *
    * @param <Rows> Rows in y.
@@ -400,6 +420,7 @@ public final class NumericalIntegration {
       if (truncationError <= maxError) {
         // Accept the step
         y = newY;
+        t += h;
         dtElapsed += h;
       }
 

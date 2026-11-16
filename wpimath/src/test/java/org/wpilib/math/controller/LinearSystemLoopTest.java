@@ -28,7 +28,7 @@ class LinearSystemLoopTest {
   private static final Random random = new Random();
 
   LinearSystem<N2, N1, N2> m_plant =
-      Models.elevatorFromPhysicalConstants(DCMotor.getVex775Pro(2), 5, 0.0181864, 1.0);
+      Models.linearPositionFromPhysicalConstants(DCMotor.getVex775Pro(2), 5, 0.0181864, 1.0);
 
   @SuppressWarnings("unchecked")
   KalmanFilter<N2, N1, N1> m_observer =
@@ -95,7 +95,7 @@ class LinearSystemLoopTest {
   @Test
   void testFlywheelEnabled() {
     LinearSystem<N1, N1, N1> plant =
-        Models.flywheelFromPhysicalConstants(DCMotor.getNEO(2), 0.00289, 1.0);
+        Models.angularVelocityFromPhysicalConstants(DCMotor.getNEO(2), 0.00289, 1.0);
     KalmanFilter<N1, N1, N1> observer =
         new KalmanFilter<>(
             Nat.N1(), Nat.N1(), plant, VecBuilder.fill(1.0), VecBuilder.fill(POSITION_STDDEV), DT);

@@ -57,7 +57,7 @@ class MyRobot(wpilib.TimedRobot):
         # Outputs (what we can measure): [position], in meters.
 
         # This elevator is driven by two NEO motors.
-        self.elevator_plant = wpimath.Models.elevator_from_physical_constants(
+        self.elevator_plant = wpimath.Models.linear_position_from_physical_constants(
             wpimath.DCMotor.neo(2),
             CARRIAGE_MASS,
             DRUM_RADIUS,

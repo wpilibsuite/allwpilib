@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   private final LinearSystem<N2, N1, N2> armPlant =
-      Models.singleJointedArmFromPhysicalConstants(DCMotor.getNEO(2), ARM_MOI, ARM_GEARING);
+      Models.angularPositionFromPhysicalConstants(DCMotor.getNEO(2), ARM_MOI, ARM_GEARING);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")

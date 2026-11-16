@@ -62,6 +62,7 @@ scan_headers_ignore = [
     "wpi/math/estimator/KalmanFilterLatencyCompensator.hpp",
     "wpi/math/estimator/MerweScaledSigmaPoints.hpp",
     "wpi/math/estimator/MerweUKF.hpp",
+    "wpi/math/estimator/ParticleFilter.hpp",
     "wpi/math/estimator/S3SigmaPoints.hpp",
     "wpi/math/estimator/S3UKF.hpp",
     "wpi/math/estimator/SigmaPoints.hpp",
@@ -1490,6 +1491,7 @@ SimpleMotorFeedforward = "wpi/math/controller/SimpleMotorFeedforward.hpp"
 
 # wpi/math/estimator
 # AngleStatistics = "wpi/math/estimator/AngleStatistics.hpp"
+DCMotorBiasEstimator = "wpi/math/estimator/DCMotorBiasEstimator.hpp"
 DifferentialDrivePoseEstimator = "wpi/math/estimator/DifferentialDrivePoseEstimator.hpp"
 DifferentialDrivePoseEstimator3d = "wpi/math/estimator/DifferentialDrivePoseEstimator3d.hpp"
 ExtendedKalmanFilter = "wpi/math/estimator/ExtendedKalmanFilter.hpp"

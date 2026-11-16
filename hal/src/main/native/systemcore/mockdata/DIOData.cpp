@@ -18,9 +18,7 @@ HAL_SimDeviceHandle HALSIM_GetDIOSimDevice(int32_t index) {
 
 DEFINE_CAPI(HAL_Bool, Initialized, false)
 DEFINE_CAPI(HAL_Bool, Value, false)
-DEFINE_CAPI(double, PulseLength, 0)
 DEFINE_CAPI(HAL_Bool, IsInput, false)
-DEFINE_CAPI(int32_t, FilterIndex, 0)
 
 void HALSIM_RegisterDIOAllCallbacks(int32_t index, HAL_NotifyCallback callback,
                                     void* param, HAL_Bool initialNotify) {}

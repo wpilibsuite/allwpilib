@@ -24,7 +24,6 @@ class NTDigitalOutputModel : public DIOModel {
 
   const char* GetSimDevice() const override { return nullptr; }
 
-  DPWMModel* GetDPWM() override { return nullptr; }
   DutyCycleModel* GetDutyCycle() override { return nullptr; }
   EncoderModel* GetEncoder() override { return nullptr; }
 

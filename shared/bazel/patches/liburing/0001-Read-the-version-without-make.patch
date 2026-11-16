@@ -3,7 +3,7 @@ Subject: [PATCH] Read the version without make
 configure shells out to make to print VERSION_MAJOR and VERSION_MINOR from
 Makefile.common, which reads them out of liburing.spec.  Shell builtins get the
 same two numbers, so a cross build does not have to provide make just to
-configure.  The Windows SystemCore builds have bash but no make.
+configure.  The Windows Systemcore builds have bash but no make.
 
 --- a/configure
 +++ b/configure

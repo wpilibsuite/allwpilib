@@ -14,7 +14,7 @@ cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "native",
-    actual = ":drivers_tests",
+    tests = [":drivers_tests"],
 )

@@ -23,7 +23,7 @@ void ResetMotorSafety();
 namespace {
 
 class MockMotorSafety : public wpi::MotorSafety {
- public:
+ protected:
   void StopMotor() override {}
   std::string GetDescription() const override { return "MockMotorSafety"; }
 };

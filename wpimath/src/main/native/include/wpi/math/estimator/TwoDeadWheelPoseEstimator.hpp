@@ -182,10 +182,6 @@ class TwoDeadWheelPoseEstimator {
    *
    * @param translation The pose to translation to.
    */
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif  // defined(__GNUC__) && !defined(__clang__)
   void ResetTranslation(const Translation2d& translation) {
     m_odometry.ResetTranslation(translation);
 
@@ -208,19 +204,12 @@ class TwoDeadWheelPoseEstimator {
       m_poseEstimate = m_odometry.GetPose();
     }
   }
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__) && !defined(__clang__)
 
   /**
    * Resets the robot's rotation.
    *
    * @param rotation The rotation to reset to.
    */
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif  // defined(__GNUC__) && !defined(__clang__)
   void ResetRotation(const Rotation2d& rotation) {
     m_odometry.ResetRotation(rotation);
 
@@ -243,9 +232,6 @@ class TwoDeadWheelPoseEstimator {
       m_poseEstimate = m_odometry.GetPose();
     }
   }
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif  // defined(__GNUC__) && !defined(__clang__)
 
   /**
    * Gets the estimated robot pose.

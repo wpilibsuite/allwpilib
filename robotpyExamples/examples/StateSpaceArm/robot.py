@@ -51,7 +51,7 @@ class MyRobot(wpilib.TimedRobot):
         # States: [position, velocity], in radians and radians per second.
         # Inputs (what we can "put in"): [voltage], in volts.
         # Outputs (what we can measure): [position], in radians.
-        self.arm_plant = wpimath.Models.single_jointed_arm_from_physical_constants(
+        self.arm_plant = wpimath.Models.angular_position_from_physical_constants(
             wpimath.DCMotor.neo(2),
             ARM_MOI,
             ARM_GEARING,

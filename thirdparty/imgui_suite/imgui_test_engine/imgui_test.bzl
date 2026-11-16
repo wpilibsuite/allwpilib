@@ -17,14 +17,14 @@ IMGUI_TEST_ENV = {
 
 def _imgui_test_transition_impl(_, attr):
     return {
-        "//shared/bazel/rules:with_imgui_test_engine_hooks": True,
+        "//thirdparty/imgui_suite/imgui_test_engine:with_imgui_test_engine_hooks": True,
     }
 
 _imgui_test_transition = transition(
     implementation = _imgui_test_transition_impl,
     inputs = [],
     outputs = [
-        "//shared/bazel/rules:with_imgui_test_engine_hooks",
+        "//thirdparty/imgui_suite/imgui_test_engine:with_imgui_test_engine_hooks",
     ],
 )
 
@@ -70,7 +70,7 @@ _imgui_cc_test_wrapper_test = rule(
 
 def imgui_test_target_compatible_with():
     return select({
-        "//shared/bazel/rules:with_imgui_tests_enabled": [],
+        "//thirdparty/imgui_suite/imgui_test_engine:with_imgui_tests_enabled": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }) + select({
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],

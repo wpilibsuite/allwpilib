@@ -44,7 +44,7 @@ bool PWMMotorController::GetInverted() const {
   return m_isInverted;
 }
 
-void PWMMotorController::Disable() {
+void PWMMotorController::StopMotor() {
   m_pwm.SetDisabled();
 
   if (m_simThrottle) {
@@ -52,15 +52,11 @@ void PWMMotorController::Disable() {
   }
 
   for (auto& follower : m_nonowningFollowers) {
-    follower->Disable();
+    follower->StopMotor();
   }
   for (auto& follower : m_owningFollowers) {
-    follower->Disable();
+    follower->StopMotor();
   }
-}
-
-void PWMMotorController::StopMotor() {
-  Disable();
 }
 
 std::string PWMMotorController::GetDescription() const {

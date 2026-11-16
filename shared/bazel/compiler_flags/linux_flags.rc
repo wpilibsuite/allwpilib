@@ -7,7 +7,7 @@
 common:linux --repo_env=BAZEL_COPTS="-Wall:-Wextra:-Werror:-gz=zlib"
 
 # C++ only
-common:linux --repo_env=BAZEL_CXXOPTS="-std=c++23:-Wformat=2:-pedantic:-Wno-psabi:-Wno-unused-parameter:-pthread:-Wno-deprecated-enum-enum-conversion:-Wno-array-bounds"
+common:linux --repo_env=BAZEL_CXXOPTS="-std=c++23:-Wformat=2:-pedantic:-Wno-psabi:-Wno-unused-parameter:-pthread:-Wno-array-bounds"
 
 # C Only
 common:linux --repo_env=BAZEL_CONLYOPTS="-std=gnu23:-Wformat=2:-pedantic:-Wno-psabi:-Wno-unused-parameter:-pthread"
@@ -17,7 +17,6 @@ common:linux --repo_env=BAZEL_LINKOPTS="-rdynamic:-pthread:-ldl:-latomic:-Wl,-rp
 
 # Cleanup build output for tools
 build:linux --host_cxxopt=-Wno-missing-field-initializers
-build:linux --host_cxxopt=-Wno-deprecated-enum-enum-conversion
 build:linux --host_cxxopt=-Wno-sign-compare
 build:linux --host_cxxopt=-Wno-unknown-pragmas
 build:linux --host_cxxopt=-Wno-attributes
@@ -37,5 +36,5 @@ build:linux --force_pic
 build:linux --features=set_soname
 build:linux --host_features=set_soname
 
-build:linux --host_platform=//shared/bazel:linux_x86_64
-build:linux --platforms=//shared/bazel:linux_x86_64
+build:linux --host_platform=//shared/bazel:linux_host
+build:linux --platforms=//shared/bazel:linux_host

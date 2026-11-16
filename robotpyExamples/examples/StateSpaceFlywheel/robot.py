@@ -43,7 +43,7 @@ class MyRobot(wpilib.TimedRobot):
         # States: [velocity], in radians per second.
         # Inputs (what we can "put in"): [voltage], in volts.
         # Outputs (what we can measure): [velocity], in radians per second.
-        self.flywheel_plant = wpimath.Models.flywheel_from_physical_constants(
+        self.flywheel_plant = wpimath.Models.angular_velocity_from_physical_constants(
             wpimath.DCMotor.neo(2),
             FLYWHEEL_MOMENT_OF_INERTIA,
             FLYWHEEL_GEARING,

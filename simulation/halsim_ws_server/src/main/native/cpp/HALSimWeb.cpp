@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <system_error>
 
 #include "wpi/halsim/ws_server/HALSimHttpConnection.hpp"
 #include "wpi/net/WebSocketServer.hpp"
@@ -44,21 +45,36 @@ bool HALSimWeb::Initialize() {
 
   // determine where to get static content from
   fs::path path;
+  std::error_code ec;
   const char* webroot_sys = std::getenv("HALSIMWS_SYSROOT");
   if (webroot_sys != nullptr) {
     path = webroot_sys;
   } else {
-    path = fs::current_path() / "sim";
+    path = fs::current_path(ec) / "sim";
+    if (ec) {
+      return false;
+    }
   }
-  m_webroot_sys = fs::absolute(path).string();
+  auto absolutePath = fs::absolute(path, ec);
+  if (ec) {
+    return false;
+  }
+  m_webroot_sys = absolutePath.string();
 
   const char* webroot_user = std::getenv("HALSIMWS_USERROOT");
   if (webroot_user != nullptr) {
     path = webroot_sys;
   } else {
-    path = fs::current_path() / "sim" / "user";
+    path = fs::current_path(ec) / "sim" / "user";
+    if (ec) {
+      return false;
+    }
   }
-  m_webroot_user = fs::absolute(path).string();
+  absolutePath = fs::absolute(path, ec);
+  if (ec) {
+    return false;
+  }
+  m_webroot_user = absolutePath.string();
 
   const char* uri = std::getenv("HALSIMWS_URI");
   if (uri != nullptr) {

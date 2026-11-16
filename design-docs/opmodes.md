@@ -219,7 +219,7 @@ The lifecycle of an opmode is:
 
 Following `close()` being called (Java)/the opmode being destroyed (C++), a *new* opmode object is constructed based on the DS teleop/auto/utility/match selector and selected opmode.  In teleop/auto/utility, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
 
-For consistency in operation, the library will ensure that `disabledPeriodic()` is always called at least once before `start()` is called.
+For consistency in operation, the library will ensure that `disabledPeriodic()` is always called at least once before `start()` is called.  This includes the case where an opmode is selected while the robot is already enabled: `disabledPeriodic()` is called once immediately after the opmode is constructed, followed by `start()` in the same loop iteration.  `disabledPeriodic()` is not called again while the robot remains enabled.
 
 User implementations of opmode classes may have either a no-parameter constructor or a constructor that accepts (a subclass of) the user's `Robot` class type.  If available, the library will call the latter and pass the user's `Robot` object to it when constructing the class.
 

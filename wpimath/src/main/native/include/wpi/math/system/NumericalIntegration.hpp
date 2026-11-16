@@ -217,6 +217,7 @@ T RKDP(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
     if (truncationError <= maxError) {
       // Accept the step
       y = newY;
+      t += wpi::units::second_t{h};
       dtElapsed += h;
     }
 

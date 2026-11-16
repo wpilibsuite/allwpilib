@@ -20,7 +20,7 @@ if (project.hasProperty('ciDebugOnly')) {
 
 nativeUtils.addWpiNativeUtils()
 nativeUtils.withCrossLinuxArm64()
-nativeUtils.withCrossSystemCore()
+nativeUtils.withCrossSystemcore()
 nativeUtils {
     wpi {
         configureDependencies {

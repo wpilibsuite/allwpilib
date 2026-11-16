@@ -20,8 +20,8 @@
 
 TEST_CASE("StateSpaceSimTest FlywheelSim", "[wpilibc][simulation]") {
   const wpi::math::LinearSystem<1, 1, 1> plant =
-      wpi::math::Models::FlywheelFromSysId(0.02_V / 1_rad_per_s,
-                                           0.01_V / 1_rad_per_s_sq);
+      wpi::math::Models::AngularVelocityFromSysId(0.02_V / 1_rad_per_s,
+                                                  0.01_V / 1_rad_per_s_sq);
   wpi::sim::FlywheelSim sim{plant, wpi::math::DCMotor::NEO(2)};
   wpi::math::PIDController controller{0.2, 0.0, 0.0};
   wpi::math::SimpleMotorFeedforward<wpi::units::radian> feedforward{

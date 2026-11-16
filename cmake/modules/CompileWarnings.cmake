@@ -32,20 +32,6 @@ macro(wpilib_target_warnings target)
         target_compile_options(${target} PRIVATE ${WARNING_FLAGS})
     endif()
 
-    # Suppress C++-specific OpenCV warning; C compiler rejects it with an error
-    # https://github.com/opencv/opencv/issues/20269
-    if(UNIX AND NOT APPLE)
-        target_compile_options(
-            ${target}
-            PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-enum-enum-conversion>
-        )
-    elseif(UNIX AND APPLE)
-        target_compile_options(
-            ${target}
-            PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-anon-enum-enum-conversion>
-        )
-    endif()
-
     # Suppress -Warray-bounds
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-array-bounds>)

@@ -19,7 +19,7 @@ cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "native",
-    actual = ":ntcore_tests",
+    tests = [":ntcore_tests"],
 )

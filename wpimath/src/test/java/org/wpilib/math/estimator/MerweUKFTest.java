@@ -222,7 +222,7 @@ class MerweUKFTest {
   @Test
   void testLinearUKF() {
     var dt = 0.020;
-    var plant = Models.flywheelFromSysId(0.02, 0.006);
+    var plant = Models.angularVelocityFromSysId(0.02, 0.006);
     var observer =
         new MerweUKF<>(
             Nat.N1(),

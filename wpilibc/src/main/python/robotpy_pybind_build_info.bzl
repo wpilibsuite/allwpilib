@@ -1407,16 +1407,6 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
             ],
         ),
         struct(
-            class_name = "DigitalPWMSim",
-            yml_file = "semiwrap/simulation/DigitalPWMSim.yml",
-            header_root = "$(execpath //wpilibc:robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath //wpilibc:robotpy-native-wpilib.copy_headers)/wpi/simulation/DigitalPWMSim.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::sim::DigitalPWMSim", "wpi__sim__DigitalPWMSim.hpp"),
-            ],
-        ),
-        struct(
             class_name = "DoubleSolenoidSim",
             yml_file = "semiwrap/simulation/DoubleSolenoidSim.yml",
             header_root = "$(execpath //wpilibc:robotpy-native-wpilib.copy_headers)",

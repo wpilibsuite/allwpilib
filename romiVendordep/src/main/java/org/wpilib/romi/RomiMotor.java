@@ -64,9 +64,4 @@ public class RomiMotor implements MotorController {
   public boolean getInverted() {
     return m_inverted;
   }
-
-  @Override
-  public void disable() {
-    setThrottle(0.0);
-  }
 }
