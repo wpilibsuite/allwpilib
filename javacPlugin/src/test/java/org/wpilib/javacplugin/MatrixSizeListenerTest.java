@@ -114,7 +114,7 @@ class MatrixSizeListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(
                 NUM,
                 NAT,
@@ -145,7 +145,7 @@ class MatrixSizeListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(
                 NAT,
                 N3,
@@ -183,7 +183,7 @@ class MatrixSizeListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(
                 NAT,
                 N3,
@@ -213,7 +213,7 @@ class MatrixSizeListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(
                 NAT,
                 N3,
@@ -250,7 +250,7 @@ class MatrixSizeListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(
                 NAT,
                 N3,
@@ -282,7 +282,7 @@ class MatrixSizeListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(
                 NAT,
                 N3,
@@ -317,7 +317,7 @@ class MatrixSizeListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(
                 NAT,
                 N3,
@@ -354,7 +354,7 @@ class MatrixSizeListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(
                 NAT,
                 N3,
