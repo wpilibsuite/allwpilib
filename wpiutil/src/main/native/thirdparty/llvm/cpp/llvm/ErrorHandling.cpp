@@ -204,8 +204,14 @@ void wpi::util::wpi_unreachable_internal(const char *msg, const char *file,
 
 #ifdef _WIN32
 
+// mingw-w64 tends to define it as 0x0502 in its headers.
+#undef _WIN32_WINNT
+
+// Require at least Windows 7 API.
+#define _WIN32_WINNT 0x0601
+#define WIN32_LEAN_AND_MEAN
 #define WIN32_NO_STATUS
-#include "Windows/WindowsSupport.hpp"
+#include <windows.h>
 #undef WIN32_NO_STATUS
 #include <ntstatus.h>
 #include <winerror.h>

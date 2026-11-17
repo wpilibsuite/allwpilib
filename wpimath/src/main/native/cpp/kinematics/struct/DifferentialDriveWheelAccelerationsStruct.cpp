@@ -10,21 +10,21 @@
 wpi::math::DifferentialDriveWheelAccelerations
 wpi::util::Struct<wpi::math::DifferentialDriveWheelAccelerations>::Unpack(
     std::span<const uint8_t> data) {
-  constexpr size_t kLeftOff = 0;
-  constexpr size_t kRightOff = kLeftOff + 8;
+  constexpr size_t LEFT_OFF = 0;
+  constexpr size_t RIGHT_OFF = LEFT_OFF + 8;
   return wpi::math::DifferentialDriveWheelAccelerations{
       units::meters_per_second_squared_t{
-          wpi::util::UnpackStruct<double, kLeftOff>(data)},
+          wpi::util::UnpackStruct<double, LEFT_OFF>(data)},
       units::meters_per_second_squared_t{
-          wpi::util::UnpackStruct<double, kRightOff>(data)},
+          wpi::util::UnpackStruct<double, RIGHT_OFF>(data)},
   };
 }
 
 void wpi::util::Struct<wpi::math::DifferentialDriveWheelAccelerations>::Pack(
     std::span<uint8_t> data,
     const wpi::math::DifferentialDriveWheelAccelerations& value) {
-  constexpr size_t kLeftOff = 0;
-  constexpr size_t kRightOff = kLeftOff + 8;
-  wpi::util::PackStruct<kLeftOff>(data, value.left.value());
-  wpi::util::PackStruct<kRightOff>(data, value.right.value());
+  constexpr size_t LEFT_OFF = 0;
+  constexpr size_t RIGHT_OFF = LEFT_OFF + 8;
+  wpi::util::PackStruct<LEFT_OFF>(data, value.left.value());
+  wpi::util::PackStruct<RIGHT_OFF>(data, value.right.value());
 }

@@ -24,6 +24,7 @@ void RoboRioData::ResetData() {
   userActive3V3.Reset(true);
   userFaults3V3.Reset(0);
   brownoutVoltage.Reset(6.75);
+  brownoutRecoveryVoltage.Reset(7.25);
   cpuTemp.Reset(45.0);
   teamNumber.Reset(0);
   m_serialNumber = "";
@@ -62,36 +63,6 @@ void RoboRioData::SetSerialNumber(std::string_view serialNumber) {
   m_serialNumberCallbacks(m_serialNumber.c_str(), m_serialNumber.size());
 }
 
-int32_t RoboRioData::RegisterCommentsCallback(
-    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
-  std::scoped_lock lock(m_commentsMutex);
-  int32_t uid = m_commentsCallbacks.Register(callback, param);
-  if (initialNotify) {
-    callback(GetCommentsName(), param, m_comments.c_str(),
-             m_serialNumber.size());
-  }
-  return uid;
-}
-
-void RoboRioData::CancelCommentsCallback(int32_t uid) {
-  m_commentsCallbacks.Cancel(uid);
-}
-
-void RoboRioData::GetComments(struct WPI_String* comments) {
-  std::scoped_lock lock(m_commentsMutex);
-  auto write = WPI_AllocateString(comments, m_comments.size());
-  m_comments.copy(write, m_comments.size());
-}
-
-void RoboRioData::SetComments(std::string_view comments) {
-  if (comments.size() > 64) {
-    comments = comments.substr(0, 64);
-  }
-  std::scoped_lock lock(m_commentsMutex);
-  m_comments = std::string(comments);
-  m_commentsCallbacks(m_comments.c_str(), m_comments.size());
-}
-
 extern "C" {
 void HALSIM_ResetRoboRioData(void) {
   SimRoboRioData->ResetData();
@@ -107,6 +78,7 @@ DEFINE_CAPI(double, UserCurrent3V3, userCurrent3V3)
 DEFINE_CAPI(HAL_Bool, UserActive3V3, userActive3V3)
 DEFINE_CAPI(int32_t, UserFaults3V3, userFaults3V3)
 DEFINE_CAPI(double, BrownoutVoltage, brownoutVoltage)
+DEFINE_CAPI(double, BrownoutRecoveryVoltage, brownoutRecoveryVoltage)
 DEFINE_CAPI(double, CPUTemp, cpuTemp)
 DEFINE_CAPI(int32_t, TeamNumber, teamNumber)
 
@@ -125,21 +97,6 @@ void HALSIM_SetRoboRioSerialNumber(const struct WPI_String* serialNumber) {
   SimRoboRioData->SetSerialNumber(wpi::util::to_string_view(serialNumber));
 }
 
-int32_t HALSIM_RegisterRoboRioCommentsCallback(
-    HAL_RoboRioStringCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimRoboRioData->RegisterCommentsCallback(callback, param,
-                                                  initialNotify);
-}
-void HALSIM_CancelRoboRioCommentsCallback(int32_t uid) {
-  SimRoboRioData->CancelCommentsCallback(uid);
-}
-void HALSIM_GetRoboRioComments(struct WPI_String* comments) {
-  SimRoboRioData->GetComments(comments);
-}
-void HALSIM_SetRoboRioComments(const struct WPI_String* comments) {
-  SimRoboRioData->SetComments(wpi::util::to_string_view(comments));
-}
-
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
                                         void* param, HAL_Bool initialNotify);
 
@@ -154,6 +111,7 @@ void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
   REGISTER(userActive3V3);
   REGISTER(userFaults3V3);
   REGISTER(brownoutVoltage);
+  REGISTER(brownoutRecoveryVoltage);
   REGISTER(cpuTemp);
 }
 }  // extern "C"

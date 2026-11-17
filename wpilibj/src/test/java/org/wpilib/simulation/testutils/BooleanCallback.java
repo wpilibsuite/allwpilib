@@ -9,7 +9,7 @@ import org.wpilib.hardware.hal.HALValue;
 public class BooleanCallback extends CallbackHelperBase<Boolean> {
   @Override
   public void callback(String name, HALValue value) {
-    if (value.getType() != HALValue.kBoolean) {
+    if (value.getType() != HALValue.BOOLEAN) {
       throw new IllegalArgumentException("Wrong callback for type " + value.getType());
     }
 

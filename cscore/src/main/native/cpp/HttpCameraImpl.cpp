@@ -4,12 +4,11 @@
 
 #include "HttpCameraImpl.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "Instance.hpp"
 #include "JpegUtil.hpp"
@@ -30,7 +29,10 @@ HttpCameraImpl::HttpCameraImpl(std::string_view name, CS_HttpCameraKind kind,
     : SourceImpl{name, logger, notifier, telemetry}, m_kind{kind} {}
 
 HttpCameraImpl::~HttpCameraImpl() {
-  m_active = false;
+  {
+    std::scoped_lock lock(m_mutex);
+    m_active = false;
+  }
 
   // force wakeup of monitor thread
   m_monitorCond.notify_one();
@@ -292,7 +294,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::util::raw_istream& is,
   // Check the content type (if present)
   if (!contentTypeBuf.str().empty() &&
       !wpi::util::starts_with(contentTypeBuf, "image/jpeg")) {
-    auto errMsg = fmt::format("received unknown Content-Type \"{}\"",
+    auto errMsg = std::format("received unknown Content-Type \"{}\"",
                               contentTypeBuf.str());
     SWARNING("{}", errMsg);
     PutError(errMsg, wpi::util::Now());
@@ -532,10 +534,10 @@ bool HttpCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   m_streamSettings.clear();
   if (mode.width != 0 && mode.height != 0) {
     m_streamSettings["resolution"] =
-        fmt::format("{}x{}", mode.width, mode.height);
+        std::format("{}x{}", mode.width, mode.height);
   }
   if (mode.fps != 0) {
-    m_streamSettings["fps"] = fmt::format("{}", mode.fps);
+    m_streamSettings["fps"] = std::format("{}", mode.fps);
   }
   m_streamSettingsUpdated = true;
   return true;
@@ -546,6 +548,8 @@ void HttpCameraImpl::NumSinksChanged() {
 }
 
 void HttpCameraImpl::NumSinksEnabledChanged() {
+  // Synchronize with the enable predicate check before notifying.
+  std::scoped_lock lock(m_mutex);
   m_sinkEnabledCond.notify_one();
 }
 

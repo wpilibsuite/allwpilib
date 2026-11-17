@@ -42,7 +42,7 @@ HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
  * Initializes a serial port with a direct name.
  *
  * This name is the /dev name for a specific port.
- * Note these are not always consistent between roboRIO reboots.
+ * Note these are not always consistent between Systemcore reboots.
  *
  * @param[in] port     the serial port to initialize
  * @param[in] portName the dev port name

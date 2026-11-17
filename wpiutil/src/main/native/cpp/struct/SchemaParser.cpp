@@ -4,10 +4,9 @@
 
 #include "wpi/util/struct/SchemaParser.hpp"
 
+#include <format>
 #include <string>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/util/StringExtras.hpp"
 
@@ -82,7 +81,7 @@ Token Lexer::Scan() {
     case -1:
       return {Token::END_OF_INPUT, {}};
     default:
-      if (isAlpha(m_current) || m_current == '_') {
+      if (isAlpha(m_current) || m_current == '_' || m_current >= 0x80) {
         [[likely]] return ScanIdentifier();
       }
       return MakeToken(Token::UNKNOWN);
@@ -100,17 +99,17 @@ Token Lexer::ScanInteger() {
 Token Lexer::ScanIdentifier() {
   do {
     Get();
-  } while (isAlnum(m_current) || m_current == '_');
+  } while (isAlnum(m_current) || m_current == '_' || m_current >= 0x80);
   Unget();
   return MakeToken(Token::IDENTIFIER);
 }
 
 void Parser::FailExpect(Token::Kind desired) {
-  Fail(fmt::format("expected {}, got '{}'", ToString(desired), m_token.text));
+  Fail(std::format("expected {}, got '{}'", ToString(desired), m_token.text));
 }
 
 void Parser::Fail(std::string_view msg) {
-  m_error = fmt::format("{}: {}", m_lexer.GetPosition(), msg);
+  m_error = std::format("{}: {}", m_lexer.GetPosition(), msg);
 }
 
 bool Parser::Parse(ParsedSchema* out) {
@@ -171,7 +170,7 @@ bool Parser::ParseDeclaration(ParsedDeclaration* out) {
     if (val && *val > 0) {
       out->arraySize = *val;
     } else {
-      Fail(fmt::format("array size '{}' is not a positive integer",
+      Fail(std::format("array size '{}' is not a positive integer",
                        m_token.text));
       [[unlikely]] return false;
     }
@@ -189,7 +188,7 @@ bool Parser::ParseDeclaration(ParsedDeclaration* out) {
     if (val && *val > 0) {
       out->bitWidth = *val;
     } else {
-      Fail(fmt::format("bitfield width '{}' is not a positive integer",
+      Fail(std::format("bitfield width '{}' is not a positive integer",
                        m_token.text));
       [[unlikely]] return false;
     }
@@ -224,7 +223,7 @@ bool Parser::ParseEnum(EnumValues* out) {
     if (auto val = parse_integer<int64_t>(m_token.text, 10)) {
       value = *val;
     } else {
-      Fail(fmt::format("could not parse enum value '{}'", m_token.text));
+      Fail(std::format("could not parse enum value '{}'", m_token.text));
       [[unlikely]] return false;
     }
     out->emplace_back(std::move(name), value);

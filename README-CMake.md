@@ -34,29 +34,41 @@ By default, all libraries get built with a default CMake setup. The libraries ar
 
 OpenCV needs to be findable by CMake. On systems like the Jetson, this is installed by default. Otherwise, you will need to build OpenCV from source and install it.
 
+To build GUI apps (`WPILIB_WITH_GUI`), SDL3 needs to be findable by CMake.
+
+To build ImGui GUI tests (`WPILIB_WITH_IMGUI_TESTS`), CMake needs internet access to download `imgui_test_engine`.
+
+To build wpical (`WPILIB_WITH_WPICAL`), libsuitesparse-dev and libceres-dev are required.
+
 ## Build Options
 
 The following build options are available:
 
 * `BUILD_SHARED_LIBS` (ON Default)
   * This option will cause CMake to build static libraries instead of shared libraries.
-* `WITH_CSCORE` (ON Default)
-  * This option will cause cscore to be built. Turning this off will implicitly disable cameraserver. If this is off, the OpenCV build requirement is removed.
-* `WITH_EXAMPLES` (OFF Default)
+* `WPILIB_WITH_CSCORE` (ON Default)
+  * This option will cause cscore to be built. CameraServer is built when both this option and `WPILIB_WITH_WPILIB` are enabled. If this is off, the OpenCV build requirement is removed.
+* `WPILIB_WITH_EXAMPLES` (OFF Default)
   * This option will build C++ examples.
-* `WITH_GUI` (ON Default)
-  * This option will build GUI items. If this is off, and `WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built.
-* `WITH_NTCORE` (ON Default)
-  * This option will cause ntcore to be built. Turning this off will implicitly disable wpinet, and will cause an error if `WITH_WPILIB` is enabled.
-* `WITH_SIMULATION_MODULES` (ON Default)
+* `WPILIB_WITH_GUI` (OFF Default)
+  * This option will build GUI items. If this is off, and `WPILIB_WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built. If this is off, the SDL3 build requirement is removed.
+* `WPILIB_WITH_IMGUI_TESTS` (OFF Default)
+  * This option will build imgui_test_engine-based GUI tests. It requires `WPILIB_WITH_GUI` and `WPILIB_WITH_TESTS`. When enabled, CMake downloads imgui_test_engine during configure. The tests run headless by default.
+* `WPILIB_IMGUI_TESTS_HEADLESS` (ON Default when `WPILIB_WITH_IMGUI_TESTS` is enabled)
+  * This option will run ImGui GUI tests with SDL's dummy video backend and software renderer so no GUI windows are shown. Set this to `OFF` to show windows while debugging GUI tests locally.
+* `WPILIB_WITH_NTCORE` (ON Default)
+  * This option will cause ntcore to be built. Turning this off will implicitly disable wpinet, and will cause an error if `WPILIB_WITH_WPILIB` is enabled.
+* `WPILIB_WITH_SIMULATION_MODULES` (ON Default)
   * This option will build simulation modules.
-* `WITH_TESTS` (ON Default)
+* `WPILIB_WITH_TESTS` (ON Default)
   * This option will build C++ unit tests. These can be run via `ctest -C <config>`, where `<config>` is the build configuration, e.g. `Debug` or `Release`.
-* `WITH_WPILIB` (ON Default)
+* `WPILIB_WITH_WPICAL` (OFF Default)
+  * This option will build wpical.
+* `WPILIB_WITH_WPILIB` (ON Default)
   * This option will build the HAL and wpilibc during the build. The HAL is the simulation HAL, unless the external HAL options are used. The CMake build has no capability to build for Systemcore.
-* `WITH_WPIMATH` (ON Default)
+* `WPILIB_WITH_WPIMATH` (ON Default)
   * This option will build the wpimath library. This option must be on to build wpilib.
-* `NO_WERROR` (OFF Default)
+* `WPILIB_NO_WERROR` (OFF Default)
   * This option will disable the `-Werror` compilation flag for non-MSVC builds.
 * `WPILIB_TARGET_WARNINGS`
   * Add compiler flags to this option to customize compiler options like warnings.
@@ -116,9 +128,10 @@ cmake_minimum_required(VERSION 3.11)
 project(vision_app) # Project Name Here
 
 find_package(wpilib REQUIRED)
+find_package(cameraserver REQUIRED)
 
 add_executable(my_vision_app main.cpp) # executable name as first parameter
-target_link_libraries(my_vision_app cameraserver ntcore cscore wpiutil)
+target_link_libraries(my_vision_app cameraserver)
 ```
 
 If you want to use other libraries or are building a robot program, `wpilibc` and `hal` should be added in the `target_link_libraries` function, along with any other libraries you plan on using, e.g. `wpimath`.
@@ -133,7 +146,7 @@ After that, run `cmake --build .`. That will create your executable. Then you sh
 
 ## Using vendordeps
 
-Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `xrpVendordep` or `romiVendordep`. Note that commandsv2, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal (using `target_link_libraries`).
+Vendordeps are not included as part of the `wpilib` CMake package. However, if you want to use a vendordep, you need to use `find_package(VENDORDEP)`, where `VENDORDEP` is the name of the vendordep (case-sensitive), like `apriltag`, `cameraserver`, `xrpVendordep`, or `romiVendordep`. Note that commandsv2, while a vendordep in normal robot projects, is not built as a vendordep in CMake, and is instead included as part of the `wpilib` CMake package. After you used `find_package`, you can reference the vendordep library like normal (using `target_link_libraries`).
 
 ## Troubleshooting
 Below are some common issues that are run into when building.

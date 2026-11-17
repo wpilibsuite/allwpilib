@@ -14,8 +14,8 @@ import org.wpilib.math.util.Nat;
 
 class ModelsTest {
   @Test
-  void testFlywheelFromPhysicalConstants() {
-    var model = Models.flywheelFromPhysicalConstants(DCMotor.getNEO(2), 0.00032, 1.0);
+  void testAngularVelocityFromPhysicalConstants() {
+    var model = Models.angularVelocityFromPhysicalConstants(DCMotor.getNEO(2), 0.00032, 1.0);
     assertTrue(model.getA().isEqual(VecBuilder.fill(-26.87032), 0.001));
 
     assertTrue(model.getB().isEqual(VecBuilder.fill(1354.166667), 0.001));
@@ -26,10 +26,10 @@ class ModelsTest {
   }
 
   @Test
-  void testFlywheelFromSysId() {
+  void testAngularVelocityFromSysId() {
     var kv = 1.0;
     var ka = 0.5;
-    var model = Models.flywheelFromSysId(kv, ka);
+    var model = Models.angularVelocityFromSysId(kv, ka);
 
     assertEquals(model.getA(), VecBuilder.fill(-kv / ka));
     assertEquals(model.getB(), VecBuilder.fill(1 / ka));
@@ -60,8 +60,8 @@ class ModelsTest {
   }
 
   @Test
-  void testElevatorFromPhysicalConstants() {
-    var model = Models.elevatorFromPhysicalConstants(DCMotor.getNEO(2), 5, 0.05, 12);
+  void testLinearPositionFromPhysicalConstants() {
+    var model = Models.linearPositionFromPhysicalConstants(DCMotor.getNEO(2), 5, 0.05, 12);
     assertTrue(
         model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -99.05473), 0.001));
 
@@ -73,21 +73,21 @@ class ModelsTest {
   }
 
   @Test
-  void testElevatorFromSysId() {
+  void testLinearPositionFromSysId() {
     var kv = 1.0;
     var ka = 0.5;
-    var model = Models.elevatorFromSysId(kv, ka);
+    var model = Models.linearPositionFromSysId(kv, ka);
 
     assertEquals(model.getA(), MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -kv / ka));
     assertEquals(model.getB(), VecBuilder.fill(0, 1 / ka));
   }
 
   @Test
-  void testSingleJointedArmFromSysId() {
+  void testAngularPositionFromSysId() {
     var kv = 1.0;
     var ka = 0.5;
 
-    var model = Models.singleJointedArmFromSysId(kv, ka);
+    var model = Models.angularPositionFromSysId(kv, ka);
 
     assertTrue(
         model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0.0, 1.0, 0.0, -kv / ka), 0.001));

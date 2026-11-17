@@ -90,10 +90,10 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
   template <typename... U>
   void Send(U&&... u) {
     auto loop = m_loop.lock();
-    if (loop->IsClosing()) {
+    if (!loop || loop->IsClosing()) {
       return;
     }
-    if (loop && loop->GetThreadId() == std::this_thread::get_id()) {
+    if (loop->GetThreadId() == std::this_thread::get_id()) {
       // called from within the loop, just call the function directly
       wakeup(std::forward<U>(u)...);
       return;
@@ -103,9 +103,7 @@ class Async final : public HandleImpl<Async<T...>, uv_async_t> {
       std::scoped_lock lock(m_mutex);
       m_data.emplace_back(std::forward_as_tuple(std::forward<U>(u)...));
     }
-    if (loop) {
-      this->Invoke(&uv_async_send, this->GetRaw());
-    }
+    this->Invoke(&uv_async_send, this->GetRaw());
   }
 
   /**

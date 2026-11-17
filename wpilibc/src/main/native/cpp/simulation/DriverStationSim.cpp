@@ -42,12 +42,12 @@ std::unique_ptr<CallbackStore> DriverStationSim::RegisterRobotModeCallback(
   return store;
 }
 
-HAL_RobotMode DriverStationSim::GetRobotMode() {
-  return HALSIM_GetDriverStationRobotMode();
+hal::RobotMode DriverStationSim::GetRobotMode() {
+  return static_cast<hal::RobotMode>(HALSIM_GetDriverStationRobotMode());
 }
 
-void DriverStationSim::SetRobotMode(HAL_RobotMode robotMode) {
-  HALSIM_SetDriverStationRobotMode(robotMode);
+void DriverStationSim::SetRobotMode(hal::RobotMode robotMode) {
+  HALSIM_SetDriverStationRobotMode(static_cast<HAL_RobotMode>(robotMode));
 }
 
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterEStopCallback(
@@ -111,13 +111,15 @@ DriverStationSim::RegisterAllianceStationIdCallback(NotifyCallback callback,
   return store;
 }
 
-HAL_AllianceStationID DriverStationSim::GetAllianceStationId() {
-  return HALSIM_GetDriverStationAllianceStationId();
+wpi::hal::AllianceStationID DriverStationSim::GetAllianceStationId() {
+  return static_cast<wpi::hal::AllianceStationID>(
+      HALSIM_GetDriverStationAllianceStationId());
 }
 
 void DriverStationSim::SetAllianceStationId(
-    HAL_AllianceStationID allianceStationId) {
-  HALSIM_SetDriverStationAllianceStationId(allianceStationId);
+    wpi::hal::AllianceStationID allianceStationId) {
+  HALSIM_SetDriverStationAllianceStationId(
+      static_cast<HAL_AllianceStationID>(allianceStationId));
 }
 
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterMatchTimeCallback(

@@ -11,6 +11,6 @@ class TimedCommandRobot(TimedRobot):
 
     def __init__(self, period: seconds = TimedRobot.DEFAULT_PERIOD / 1000) -> None:
         super().__init__(period)
-        self.addPeriodic(
-            CommandScheduler.getInstance().run, period, self.SCHEDULER_OFFSET
+        self.add_periodic(
+            CommandScheduler.get_instance().run, period, self.SCHEDULER_OFFSET
         )

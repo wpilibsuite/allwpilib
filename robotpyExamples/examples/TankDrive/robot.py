@@ -5,7 +5,10 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
+import wpilib_drivers
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -18,16 +21,17 @@ class MyRobot(wpilib.TimedRobot):
         """Robot initialization function"""
         super().__init__()
 
-        leftMotor = wpilib.PWMSparkMax(0)
-        rightMotor = wpilib.PWMSparkMax(1)
-        self.robotDrive = wpilib.DifferentialDrive(leftMotor, rightMotor)
-        self.leftStick = wpilib.Joystick(0)
-        self.rightStick = wpilib.Joystick(1)
+        left_motor = wpilib_drivers.PWMSparkMax(0)
+        right_motor = wpilib_drivers.PWMSparkMax(1)
+        self.robot_drive = wpilib.DifferentialDrive(left_motor, right_motor)
+        self.left_stick = wpilib.Joystick(0)
+        self.right_stick = wpilib.Joystick(1)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        rightMotor.setInverted(True)
+        right_motor.set_inverted(True)
 
-    def teleopPeriodic(self):
-        self.robotDrive.tankDrive(-self.leftStick.getY(), -self.rightStick.getY())
+    @override
+    def teleop_periodic(self):
+        self.robot_drive.tank_drive(-self.left_stick.get_y(), -self.right_stick.get_y())

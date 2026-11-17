@@ -4,12 +4,18 @@
 
 #pragma once
 
+#include <array>
+
+#include <Eigen/Core>
+
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/units/current.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
@@ -125,6 +131,19 @@ class DifferentialDrivetrainSim {
    * Returns the current pose.
    */
   wpi::math::Pose2d GetPose() const;
+
+  /**
+   * Returns the current state vector x. Note that this will not include noise!
+   */
+  wpi::math::Vectord<7> GetState() const;
+
+  /**
+   * Returns an element of the state vector. Note that this will not include
+   * noise!
+   *
+   * @param state The row of the state vector.
+   */
+  double GetState(int state) const;
 
   /**
    * Get the right encoder position in meters.
@@ -336,19 +355,6 @@ class DifferentialDrivetrainSim {
    * Returns the current output vector y.
    */
   wpi::math::Vectord<7> GetOutput() const;
-
-  /**
-   * Returns an element of the state vector. Note that this will not include
-   * noise!
-   *
-   * @param output The row of the output vector.
-   */
-  double GetState(int state) const;
-
-  /**
-   * Returns the current state vector x. Note that this will not include noise!
-   */
-  wpi::math::Vectord<7> GetState() const;
 
   wpi::math::LinearSystem<2, 2, 2> m_plant;
   wpi::units::meter_t m_rb;

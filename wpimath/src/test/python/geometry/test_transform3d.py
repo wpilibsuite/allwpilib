@@ -1,4 +1,3 @@
-import pytest
 import math
 import numpy as np
 
@@ -12,7 +11,7 @@ def test_to_matrix():
         z=3,
         rotation=Rotation3d(math.radians(10), math.radians(20), math.radians(30)),
     )
-    after = Transform3d.fromMatrix(before.toMatrix())
+    after = Transform3d.from_matrix(before.to_matrix())
 
     assert before == after
 

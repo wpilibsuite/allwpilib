@@ -1,0 +1,22 @@
+load("//thirdparty/imgui_suite/imgui_test_engine:imgui_test.bzl", "wpilib_imgui_cc_test")
+
+wpilib_imgui_cc_test(
+    name = "halsim_gui_imgui_tests",
+    size = "small",
+    srcs = [
+        "//simulation/halsim_gui:main-native-srcs",
+    ] + glob(["*.cpp"]),
+    tags = [
+        "no-asan",
+    ],
+    deps = [
+        "//glass:glassnt",
+        "//hal:wpiHal",
+        "//simulation/halsim_gui:headers",
+    ],
+)
+
+test_suite(
+    name = "imgui",
+    tests = [":halsim_gui_imgui_tests"],
+)

@@ -34,13 +34,10 @@ void HALSIM_CancelEncoderCountCallback(int32_t index, int32_t uid);
 int32_t HALSIM_GetEncoderCount(int32_t index);
 void HALSIM_SetEncoderCount(int32_t index, int32_t count);
 
-int32_t HALSIM_RegisterEncoderPeriodCallback(int32_t index,
-                                             HAL_NotifyCallback callback,
-                                             void* param,
-                                             HAL_Bool initialNotify);
-void HALSIM_CancelEncoderPeriodCallback(int32_t index, int32_t uid);
-double HALSIM_GetEncoderPeriod(int32_t index);
-void HALSIM_SetEncoderPeriod(int32_t index, double period);
+int32_t HALSIM_RegisterEncoderRateCallback(int32_t index,
+                                           HAL_NotifyCallback callback,
+                                           void* param, HAL_Bool initialNotify);
+void HALSIM_CancelEncoderRateCallback(int32_t index, int32_t uid);
 
 int32_t HALSIM_RegisterEncoderResetCallback(int32_t index,
                                             HAL_NotifyCallback callback,
@@ -49,14 +46,6 @@ int32_t HALSIM_RegisterEncoderResetCallback(int32_t index,
 void HALSIM_CancelEncoderResetCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetEncoderReset(int32_t index);
 void HALSIM_SetEncoderReset(int32_t index, HAL_Bool reset);
-
-int32_t HALSIM_RegisterEncoderMaxPeriodCallback(int32_t index,
-                                                HAL_NotifyCallback callback,
-                                                void* param,
-                                                HAL_Bool initialNotify);
-void HALSIM_CancelEncoderMaxPeriodCallback(int32_t index, int32_t uid);
-double HALSIM_GetEncoderMaxPeriod(int32_t index);
-void HALSIM_SetEncoderMaxPeriod(int32_t index, double maxPeriod);
 
 int32_t HALSIM_RegisterEncoderDirectionCallback(int32_t index,
                                                 HAL_NotifyCallback callback,
@@ -73,13 +62,6 @@ void HALSIM_CancelEncoderReverseDirectionCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetEncoderReverseDirection(int32_t index);
 void HALSIM_SetEncoderReverseDirection(int32_t index,
                                        HAL_Bool reverseDirection);
-
-int32_t HALSIM_RegisterEncoderSamplesToAverageCallback(
-    int32_t index, HAL_NotifyCallback callback, void* param,
-    HAL_Bool initialNotify);
-void HALSIM_CancelEncoderSamplesToAverageCallback(int32_t index, int32_t uid);
-int32_t HALSIM_GetEncoderSamplesToAverage(int32_t index);
-void HALSIM_SetEncoderSamplesToAverage(int32_t index, int32_t samplesToAverage);
 
 int32_t HALSIM_RegisterEncoderDistancePerPulseCallback(
     int32_t index, HAL_NotifyCallback callback, void* param,

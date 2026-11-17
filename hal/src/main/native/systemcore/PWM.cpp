@@ -6,9 +6,8 @@
 
 #include <cmath>
 #include <cstdio>
+#include <format>
 #include <thread>
-
-#include <fmt/format.h>
 
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
@@ -31,10 +30,10 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  if (channel < 0 || channel >= kNumSmartIo) {
+  if (channel < 0 || channel >= NUM_SMART_IO) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
-                                       "Invalid Index for PWM", 0, kNumSmartIo,
-                                       channel);
+                                       "Invalid Index for PWM", 0,
+                                       NUM_SMART_IO - 1, channel);
     return HAL_INVALID_HANDLE;
   }
 
@@ -91,7 +90,7 @@ void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
 }
 
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
-  return channel < kNumSmartIo && channel >= 0;
+  return channel < NUM_SMART_IO && channel >= 0;
 }
 
 void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
@@ -107,7 +106,7 @@ void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,
       (microsecondPulseTime != 0xFFFF && microsecondPulseTime >= 4096)) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format("Pulse time {} out of range. Expect [0-4096) or 0xFFFF",
+        std::format("Pulse time {} out of range. Expect [0-4096) or 0xFFFF",
                     microsecondPulseTime));
     return;
   }

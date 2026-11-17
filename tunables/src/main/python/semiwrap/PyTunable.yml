@@ -1,0 +1,28 @@
+defaults:
+  default_args_as_kw_only: true
+classes:
+  wpi::tunables::python::PyTunable:
+    rename: Tunable
+    ignored_bases:
+    - std::enable_shared_from_this<PyTunable>
+    force_no_trampoline: true
+    methods:
+      PyTunable:
+        no_release_gil: true
+        param_override:
+          isMutable:
+            name: mutable
+          narrowScalar:
+            ignore: true
+      Get:
+        no_release_gil: true
+      Set:
+        no_release_gil: true
+      Mutate:
+        no_release_gil: true
+      GetBase:
+        ignore_py: true
+      Refresh:
+        ignore_py: true
+      NeedsRefresh:
+        ignore_py: true

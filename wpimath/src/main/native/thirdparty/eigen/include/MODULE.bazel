@@ -1,7 +1,7 @@
 module(
     name = "eigen",
-    version = "3.4.0",
+    version = "5.0.1",
 )
 
-bazel_dep(name = "rules_cc", version = "0.1.5")
+bazel_dep(name = "rules_cc", version = "0.2.18")
 bazel_dep(name = "rules_license", version = "1.0.0")

@@ -16,12 +16,12 @@ def test_deferred_functions(scheduler: commands2.CommandScheduler):
     command.execute()
     verify(inner_command).execute()
 
-    assert not command.isFinished()
-    verify(inner_command).isFinished()
+    assert not command.is_finished()
+    verify(inner_command).is_finished()
 
-    inner_command.isFinished = lambda: True
-    assert command.isFinished()
-    verify(inner_command, times=times(2)).isFinished()
+    inner_command.is_finished = lambda: True
+    assert command.is_finished()
+    verify(inner_command, times=times(2)).is_finished()
 
     command.end(False)
     verify(inner_command).end(False)
@@ -52,12 +52,12 @@ def test_deferred_requirements(scheduler: commands2.CommandScheduler):
     subsystem = commands2.Subsystem()
     command = commands2.DeferredCommand(lambda: commands2.Command(), subsystem)
 
-    assert subsystem in command.getRequirements()
+    assert subsystem in command.get_requirements()
 
 
 def test_deferred_null_command(scheduler: commands2.CommandScheduler):
     command = commands2.DeferredCommand(lambda: None)  # type: ignore
     command.initialize()
     command.execute()
-    command.isFinished()
+    command.is_finished()
     command.end(False)

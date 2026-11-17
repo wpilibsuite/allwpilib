@@ -11,9 +11,9 @@ package org.wpilib.examples.drivedistanceoffboard;
  */
 public class ExampleSmartMotorController {
   public enum PIDMode {
-    kPosition,
-    kVelocity,
-    kMovementWitchcraft
+    POSITION,
+    VELOCITY,
+    MOVEMENT_WITCHCRAFT
   }
 
   double value;
@@ -84,8 +84,4 @@ public class ExampleSmartMotorController {
   public boolean getInverted() {
     return false;
   }
-
-  public void disable() {}
-
-  public void stopMotor() {}
 }

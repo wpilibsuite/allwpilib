@@ -7,21 +7,22 @@
 #include <stdint.h>
 
 #include <deque>
+#include <limits>
 #include <span>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "../MockLogger.hpp"
+#include "net/ClientImpl.hpp"
 #include "net/Message.hpp"
 #include "net/WireConnection.hpp"
 #include "net/WireDecoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/raw_ostream.hpp"
-
-using namespace std::string_literals;
 
 namespace wpi::nt::net {
 namespace {
@@ -71,7 +72,7 @@ class RecordingWireConnection : public WireConnection {
     binarySends.emplace_back(std::move(binary));
   }
 
-  uint64_t GetLastFlushTime() const override { return lastFlushTime; }
+  int64_t GetLastFlushTime() const override { return lastFlushTime; }
   uint64_t GetLastReceivedTime() const override { return lastReceivedTime; }
 
   void StopRead() override { readStopped = true; }
@@ -93,7 +94,7 @@ class RecordingWireConnection : public WireConnection {
   unsigned int version = 0x0401;
   bool ready = true;
   bool readStopped = false;
-  uint64_t lastFlushTime = 0;
+  int64_t lastFlushTime = 0;
   uint64_t lastReceivedTime = 0;
   std::string disconnectReason;
   std::vector<uint64_t> pings;
@@ -112,323 +113,481 @@ std::pair<int, Value> DecodeBinary(std::span<const uint8_t> data,
   int id = 0;
   Value value;
   std::string error;
-  EXPECT_TRUE(WireDecodeBinary(&data, &id, &value, &error, localTimeOffset))
-      << error;
-  EXPECT_TRUE(data.empty());
+  bool decoded = WireDecodeBinary(&data, &id, &value, &error, localTimeOffset);
+  UNSCOPED_INFO(error);
+  CHECK(decoded);
+  CHECK(data.empty());
   return {id, value};
 }
 
 ClientMessage Publish(int pubuid, std::string_view name) {
+  using namespace std::literals;
   return ClientMessage{PublishMsg{
       pubuid, std::string{name}, "double"s, wpi::util::json::object(), {}}};
 }
 
 }  // namespace
 
-TEST(NetworkOutgoingQueueTest, UpdatePeriodCalcUsesGcdAndMinimum) {
-  EXPECT_EQ(UpdatePeriodCalc(UINT32_MAX, 100), 100u);
-  EXPECT_EQ(UpdatePeriodCalc(100, 40), 20u);
-  EXPECT_EQ(UpdatePeriodCalc(6, 4), kMinPeriodMs);
+TEST_CASE("NetworkOutgoingQueueTest UpdatePeriodCalcUsesGcdAndMinimum",
+          "[ntcore][network-outgoing-queue]") {
+  CHECK(UpdatePeriodCalc(UINT32_MAX, 100) == 100u);
+  CHECK(UpdatePeriodCalc(100, 40) == 20u);
+  CHECK(UpdatePeriodCalc(6, 4) == MIN_PERIOD_MS);
 }
 
-TEST(NetworkOutgoingQueueTest, CalculatePeriodUsesGcdAndMinimum) {
+TEST_CASE("ClientImpl rejects overflowing RTT timestamps", "[ntcore][client]") {
+  RecordingWireConnection wire;
+  wpi::MockLogger logger;
+  int timeSyncUpdates = 0;
+  ClientImpl client{0,
+                    wire,
+                    false,
+                    logger,
+                    [&](int64_t, int64_t, bool) { ++timeSyncUpdates; },
+                    [](uint32_t) {}};
+  std::vector<uint8_t> encoded;
+  wpi::util::raw_uvector_ostream os{encoded};
+  WireEncodeBinary(os, -1, 1,
+                   Value::MakeInteger(std::numeric_limits<int64_t>::min()));
+
+  client.ProcessIncomingBinary(0, encoded);
+
+  CHECK(timeSyncUpdates == 0);
+}
+
+TEST_CASE("NetworkOutgoingQueueTest CalculatePeriodUsesGcdAndMinimum",
+          "[ntcore][network-outgoing-queue]") {
   std::vector<uint32_t> periods{100, 40, 60};
-  EXPECT_EQ(CalculatePeriod(periods, [](uint32_t period) { return period; }),
-            20u);
+  CHECK(CalculatePeriod(periods, [](uint32_t period) { return period; }) ==
+        20u);
 
   periods = {2, 4};
-  EXPECT_EQ(CalculatePeriod(periods, [](uint32_t period) { return period; }),
-            kMinPeriodMs);
+  CHECK(CalculatePeriod(periods, [](uint32_t period) { return period; }) ==
+        MIN_PERIOD_MS);
 }
 
-TEST(NetworkOutgoingQueueTest, RemoteTextMessageWaitsForReadyAndMinimumPeriod) {
+TEST_CASE(
+    "NetworkOutgoingQueueTest RemoteTextMessageWaitsForReadyAndMinimumPeriod",
+    "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ClientMessage> queue{wire, false};
 
   queue.SendMessage(5, Publish(5, "test"));
 
   queue.SendOutgoing(4, false);
-  EXPECT_TRUE(wire.textWrites.empty());
+  CHECK(wire.textWrites.empty());
 
   wire.ready = false;
   queue.SendOutgoing(5, false);
-  EXPECT_TRUE(wire.textWrites.empty());
+  CHECK(wire.textWrites.empty());
 
   wire.ready = true;
   queue.SendOutgoing(5, false);
-  ASSERT_EQ(wire.textWrites.size(), 1u);
-  EXPECT_EQ(wire.textWrites[0],
-            "{\"method\":\"publish\",\"params\":{\"name\":\"test\","
-            "\"properties\":{},\"pubuid\":5,\"type\":\"double\"}}");
-  EXPECT_EQ(wire.flushCount, 1);
+  REQUIRE(wire.textWrites.size() == 1u);
+  CHECK(wire.textWrites[0] ==
+        "{\"method\":\"publish\",\"params\":{\"name\":\"test\","
+        "\"properties\":{},\"pubuid\":5,\"type\":\"double\"}}");
+  CHECK(wire.flushCount == 1);
 
   queue.SendOutgoing(10, false);
-  EXPECT_EQ(wire.textWrites.size(), 1u);
+  CHECK(wire.textWrites.size() == 1u);
 }
 
-TEST(NetworkOutgoingQueueTest, FlushWaitsForMinimumPeriod) {
+TEST_CASE("NetworkOutgoingQueueTest FlushWaitsForMinimumPeriod",
+          "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ClientMessage> queue{wire, false};
 
   queue.SendMessage(1, Publish(1, "first"));
   queue.SendOutgoing(5, false);
-  ASSERT_EQ(wire.textWrites.size(), 1u);
+  REQUIRE(wire.textWrites.size() == 1u);
 
   queue.SendMessage(2, Publish(2, "second"));
   queue.SendOutgoing(6, true);
-  ASSERT_EQ(wire.textWrites.size(), 1u);
+  REQUIRE(wire.textWrites.size() == 1u);
 
   queue.SendOutgoing(10, true);
-  ASSERT_EQ(wire.textWrites.size(), 2u);
-  EXPECT_EQ(wire.textWrites[1],
-            "{\"method\":\"publish\",\"params\":{\"name\":\"second\","
-            "\"properties\":{},\"pubuid\":2,\"type\":\"double\"}}");
+  REQUIRE(wire.textWrites.size() == 2u);
+  CHECK(wire.textWrites[1] ==
+        "{\"method\":\"publish\",\"params\":{\"name\":\"second\","
+        "\"properties\":{},\"pubuid\":2,\"type\":\"double\"}}");
 }
 
-TEST(NetworkOutgoingQueueTest, NormalValueKeepsOnlyNewestQueuedTimestamp) {
+TEST_CASE("NetworkOutgoingQueueTest NormalValueKeepsOnlyNewestQueuedTimestamp",
+          "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
-  queue.SendValue(7, Value::MakeDouble(1.0, 100), ValueSendMode::kNormal);
-  queue.SendValue(7, Value::MakeDouble(2.0, 200), ValueSendMode::kNormal);
-  queue.SendValue(7, Value::MakeDouble(3.0, 150), ValueSendMode::kNormal);
+  queue.SendValue(7, Value::MakeDouble(1.0, 100'000), ValueSendMode::NORMAL);
+  queue.SendValue(7, Value::MakeDouble(2.0, 200'000), ValueSendMode::NORMAL);
+  queue.SendValue(7, Value::MakeDouble(3.0, 150'000), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
 
-  ASSERT_EQ(wire.binaryWrites.size(), 1u);
+  REQUIRE(wire.binaryWrites.size() == 1u);
   auto [id, value] = DecodeBinary(wire.binaryWrites[0]);
-  EXPECT_EQ(id, 7);
-  EXPECT_EQ(value.time(), 200);
-  EXPECT_EQ(value.GetDouble(), 2.0);
+  CHECK(id == 7);
+  CHECK(value.time() == 200'000);
+  CHECK(value.GetDouble() == 2.0);
 }
 
-TEST(NetworkOutgoingQueueTest, NormalValueShrinkUpdatesTotalSize) {
+TEST_CASE("NetworkOutgoingQueueTest NormalValueShrinkUpdatesTotalSize",
+          "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
   queue.SendValue(1, Value::MakeString(std::string(900 * 1024, 'x'), 10),
-                  ValueSendMode::kNormal);
-  queue.SendValue(1, Value::MakeDouble(1.0, 20), ValueSendMode::kNormal);
-  queue.SendValue(1, Value::MakeDouble(2.0, 30), ValueSendMode::kAll);
-  queue.SendValue(1, Value::MakeDouble(3.0, 40), ValueSendMode::kAll);
+                  ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeDouble(1.0, 20), ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeDouble(2.0, 30), ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeDouble(3.0, 40), ValueSendMode::ALL);
 
   queue.SendOutgoing(5, true);
 
-  ASSERT_EQ(wire.binaryWrites.size(), 3u);
+  REQUIRE(wire.binaryWrites.size() == 3u);
 
   auto [id0, value0] = DecodeBinary(wire.binaryWrites[0]);
-  EXPECT_EQ(id0, 1);
-  EXPECT_EQ(value0.GetDouble(), 1.0);
+  CHECK(id0 == 1);
+  CHECK(value0.GetDouble() == 1.0);
 
   auto [id1, value1] = DecodeBinary(wire.binaryWrites[1]);
-  EXPECT_EQ(id1, 1);
-  EXPECT_EQ(value1.GetDouble(), 2.0);
+  CHECK(id1 == 1);
+  CHECK(value1.GetDouble() == 2.0);
 
   auto [id2, value2] = DecodeBinary(wire.binaryWrites[2]);
-  EXPECT_EQ(id2, 1);
-  EXPECT_EQ(value2.GetDouble(), 3.0);
+  CHECK(id2 == 1);
+  CHECK(value2.GetDouble() == 3.0);
 }
 
-TEST(NetworkOutgoingQueueTest, NormalValueReplacesAfterPeriodChange) {
+TEST_CASE(
+    "NetworkOutgoingQueueTest "
+    "NormalValueShrinkBelowBackpressureUpdatesTotalSize",
+    "[ntcore][network-outgoing-queue]") {
+  RecordingWireConnection wire;
+  NetworkOutgoingQueue<ServerMessage> queue{wire, false};
+
+  queue.SendValue(
+      1, Value::MakeRaw(std::vector<uint8_t>(1100 * 1024, 'x'), 10'000),
+      ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'y'), 20'000),
+                  ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'z'), 30'000),
+                  ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'w'), 40'000),
+                  ValueSendMode::ALL);
+
+  queue.SendOutgoing(5, true);
+
+  REQUIRE(wire.binaryWrites.size() == 3u);
+
+  auto [id0, value0] = DecodeBinary(wire.binaryWrites[0]);
+  CHECK(id0 == 1);
+  CHECK(value0.time() == 20'000);
+  CHECK(value0.GetRaw().size() == 32u);
+
+  auto [id1, value1] = DecodeBinary(wire.binaryWrites[1]);
+  CHECK(id1 == 1);
+  CHECK(value1.time() == 30'000);
+  CHECK(value1.GetRaw().size() == 32u);
+
+  auto [id2, value2] = DecodeBinary(wire.binaryWrites[2]);
+  CHECK(id2 == 1);
+  CHECK(value2.time() == 40'000);
+  CHECK(value2.GetRaw().size() == 32u);
+}
+
+TEST_CASE("NetworkOutgoingQueueTest NormalValueGrowThenDrainClearsTotalSize",
+          "[ntcore][network-outgoing-queue]") {
+  RecordingWireConnection wire;
+  NetworkOutgoingQueue<ServerMessage> queue{wire, false};
+
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'x'), 10'000),
+                  ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(4096, 'y'), 20'000),
+                  ValueSendMode::NORMAL);
+  queue.SendOutgoing(5, true);
+
+  wire.binaryWrites.clear();
+
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'z'), 30'000),
+                  ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'w'), 40'000),
+                  ValueSendMode::ALL);
+  queue.SendOutgoing(10, true);
+
+  REQUIRE(wire.binaryWrites.size() == 2u);
+
+  auto [id0, value0] = DecodeBinary(wire.binaryWrites[0]);
+  CHECK(id0 == 1);
+  CHECK(value0.time() == 30'000);
+  CHECK(value0.GetRaw().size() == 32u);
+
+  auto [id1, value1] = DecodeBinary(wire.binaryWrites[1]);
+  CHECK(id1 == 1);
+  CHECK(value1.time() == 40'000);
+  CHECK(value1.GetRaw().size() == 32u);
+}
+
+TEST_CASE(
+    "NetworkOutgoingQueueTest NormalValueGrowAcrossBackpressureLimitCoalesces",
+    "[ntcore][network-outgoing-queue]") {
+  RecordingWireConnection wire;
+  NetworkOutgoingQueue<ServerMessage> queue{wire, false};
+
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'x'), 10'000),
+                  ValueSendMode::NORMAL);
+  queue.SendValue(
+      1, Value::MakeRaw(std::vector<uint8_t>(1024 * 1024, 'y'), 20'000),
+      ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(64, 'z'), 30'000),
+                  ValueSendMode::ALL);
+
+  queue.SendOutgoing(5, true);
+
+  REQUIRE(wire.binaryWrites.size() == 1u);
+
+  auto [id, value] = DecodeBinary(wire.binaryWrites[0]);
+  CHECK(id == 1);
+  CHECK(value.time() == 30'000);
+  CHECK(value.GetRaw().size() == 64u);
+}
+
+TEST_CASE("NetworkOutgoingQueueTest OlderNormalValueDoesNotChangeTotalSize",
+          "[ntcore][network-outgoing-queue]") {
+  RecordingWireConnection wire;
+  NetworkOutgoingQueue<ServerMessage> queue{wire, false};
+
+  queue.SendValue(
+      1, Value::MakeRaw(std::vector<uint8_t>(1100 * 1024, 'x'), 20'000),
+      ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(32, 'y'), 10'000),
+                  ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeRaw(std::vector<uint8_t>(64, 'z'), 30'000),
+                  ValueSendMode::ALL);
+
+  queue.SendOutgoing(5, true);
+
+  REQUIRE(wire.binaryWrites.size() == 1u);
+
+  auto [id, value] = DecodeBinary(wire.binaryWrites[0]);
+  CHECK(id == 1);
+  CHECK(value.time() == 30'000);
+  CHECK(value.GetRaw().size() == 64u);
+}
+
+TEST_CASE("NetworkOutgoingQueueTest NormalValueReplacesAfterPeriodChange",
+          "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
   queue.SetPeriod(1, 100);
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10'000), ValueSendMode::NORMAL);
 
   queue.SetPeriod(2, 50);
-  queue.SendValue(2, Value::MakeDouble(2.0, 20), ValueSendMode::kNormal);
+  queue.SendValue(2, Value::MakeDouble(2.0, 20'000), ValueSendMode::NORMAL);
 
   queue.SetPeriod(1, 50);
-  queue.SendValue(1, Value::MakeDouble(3.0, 30), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(3.0, 30'000), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
 
-  ASSERT_EQ(wire.binaryWrites.size(), 2u);
+  REQUIRE(wire.binaryWrites.size() == 2u);
   auto [id0, value0] = DecodeBinary(wire.binaryWrites[0]);
-  EXPECT_EQ(id0, 2);
-  EXPECT_EQ(value0.GetDouble(), 2.0);
+  CHECK(id0 == 2);
+  CHECK(value0.GetDouble() == 2.0);
 
   auto [id1, value1] = DecodeBinary(wire.binaryWrites[1]);
-  EXPECT_EQ(id1, 1);
-  EXPECT_EQ(value1.time(), 30);
-  EXPECT_EQ(value1.GetDouble(), 3.0);
+  CHECK(id1 == 1);
+  CHECK(value1.time() == 30'000);
+  CHECK(value1.GetDouble() == 3.0);
 }
 
-TEST(NetworkOutgoingQueueTest, NormalValueReplacesLastValueAfterPeriodChange) {
+TEST_CASE(
+    "NetworkOutgoingQueueTest NormalValueReplacesLastValueAfterPeriodChange",
+    "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
   queue.SetPeriod(1, 100);
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kAll);
-  queue.SendValue(1, Value::MakeDouble(2.0, 20), ValueSendMode::kAll);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10'000), ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeDouble(2.0, 20'000), ValueSendMode::ALL);
 
   queue.SetPeriod(2, 50);
-  queue.SendValue(2, Value::MakeDouble(4.0, 40), ValueSendMode::kNormal);
+  queue.SendValue(2, Value::MakeDouble(4.0, 40'000), ValueSendMode::NORMAL);
 
   queue.SetPeriod(1, 50);
-  queue.SendValue(1, Value::MakeDouble(3.0, 30), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(3.0, 30'000), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
 
-  ASSERT_EQ(wire.binaryWrites.size(), 3u);
+  REQUIRE(wire.binaryWrites.size() == 3u);
   auto [id0, value0] = DecodeBinary(wire.binaryWrites[0]);
-  EXPECT_EQ(id0, 2);
-  EXPECT_EQ(value0.GetDouble(), 4.0);
+  CHECK(id0 == 2);
+  CHECK(value0.GetDouble() == 4.0);
 
   auto [id1, value1] = DecodeBinary(wire.binaryWrites[1]);
-  EXPECT_EQ(id1, 1);
-  EXPECT_EQ(value1.time(), 10);
-  EXPECT_EQ(value1.GetDouble(), 1.0);
+  CHECK(id1 == 1);
+  CHECK(value1.time() == 10'000);
+  CHECK(value1.GetDouble() == 1.0);
 
   auto [id2, value2] = DecodeBinary(wire.binaryWrites[2]);
-  EXPECT_EQ(id2, 1);
-  EXPECT_EQ(value2.time(), 30);
-  EXPECT_EQ(value2.GetDouble(), 3.0);
+  CHECK(id2 == 1);
+  CHECK(value2.time() == 30'000);
+  CHECK(value2.GetDouble() == 3.0);
 }
 
-TEST(NetworkOutgoingQueueTest, PeriodChangeMovesMixedMessagesInStableOrder) {
+TEST_CASE(
+    "NetworkOutgoingQueueTest PeriodChangeMovesMixedMessagesInStableOrder",
+    "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ClientMessage> queue{wire, false};
 
   queue.SetPeriod(1, 100);
   queue.SendMessage(1, Publish(1, "first"));
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kAll);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10'000), ValueSendMode::ALL);
   queue.SendMessage(1, Publish(1, "second"));
 
   queue.SetPeriod(2, 50);
   queue.SendMessage(2, Publish(2, "dest"));
 
   queue.SetPeriod(1, 50);
-  queue.SendValue(1, Value::MakeDouble(2.0, 20), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(2.0, 20'000), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
 
-  ASSERT_EQ(wire.textWrites.size(), 3u);
-  EXPECT_EQ(wire.textWrites[0],
-            "{\"method\":\"publish\",\"params\":{\"name\":\"dest\","
-            "\"properties\":{},\"pubuid\":2,\"type\":\"double\"}}");
-  EXPECT_EQ(wire.textWrites[1],
-            "{\"method\":\"publish\",\"params\":{\"name\":\"first\","
-            "\"properties\":{},\"pubuid\":1,\"type\":\"double\"}}");
-  EXPECT_EQ(wire.textWrites[2],
-            "{\"method\":\"publish\",\"params\":{\"name\":\"second\","
-            "\"properties\":{},\"pubuid\":1,\"type\":\"double\"}}");
+  REQUIRE(wire.textWrites.size() == 3u);
+  CHECK(wire.textWrites[0] ==
+        "{\"method\":\"publish\",\"params\":{\"name\":\"dest\","
+        "\"properties\":{},\"pubuid\":2,\"type\":\"double\"}}");
+  CHECK(wire.textWrites[1] ==
+        "{\"method\":\"publish\",\"params\":{\"name\":\"first\","
+        "\"properties\":{},\"pubuid\":1,\"type\":\"double\"}}");
+  CHECK(wire.textWrites[2] ==
+        "{\"method\":\"publish\",\"params\":{\"name\":\"second\","
+        "\"properties\":{},\"pubuid\":1,\"type\":\"double\"}}");
 
-  ASSERT_EQ(wire.binaryWrites.size(), 1u);
+  REQUIRE(wire.binaryWrites.size() == 1u);
   auto [id, value] = DecodeBinary(wire.binaryWrites[0]);
-  EXPECT_EQ(id, 1);
-  EXPECT_EQ(value.time(), 20);
-  EXPECT_EQ(value.GetDouble(), 2.0);
+  CHECK(id == 1);
+  CHECK(value.time() == 20'000);
+  CHECK(value.GetDouble() == 2.0);
 }
 
-TEST(NetworkOutgoingQueueTest, SendAllValuesAppendBelowBackpressureLimit) {
+TEST_CASE("NetworkOutgoingQueueTest SendAllValuesAppendBelowBackpressureLimit",
+          "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kAll);
-  queue.SendValue(1, Value::MakeDouble(2.0, 20), ValueSendMode::kAll);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeDouble(2.0, 20), ValueSendMode::ALL);
 
   queue.SendOutgoing(5, true);
 
-  ASSERT_EQ(wire.binaryWrites.size(), 2u);
+  REQUIRE(wire.binaryWrites.size() == 2u);
   auto [id0, value0] = DecodeBinary(wire.binaryWrites[0]);
-  EXPECT_EQ(id0, 1);
-  EXPECT_EQ(value0.GetDouble(), 1.0);
+  CHECK(id0 == 1);
+  CHECK(value0.GetDouble() == 1.0);
 
   auto [id1, value1] = DecodeBinary(wire.binaryWrites[1]);
-  EXPECT_EQ(id1, 1);
-  EXPECT_EQ(value1.GetDouble(), 2.0);
+  CHECK(id1 == 1);
+  CHECK(value1.GetDouble() == 2.0);
 }
 
-TEST(NetworkOutgoingQueueTest, SendAllValuesCoalesceAfterBackpressureLimit) {
+TEST_CASE(
+    "NetworkOutgoingQueueTest SendAllValuesCoalesceAfterBackpressureLimit",
+    "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
   queue.SendValue(1, Value::MakeString(std::string(1024 * 1024, 'x'), 10),
-                  ValueSendMode::kAll);
+                  ValueSendMode::ALL);
   queue.SendValue(1, Value::MakeString(std::string(1024 * 1024, 'y'), 20),
-                  ValueSendMode::kAll);
-  queue.SendValue(1, Value::MakeDouble(3.0, 30), ValueSendMode::kAll);
+                  ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeDouble(3.0, 30), ValueSendMode::ALL);
 
   queue.SendOutgoing(5, true);
 
-  ASSERT_EQ(wire.binaryWrites.size(), 1u);
+  REQUIRE(wire.binaryWrites.size() == 1u);
   auto [id, value] = DecodeBinary(wire.binaryWrites[0]);
-  EXPECT_EQ(id, 1);
-  EXPECT_EQ(value.GetDouble(), 3.0);
+  CHECK(id == 1);
+  CHECK(value.GetDouble() == 3.0);
 }
 
-TEST(NetworkOutgoingQueueTest, PartialWriteRetainsUnsentValueForReplacement) {
+TEST_CASE(
+    "NetworkOutgoingQueueTest PartialWriteRetainsUnsentValueForReplacement",
+    "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   wire.binaryWriteReturns = {0, 1};
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kNormal);
-  queue.SendValue(2, Value::MakeDouble(2.0, 20), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::NORMAL);
+  queue.SendValue(2, Value::MakeDouble(2.0, 20), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
-  ASSERT_EQ(wire.binaryWrites.size(), 2u);
+  REQUIRE(wire.binaryWrites.size() == 2u);
 
-  queue.SendValue(2, Value::MakeDouble(3.0, 30), ValueSendMode::kNormal);
+  queue.SendValue(2, Value::MakeDouble(3.0, 30'000), ValueSendMode::NORMAL);
   queue.SendOutgoing(10, true);
 
-  ASSERT_EQ(wire.binaryWrites.size(), 3u);
+  REQUIRE(wire.binaryWrites.size() == 3u);
   auto [id, value] = DecodeBinary(wire.binaryWrites[2]);
-  EXPECT_EQ(id, 2);
-  EXPECT_EQ(value.time(), 30);
-  EXPECT_EQ(value.GetDouble(), 3.0);
+  CHECK(id == 2);
+  CHECK(value.time() == 30'000);
+  CHECK(value.GetDouble() == 3.0);
 }
 
-TEST(NetworkOutgoingQueueTest, FlushBackpressureRetainsLastUnsentValue) {
+TEST_CASE("NetworkOutgoingQueueTest FlushBackpressureRetainsLastUnsentValue",
+          "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   wire.flushReturns = {1};
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kNormal);
-  queue.SendValue(2, Value::MakeDouble(2.0, 20), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::NORMAL);
+  queue.SendValue(2, Value::MakeDouble(2.0, 20), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
-  ASSERT_EQ(wire.binaryWrites.size(), 2u);
+  REQUIRE(wire.binaryWrites.size() == 2u);
 
   queue.SendOutgoing(10, true);
 
-  ASSERT_EQ(wire.binaryWrites.size(), 3u);
+  REQUIRE(wire.binaryWrites.size() == 3u);
   auto [id, value] = DecodeBinary(wire.binaryWrites[2]);
-  EXPECT_EQ(id, 2);
-  EXPECT_EQ(value.GetDouble(), 2.0);
+  CHECK(id == 2);
+  CHECK(value.GetDouble() == 2.0);
 }
 
-TEST(NetworkOutgoingQueueTest, ClientImmediateValueAppliesTimeOffset) {
+TEST_CASE("NetworkOutgoingQueueTest ClientImmediateValueAppliesTimeOffset",
+          "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ClientMessage> queue{wire, false};
-  queue.SetTimeOffset(5);
+  queue.SetTimeOffset(5'000);
 
-  queue.SendValue(3, Value::MakeDouble(1.0, 10), ValueSendMode::kImm);
+  queue.SendValue(3, Value::MakeDouble(1.0, 10'000), ValueSendMode::IMM);
 
-  ASSERT_EQ(wire.binarySends.size(), 1u);
-  auto [id, value] = DecodeBinary(wire.binarySends[0], -5);
-  EXPECT_EQ(id, 3);
-  EXPECT_EQ(value.time(), 10);
-  EXPECT_EQ(value.server_time(), 15);
-  EXPECT_EQ(value.GetDouble(), 1.0);
+  REQUIRE(wire.binarySends.size() == 1u);
+  auto [id, value] = DecodeBinary(wire.binarySends[0], -5'000);
+  CHECK(id == 3);
+  CHECK(value.time() == 10'000);
+  CHECK(value.server_time() == 15'000);
+  CHECK(value.GetDouble() == 1.0);
 }
 
-TEST(NetworkOutgoingQueueTest, LocalQueueSendsImmediately) {
+TEST_CASE("NetworkOutgoingQueueTest LocalQueueSendsImmediately",
+          "[ntcore][network-outgoing-queue]") {
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ClientMessage> queue{wire, true};
 
   queue.SendMessage(5, Publish(5, "local"));
-  queue.SendValue(5, Value::MakeDouble(1.0, 10), ValueSendMode::kNormal);
+  queue.SendValue(5, Value::MakeDouble(1.0, 10), ValueSendMode::NORMAL);
   queue.SendOutgoing(5, true);
 
-  ASSERT_EQ(wire.textSends.size(), 1u);
-  EXPECT_EQ(wire.textSends[0],
-            "{\"method\":\"publish\",\"params\":{\"name\":\"local\","
-            "\"properties\":{},\"pubuid\":5,\"type\":\"double\"}}");
-  ASSERT_EQ(wire.binarySends.size(), 1u);
-  EXPECT_TRUE(wire.textWrites.empty());
-  EXPECT_TRUE(wire.binaryWrites.empty());
+  REQUIRE(wire.textSends.size() == 1u);
+  CHECK(wire.textSends[0] ==
+        "{\"method\":\"publish\",\"params\":{\"name\":\"local\","
+        "\"properties\":{},\"pubuid\":5,\"type\":\"double\"}}");
+  REQUIRE(wire.binarySends.size() == 1u);
+  CHECK(wire.textWrites.empty());
+  CHECK(wire.binaryWrites.empty());
 }
 
 }  // namespace wpi::nt::net

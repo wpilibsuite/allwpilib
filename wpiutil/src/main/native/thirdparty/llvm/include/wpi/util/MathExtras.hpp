@@ -14,7 +14,6 @@
 #define WPIUTIL_WPI_MATHEXTRAS_H
 
 #include "wpi/util/STLForwardCompat.hpp"
-#include "wpi/util/bit.hpp"
 #include "wpi/util/Compiler.hpp"
 #include <bit>
 #include <cassert>
@@ -764,6 +763,9 @@ using stack_float_t = volatile float;
 #else
 using stack_float_t = float;
 #endif
+
+/// Returns the number of digits in the given integer.
+LLVM_ABI int NumDigitsBase10(uint64_t X);
 
 // Typesafe implementation of the signum function.
 // Returns -1 if negative, 1 if positive, 0 if 0.

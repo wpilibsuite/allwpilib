@@ -10,6 +10,9 @@ This example shows how to use a duty cycle encoder for devices such as
 an arm or elevator.
 """
 
+from typing import override
+
+import telemetry
 import wpilib
 import wpimath
 
@@ -28,7 +31,7 @@ class MyRobot(wpilib.TimedRobot):
         # to measure this is fairly easy. Set the value to 0, place the mechanism
         # where you want "0" to be, and observe the value on the dashboard, That
         # is the value to enter for the 3rd parameter.
-        self.dutyCycleEncoder = wpilib.DutyCycleEncoder(0, FULL_RANGE, EXPECTED_ZERO)
+        self.duty_cycle_encoder = wpilib.DutyCycleEncoder(0, FULL_RANGE, EXPECTED_ZERO)
 
         # If you know the frequency of your sensor, uncomment the following
         # method, and set the method to the frequency of your sensor.
@@ -41,17 +44,18 @@ class MyRobot(wpilib.TimedRobot):
         # those values. This number doesn't have to be perfect,
         # just having a fairly close value will make the output readings
         # much more stable.
-        self.dutyCycleEncoder.setAssumedFrequency(967.8)
+        self.duty_cycle_encoder.set_assumed_frequency(967.8)
 
-    def robotPeriodic(self):
+    @override
+    def robot_periodic(self):
         # Connected can be checked, and uses the frequency of the encoder
-        connected = self.dutyCycleEncoder.isConnected()
+        connected = self.duty_cycle_encoder.is_connected()
 
         # Duty Cycle Frequency in Hz
-        frequency = self.dutyCycleEncoder.getFrequency()
+        frequency = self.duty_cycle_encoder.get_frequency()
 
         # Output of encoder
-        output = self.dutyCycleEncoder.get()
+        output = self.duty_cycle_encoder.get()
 
         # By default, the output will wrap around to the full range value
         # when the sensor goes below 0. However, for moving mechanisms this
@@ -63,12 +67,12 @@ class MyRobot(wpilib.TimedRobot):
         # can go a bit negative before wrapping. Usually 10% or so is fine.
         # This does not change where "0" is, so no calibration numbers need
         # to be changed.
-        percentOfRange = FULL_RANGE * 0.1
-        shiftedOutput = wpimath.inputModulus(
-            output, 0 - percentOfRange, FULL_RANGE - percentOfRange
+        percent_of_range = FULL_RANGE * 0.1
+        shifted_output = wpimath.input_modulus(
+            output, 0 - percent_of_range, FULL_RANGE - percent_of_range
         )
 
-        wpilib.SmartDashboard.putBoolean("Connected", connected)
-        wpilib.SmartDashboard.putNumber("Frequency", frequency)
-        wpilib.SmartDashboard.putNumber("Output", output)
-        wpilib.SmartDashboard.putNumber("ShiftedOutput", shiftedOutput)
+        telemetry.log("Connected", connected)
+        telemetry.log("Frequency", frequency)
+        telemetry.log("Output", output)
+        telemetry.log("ShiftedOutput", shifted_output)

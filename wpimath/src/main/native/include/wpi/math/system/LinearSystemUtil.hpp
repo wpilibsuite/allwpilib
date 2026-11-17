@@ -5,6 +5,7 @@
 #pragma once
 
 #include <complex>
+#include <limits>
 
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
@@ -32,7 +33,8 @@ bool IsStabilizable(const Eigen::Matrix<double, States, States>& A,
   Eigen::EigenSolver<Eigen::Matrix<double, States, States>> es{A, false};
 
   for (int i = 0; i < A.rows(); ++i) {
-    if (std::norm(es.eigenvalues()[i]) < 1) {
+    if (std::norm(es.eigenvalues()[i]) <
+        1.0 - std::numeric_limits<double>::epsilon()) {
       continue;
     }
 

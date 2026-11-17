@@ -1,0 +1,17 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+// One of two schemas that define Shared differently.
+
+namespace wpi.aosnt.testing.conflict;
+
+table Shared {
+  b:float (id: 0);
+}
+
+table Second {
+  shared:Shared (id: 0);
+}
+
+root_type Second;

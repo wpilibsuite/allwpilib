@@ -7,7 +7,6 @@ package org.wpilib.simulation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.hardware.motor.PWMVictorSPX;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.numbers.N1;
@@ -24,10 +23,10 @@ class DCMotorSimTest {
 
     DCMotor gearbox = DCMotor.getNEO(1);
     LinearSystem<N2, N1, N2> plant =
-        Models.singleJointedArmFromPhysicalConstants(gearbox, 0.0005, 1);
+        Models.angularPositionFromPhysicalConstants(gearbox, 0.0005, 1);
     DCMotorSim sim = new DCMotorSim(plant, gearbox);
 
-    try (var motor = new PWMVictorSPX(0);
+    try (var motor = new TestPWMMotorController(0);
         var encoder = new Encoder(0, 1)) {
       var encoderSim = new EncoderSim(encoder);
       encoderSim.resetData();
@@ -66,12 +65,12 @@ class DCMotorSimTest {
 
     DCMotor gearbox = DCMotor.getNEO(1);
     LinearSystem<N2, N1, N2> plant =
-        Models.singleJointedArmFromPhysicalConstants(gearbox, 0.0005, 1);
+        Models.angularPositionFromPhysicalConstants(gearbox, 0.0005, 1);
     DCMotorSim sim = new DCMotorSim(plant, gearbox);
 
-    try (var motor = new PWMVictorSPX(0);
-        var encoder = new Encoder(0, 1);
-        var controller = new PIDController(0.04, 0.0, 0.001)) {
+    try (var motor = new TestPWMMotorController(0);
+        var encoder = new Encoder(0, 1)) {
+      var controller = new PIDController(0.04, 0.0, 0.001);
       var encoderSim = new EncoderSim(encoder);
       encoderSim.resetData();
 

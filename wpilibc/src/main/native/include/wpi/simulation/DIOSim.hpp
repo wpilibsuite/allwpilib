@@ -93,31 +93,6 @@ class DIOSim {
   void SetValue(bool value);
 
   /**
-   * Register a callback to be run whenever the pulse length changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to call the callback with the initial state
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterPulseLengthCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Read the pulse length.
-   *
-   * @return the pulse length of this DIO port
-   */
-  double GetPulseLength() const;
-
-  /**
-   * Change the pulse length of this DIO port.
-   *
-   * @param pulseLength the new pulse length
-   */
-  void SetPulseLength(double pulseLength);
-
-  /**
    * Register a callback to be run whenever this DIO changes to be an input.
    *
    * @param callback the callback
@@ -142,32 +117,6 @@ class DIOSim {
    * @param isInput whether this DIO should be an Input
    */
   void SetIsInput(bool isInput);
-
-  /**
-   * Register a callback to be run whenever the filter index changes.
-   *
-   * @param callback the callback
-   * @param initialNotify whether the callback should be called with the
-   *                      initial value
-   * @return the CallbackStore object associated with this callback
-   */
-  [[nodiscard]]
-  std::unique_ptr<CallbackStore> RegisterFilterIndexCallback(
-      NotifyCallback callback, bool initialNotify);
-
-  /**
-   * Read the filter index.
-   *
-   * @return the filter index of this DIO port
-   */
-  int GetFilterIndex() const;
-
-  /**
-   * Change the filter index of this DIO port.
-   *
-   * @param filterIndex the new filter index
-   */
-  void SetFilterIndex(int filterIndex);
 
   /**
    * Reset all simulation data of this object.

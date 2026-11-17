@@ -27,11 +27,8 @@ class MatchState final {
    * Warning: This is not an official time (so it cannot be used to dispute ref
    * calls or guarantee that a function will trigger before the match ends).
    *
-   * When connected to the real field, this number only changes in full integer
-   * increments, and always counts down.
-   *
-   * When the DS is in practice mode, this number is a floating point number,
-   * and counts down.
+   * This number only changes in full integer increments and always counts down,
+   * both when connected to the real field and when the DS is in match mode.
    *
    * When the DS is in teleop or autonomous mode, this number returns -1.0.
    *
@@ -92,8 +89,8 @@ class MatchState final {
   /**
    * Returns the type of match being played provided by the FMS.
    *
-   * @return The match type enum (kNone, kPractice, kQualification,
-   *         kElimination)
+   * @return The match type enum (NONE, PRACTICE, QUALIFICATION,
+   *         ELIMINATION)
    */
   static MatchType GetMatchType() {
     return wpi::internal::DriverStationBackend::GetMatchType();

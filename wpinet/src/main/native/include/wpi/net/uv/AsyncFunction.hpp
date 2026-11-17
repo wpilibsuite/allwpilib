@@ -147,11 +147,12 @@ class AsyncFunction<R(T...)> final
       m_params.emplace_back(std::piecewise_construct,
                             std::forward_as_tuple(req),
                             std::forward_as_tuple(std::forward<U>(u)...));
-    }
 
-    // signal the loop
-    if (loop) {
-      this->Invoke(&uv_async_send, this->GetRaw());
+      // Keep the queue locked until signaling finishes. An earlier wakeup
+      // could otherwise run this call and close the handle before we send.
+      if (loop) {
+        this->Invoke(&uv_async_send, this->GetRaw());
+      }
     }
 
     // return future

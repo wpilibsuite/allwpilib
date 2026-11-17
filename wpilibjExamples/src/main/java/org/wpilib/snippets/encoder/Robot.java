@@ -26,15 +26,8 @@ public class Robot extends TimedRobot {
     // Configures the encoder to return a distance of 4 for every 256 pulses
     // Also changes the units of getRate
     encoder.setDistancePerPulse(4.0 / 256.0);
-    // Configures the encoder to consider itself stopped after .1 seconds
-    encoder.setMaxPeriod(0.1);
-    // Configures the encoder to consider itself stopped when its rate is below 10
-    encoder.setMinRate(10);
     // Reverses the direction of the encoder
     encoder.setReverseDirection(true);
-    // Configures an encoder to average its period measurement over 5 samples
-    // Can be between 1 and 127 samples
-    encoder.setSamplesToAverage(5);
 
     encoder2x.getRate();
   }
@@ -54,7 +47,6 @@ public class Robot extends TimedRobot {
     encoder.getDirection();
 
     // Gets the current period of the encoder
-    encoder.getPeriod();
 
     // Resets the encoder to read a distance of zero
     encoder.reset();

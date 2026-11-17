@@ -25,7 +25,6 @@ class HALSimWSProviderDIO : public HALSimWSHalChanProvider {
  private:
   int32_t m_initCbKey = 0;
   int32_t m_valueCbKey = 0;
-  int32_t m_pulseLengthCbKey = 0;
   int32_t m_inputCbKey = 0;
 };
 

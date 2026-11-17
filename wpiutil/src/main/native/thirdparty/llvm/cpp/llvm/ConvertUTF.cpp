@@ -62,6 +62,7 @@
 ------------------------------------------------------------------------ */
 
 #include "wpi/util/ConvertUTF.hpp"
+#include "wpi/util/SmallVector.hpp"
 #ifdef CVTUTF_DEBUG
 #include <stdio.h>
 #endif
@@ -69,7 +70,16 @@
 
 #ifdef _WIN32
 #include "wpi/util/WindowsError.hpp"
-#include "Windows/WindowsSupport.hpp"
+// mingw-w64 tends to define it as 0x0502 in its headers.
+#undef _WIN32_WINNT
+
+// Require at least Windows 7 API.
+#define _WIN32_WINNT 0x0601
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
 #endif
 
 /*
@@ -450,9 +460,8 @@ unsigned getUTF8SequenceSize(const UTF8 *source, const UTF8 *sourceEnd) {
 
 /* --------------------------------------------------------------------- */
 
-static unsigned
-findMaximalSubpartOfIllFormedUTF8Sequence(const UTF8 *source,
-                                          const UTF8 *sourceEnd) {
+unsigned findMaximalSubpartOfIllFormedUTF8Sequence(const UTF8 *source,
+                                                   const UTF8 *sourceEnd) {
   UTF8 b1, b2, b3;
 
   assert(!isLegalUTF8Sequence(source, sourceEnd));

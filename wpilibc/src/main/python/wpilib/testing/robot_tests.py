@@ -8,11 +8,30 @@ To use these, add the following to a python file in your tests directory::
 
     from wpilib.testing.robot_tests import *
 
+In addition to the standard autonomous/teleop tests, ``test_opmode`` runs each
+published opmode (including utility modes) as a separate pytest parameter. Each
+case gets a fresh robot and runs disabled, enabled for 15 simulated seconds, and
+disabled again. Robots without published opmodes skip this test.
+
+Discovery starts a separate robot during collection and reads the opmodes
+published by startup, without constructing or enabling those opmodes. Modes
+registered later during operation are not included. This also applies when
+using the ``opmode`` fixture in custom tests.
+
 """
 
 import pytest
 
+from . import OpMode
 from .controller import RobotTestController
+
+
+def test_opmode(control: RobotTestController, opmode: OpMode):
+    """Runs each published opmode through disabled, enabled, and disabled."""
+    with control.run_robot():
+        control.step_timing(seconds=0.5, opmode=opmode, enabled=False)
+        control.step_timing(seconds=15, opmode=opmode, enabled=True)
+        control.step_timing(seconds=0.5, opmode=opmode, enabled=False)
 
 
 def test_autonomous(control: RobotTestController):

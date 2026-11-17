@@ -20,11 +20,11 @@ classes:
     template_inline_code: |
       cls_ImplicitModelFollower
         .def(py::init<const wpi::math::LinearSystem<States, Inputs, 1>&, const wpi::math::LinearSystem<States, Inputs, 1>&>(),
-          py::arg("plant"), py::arg("plantRef"))
+          py::arg("plant"), py::arg("plant_ref"))
         .def(py::init<const wpi::math::LinearSystem<States, Inputs, 2>&, const wpi::math::LinearSystem<States, Inputs, 2>&>(),
-          py::arg("plant"), py::arg("plantRef"))
+          py::arg("plant"), py::arg("plant_ref"))
         .def(py::init<const wpi::math::LinearSystem<States, Inputs, 3>&, const wpi::math::LinearSystem<States, Inputs, 3>&>(),
-          py::arg("plant"), py::arg("plantRef"))
+          py::arg("plant"), py::arg("plant_ref"))
         ;
 
 templates:

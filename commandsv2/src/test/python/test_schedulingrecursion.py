@@ -10,156 +10,156 @@ import pytest
 
 
 @pytest.mark.parametrize(
-    "interruptionBehavior",
+    "interruption_behavior",
     [
-        commands2.InterruptionBehavior.kCancelIncoming,
-        commands2.InterruptionBehavior.kCancelSelf,
+        commands2.InterruptionBehavior.CANCEL_INCOMING,
+        commands2.InterruptionBehavior.CANCEL_SELF,
     ],
 )
-def test_cancelFromInitialize(
-    interruptionBehavior: commands2.InterruptionBehavior,
+def test_cancel_from_initialize(
+    interruption_behavior: commands2.InterruptionBehavior,
     scheduler: commands2.CommandScheduler,
 ):
-    hasOtherRun = OOBoolean()
+    has_other_run = OOBoolean()
     requirement = commands2.Subsystem()
 
-    selfCancels = commands2.Command()
-    selfCancels.addRequirements(requirement)
-    selfCancels.getInterruptionBehavior = lambda: interruptionBehavior
-    selfCancels.initialize = lambda: scheduler.cancel(selfCancels)
+    self_cancels = commands2.Command()
+    self_cancels.add_requirements(requirement)
+    self_cancels.get_interruption_behavior = lambda: interruption_behavior
+    self_cancels.initialize = lambda: scheduler.cancel(self_cancels)
 
-    other = commands2.RunCommand(lambda: hasOtherRun.set(True), requirement)
+    other = commands2.RunCommand(lambda: has_other_run.set(True), requirement)
 
-    scheduler.schedule(selfCancels)
+    scheduler.schedule(self_cancels)
     scheduler.run()
     scheduler.schedule(other)
 
-    assert not scheduler.isScheduled(selfCancels)
-    assert scheduler.isScheduled(other)
+    assert not scheduler.is_scheduled(self_cancels)
+    assert scheduler.is_scheduled(other)
     scheduler.run()
-    assert hasOtherRun == True
+    assert has_other_run == True
 
 
 @pytest.mark.parametrize(
-    "interruptionBehavior",
+    "interruption_behavior",
     [
-        commands2.InterruptionBehavior.kCancelIncoming,
-        commands2.InterruptionBehavior.kCancelSelf,
+        commands2.InterruptionBehavior.CANCEL_INCOMING,
+        commands2.InterruptionBehavior.CANCEL_SELF,
     ],
 )
-def test_defaultCommandGetsRescheduledAfterSelfCanceling(
-    interruptionBehavior: commands2.InterruptionBehavior,
+def test_default_command_gets_rescheduled_after_self_canceling(
+    interruption_behavior: commands2.InterruptionBehavior,
     scheduler: commands2.CommandScheduler,
 ):
-    hasOtherRun = OOBoolean()
+    has_other_run = OOBoolean()
     requirement = commands2.Subsystem()
 
-    selfCancels = commands2.Command()
-    selfCancels.addRequirements(requirement)
-    selfCancels.getInterruptionBehavior = lambda: interruptionBehavior
-    selfCancels.initialize = lambda: scheduler.cancel(selfCancels)
+    self_cancels = commands2.Command()
+    self_cancels.add_requirements(requirement)
+    self_cancels.get_interruption_behavior = lambda: interruption_behavior
+    self_cancels.initialize = lambda: scheduler.cancel(self_cancels)
 
-    other = commands2.RunCommand(lambda: hasOtherRun.set(True), requirement)
-    scheduler.setDefaultCommand(requirement, other)
+    other = commands2.RunCommand(lambda: has_other_run.set(True), requirement)
+    scheduler.set_default_command(requirement, other)
 
-    scheduler.schedule(selfCancels)
+    scheduler.schedule(self_cancels)
     scheduler.run()
 
     scheduler.run()
-    assert not scheduler.isScheduled(selfCancels)
-    assert scheduler.isScheduled(other)
+    assert not scheduler.is_scheduled(self_cancels)
+    assert scheduler.is_scheduled(other)
     scheduler.run()
-    assert hasOtherRun == True
+    assert has_other_run == True
 
 
-def test_cancelFromEnd(scheduler: commands2.CommandScheduler):
+def test_cancel_from_end(scheduler: commands2.CommandScheduler):
     counter = OOInteger()
-    selfCancels = commands2.Command()
+    self_cancels = commands2.Command()
 
-    @patch_via_decorator(selfCancels)
+    @patch_via_decorator(self_cancels)
     def end(self, interrupted):
-        counter.incrementAndGet()
+        counter.increment_and_get()
         scheduler.cancel(self)
 
-    scheduler.schedule(selfCancels)
+    scheduler.schedule(self_cancels)
 
-    scheduler.cancel(selfCancels)
+    scheduler.cancel(self_cancels)
     assert counter == 1
-    assert not scheduler.isScheduled(selfCancels)
+    assert not scheduler.is_scheduled(self_cancels)
 
 
-def test_scheduleFromEnd(scheduler: commands2.CommandScheduler):
+def test_schedule_from_end(scheduler: commands2.CommandScheduler):
     counter = OOInteger()
     requirement = commands2.Subsystem()
     other = commands2.InstantCommand(lambda: None, requirement)
 
-    selfCancels = commands2.Command()
-    selfCancels.addRequirements(requirement)
+    self_cancels = commands2.Command()
+    self_cancels.add_requirements(requirement)
 
-    @patch_via_decorator(selfCancels)
+    @patch_via_decorator(self_cancels)
     def end(self, interrupted):
-        counter.incrementAndGet()
+        counter.increment_and_get()
         scheduler.schedule(other)
 
-    scheduler.schedule(selfCancels)
+    scheduler.schedule(self_cancels)
 
-    scheduler.cancel(selfCancels)
+    scheduler.cancel(self_cancels)
     assert counter == 1
-    assert not scheduler.isScheduled(selfCancels)
+    assert not scheduler.is_scheduled(self_cancels)
 
 
-def test_scheduleFromEndInterrupt(scheduler: commands2.CommandScheduler):
+def test_schedule_from_end_interrupt(scheduler: commands2.CommandScheduler):
     counter = OOInteger()
     requirement = commands2.Subsystem()
     other = commands2.InstantCommand(lambda: None, requirement)
 
-    selfCancels = commands2.Command()
-    selfCancels.addRequirements(requirement)
+    self_cancels = commands2.Command()
+    self_cancels.add_requirements(requirement)
 
-    @patch_via_decorator(selfCancels)
+    @patch_via_decorator(self_cancels)
     def end(self, interrupted):
-        counter.incrementAndGet()
+        counter.increment_and_get()
         scheduler.schedule(other)
 
-    scheduler.schedule(selfCancels)
+    scheduler.schedule(self_cancels)
 
     scheduler.schedule(other)
     assert counter == 1
-    assert not scheduler.isScheduled(selfCancels)
-    assert scheduler.isScheduled(other)
+    assert not scheduler.is_scheduled(self_cancels)
+    assert scheduler.is_scheduled(other)
 
 
 @pytest.mark.parametrize(
-    "interruptionBehavior",
+    "interruption_behavior",
     [
-        commands2.InterruptionBehavior.kCancelIncoming,
-        commands2.InterruptionBehavior.kCancelSelf,
+        commands2.InterruptionBehavior.CANCEL_INCOMING,
+        commands2.InterruptionBehavior.CANCEL_SELF,
     ],
 )
-def test_scheduleInitializeFromDefaultCommand(
-    interruptionBehavior: commands2.InterruptionBehavior,
+def test_schedule_initialize_from_default_command(
+    interruption_behavior: commands2.InterruptionBehavior,
     scheduler: commands2.CommandScheduler,
 ):
     counter = OOInteger()
     requirement = commands2.Subsystem()
-    other = commands2.InstantCommand(lambda: None, requirement).withInterruptBehavior(
-        interruptionBehavior
+    other = commands2.InstantCommand(lambda: None, requirement).with_interrupt_behavior(
+        interruption_behavior
     )
 
-    defaultCommand = commands2.Command()
-    defaultCommand.addRequirements(requirement)
+    default_command = commands2.Command()
+    default_command.add_requirements(requirement)
 
-    @patch_via_decorator(defaultCommand)
+    @patch_via_decorator(default_command)
     def initialize(self):
-        counter.incrementAndGet()
+        counter.increment_and_get()
         scheduler.schedule(other)
 
-    scheduler.setDefaultCommand(requirement, defaultCommand)
+    scheduler.set_default_command(requirement, default_command)
 
     scheduler.run()
     scheduler.run()
     scheduler.run()
 
     assert counter == 3
-    assert not scheduler.isScheduled(defaultCommand)
-    assert scheduler.isScheduled(other)
+    assert not scheduler.is_scheduled(default_command)
+    assert scheduler.is_scheduled(other)

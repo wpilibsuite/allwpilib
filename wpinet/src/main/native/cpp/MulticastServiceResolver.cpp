@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/net/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceResolver.hpp"
 
 #include <memory>
 #include <utility>
@@ -71,6 +71,7 @@ WPI_EventHandle WPI_GetMulticastServiceResolverEventHandle(
 
 WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     WPI_MulticastServiceResolverHandle handle, int32_t* dataCount) {
+  *dataCount = 0;
   std::vector<wpi::net::MulticastServiceResolver::ServiceData> allData;
   {
     auto& manager = wpi::net::GetMulticastManager();
@@ -79,7 +80,6 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     allData = resolver->GetData();
   }
   if (allData.empty()) {
-    *dataCount = 0;
     return nullptr;
   }
   size_t allocSize = sizeof(WPI_ServiceData) * allData.size();
@@ -107,7 +107,7 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     return nullptr;
   }
   WPI_ServiceData* rootArray = reinterpret_cast<WPI_ServiceData*>(cDataRaw);
-  cDataRaw += (sizeof(WPI_ServiceData) + allData.size());
+  cDataRaw += sizeof(WPI_ServiceData) * allData.size();
   WPI_ServiceData* currentData = rootArray;
 
   for (auto&& data : allData) {
@@ -146,6 +146,7 @@ WPI_ServiceData* WPI_GetMulticastServiceResolverData(
     currentData++;
   }
 
+  *dataCount = static_cast<int32_t>(allData.size());
   return rootArray;
 }
 

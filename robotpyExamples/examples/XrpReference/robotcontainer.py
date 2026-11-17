@@ -4,10 +4,9 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import typing
-
 import commands2
 import commands2.button
+import tunables
 import wpilib
 import xrp
 
@@ -30,18 +29,18 @@ class RobotContainer:
     def __init__(self) -> None:
         # The robot's subsystems and commands are defined here...
         self.drivetrain = Drivetrain()
-        self.onboardIO = xrp.XRPOnBoardIO()
+        self.onboard_io = xrp.XRPOnBoardIO()
         self.arm = Arm()
 
         # Assumes a gamepad plugged into channnel 0
         self.controller = wpilib.Joystick(0)
 
-        # Create SmartDashboard chooser for autonomous routines
-        self.chooser = wpilib.SendableChooser()
+        # Create a tunable selector for autonomous routines.
+        self.chooser = tunables.Selectable()
 
-        self._configureButtonBindings()
+        self._configure_button_bindings()
 
-    def _configureButtonBindings(self):
+    def _configure_button_bindings(self):
         """Use this method to define your button->command mappings. Buttons can be created by
         instantiating a :class:`.GenericHID` or one of its subclasses (:class`.Joystick or
         :class:`.XboxController`), and then passing it to a :class:`.JoystickButton`.
@@ -49,47 +48,49 @@ class RobotContainer:
 
         # Default command is arcade drive. This will run unless another command
         # is scheduled over it
-        self.drivetrain.setDefaultCommand(self.getArcadeDriveCommand())
+        self.drivetrain.set_default_command(self.get_arcade_drive_command())
 
         # Example of how to use the onboard IO
-        onboardButtonA = commands2.button.Trigger(self.onboardIO.getUserButtonPressed)
-        onboardButtonA.onTrue(commands2.PrintCommand("USER Button Pressed")).onFalse(
-            commands2.PrintCommand("USER Button Released")
+        onboard_button_a = commands2.button.Trigger(
+            self.onboard_io.get_user_button_pressed
+        )
+        onboard_button_a.on_true(
+            commands2.PrintCommand("USER Button Pressed")
+        ).on_false(commands2.PrintCommand("USER Button Released"))
+
+        joystick_a_button = commands2.button.JoystickButton(self.controller, 1)
+        joystick_a_button.on_true(
+            commands2.InstantCommand(lambda: self.arm.set_angle(45.0), self.arm)
+        )
+        joystick_a_button.on_false(
+            commands2.InstantCommand(lambda: self.arm.set_angle(0.0), self.arm)
         )
 
-        joystickAButton = commands2.button.JoystickButton(self.controller, 1)
-        joystickAButton.onTrue(
-            commands2.InstantCommand(lambda: self.arm.setAngle(45.0), self.arm)
+        joystick_b_button = commands2.button.JoystickButton(self.controller, 2)
+        joystick_b_button.on_true(
+            commands2.InstantCommand(lambda: self.arm.set_angle(90.0), self.arm)
         )
-        joystickAButton.onFalse(
-            commands2.InstantCommand(lambda: self.arm.setAngle(0.0), self.arm)
-        )
-
-        joystickBButton = commands2.button.JoystickButton(self.controller, 2)
-        joystickBButton.onTrue(
-            commands2.InstantCommand(lambda: self.arm.setAngle(90.0), self.arm)
-        )
-        joystickBButton.onFalse(
-            commands2.InstantCommand(lambda: self.arm.setAngle(0.0), self.arm)
+        joystick_b_button.on_false(
+            commands2.InstantCommand(lambda: self.arm.set_angle(0.0), self.arm)
         )
 
-        # Setup SmartDashboard options
-        self.chooser.setDefaultOption(
+        # Set up autonomous options.
+        self.chooser.add_default(
             "Auto Routine Distance", AutonomousDistance(self.drivetrain)
         )
-        self.chooser.addOption("Auto Routine Time", AutonomousTime(self.drivetrain))
-        wpilib.SmartDashboard.putData(self.chooser)
+        self.chooser.add("Auto Routine Time", AutonomousTime(self.drivetrain))
+        tunables.publish("Autonomous", self.chooser)
 
-    def getAutonomousCommand(self) -> typing.Optional[commands2.Command]:
-        return self.chooser.getSelected()
+    def get_autonomous_command(self) -> commands2.Command | None:
+        return self.chooser.get_selected()
 
-    def getArcadeDriveCommand(self) -> ArcadeDrive:
+    def get_arcade_drive_command(self) -> ArcadeDrive:
         """Use this to pass the teleop command to the main robot class.
 
         :returns: the command to run in teleop
         """
         return ArcadeDrive(
             self.drivetrain,
-            lambda: -self.controller.getRawAxis(1),
-            lambda: -self.controller.getRawAxis(2),
+            lambda: -self.controller.get_raw_axis(1),
+            lambda: -self.controller.get_raw_axis(2),
         )

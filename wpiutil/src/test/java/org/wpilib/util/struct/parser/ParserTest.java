@@ -38,6 +38,19 @@ class ParserTest {
   }
 
   @Test
+  void testUtf8Identifiers() {
+    Parser p = new Parser("{😀=1,二=2} 🚀Type data💾;");
+    ParsedSchema schema = assertDoesNotThrow(p::parse);
+    assertEquals(schema.declarations.size(), 1);
+    var decl = schema.declarations.get(0);
+    assertEquals(decl.typeString, "🚀Type");
+    assertEquals(decl.name, "data💾");
+    assertEquals(decl.enumValues.size(), 2);
+    assertEquals(decl.enumValues.get("😀"), 1);
+    assertEquals(decl.enumValues.get("二"), 2);
+  }
+
+  @Test
   void testSimpleTrailingSemi() {
     Parser p = new Parser("int32 a;");
     ParsedSchema schema = assertDoesNotThrow(p::parse);

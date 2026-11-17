@@ -71,11 +71,11 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
 
 jbyteArray SetCANReceiveMessageObject(JNIEnv* env, jobject canData,
                                       int32_t length, int32_t flags,
-                                      uint64_t timestamp);
+                                      int64_t timestamp);
 
 jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
                               int32_t length, int32_t flags, uint32_t messageId,
-                              uint64_t timestamp);
+                              int64_t timestamp);
 
 jobject CreateHALValue(JNIEnv* env, const HAL_Value& value);
 

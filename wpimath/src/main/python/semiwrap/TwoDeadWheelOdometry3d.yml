@@ -1,0 +1,11 @@
+classes:
+  wpi::math::TwoDeadWheelOdometry3d:
+    methods:
+      TwoDeadWheelOdometry3d:
+      ResetPosition:
+      ResetPose:
+      ResetTranslation:
+      ResetRotation:
+      GetPose:
+      Update:
+      ToChassisVelocities:

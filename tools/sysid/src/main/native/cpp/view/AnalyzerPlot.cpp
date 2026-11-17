@@ -6,12 +6,11 @@
 
 #include <algorithm>
 #include <cmath>
+#include <format>
 #include <functional>
 #include <mutex>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/sysid/Util.hpp"
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
@@ -77,8 +76,8 @@ AnalyzerPlot::AnalyzerPlot(wpi::util::Logger& logger) : m_logger(logger) {}
 void AnalyzerPlot::SetRawTimeData(const std::vector<PreparedData>& rawSlow,
                                   const std::vector<PreparedData>& rawFast,
                                   std::atomic<bool>& abort) {
-  auto rawSlowStep = std::ceil(rawSlow.size() * 1.0 / kMaxSize * 4);
-  auto rawFastStep = std::ceil(rawFast.size() * 1.0 / kMaxSize * 4);
+  auto rawSlowStep = std::ceil(rawSlow.size() * 1.0 / MAX_SIZE * 4);
+  auto rawFastStep = std::ceil(rawFast.size() * 1.0 / MAX_SIZE * 4);
   // Populate Raw Slow Time Series Data
   for (size_t i = 0; i < rawSlow.size(); i += rawSlowStep) {
     if (abort) {
@@ -109,10 +108,10 @@ void AnalyzerPlot::ResetData() {
 
 void AnalyzerPlot::SetGraphLabels(std::string_view unit) {
   std::string_view abbreviation = GetAbbreviation(unit);
-  m_velocityLabel = fmt::format("Velocity ({}/s)", abbreviation);
-  m_accelerationLabel = fmt::format("Acceleration ({}/s²)", abbreviation);
+  m_velocityLabel = std::format("Velocity ({}/s)", abbreviation);
+  m_accelerationLabel = std::format("Acceleration ({}/s²)", abbreviation);
   m_velPortionAccelLabel =
-      fmt::format("Velocity-Portion Accel ({}/s²)", abbreviation);
+      std::format("Velocity-Portion Accel ({}/s²)", abbreviation);
 }
 
 void AnalyzerPlot::SetRawData(const Storage& data, std::string_view unit,
@@ -161,8 +160,8 @@ void AnalyzerPlot::SetData(
 
   // Calculate step sizes to ensure that we only use the memory that we
   // allocated.
-  auto slowStep = std::ceil(slow.size() * 1.0 / kMaxSize * 4);
-  auto fastStep = std::ceil(fast.size() * 1.0 / kMaxSize * 4);
+  auto slowStep = std::ceil(slow.size() * 1.0 / MAX_SIZE * 4);
+  auto fastStep = std::ceil(fast.size() * 1.0 / MAX_SIZE * 4);
 
   wpi::units::second_t dtMean = GetMeanTimeDelta(filteredData);
 
@@ -226,7 +225,7 @@ void AnalyzerPlot::SetData(
     SetRawTimeData(rawSlow, rawFast, abort);
 
     // Populate simulated time domain data
-    if (type == analysis::kElevator) {
+    if (type == analysis::ELEVATOR) {
       const auto& Kg = ffGains.Kg.gain;
       m_quasistaticData.simData = PopulateTimeDomainSim(
           rawSlow, startTimes, fastStep, sysid::ElevatorSim{Ks, Kv, Ka, Kg},
@@ -234,7 +233,7 @@ void AnalyzerPlot::SetData(
       m_dynamicData.simData = PopulateTimeDomainSim(
           rawFast, startTimes, fastStep, sysid::ElevatorSim{Ks, Kv, Ka, Kg},
           &simSquaredErrorSum, &squaredVariationSum, &timeSeriesPoints);
-    } else if (type == analysis::kArm) {
+    } else if (type == analysis::ARM) {
       const auto& Kg = ffGains.Kg.gain;
       const auto& offset = ffGains.offset.gain;
       m_quasistaticData.simData = PopulateTimeDomainSim(
@@ -291,10 +290,10 @@ void AnalyzerPlot::SetData(
     double accelPortion = slow[i].acceleration - 1.0 / Ka * slow[i].voltage +
                           std::copysign(Ks / Ka, slow[i].velocity);
 
-    if (type == analysis::kElevator) {
+    if (type == analysis::ELEVATOR) {
       const auto& Kg = ffGains.Kg.gain;
       accelPortion -= Kg / Ka;
-    } else if (type == analysis::kArm) {
+    } else if (type == analysis::ARM) {
       const auto& Kg = ffGains.Kg.gain;
       accelPortion -= Kg / Ka * slow[i].cos;
     }
@@ -310,10 +309,10 @@ void AnalyzerPlot::SetData(
     double accelPortion = fast[i].acceleration - 1.0 / Ka * fast[i].voltage +
                           std::copysign(Ks / Ka, fast[i].velocity);
 
-    if (type == analysis::kElevator) {
+    if (type == analysis::ELEVATOR) {
       const auto& Kg = ffGains.Kg.gain;
       accelPortion -= Kg / Ka;
-    } else if (type == analysis::kArm) {
+    } else if (type == analysis::ARM) {
       const auto& Kg = ffGains.Kg.gain;
       accelPortion -= Kg / Ka * fast[i].cos;
     }
@@ -437,9 +436,9 @@ bool AnalyzerPlot::DisplayPlots() {
 }
 
 AnalyzerPlot::FilteredDataVsTimePlot::FilteredDataVsTimePlot() {
-  rawData.reserve(kMaxSize);
-  filteredData.reserve(kMaxSize);
-  simData.reserve(kMaxSize);
+  rawData.reserve(MAX_SIZE);
+  filteredData.reserve(MAX_SIZE);
+  simData.reserve(MAX_SIZE);
 }
 
 void AnalyzerPlot::FilteredDataVsTimePlot::Plot(const char* title,
@@ -484,7 +483,7 @@ void AnalyzerPlot::FilteredDataVsTimePlot::Clear() {
 }
 
 AnalyzerPlot::DataWithFitLinePlot::DataWithFitLinePlot() {
-  data.reserve(kMaxSize);
+  data.reserve(MAX_SIZE);
 }
 
 void AnalyzerPlot::DataWithFitLinePlot::Plot(const char* title,

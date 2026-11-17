@@ -43,7 +43,6 @@ components:
             - $ref: "#/components/schemas/addressableLEDData"
             - $ref: "#/components/schemas/aiData"
             - $ref: "#/components/schemas/dioData"
-            - $ref: "#/components/schemas/dpwmData"
             - $ref: "#/components/schemas/driverstationData"
             - $ref: "#/components/schemas/dutycycleData"
             - $ref: "#/components/schemas/encoderData"
@@ -161,35 +160,6 @@ components:
               type: number
               description: "Reserved for future use"
 
-    dpwmData:
-      type: object
-      required:
-      - type
-      - device
-      properties:
-        type:
-          type: string
-          description: Device Type (e.g. DIO/AI/PWM/Encoder etc)
-          const: dPWM
-        device:
-          type: string
-          description: Device Identifier (usually channel)
-        data:
-          type: object
-          description: "Duty Cycle Output Data (type: dPWM, device: channel number)"
-          properties:
-            <init:
-              type: boolean
-              description: "If output is initialized in the robot program"
-            <duty_cycle:
-              type: number
-              description: "Duty cycle %"
-              minimum: 0.0
-              maximum: 1.0
-            <dio_pin:
-              type: integer
-              description: "DIO pin number"
-
     driverstationData:
       type: object
       required:
@@ -213,12 +183,15 @@ components:
             ">enabled":
               type: boolean
               description: "True to enable the robot program"
+            ">robotMode":
+              type: integer
+              description: "Robot mode: 0 = unknown, 1 = autonomous, 2 = teleoperated, 3 = utility. Independent of enabled state."
             ">autonomous":
               type: boolean
-              description: "True for autonomous mode; false for teleoperated mode"
+              description: "Legacy output flag: true for autonomous mode; false for other modes. Sent with >robotMode for compatibility; not accepted as input."
             ">test":
               type: boolean
-              description: "True for test mode; false for other modes"
+              description: "Legacy output flag: true for utility mode; false for other modes. Sent with >robotMode for compatibility; not accepted as input."
             ">estop":
               type: boolean
               description: "True to emergency stop (no motor outputs)"
@@ -288,15 +261,12 @@ components:
             <channel_b:
               type: integer
               description: "Digital channel number for 'B' phase"
-            <samples_to_avg:
-              type: integer
-              description: "Number of samples to average for period measurement"
             ">count":
               type: integer
               description: "Accumulated count (pulses)"
-            ">period":
+            ">rate":
               type: number
-              description: "Period between pulses in seconds"
+              description: "Encoder rate in distance units per second"
             "<reverse_direction":
               type: boolean
               description: "If the encoder direction should be inverted"

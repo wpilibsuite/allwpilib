@@ -14,8 +14,6 @@
 #include <cstring>
 #include <string>
 
-#include <fmt/format.h>
-
 #include "HALInitializer.hpp"
 #include "mockdata/DriverStationDataInternal.hpp"
 #include "wpi/hal/DriverStationTypes.h"
@@ -25,21 +23,22 @@
 #include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
 #include "wpi/util/string.hpp"
 
 using namespace wpi::hal;
 
-static constexpr int kJoystickPorts = 6;
+static constexpr int JOYSTICK_PORTS = 6;
 
 namespace {
 struct JoystickDataCache {
   JoystickDataCache() { std::memset(this, 0, sizeof(*this)); }
   void Update();
 
-  HAL_JoystickAxes axes[kJoystickPorts];
-  HAL_JoystickPOVs povs[kJoystickPorts];
-  HAL_JoystickButtons buttons[kJoystickPorts];
-  HAL_JoystickTouchpads touchpads[kJoystickPorts];
+  HAL_JoystickAxes axes[JOYSTICK_PORTS];
+  HAL_JoystickPOVs povs[JOYSTICK_PORTS];
+  HAL_JoystickButtons buttons[JOYSTICK_PORTS];
+  HAL_JoystickTouchpads touchpads[JOYSTICK_PORTS];
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
@@ -52,7 +51,7 @@ static std::atomic_bool gShutdown{false};
 }  // namespace
 
 void JoystickDataCache::Update() {
-  for (int i = 0; i < kJoystickPorts; i++) {
+  for (int i = 0; i < JOYSTICK_PORTS; i++) {
     SimDriverStationData->GetJoystickAxes(i, &axes[i]);
     SimDriverStationData->GetJoystickPOVs(i, &povs[i]);
     SimDriverStationData->GetJoystickButtons(i, &buttons[i]);
@@ -160,6 +159,8 @@ class MrcLibDsSimImpl : public MrcLibDs {
 
   int32_t getSystemTimeValid(bool* systemTimeValid) override;
 
+  int32_t writeDisplayAnsi(const struct WPI_String* line) override;
+
   wpi::util::EventVector newDataEvents;
 
   void NewDriverStationData();
@@ -201,6 +202,8 @@ MrcLibDsSimImpl::MrcLibDsSimImpl() {
 static std::atomic<HALSIM_SendErrorHandler> sendErrorHandler{nullptr};
 static std::atomic<HALSIM_SendConsoleLineHandler> sendConsoleLineHandler{
     nullptr};
+static std::atomic<HALSIM_WriteDisplayAnsiHandler> writeDisplayAnsiHandler{
+    nullptr};
 
 extern "C" {
 
@@ -210,6 +213,10 @@ void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {
 
 void HALSIM_SetSendConsoleLine(HALSIM_SendConsoleLineHandler handler) {
   sendConsoleLineHandler.store(handler);
+}
+
+void HALSIM_SetWriteDisplayAnsi(HALSIM_WriteDisplayAnsiHandler handler) {
+  writeDisplayAnsiHandler.store(handler);
 }
 }  // extern "C"
 
@@ -241,7 +248,7 @@ int32_t MrcLibDsSimImpl::sendConsoleLine(const struct WPI_String* line) {
   if (handler) {
     return handler(line);
   }
-  fmt::print("{}\n", wpi::util::to_string_view(line));
+  wpi::util::print("{}\n", wpi::util::to_string_view(line));
   std::fflush(stdout);
   return 0;
 }
@@ -249,10 +256,10 @@ int32_t MrcLibDsSimImpl::sendConsoleLine(const struct WPI_String* line) {
 int32_t MrcLibDsSimImpl::sendProgramCrash(const struct WPI_String* details,
                                           const struct WPI_String* location,
                                           const struct WPI_String* callStack) {
-  fmt::print(stderr, "Program Crash: {}\nLocation: {}\nCall Stack:\n{}\n",
-             wpi::util::to_string_view(details),
-             wpi::util::to_string_view(location),
-             wpi::util::to_string_view(callStack));
+  wpi::util::print(stderr, "Program Crash: {}\nLocation: {}\nCall Stack:\n{}\n",
+                   wpi::util::to_string_view(details),
+                   wpi::util::to_string_view(location),
+                   wpi::util::to_string_view(callStack));
   std::fflush(stderr);
   return 0;
 }
@@ -503,6 +510,14 @@ int32_t MrcLibDsSimImpl::getOutputsEnabled(bool* outputsEnabled) {
 
 int32_t MrcLibDsSimImpl::getSystemTimeValid(bool* systemTimeValid) {
   *systemTimeValid = true;
+  return 0;
+}
+
+int32_t MrcLibDsSimImpl::writeDisplayAnsi(const struct WPI_String* line) {
+  auto handler = writeDisplayAnsiHandler.load();
+  if (handler) {
+    return handler(line);
+  }
   return 0;
 }
 

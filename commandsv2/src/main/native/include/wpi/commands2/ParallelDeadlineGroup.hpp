@@ -96,7 +96,7 @@ class ParallelDeadlineGroup
 
   Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
@@ -107,7 +107,7 @@ class ParallelDeadlineGroup
   Command* m_deadline;
   bool m_runWhenDisabled{true};
   Command::InterruptionBehavior m_interruptBehavior{
-      Command::InterruptionBehavior::kCancelIncoming};
+      Command::InterruptionBehavior::CANCEL_INCOMING};
   bool m_finished{true};
 };
 }  // namespace wpi::cmd

@@ -14,7 +14,7 @@ import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.system.Discretization;
-import org.wpilib.math.trajectory.Trajectory;
+import org.wpilib.math.trajectory.HolonomicSample;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.StateSpaceUtil;
 
@@ -22,9 +22,6 @@ import org.wpilib.math.util.StateSpaceUtil;
  * The linear time-varying unicycle controller has a similar form to the LQR, but the model used to
  * compute the controller gain is the nonlinear unicycle model linearized around the drivetrain's
  * current state.
- *
- * <p>See section 8.9 in Controls Engineering in FRC for a derivation of the control law we used
- * shown in theorem 8.9.1.
  */
 public class LTVUnicycleController {
   // LQR cost matrices
@@ -107,56 +104,20 @@ public class LTVUnicycleController {
    */
   public ChassisVelocities calculate(
       Pose2d currentPose, Pose2d poseRef, double linearVelocityRef, double angularVelocityRef) {
-    // The change in global pose for a unicycle is defined by the following
-    // three equations.
-    //
-    // ẋ = v cosθ
-    // ẏ = v sinθ
-    // θ̇ = ω
-    //
-    // Here's the model as a vector function where x = [x  y  θ]ᵀ and
-    // u = [v  ω]ᵀ.
-    //
-    //           [v cosθ]
-    // f(x, u) = [v sinθ]
-    //           [  ω   ]
-    //
-    // To create an LQR, we need to linearize this.
-    //
-    //               [0  0  −v sinθ]                  [cosθ  0]
-    // ∂f(x, u)/∂x = [0  0   v cosθ]    ∂f(x, u)/∂u = [sinθ  0]
-    //               [0  0     0   ]                  [ 0    1]
-    //
-    // We're going to make a cross-track error controller, so we'll apply a
-    // clockwise rotation matrix to the global tracking error to transform it
-    // into the robot's coordinate frame. Since the cross-track error is always
-    // measured from the robot's coordinate frame, the model used to compute the
-    // LQR should be linearized around θ = 0 at all times.
-    //
-    //     [0  0  −v sin0]        [cos0  0]
-    // A = [0  0   v cos0]    B = [sin0  0]
-    //     [0  0     0   ]        [ 0    1]
-    //
-    //     [0  0  0]              [1  0]
-    // A = [0  0  v]          B = [0  0]
-    //     [0  0  0]              [0  1]
+    // See theorem 8.8.1 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
 
     if (!m_enabled) {
       return new ChassisVelocities(linearVelocityRef, 0.0, angularVelocityRef);
     }
 
-    // The DARE is ill-conditioned if the velocity is close to zero, so don't
-    // let the system stop.
-    if (Math.abs(linearVelocityRef) < 1e-4) {
-      linearVelocityRef = 1e-4;
-    }
-
     m_poseError = poseRef.relativeTo(currentPose);
 
     // spotless:off
+    final double τ = 20.0;
     var A = MatBuilder.fill(Nat.N3(), Nat.N3(),
         0.0, 0.0, 0.0,
-        0.0, 0.0, linearVelocityRef,
+        0.0, -1 / τ, linearVelocityRef,
         0.0, 0.0, 0.0);
     var B = MatBuilder.fill(Nat.N3(), Nat.N2(),
         1.0, 0.0,
@@ -202,12 +163,12 @@ public class LTVUnicycleController {
    * @param desiredState The desired pose, linear velocity, and angular velocity from a trajectory.
    * @return The linear and angular velocity outputs of the LTV controller.
    */
-  public ChassisVelocities calculate(Pose2d currentPose, Trajectory.State desiredState) {
-    return calculate(
-        currentPose,
-        desiredState.pose,
-        desiredState.velocity,
-        desiredState.velocity * desiredState.curvature);
+  public ChassisVelocities calculate(Pose2d currentPose, HolonomicSample desiredState) {
+    // The sample velocity is field-relative; the controller needs the
+    // robot-relative forward (linear) velocity.
+    double linearVelocity =
+        desiredState.velocity.toRobotRelative(desiredState.pose.getRotation()).vx;
+    return calculate(currentPose, desiredState.pose, linearVelocity, desiredState.velocity.omega);
   }
 
   /**

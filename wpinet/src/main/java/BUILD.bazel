@@ -1,0 +1,19 @@
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_java_library")
+
+wpilib_jni_java_library(
+    name = "wpinet-java",
+    srcs = glob(["**/*.java"]),
+    maven_artifact_name = "wpinet-java",
+    maven_group_id = "org.wpilib.wpinet",
+    native_libs = ["//wpinet:shared/wpinetjni"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil/src/main/java",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":wpinet-java",
+    visibility = ["//visibility:public"],
+)

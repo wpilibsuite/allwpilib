@@ -3,7 +3,6 @@ import argparse
 import importlib.metadata
 import logging
 import sys
-import typing
 
 import wpilib
 
@@ -49,7 +48,7 @@ class RobotSim:
         self,
         options: argparse.Namespace,
         nogui: bool,
-        robot_class: typing.Type[wpilib.RobotBase],
+        robot_class: type[wpilib.RobotBase],
     ):
         if not nogui:
             try:
@@ -58,7 +57,7 @@ class RobotSim:
                 print("robotpy-halsim-gui is not installed!", file=sys.stderr)
                 exit(1)
             else:
-                halsim_gui.loadExtension()
+                halsim_gui.load_extension()
 
         # Some extensions (gui) changes the current directory
         cwd = os.getcwd()
@@ -66,7 +65,7 @@ class RobotSim:
         for name, module in self.simexts.items():
             if getattr(options, name.replace("-", "_"), False):
                 try:
-                    module.loadExtension()
+                    module.load_extension()
                 except:
                     print(f"Error loading {name}!", file=sys.stderr)
                     raise

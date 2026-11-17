@@ -39,8 +39,7 @@ class XRPMotor : public wpi::MotorController, public wpi::MotorSafety {
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;
 
-  void Disable() override;
-
+ protected:
   void StopMotor() override;
   std::string GetDescription() const override;
 

@@ -4,8 +4,8 @@
 
 #include "rpy/AddressableLEDBuffer.h"
 
-#include <stdexcept>
 #include <span>
+#include <stdexcept>
 
 namespace wpi {
 
@@ -21,17 +21,22 @@ void AddressableLEDBuffer::SetLED(size_t index, const wpi::util::Color& color) {
   m_buffer.at(index).SetLED(color);
 }
 
-void AddressableLEDBuffer::SetLED(size_t index, const wpi::util::Color8Bit& color) {
+void AddressableLEDBuffer::SetLED(size_t index,
+                                  const wpi::util::Color8Bit& color) {
   m_buffer.at(index).SetLED(color);
 }
 
-int AddressableLEDBuffer::GetRed(size_t index) const { return m_buffer.at(index).r; }
+int AddressableLEDBuffer::GetRed(size_t index) const {
+  return m_buffer.at(index).r;
+}
 
 int AddressableLEDBuffer::GetGreen(size_t index) const {
   return m_buffer.at(index).g;
 }
 
-int AddressableLEDBuffer::GetBlue(size_t index) const { return m_buffer.at(index).b; }
+int AddressableLEDBuffer::GetBlue(size_t index) const {
+  return m_buffer.at(index).b;
+}
 
 wpi::util::Color AddressableLEDBuffer::GetLED(size_t index) const {
   const auto& led = m_buffer.at(index);
@@ -64,7 +69,8 @@ void AddressableLEDBuffer::View::SetHSV(size_t index, int h, int s, int v) {
   at(index).SetHSV(h, s, v);
 }
 
-void AddressableLEDBuffer::View::SetLED(size_t index, const wpi::util::Color& color) {
+void AddressableLEDBuffer::View::SetLED(size_t index,
+                                        const wpi::util::Color& color) {
   at(index).SetLED(color);
 }
 
@@ -81,8 +87,7 @@ AddressableLED::LEDData& AddressableLEDBuffer::View::at(size_t index) {
   return m_data[index];
 }
 
-AddressableLED::LEDData& AddressableLEDBuffer::View::operator[](
-    size_t index) {
+AddressableLED::LEDData& AddressableLEDBuffer::View::operator[](size_t index) {
   return at(index);
 }
 
@@ -105,7 +110,8 @@ wpi::util::Color AddressableLEDBuffer::View::GetLED(size_t index) const {
   return wpi::util::Color{led.r / 255.0, led.g / 255.0, led.b / 255.0};
 }
 
-wpi::util::Color8Bit AddressableLEDBuffer::View::GetLED8Bit(size_t index) const {
+wpi::util::Color8Bit AddressableLEDBuffer::View::GetLED8Bit(
+    size_t index) const {
   const auto& led = at(index);
   return wpi::util::Color8Bit{led.r, led.g, led.b};
 }

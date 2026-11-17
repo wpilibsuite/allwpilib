@@ -38,17 +38,17 @@ def test_rotate_by():
 
     translation = Translation3d(1, 2, 3)
 
-    rotated1 = translation.rotateBy(Rotation3d(x_axis, math.radians(90)))
+    rotated1 = translation.rotate_by(Rotation3d(x_axis, math.radians(90)))
     assert rotated1.x == pytest.approx(1.0, abs=1e-9)
     assert rotated1.y == pytest.approx(-3.0, abs=1e-9)
     assert rotated1.z == pytest.approx(2.0, abs=1e-9)
 
-    rotated2 = translation.rotateBy(Rotation3d(y_axis, math.radians(90)))
+    rotated2 = translation.rotate_by(Rotation3d(y_axis, math.radians(90)))
     assert rotated2.x == pytest.approx(3.0, abs=1e-9)
     assert rotated2.y == pytest.approx(2.0, abs=1e-9)
     assert rotated2.z == pytest.approx(-1.0, abs=1e-9)
 
-    rotated3 = translation.rotateBy(Rotation3d(z_axis, math.radians(90)))
+    rotated3 = translation.rotate_by(Rotation3d(z_axis, math.radians(90)))
     assert rotated3.x == pytest.approx(-2.0, abs=1e-9)
     assert rotated3.y == pytest.approx(1.0, abs=1e-9)
     assert rotated3.z == pytest.approx(3.0, abs=1e-9)
@@ -62,17 +62,17 @@ def test_rotate_around():
     translation = Translation3d(1, 2, 3)
     around = Translation3d(3, 2, 1)
 
-    rotated1 = translation.rotateAround(around, Rotation3d(x_axis, math.radians(90)))
+    rotated1 = translation.rotate_around(around, Rotation3d(x_axis, math.radians(90)))
     assert rotated1.x == pytest.approx(1.0, abs=1e-9)
     assert rotated1.y == pytest.approx(0.0, abs=1e-9)
     assert rotated1.z == pytest.approx(1.0, abs=1e-9)
 
-    rotated2 = translation.rotateAround(around, Rotation3d(y_axis, math.radians(90)))
+    rotated2 = translation.rotate_around(around, Rotation3d(y_axis, math.radians(90)))
     assert rotated2.x == pytest.approx(5.0, abs=1e-9)
     assert rotated2.y == pytest.approx(2.0, abs=1e-9)
     assert rotated2.z == pytest.approx(3.0, abs=1e-9)
 
-    rotated3 = translation.rotateAround(around, Rotation3d(z_axis, math.radians(90)))
+    rotated3 = translation.rotate_around(around, Rotation3d(z_axis, math.radians(90)))
     assert rotated3.x == pytest.approx(3.0, abs=1e-9)
     assert rotated3.y == pytest.approx(0.0, abs=1e-9)
     assert rotated3.z == pytest.approx(3.0, abs=1e-9)
@@ -82,7 +82,7 @@ def test_to_translation2d():
     translation = Translation3d(1, 2, 3)
     expected = Translation2d(1, 2)
 
-    assert expected == translation.toTranslation2d()
+    assert expected == translation.to_translation2d()
 
 
 def test_multiplication():
@@ -110,7 +110,7 @@ def test_norm():
 
 def test_squared_norm():
     one = Translation3d(3, 5, 7)
-    assert one.squaredNorm() == pytest.approx(83.0, abs=1e-9)
+    assert one.squared_norm() == pytest.approx(83.0, abs=1e-9)
 
 
 def test_distance():
@@ -122,7 +122,7 @@ def test_distance():
 def test_squared_distance():
     one = Translation3d(1, 1, 1)
     two = Translation3d(6, 6, 6)
-    assert one.squaredDistance(two) == pytest.approx(75.0, abs=1e-9)
+    assert one.squared_distance(two) == pytest.approx(75.0, abs=1e-9)
 
 
 def test_unary_minus():
@@ -168,7 +168,7 @@ def test_to_vector():
     assert vec[1] == pytest.approx(translation.y)
     assert vec[2] == pytest.approx(translation.z)
 
-    assert np.allclose(vec, translation.toVector())
+    assert np.allclose(vec, translation.to_vector())
 
 
 def test_nearest():

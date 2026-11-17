@@ -15,9 +15,9 @@ void ResumeTiming();
 
 bool IsTimingPaused();
 
-void StepTiming(uint64_t delta);
+void StepTiming(int64_t delta);
 
-uint64_t GetMonotonicTime();
+int64_t GetMonotonicTime();
 
 void SetProgramStarted();
 }  // namespace wpi::hal

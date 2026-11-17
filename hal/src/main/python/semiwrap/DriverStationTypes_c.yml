@@ -6,6 +6,7 @@ extra_includes:
 
 enums:
   HAL_AllianceStationID:
+    rename: _AllianceStationID
     value_prefix: HAL_ALLIANCE_STATION
   HAL_JoystickPOV:
     value_prefix: HAL_JOYSTICK_POV

@@ -15,12 +15,12 @@ import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.interpolation.TimeInterpolatableBuffer;
-import org.wpilib.math.kinematics.Kinematics;
 import org.wpilib.math.kinematics.Odometry3d;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N4;
 import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 
 /**
  * This class wraps {@link Odometry3d} to fuse latency-compensated vision measurements with encoder
@@ -50,10 +50,10 @@ public class PoseEstimator3d<T> {
   // Diagonal of Kalman gain matrix K
   private final double[] m_vision_k = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-  private static final double kBufferDuration = 1.5;
+  private static final double BUFFER_DURATION = 1.5;
   // Maps timestamps to odometry-only pose estimates
   private final TimeInterpolatableBuffer<Pose3d> m_odometryPoseBuffer =
-      TimeInterpolatableBuffer.createBuffer(kBufferDuration);
+      TimeInterpolatableBuffer.createBuffer(BUFFER_DURATION);
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer, unless there have
   // been no vision measurements after the last reset. May contain one entry while
@@ -66,7 +66,6 @@ public class PoseEstimator3d<T> {
   /**
    * Constructs a PoseEstimator3d.
    *
-   * @param kinematics A correctly-configured kinematics object for your drivetrain.
    * @param odometry A correctly-configured odometry object for your drivetrain.
    * @param stateStdDevs Standard deviations of the pose estimate (x position in meters, y position
    *     in meters, z position in meters, and angle in radians). Increase these numbers to trust
@@ -76,7 +75,6 @@ public class PoseEstimator3d<T> {
    *     these numbers to trust the vision pose measurement less.
    */
   public PoseEstimator3d(
-      Kinematics<T, ?, ?> kinematics,
       Odometry3d<T> odometry,
       Matrix<N4, N1> stateStdDevs,
       Matrix<N4, N1> visionMeasurementStdDevs) {
@@ -88,7 +86,7 @@ public class PoseEstimator3d<T> {
       m_q[i] = stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0);
     }
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
-    MathSharedStore.getMathShared().reportUsage("PoseEstimator3d", "");
+    UsageReporting.reportUsage("PoseEstimator3d", "");
   }
 
   /**
@@ -108,7 +106,7 @@ public class PoseEstimator3d<T> {
     }
 
     // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
-    // and C = I. See wpimath/algorithms.md.
+    // and C = I. See wpimath/docs/ClosedFormKalmanGain.md.
     for (int row = 0; row < 4; ++row) {
       if (m_q[row] == 0.0) {
         m_vision_k[row] = 0.0;
@@ -125,10 +123,10 @@ public class PoseEstimator3d<T> {
   /**
    * Resets the robot's position on the field.
    *
-   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
-   * automatically takes care of offsetting the gyro angle.
+   * <p>The gyroscope angle does not need to be reset here in the user's robot code.
    *
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @param pose The position on the field that your robot is at.
    */
@@ -289,7 +287,7 @@ public class PoseEstimator3d<T> {
   public void addVisionMeasurement(Pose3d visionRobotPose, double timestamp) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
     if (m_odometryPoseBuffer.getInternalBuffer().isEmpty()
-        || m_odometryPoseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestamp) {
+        || m_odometryPoseBuffer.getInternalBuffer().lastKey() - BUFFER_DURATION > timestamp) {
       return;
     }
 
@@ -375,7 +373,8 @@ public class PoseEstimator3d<T> {
    * Updates the pose estimator with wheel encoder and gyro information. This should be called every
    * loop.
    *
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @return The estimated pose of the robot in meters.
    */
@@ -388,7 +387,8 @@ public class PoseEstimator3d<T> {
    * loop.
    *
    * @param currentTime Time at which this method was called, in seconds.
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @return The estimated pose of the robot in meters.
    */

@@ -21,6 +21,9 @@ classes:
       RegisterBrownoutVoltageCallback:
       GetBrownoutVoltage:
       SetBrownoutVoltage:
+      RegisterBrownoutRecoveryVoltageCallback:
+      GetBrownoutRecoveryVoltage:
+      SetBrownoutRecoveryVoltage:
       RegisterCPUTempCallback:
       GetCPUTemp:
       SetCPUTemp:
@@ -29,6 +32,4 @@ classes:
       SetTeamNumber:
       GetSerialNumber:
       SetSerialNumber:
-      GetComments:
-      SetComments:
       ResetData:

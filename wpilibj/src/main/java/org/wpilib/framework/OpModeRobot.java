@@ -21,11 +21,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.wpilib.driverstation.Alert;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.UserControls;
-import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -40,11 +37,15 @@ import org.wpilib.opmode.OpMode;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 import org.wpilib.opmode.Utility;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Watchdog;
+import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.units.measure.Frequency;
+import org.wpilib.units.measure.Time;
+import org.wpilib.util.Alert;
 import org.wpilib.util.Color;
 import org.wpilib.util.ConstructorMatch;
+import org.wpilib.util.UsageReporting;
 
 /**
  * OpModeRobot implements the opmode-based robot program framework.
@@ -61,6 +62,26 @@ import org.wpilib.util.ConstructorMatch;
  * On disable or mode switch while enabled, {@link PeriodicOpMode#end()} is called asynchronously
  * and the opmode is then closed and discarded. When no opmode is selected, {@link #nonePeriodic()}
  * is called. {@link #driverStationConnected()} is called once when the DS first connects.
+ *
+ * <p>Every period, the robot's loop function runs first, calling these in order:
+ *
+ * <ol>
+ *   <li>{@link #disabledPeriodic()}, only while disabled
+ *   <li>{@link PeriodicOpMode#disabledPeriodic()} of the selected opmode, only while disabled
+ *   <li>{@link #nonePeriodic()}, only when no opmode is selected
+ *   <li>{@link #robotPeriodic()}
+ *   <li>{@link #simulationPeriodic()}, only in simulation
+ * </ol>
+ *
+ * <p>Then, while enabled, {@link PeriodicOpMode#periodic()} runs. Both are scheduled on the same
+ * period, and the loop function was registered first, so {@link #robotPeriodic()} and {@link
+ * #simulationPeriodic()} always run before {@link PeriodicOpMode#periodic()} in a given period.
+ * Additional callbacks from {@link #addPeriodic} or the opmode run on their own schedules.
+ *
+ * <p>One exception to the list above: if an opmode is selected while the robot is already enabled,
+ * its {@code disabledPeriodic()} is called once, right after construction and before {@code
+ * start()}, even though the robot is not disabled. That call happens before {@link
+ * #robotPeriodic()} in that loop.
  */
 public abstract class OpModeRobot extends RobotBase {
   private final ControlWord m_word = new ControlWord();
@@ -73,38 +94,25 @@ public abstract class OpModeRobot extends RobotBase {
   private final PeriodicPriorityQueue m_callbacks = new PeriodicPriorityQueue();
   private int m_notifier;
   private final double m_period;
-  private final long m_startTimeUs;
+  private final long m_startTimeNs;
 
   // OpMode lifecycle state
   private long m_lastModeId = -1;
   private boolean m_calledDriverStationConnected = false;
-  private boolean m_lastEnabledState = false;
+  // null until the first loop, so that disabledInit() runs on startup
+  private RobotMode m_lastMode;
   private OpMode m_currentOpMode;
+  private String m_currentOpModeName;
   private Callback m_currentOpModePeriodic;
   private final Set<Callback> m_activeOpModeCallbacks = new HashSet<>();
   private final Watchdog m_watchdog;
   private final Alert m_loopOverrunAlert;
+  private final Watchdog m_opModeWatchdog;
+  private final Alert m_opModePeriodicOverrunAlert;
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
     DriverStationErrors.reportError(
         "Error adding OpMode " + cls.getSimpleName() + ": " + message, false);
-  }
-
-  private final Optional<Class<? extends UserControls>> m_userControlsBaseClass;
-  private UserControls m_userControlsInstance;
-
-  void setUserControlsInstance(UserControls userControlsInstance) {
-    if (m_userControlsBaseClass.isEmpty()) {
-      throw new IllegalStateException("No UserControls class specified");
-    }
-
-    if (!m_userControlsBaseClass.get().isAssignableFrom(userControlsInstance.getClass())) {
-      throw new IllegalArgumentException(
-          userControlsInstance.getClass().getSimpleName()
-              + " is not assignable to "
-              + m_userControlsBaseClass.get().getSimpleName());
-    }
-    m_userControlsInstance = userControlsInstance;
   }
 
   /**
@@ -116,26 +124,10 @@ public abstract class OpModeRobot extends RobotBase {
   private <T> Optional<ConstructorMatch<T>> findOpModeConstructor(Class<T> cls) {
     Optional<ConstructorMatch<T>> ctor;
 
-    // try 2-parameter constructor
-    if (m_userControlsBaseClass.isPresent()) {
-      ctor = ConstructorMatch.findBestConstructor(cls, getClass(), m_userControlsBaseClass.get());
-      if (ctor.isPresent()) {
-        return ctor;
-      }
-    }
-
     // try 1-parameter constructor with RobotBase parameter
     ctor = ConstructorMatch.findBestConstructor(cls, getClass());
     if (ctor.isPresent()) {
       return ctor;
-    }
-
-    // try 1-parameter constructor with UserControls parameter
-    if (m_userControlsBaseClass.isPresent()) {
-      ctor = ConstructorMatch.findBestConstructor(cls, m_userControlsBaseClass.get());
-      if (ctor.isPresent()) {
-        return ctor;
-      }
     }
 
     // try no-parameter constructor
@@ -151,15 +143,10 @@ public abstract class OpModeRobot extends RobotBase {
       return null;
     }
     try {
-      if (m_userControlsInstance != null) {
-        return constructor.get().newInstance(this, m_userControlsInstance);
-      } else {
-        return constructor.get().newInstance(this);
-      }
+      return constructor.get().newInstance(this);
     } catch (ReflectiveOperationException e) {
-      DriverStationErrors.reportError(
-          "Could not instantiate OpMode " + cls.getSimpleName(), e.getStackTrace());
-      return null;
+      throw new RuntimeException(
+          "Could not instantiate OpMode " + cls.getSimpleName(), e.getCause());
     }
   }
 
@@ -194,23 +181,23 @@ public abstract class OpModeRobot extends RobotBase {
    * Adds an opmode using a factory function that creates the opmode. It's necessary to call
    * publishOpModes() to make the added mode visible to the driver station.
    *
-   * @param factory factory function to create the opmode
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
    * @param textColor text color, or null for default
    * @param backgroundColor background color, or null for default
+   * @param factory factory function to create the opmode
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpModeFactory(
-      Supplier<OpMode> factory,
+  public void addOpMode(
       RobotMode mode,
       String name,
       String group,
       String description,
       Color textColor,
-      Color backgroundColor) {
+      Color backgroundColor,
+      Supplier<OpMode> factory) {
     long id = RobotState.addOpMode(mode, name, group, description, textColor, backgroundColor);
     m_opModes.put(id, new OpModeFactory(name, factory));
   }
@@ -219,44 +206,43 @@ public abstract class OpModeRobot extends RobotBase {
    * Adds an opmode using a factory function that creates the opmode. It's necessary to call
    * publishOpModes() to make the added mode visible to the driver station.
    *
-   * @param factory factory function to create the opmode
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
+   * @param factory factory function to create the opmode
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpModeFactory(
-      Supplier<OpMode> factory, RobotMode mode, String name, String group, String description) {
-    addOpModeFactory(factory, mode, name, group, description, null, null);
+  public void addOpMode(
+      RobotMode mode, String name, String group, String description, Supplier<OpMode> factory) {
+    addOpMode(mode, name, group, description, null, null, factory);
   }
 
   /**
    * Adds an opmode using a factory function that creates the opmode. It's necessary to call
    * publishOpModes() to make the added mode visible to the driver station.
    *
-   * @param factory factory function to create the opmode
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
+   * @param factory factory function to create the opmode
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpModeFactory(
-      Supplier<OpMode> factory, RobotMode mode, String name, String group) {
-    addOpModeFactory(factory, mode, name, group, "");
+  public void addOpMode(RobotMode mode, String name, String group, Supplier<OpMode> factory) {
+    addOpMode(mode, name, group, "", factory);
   }
 
   /**
    * Adds an opmode using a factory function that creates the opmode. It's necessary to call
    * publishOpModes() to make the added mode visible to the driver station.
    *
-   * @param factory factory function to create the opmode
    * @param mode robot mode
    * @param name name of the operating mode
+   * @param factory factory function to create the opmode
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpModeFactory(Supplier<OpMode> factory, RobotMode mode, String name) {
-    addOpModeFactory(factory, mode, name, "");
+  public void addOpMode(RobotMode mode, String name, Supplier<OpMode> factory) {
+    addOpMode(mode, name, "", factory);
   }
 
   /**
@@ -266,32 +252,32 @@ public abstract class OpModeRobot extends RobotBase {
    * specific parameter type is used). It's necessary to call publishOpModes() to make the added
    * mode visible to the driver station.
    *
-   * @param cls class to add
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
    * @param textColor text color, or null for default
    * @param backgroundColor background color, or null for default
+   * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
    */
   public void addOpMode(
-      Class<? extends OpMode> cls,
       RobotMode mode,
       String name,
       String group,
       String description,
       Color textColor,
-      Color backgroundColor) {
+      Color backgroundColor,
+      Class<? extends OpMode> cls) {
     checkOpModeClass(cls);
-    addOpModeFactory(
-        () -> constructOpModeClass(cls),
+    addOpMode(
         mode,
         name,
         group,
         description,
         textColor,
-        backgroundColor);
+        backgroundColor,
+        () -> constructOpModeClass(cls));
   }
 
   /**
@@ -301,16 +287,16 @@ public abstract class OpModeRobot extends RobotBase {
    * specific parameter type is used). It's necessary to call publishOpModes() to make the added
    * mode visible to the driver station.
    *
-   * @param cls class to add
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
+   * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
    */
   public void addOpMode(
-      Class<? extends OpMode> cls, RobotMode mode, String name, String group, String description) {
-    addOpMode(cls, mode, name, group, description, null, null);
+      RobotMode mode, String name, String group, String description, Class<? extends OpMode> cls) {
+    addOpMode(mode, name, group, description, null, null, cls);
   }
 
   /**
@@ -320,14 +306,14 @@ public abstract class OpModeRobot extends RobotBase {
    * specific parameter type is used). It's necessary to call publishOpModes() to make the added
    * mode visible to the driver station.
    *
-   * @param cls class to add
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
+   * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpMode(Class<? extends OpMode> cls, RobotMode mode, String name, String group) {
-    addOpMode(cls, mode, name, group, "");
+  public void addOpMode(RobotMode mode, String name, String group, Class<? extends OpMode> cls) {
+    addOpMode(mode, name, group, "", cls);
   }
 
   /**
@@ -337,13 +323,13 @@ public abstract class OpModeRobot extends RobotBase {
    * specific parameter type is used). It's necessary to call publishOpModes() to make the added
    * mode visible to the driver station.
    *
-   * @param cls class to add
    * @param mode robot mode
    * @param name name of the operating mode
+   * @param cls class to add
    * @throws IllegalArgumentException if class does not meet criteria
    */
-  public void addOpMode(Class<? extends OpMode> cls, RobotMode mode, String name) {
-    addOpMode(cls, mode, name, "");
+  public void addOpMode(RobotMode mode, String name, Class<? extends OpMode> cls) {
+    addOpMode(mode, name, "", cls);
   }
 
   private void addOpModeClassImpl(
@@ -425,7 +411,9 @@ public abstract class OpModeRobot extends RobotBase {
     String className = name.replace('/', '.').substring(0, name.length() - 6);
     Class<? extends OpMode> cls;
     try {
-      cls = Class.forName(className).asSubclass(OpMode.class);
+      cls =
+          Class.forName(className, false, Thread.currentThread().getContextClassLoader())
+              .asSubclass(OpMode.class);
     } catch (ClassNotFoundException | ClassCastException e) {
       return;
     }
@@ -555,38 +543,76 @@ public abstract class OpModeRobot extends RobotBase {
     m_notifier = NotifierJNI.createNotifier();
     NotifierJNI.setNotifierName(m_notifier, "OpModeRobot");
 
-    m_startTimeUs = RobotController.getMonotonicTime();
+    m_startTimeNs = RobotController.getMonotonicTime();
 
     m_loopOverrunAlert =
-        new Alert("Loop time of \"" + m_period + "\"s overrun", Alert.Level.MEDIUM);
+        new Alert(
+            "opmoderobot-loop-overrun",
+            "Loop time of " + m_period + "s overrun",
+            Alert.Level.MEDIUM);
     m_watchdog = new Watchdog(Seconds.of(m_period), () -> m_loopOverrunAlert.set(true));
+    m_opModePeriodicOverrunAlert =
+        new Alert(
+            "opmode-periodic-overrun",
+            "OpMode periodic() time of " + m_period + "s overrun",
+            Alert.Level.MEDIUM);
+    m_opModeWatchdog =
+        new Watchdog(Seconds.of(m_period), () -> m_opModePeriodicOverrunAlert.set(true));
 
     // Add LoopFunc as periodic callback (match C++)
     addPeriodic(this::loopFunc, period);
 
-    // Check to see if we have a DS annotation
-    UserControlsInstance userControlsAnnotation =
-        getClass().getAnnotation(UserControlsInstance.class);
-    if (userControlsAnnotation != null) {
-      m_userControlsBaseClass = Optional.of(userControlsAnnotation.value());
-    } else {
-      m_userControlsBaseClass = Optional.empty();
-    }
     // Scan for annotated opmode classes within the derived class's package and subpackages
     addAnnotatedOpModeClasses(getClass().getPackage());
     RobotState.publishOpModes();
 
-    HAL.reportUsage("Framework", "OpModeRobot");
+    UsageReporting.reportUsage("Framework", "OpModeRobot");
+  }
+
+  /**
+   * Constructor with specified period.
+   *
+   * @param period the period at which to run the robot and opmode periodic callbacks.
+   */
+  public OpModeRobot(Time period) {
+    this(period.in(Seconds));
+  }
+
+  /**
+   * Constructor with specified frequency.
+   *
+   * @param frequency the frequency at which to run the robot and opmode periodic callbacks.
+   */
+  public OpModeRobot(Frequency frequency) {
+    this(frequency.asPeriod());
   }
 
   /**
    * Add a callback to run at a specific period.
    *
+   * <p>This callback will be registered with the framework immediately when this method is called
+   * and will begin executing as soon as it is registered.
+   *
    * @param callback The callback to run.
-   * @param period The period at which to run the callback.
+   * @param period The period at which to run the callback in seconds.
    */
-  public void addPeriodic(Runnable callback, double period) {
-    m_callbacks.add(callback, m_startTimeUs, period);
+  public final void addPeriodic(Runnable callback, double period) {
+    addPeriodic(callback, period, 0);
+  }
+
+  /**
+   * Add a callback to run at a specific period with a starting time offset.
+   *
+   * <p>This callback will be registered with the framework immediately when this method is called
+   * and will begin executing as soon as it is registered.
+   *
+   * @param callback The callback to run.
+   * @param period The period at which to run the callback in seconds.
+   * @param offset The offset from the common starting time in seconds. This is useful for
+   *     scheduling a callback in a different timeslot relative to OpModeRobot.
+   */
+  public final void addPeriodic(Runnable callback, double period, double offset) {
+    m_callbacks.add(callback, m_startTimeNs, period, offset);
   }
 
   /**
@@ -606,19 +632,35 @@ public abstract class OpModeRobot extends RobotBase {
    */
   public void driverStationConnected() {}
 
-  /** Function called periodically every loop, regardless of enabled state or OpMode selection. */
+  /**
+   * Function called periodically every loop, regardless of enabled state or OpMode selection.
+   *
+   * <p>Runs after {@link #disabledPeriodic()}, the opmode's {@code disabledPeriodic()}, and {@link
+   * #nonePeriodic()}, and before {@link #simulationPeriodic()}. When an opmode is enabled, this
+   * runs before its {@code periodic()} in the same period.
+   */
   public void robotPeriodic() {}
 
   /** Function called once during robot initialization in simulation. */
   public void simulationInit() {}
 
-  /** Function called periodically in simulation. */
+  /**
+   * Function called periodically in simulation.
+   *
+   * <p>Runs after {@link #robotPeriodic()} and before the enabled opmode's {@code periodic()} in
+   * the same period.
+   */
   public void simulationPeriodic() {}
 
   /** Function called once when the robot becomes disabled. */
   public void disabledInit() {}
 
-  /** Function called periodically while the robot is disabled. */
+  /**
+   * Function called periodically while the robot is disabled.
+   *
+   * <p>Runs first in the loop, before the selected opmode's {@code disabledPeriodic()}, {@link
+   * #nonePeriodic()}, and {@link #robotPeriodic()}. Never runs while enabled.
+   */
   public void disabledPeriodic() {}
 
   /** Function called once when the robot exits disabled state. */
@@ -627,15 +669,17 @@ public abstract class OpModeRobot extends RobotBase {
   /**
    * Function called periodically anytime when no opmode is selected, including when the Driver
    * Station is disconnected.
+   *
+   * <p>Runs after {@link #disabledPeriodic()} and before {@link #robotPeriodic()}.
    */
   public void nonePeriodic() {}
 
   /**
-   * Return the system clock time in microseconds for the start of the current periodic loop. This
-   * is in the same time base as Timer.getMonotonicTimestamp(), but is stable through a loop. It is
+   * Return the system clock time in nanoseconds for the start of the current periodic loop. This is
+   * in the same time base as Timer.getMonotonicTimestamp(), but is stable through a loop. It is
    * updated at the beginning of every periodic callback (including the normal periodic loop).
    *
-   * @return Robot running time in microseconds, as of the start of the current periodic function.
+   * @return Robot running time in nanoseconds, as of the start of the current periodic function.
    */
   public long getLoopStartTime() {
     return m_callbacks.getLoopStartTime();
@@ -648,84 +692,79 @@ public abstract class OpModeRobot extends RobotBase {
     // Get current enabled state and opmode
     DriverStationBackend.refreshControlWordFromCache(m_word);
     m_watchdog.reset();
-    boolean enabled = m_word.isEnabled();
+    final boolean enabled = m_word.isEnabled();
+    // Treat disabled as unknown
+    final RobotMode mode = enabled ? m_word.getRobotMode() : RobotMode.UNKNOWN;
     long modeId = m_word.isDSAttached() ? m_word.getOpModeId() : 0;
+
+    boolean modeChanged = modeId != m_lastModeId;
+    m_lastModeId = modeId;
 
     if (!m_calledDriverStationConnected && m_word.isDSAttached()) {
       m_calledDriverStationConnected = true;
       driverStationConnected();
-      m_watchdog.addEpoch("driverStationConnected()");
     }
 
-    // Handle opmode changes
-    if (modeId != m_lastModeId) {
-      // Clean up current opmode
-      if (m_currentOpMode != null) {
-        // Remove opmode callbacks
-        m_callbacks.remove(m_currentOpModePeriodic);
-        m_callbacks.removeAll(m_activeOpModeCallbacks);
-        m_activeOpModeCallbacks.clear();
-        m_currentOpMode.end();
-        m_currentOpMode.close();
-        m_currentOpMode = null;
-      }
-
-      // Set up new opmode
-      if (modeId != 0) {
-        OpModeFactory factory = m_opModes.get(modeId);
-        if (factory != null) {
-          // Instantiate the new opmode
-          System.out.println("********** Starting OpMode " + factory.name() + " **********");
-          m_currentOpMode = factory.supplier().get();
-          if (m_currentOpMode != null) {
-            // Ensure disabledPeriodic is called at least once
-            m_currentOpMode.disabledPeriodic();
-            m_watchdog.addEpoch("opMode.disabledPeriodic()");
-            // Register the opmode's periodic callbacks
-            m_currentOpModePeriodic =
-                m_callbacks.add(m_currentOpMode::periodic, m_startTimeUs, m_period);
-            m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
-            m_callbacks.addAll(m_activeOpModeCallbacks);
-          }
-        } else {
-          DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
-        }
-      }
-      m_lastModeId = modeId;
+    // Handle opmode changes: tear down the old opmode if the selection changed
+    if (modeChanged && m_currentOpMode != null) {
+      endCurrentOpMode();
     }
 
-    // Handle enabled state changes
-    boolean justCalledDisabledInit = false;
-    if (m_lastEnabledState != enabled) {
-      if (enabled) {
-        // Transitioning to enabled
-        disabledExit();
-        m_watchdog.addEpoch("disabledExit()");
+    // Set up new opmode
+    if (modeId != 0 && m_currentOpMode == null && modeChanged) {
+      OpModeFactory factory = m_opModes.get(modeId);
+      if (factory != null) {
+        m_currentOpModeName = factory.name();
+        System.out.println("********** Creating OpMode " + m_currentOpModeName + " **********");
+        m_currentOpMode = factory.supplier().get();
         if (m_currentOpMode != null) {
-          m_currentOpMode.start();
-          m_watchdog.addEpoch("opMode.start()");
+          // Register the opmode's additional periodic callbacks immediately on creation
+          m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
+          m_callbacks.addAll(m_activeOpModeCallbacks);
+
+          // extra DisabledPeriodic call
+          if (enabled) {
+            m_currentOpMode.disabledPeriodic();
+            m_watchdog.addEpoch("OpMode::DisabledPeriodic()");
+          }
         }
       } else {
-        // Transitioning to disabled
-        if (m_currentOpMode != null && m_lastEnabledState) {
-          // Was enabled, now disabled
-          m_currentOpMode.end();
-          m_watchdog.addEpoch("opMode.end()");
+        DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
+      }
+    }
+
+    // If mode changed, call disabled exit and entry functions
+    if (m_lastMode != mode) {
+      if (m_lastMode == RobotMode.UNKNOWN) {
+        // Transitioning out of disabled
+        disabledExit();
+      }
+      if (mode == RobotMode.UNKNOWN) {
+        // Transitioning to disabled. Only tear down an opmode that was actually
+        // running; a freshly selected opmode entering its disabled phase must
+        // persist so it can be started on the next enable.
+        if (m_currentOpMode != null && m_currentOpModePeriodic != null) {
+          endCurrentOpMode();
+          m_lastModeId = -1; // force recreate next loop
         }
         disabledInit();
         m_watchdog.addEpoch("disabledInit()");
-        justCalledDisabledInit = true;
       }
-      m_lastEnabledState = enabled;
+      m_lastMode = mode;
+    }
+
+    // Start the opmode if enabled and not already started. This single check
+    // covers both the disabled->enabled transition and an opmode constructed
+    // while the robot is already enabled.
+    if (enabled && m_currentOpMode != null && m_currentOpModePeriodic == null) {
+      startCurrentOpMode();
     }
 
     // Call periodic functions based on current state
+    DriverStationJNI.observeUserProgram(m_word.getNative());
     if (!enabled) {
-      // Only call disabledPeriodic if we didn't just call disabledInit
-      if (!justCalledDisabledInit) {
-        disabledPeriodic();
-        m_watchdog.addEpoch("disabledPeriodic()");
-      }
+      disabledPeriodic();
+      m_watchdog.addEpoch("disabledPeriodic()");
 
       // Call opmode disabledPeriodic if we have one
       if (m_currentOpMode != null) {
@@ -735,7 +774,7 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // Call nonePeriodic when no opmode is selected
-    if (RobotState.getOpModeId() == 0) {
+    if (modeId == 0) {
       nonePeriodic();
       m_watchdog.addEpoch("nonePeriodic()");
     }
@@ -744,11 +783,8 @@ public abstract class OpModeRobot extends RobotBase {
     robotPeriodic();
     m_watchdog.addEpoch("robotPeriodic()");
 
-    // Always observe user program state
-    DriverStationJNI.observeUserProgram(m_word.getNative());
-
-    SmartDashboard.updateValues();
-    m_watchdog.addEpoch("SmartDashboard.updateValues()");
+    TunableRegistry.update();
+    m_watchdog.addEpoch("TunableRegistry.update()");
 
     // Call simulationPeriodic if in simulation
     if (isSimulation()) {
@@ -763,22 +799,72 @@ public abstract class OpModeRobot extends RobotBase {
     // Flush NetworkTables
     NetworkTableInstance.getDefault().flushLocal();
 
-    // Warn on loop time overruns
+    // Warn on loop time overruns, and clear the alert once the loop is back on time
     if (m_watchdog.isExpired()) {
       m_watchdog.printEpochs();
     }
+    m_loopOverrunAlert.set(m_watchdog.isExpired());
+  }
+
+  private void startCurrentOpMode() {
+    if (m_currentOpMode == null || m_currentOpModePeriodic != null) {
+      return;
+    }
+
+    System.out.println("********** Starting OpMode " + m_currentOpModeName + " **********");
+
+    // Register the main opmode periodic callback
+    final OpMode opMode = m_currentOpMode;
+    m_currentOpModePeriodic =
+        m_callbacks.add(() -> runOpModePeriodic(opMode), m_startTimeNs, m_period);
+
+    m_currentOpMode.start();
+    m_watchdog.addEpoch("opMode.start()");
+  }
+
+  private void runOpModePeriodic(OpMode opMode) {
+    m_opModeWatchdog.reset();
+    opMode.periodic();
+    m_opModeWatchdog.disable();
+
+    // Alert on opmode periodic() overruns, and clear the alert once it's back on time
+    m_opModePeriodicOverrunAlert.set(m_opModeWatchdog.isExpired());
+  }
+
+  private void endCurrentOpMode() {
+    // If the opmode was started, end it and remove its main periodic callback.
+    if (m_currentOpModePeriodic != null) {
+      System.out.println("********** Ending OpMode " + m_currentOpModeName + " **********");
+
+      m_currentOpMode.end();
+      m_watchdog.addEpoch("opMode.end()");
+
+      m_callbacks.remove(m_currentOpModePeriodic);
+      m_currentOpModePeriodic = null;
+      m_opModePeriodicOverrunAlert.set(false);
+    }
+
+    // The additional getCallbacks() callbacks are registered immediately on construction (even
+    // while disabled), so always remove them regardless of whether the opmode was started.
+    m_callbacks.removeAll(m_activeOpModeCallbacks);
+    m_activeOpModeCallbacks.clear();
+
+    // regardless of whether opmode was started, close it and set to null
+    System.out.println("********** Closing OpMode " + m_currentOpModeName + " **********");
+    m_currentOpMode.close();
+    m_currentOpMode = null;
+    m_currentOpModeName = null;
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
   @Override
   public final void startCompetition() {
-    System.out.println("********** Robot program startup complete **********");
-
     if (isSimulation()) {
       simulationInit();
     }
 
     // Tell the DS that the robot is ready to be enabled
+    System.out.println("********** Robot program startup complete **********");
     DriverStationBackend.observeUserProgramStarting();
 
     // Loop forever, calling the callback system which handles periodic functions
@@ -791,7 +877,10 @@ public abstract class OpModeRobot extends RobotBase {
 
   @Override
   public void close() {
+    m_loopOverrunAlert.close();
+    m_opModePeriodicOverrunAlert.close();
     NotifierJNI.destroyNotifier(m_notifier);
+    super.close();
   }
 
   /** Ends the main loop in startCompetition(). */

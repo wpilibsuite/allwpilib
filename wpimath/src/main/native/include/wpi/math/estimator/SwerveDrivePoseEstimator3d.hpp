@@ -4,11 +4,16 @@
 
 #pragma once
 
+#include <cstddef>
+
 #include "wpi/math/estimator/PoseEstimator3d.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
+#include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
+#include "wpi/math/kinematics/SwerveModulePosition.hpp"
+#include "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
@@ -32,6 +37,7 @@ namespace wpi::math {
 template <size_t NumModules>
 class SwerveDrivePoseEstimator3d
     : public PoseEstimator3d<
+          SwerveDriveOdometry3d<NumModules>,
           wpi::util::array<SwerveModulePosition, NumModules>,
           wpi::util::array<SwerveModuleVelocity, NumModules>,
           wpi::util::array<SwerveModuleAcceleration, NumModules>> {
@@ -48,7 +54,8 @@ class SwerveDrivePoseEstimator3d
    *
    * @param kinematics A correctly-configured kinematics object for your
    *     drivetrain.
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param modulePositions The current distance and rotation measurements of
    *     the swerve modules.
    * @param initialPose The starting pose estimate.
@@ -68,7 +75,8 @@ class SwerveDrivePoseEstimator3d
    *
    * @param kinematics A correctly-configured kinematics object for your
    *     drivetrain.
-   * @param gyroAngle The current gyro angle.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to
+   * be offset to match the robot's orientation on the field.
    * @param modulePositions The current distance and rotation measurements of
    *     the swerve modules.
    * @param initialPose The starting pose estimate.
@@ -88,13 +96,11 @@ class SwerveDrivePoseEstimator3d
       const wpi::util::array<double, 4>& stateStdDevs,
       const wpi::util::array<double, 4>& visionMeasurementStdDevs)
       : SwerveDrivePoseEstimator3d::PoseEstimator3d(
-            kinematics, m_odometryImpl, stateStdDevs, visionMeasurementStdDevs),
-        m_odometryImpl{kinematics, gyroAngle, modulePositions, initialPose} {
+            SwerveDriveOdometry3d<NumModules>{kinematics, gyroAngle,
+                                              modulePositions, initialPose},
+            stateStdDevs, visionMeasurementStdDevs) {
     this->ResetPose(initialPose);
   }
-
- private:
-  SwerveDriveOdometry3d<NumModules> m_odometryImpl;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

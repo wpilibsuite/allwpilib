@@ -80,7 +80,7 @@ public class DataLog implements AutoCloseable {
    * @param name Name (the string passed as the data type for records using this schema)
    * @param type Type of schema (e.g. "protobuf", "struct", etc)
    * @param schema Schema data
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   public void addSchema(String name, String type, byte[] schema, long timestamp) {
     if (m_schemaMap.putIfAbsent(name, 1) != null) {
@@ -114,7 +114,7 @@ public class DataLog implements AutoCloseable {
    * @param name Name (the string passed as the data type for records using this schema)
    * @param type Type of schema (e.g. "protobuf", "struct", etc)
    * @param schema Schema data
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   public void addSchema(String name, String type, String schema, long timestamp) {
     if (m_schemaMap.putIfAbsent(name, 1) != null) {
@@ -143,7 +143,7 @@ public class DataLog implements AutoCloseable {
    * ignored.
    *
    * @param proto protobuf serialization object
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void addSchema(Protobuf<?, ?> proto, long timestamp) {
     final long actualTimestamp = timestamp == 0 ? WPIUtilJNI.now() : timestamp;
@@ -168,7 +168,7 @@ public class DataLog implements AutoCloseable {
    * ignored.
    *
    * @param struct struct serialization object
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void addSchema(Struct<?> struct, long timestamp) {
     addSchemaImpl(struct, timestamp == 0 ? WPIUtilJNI.now() : timestamp, new HashSet<>());
@@ -193,7 +193,7 @@ public class DataLog implements AutoCloseable {
    * @param name Name
    * @param type Data type
    * @param metadata Initial metadata (e.g. data properties)
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    * @return Entry index
    */
   public int start(String name, String type, String metadata, long timestamp) {
@@ -233,7 +233,7 @@ public class DataLog implements AutoCloseable {
    * Finish an entry.
    *
    * @param entry Entry index
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void finish(int entry, long timestamp) {
     DataLogJNI.finish(m_impl, entry, timestamp);
@@ -253,7 +253,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index
    * @param metadata New metadata for the entry
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void setMetadata(int entry, String metadata, long timestamp) {
     DataLogJNI.setMetadata(m_impl, entry, metadata, timestamp);
@@ -280,7 +280,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param data Byte array to record; will send entire array contents
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendRaw(int entry, byte[] data, long timestamp) {
     appendRaw(entry, data, 0, data.length, timestamp);
@@ -293,7 +293,7 @@ public class DataLog implements AutoCloseable {
    * @param data Byte array to record
    * @param start Start position of data (in byte array)
    * @param len Length of data (must be less than or equal to data.length - start)
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendRaw(int entry, byte[] data, int start, int len, long timestamp) {
     DataLogJNI.appendRaw(m_impl, entry, data, start, len, timestamp);
@@ -304,7 +304,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param data Buffer to record; will send from data.position() to data.limit()
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendRaw(int entry, ByteBuffer data, long timestamp) {
     int pos = data.position();
@@ -318,7 +318,7 @@ public class DataLog implements AutoCloseable {
    * @param data Buffer to record
    * @param start Start position of data (in buffer)
    * @param len Length of data (must be less than or equal to data.capacity() - start)
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendRaw(int entry, ByteBuffer data, int start, int len, long timestamp) {
     DataLogJNI.appendRaw(m_impl, entry, data, start, len, timestamp);
@@ -329,7 +329,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param value Boolean value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendBoolean(int entry, boolean value, long timestamp) {
     DataLogJNI.appendBoolean(m_impl, entry, value, timestamp);
@@ -340,7 +340,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param value Integer value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendInteger(int entry, long value, long timestamp) {
     DataLogJNI.appendInteger(m_impl, entry, value, timestamp);
@@ -351,7 +351,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param value Float value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendFloat(int entry, float value, long timestamp) {
     DataLogJNI.appendFloat(m_impl, entry, value, timestamp);
@@ -362,7 +362,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param value Double value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendDouble(int entry, double value, long timestamp) {
     DataLogJNI.appendDouble(m_impl, entry, value, timestamp);
@@ -373,7 +373,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param value String value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendString(int entry, String value, long timestamp) {
     DataLogJNI.appendString(m_impl, entry, value, timestamp);
@@ -384,7 +384,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param arr Boolean array to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendBooleanArray(int entry, boolean[] arr, long timestamp) {
     DataLogJNI.appendBooleanArray(m_impl, entry, arr, timestamp);
@@ -395,7 +395,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param arr Integer array to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendIntegerArray(int entry, long[] arr, long timestamp) {
     DataLogJNI.appendIntegerArray(m_impl, entry, arr, timestamp);
@@ -406,7 +406,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param arr Float array to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendFloatArray(int entry, float[] arr, long timestamp) {
     DataLogJNI.appendFloatArray(m_impl, entry, arr, timestamp);
@@ -417,7 +417,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param arr Double array to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendDoubleArray(int entry, double[] arr, long timestamp) {
     DataLogJNI.appendDoubleArray(m_impl, entry, arr, timestamp);
@@ -428,7 +428,7 @@ public class DataLog implements AutoCloseable {
    *
    * @param entry Entry index, as returned by start()
    * @param arr String array to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void appendStringArray(int entry, String[] arr, long timestamp) {
     DataLogJNI.appendStringArray(m_impl, entry, arr, timestamp);

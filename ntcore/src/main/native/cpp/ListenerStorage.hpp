@@ -70,12 +70,13 @@ class ListenerStorage final : public IListenerStorage {
   NT_Listener DoAddListener(NT_ListenerPoller pollerHandle);
   std::vector<std::pair<NT_Listener, unsigned int>> DoRemoveListeners(
       std::span<const NT_Listener> handles);
+  void DoReset();
 
   int m_inst;
   mutable wpi::util::mutex m_mutex;
 
   struct PollerData {
-    static constexpr auto kType = Handle::LISTENER_POLLER;
+    static constexpr auto TYPE = Handle::LISTENER_POLLER;
 
     explicit PollerData(NT_ListenerPoller handle) : handle{handle} {}
 
@@ -85,7 +86,7 @@ class ListenerStorage final : public IListenerStorage {
   HandleMap<PollerData, 8> m_pollers;
 
   struct ListenerData {
-    static constexpr auto kType = Handle::LISTENER;
+    static constexpr auto TYPE = Handle::LISTENER;
 
     ListenerData(NT_Listener handle, PollerData* poller)
         : handle{handle}, poller{poller} {}
@@ -115,6 +116,7 @@ class ListenerStorage final : public IListenerStorage {
     wpi::util::Event m_waitQueueWaiter;
   };
   wpi::util::SafeThreadOwner<Thread> m_thread;
+  bool m_resetting{false};
 };
 
 }  // namespace wpi::nt

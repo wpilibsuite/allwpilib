@@ -12,7 +12,7 @@
  */
 class ExampleSmartMotorController {
  public:
-  enum PIDMode { kPosition, kVelocity, kMovementWitchcraft };
+  enum PIDMode { POSITION, VELOCITY, MOVEMENT_WITCHCRAFT };
 
   /**
    * Creates a new ExampleSmartMotorController.
@@ -73,8 +73,4 @@ class ExampleSmartMotorController {
   void SetInverted(bool isInverted) {}
 
   bool GetInverted() const { return false; }
-
-  void Disable() {}
-
-  void StopMotor() {}
 };

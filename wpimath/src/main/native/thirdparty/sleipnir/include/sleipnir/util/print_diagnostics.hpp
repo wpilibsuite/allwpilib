@@ -9,6 +9,8 @@
 #include <chrono>
 #include <cmath>
 #include <ranges>
+#include <ratio>
+#include <span>
 #include <string>
 #include <utility>
 
@@ -17,7 +19,6 @@
 
 #include "sleipnir/util/print.hpp"
 #include "sleipnir/util/profiler.hpp"
-#include "sleipnir/util/to_underlying.hpp"
 
 namespace slp {
 
@@ -109,15 +110,19 @@ void print_too_few_dofs_error(
 /// @tparam Scalar Scalar type.
 /// @param c_e The problem's equality constraints cₑ(x) evaluated at the current
 ///     iterate.
+/// @param tolerance Constraint violations at or below this tolerance aren't
+///     printed.
 template <typename Scalar>
 void print_c_e_local_infeasibility_error(
-    const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e) {
+    const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e, Scalar tolerance) {
+  using std::abs;
+
   slp::println(
       "The problem is locally infeasible due to violated equality "
       "constraints.");
   slp::println("Violated constraints (cₑ(x) = 0) in order of declaration:");
   for (int row = 0; row < c_e.rows(); ++row) {
-    if (c_e[row] < Scalar(0)) {
+    if (abs(c_e[row]) > tolerance) {
       slp::println("  {}/{}: {} = 0", row + 1, c_e.rows(), c_e[row]);
     }
   }
@@ -132,15 +137,17 @@ void print_c_e_local_infeasibility_error(
 /// @tparam Scalar Scalar type.
 /// @param c_i The problem's inequality constraints cᵢ(x) evaluated at the
 ///     current iterate.
+/// @param tolerance Constraint violations at or below this tolerance aren't
+///     printed.
 template <typename Scalar>
 void print_c_i_local_infeasibility_error(
-    const Eigen::Vector<Scalar, Eigen::Dynamic>& c_i) {
+    const Eigen::Vector<Scalar, Eigen::Dynamic>& c_i, Scalar tolerance) {
   slp::println(
       "The problem is locally infeasible due to violated inequality "
       "constraints.");
   slp::println("Violated constraints (cᵢ(x) ≥ 0) in order of declaration:");
   for (int row = 0; row < c_i.rows(); ++row) {
-    if (c_i[row] < Scalar(0)) {
+    if (c_i[row] < -tolerance) {
       slp::println("  {}/{}: {} ≥ 0", row + 1, c_i.rows(), c_i[row]);
     }
   }
@@ -231,7 +238,7 @@ void print_iteration_diagnostics(int iterations, IterationType type,
   slp::println(
       "│{:4} {:1} {:9.3f} {:10.4e} {:11.4e} {:10.4e} {:8.2e} {:8.2e} {:<5} "
       "{:<5} {:8.2e} {:8.2e} {:8.2e} {:8.2e} {:2d}│",
-      iterations, ITERATION_TYPES[slp::to_underlying(type)], to_ms(time), error,
+      iterations, ITERATION_TYPES[std::to_underlying(type)], to_ms(time), error,
       cost, infeasibility, complementarity, μ, power_of_10(δ), power_of_10(γ),
       full_primal_step_inf_norm, full_dual_step_inf_norm, primal_α, dual_α,
       backtracks);

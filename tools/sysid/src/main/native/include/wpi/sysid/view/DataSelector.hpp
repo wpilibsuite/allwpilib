@@ -78,9 +78,9 @@ class DataSelector : public wpi::glass::View {
   int m_selectedAnalysis = 0;
   std::future<TestData> m_testdataFuture;
   std::vector<std::string> m_testdataStats;
-  std::set<std::string> kValidTests = {"quasistatic-forward",
-                                       "quasistatic-reverse", "dynamic-forward",
-                                       "dynamic-reverse"};
+  inline static const std::set<std::string> VALID_TESTS = {
+      "quasistatic-forward", "quasistatic-reverse", "dynamic-forward",
+      "dynamic-reverse"};
   std::set<std::string> m_executedTests;
   bool m_testCountValidated = false;
 

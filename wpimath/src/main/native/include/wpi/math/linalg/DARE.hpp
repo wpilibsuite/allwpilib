@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <expected>
 #include <string_view>
 
 #include <Eigen/Cholesky>
@@ -11,7 +12,6 @@
 #include <Eigen/LU>
 
 #include "wpi/math/system/LinearSystemUtil.hpp"
-#include "wpi/util/expected"
 
 namespace wpi::math {
 
@@ -115,23 +115,11 @@ Eigen::Matrix<double, States, States> DARE(
     // Solve WV₁ = Aₖ for V₁
     StateMatrix V_1 = W_solver.solve(A_k);
 
-    // Solve V₂Wᵀ = Gₖ for V₂
+    // Solve V₂Wᵀ = Gₖ for V₂ (see wpimath/docs/LinalgIdentities.md)
     //
-    // We want to put V₂Wᵀ = Gₖ into Ax = b form so we can solve it more
-    // efficiently.
-    //
-    // V₂Wᵀ = Gₖ
-    // (V₂Wᵀ)ᵀ = Gₖᵀ
-    // WV₂ᵀ = Gₖᵀ
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // V₂ᵀ = W.solve(Gₖᵀ)
-    // V₂ = W.solve(Gₖᵀ)ᵀ
-    //
-    // Since W, Gₖ, and Hₖ are symmetric, drop the transposes on Gₖ and V₂.
-    //
-    // V₂ = W.solve(Gₖ)
+    // V₂ = Gₖ / Wᵀ
+    // V₂ = (W \ Gₖᵀ)ᵀ
+    // V₂ = W \ Gₖ since Gₖ and V₂ are symmetric
     StateMatrix V_2 = W_solver.solve(G_k);
 
     // Gₖ₊₁ = Gₖ + AₖV₂Aₖᵀ
@@ -166,7 +154,7 @@ Eigen::Matrix<double, States, States> DARE(
  * @return Solution to the DARE on success, or DAREError on failure.
  */
 template <int States, int Inputs>
-wpi::util::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
+std::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
     const Eigen::Matrix<double, States, States>& A,
     const Eigen::Matrix<double, States, Inputs>& B,
     const Eigen::Matrix<double, States, States>& Q,
@@ -175,20 +163,20 @@ wpi::util::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
   if (checkPreconditions) {
     // Require R be symmetric
     if ((R - R.transpose()).norm() > 1e-10) {
-      return wpi::util::unexpected{DAREError::RNotSymmetric};
+      return std::unexpected{DAREError::RNotSymmetric};
     }
   }
 
   // Require R be positive definite
   auto R_llt = R.llt();
   if (R_llt.info() != Eigen::Success) {
-    return wpi::util::unexpected{DAREError::RNotPositiveDefinite};
+    return std::unexpected{DAREError::RNotPositiveDefinite};
   }
 
   if (checkPreconditions) {
     // Require Q be symmetric
     if ((Q - Q.transpose()).norm() > 1e-10) {
-      return wpi::util::unexpected{DAREError::QNotSymmetric};
+      return std::unexpected{DAREError::QNotSymmetric};
     }
 
     // Require Q be positive semidefinite
@@ -203,12 +191,12 @@ wpi::util::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
     auto Q_ldlt = Q.ldlt();
     if (Q_ldlt.info() != Eigen::Success ||
         (Q_ldlt.vectorD().array() < 0.0).any()) {
-      return wpi::util::unexpected{DAREError::QNotPositiveSemidefinite};
+      return std::unexpected{DAREError::QNotPositiveSemidefinite};
     }
 
     // Require (A, B) pair be stabilizable
     if (!IsStabilizable<States, Inputs>(A, B)) {
-      return wpi::util::unexpected{DAREError::ABNotStabilizable};
+      return std::unexpected{DAREError::ABNotStabilizable};
     }
 
     // Require (A, C) pair be detectable where Q = CᵀC
@@ -221,7 +209,7 @@ wpi::util::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
         Q_ldlt.transpositionsP();
 
     if (!IsDetectable<States, States>(A, C)) {
-      return wpi::util::unexpected{DAREError::ACNotDetectable};
+      return std::unexpected{DAREError::ACNotDetectable};
     }
   }
 
@@ -281,7 +269,7 @@ J = Σ [uₖ] [0 R][uₖ] ΔT
 @return Solution to the DARE on success, or DAREError on failure.
 */
 template <int States, int Inputs>
-wpi::util::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
+std::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
     const Eigen::Matrix<double, States, States>& A,
     const Eigen::Matrix<double, States, Inputs>& B,
     const Eigen::Matrix<double, States, States>& Q,
@@ -291,14 +279,14 @@ wpi::util::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
   if (checkPreconditions) {
     // Require R be symmetric
     if ((R - R.transpose()).norm() > 1e-10) {
-      return wpi::util::unexpected{DAREError::RNotSymmetric};
+      return std::unexpected{DAREError::RNotSymmetric};
     }
   }
 
   // Require R be positive definite
   auto R_llt = R.llt();
   if (R_llt.info() != Eigen::Success) {
-    return wpi::util::unexpected{DAREError::RNotPositiveDefinite};
+    return std::unexpected{DAREError::RNotPositiveDefinite};
   }
 
   // This is a change of variables to make the DARE that includes Q, R, and N
@@ -312,15 +300,14 @@ wpi::util::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
   // where A₂ and Q₂ are a change of variables:
   //
   //   A₂ = A − BR⁻¹Nᵀ and Q₂ = Q − NR⁻¹Nᵀ
-  Eigen::Matrix<double, States, States> A_2 =
-      A - B * R_llt.solve(N.transpose());
-  Eigen::Matrix<double, States, States> Q_2 =
-      Q - N * R_llt.solve(N.transpose());
+  Eigen::Matrix<double, Inputs, States> Rinv_NT = R_llt.solve(N.transpose());
+  Eigen::Matrix<double, States, States> A_2 = A - B * Rinv_NT;
+  Eigen::Matrix<double, States, States> Q_2 = Q - N * Rinv_NT;
 
   if (checkPreconditions) {
     // Require Q be symmetric
     if ((Q_2 - Q_2.transpose()).norm() > 1e-10) {
-      return wpi::util::unexpected{DAREError::QNotSymmetric};
+      return std::unexpected{DAREError::QNotSymmetric};
     }
 
     // Require Q be positive semidefinite
@@ -335,12 +322,12 @@ wpi::util::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
     auto Q_ldlt = Q_2.ldlt();
     if (Q_ldlt.info() != Eigen::Success ||
         (Q_ldlt.vectorD().array() < 0.0).any()) {
-      return wpi::util::unexpected{DAREError::QNotPositiveSemidefinite};
+      return std::unexpected{DAREError::QNotPositiveSemidefinite};
     }
 
     // Require (A, B) pair be stabilizable
     if (!IsStabilizable<States, Inputs>(A_2, B)) {
-      return wpi::util::unexpected{DAREError::ABNotStabilizable};
+      return std::unexpected{DAREError::ABNotStabilizable};
     }
 
     // Require (A, C) pair be detectable where Q = CᵀC
@@ -353,7 +340,7 @@ wpi::util::expected<Eigen::Matrix<double, States, States>, DAREError> DARE(
         Q_ldlt.transpositionsP();
 
     if (!IsDetectable<States, States>(A_2, C)) {
-      return wpi::util::unexpected{DAREError::ACNotDetectable};
+      return std::unexpected{DAREError::ACNotDetectable};
     }
   }
 

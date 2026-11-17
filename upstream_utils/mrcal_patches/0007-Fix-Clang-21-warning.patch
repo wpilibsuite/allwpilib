@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Sat, 29 Aug 2026 15:43:14 -0700
+Subject: [PATCH 7/7] Fix Clang 21 warning
+
+---
+ poseutils.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/poseutils.c b/poseutils.c
+index b08f3716c4bc0adf750b1167541ff6f23d3ab66b..c38bc03b32d306bde51bf3bd5cf61781082e8aa4 100644
+--- a/poseutils.c
++++ b/poseutils.c
+@@ -716,7 +716,7 @@ void mrcal_compose_Rt_full( // output
+     {
+         // R01 = R0t R1t
+         // t01 = -R0t R1t t1 - R0t t0
+-        const double R0t_t0[3];
++        double R0t_t0[3];
+         mul_vec3_gen33_vout_full(R0t_t0, sizeof(R0t_t0[0]),
+                                  &P2(Rt_0,  3,0), Rt_0_stride1,
+                                  &P2(Rt_0,0,0), Rt_0_stride0, Rt_0_stride1);

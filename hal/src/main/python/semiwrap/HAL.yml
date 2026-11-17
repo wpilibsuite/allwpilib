@@ -3,6 +3,7 @@ strip_prefixes:
 
 enums:
   HAL_RuntimeType:
+    value_prefix: HAL_RUNTIME
 functions:
   HAL_GetErrorMessage:
   HAL_GetSerialNumber:
@@ -13,18 +14,6 @@ functions:
       []() {
         WPI_String s;
         HAL_GetSerialNumber(&s);
-        std::string ss(wpi::util::to_string_view(&s));
-        WPI_FreeString(&s);
-        return ss;
-      }
-  HAL_GetComments:
-    param_override:
-      comments:
-        ignore: true
-    cpp_code: |
-      []() {
-        WPI_String s;
-        HAL_GetComments(&s);
         std::string ss(wpi::util::to_string_view(&s));
         WPI_FreeString(&s);
         return ss;

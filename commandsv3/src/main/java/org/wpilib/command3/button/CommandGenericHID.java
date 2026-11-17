@@ -13,10 +13,10 @@ import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.driverstation.POVDirection;
-import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.EventLoop;
-import org.wpilib.math.util.Pair;
+import org.wpilib.util.Pair;
 
 /**
  * A version of {@link GenericHID} with {@link Trigger} factories for command-based.
@@ -82,8 +82,7 @@ public final class CommandGenericHID {
     m_hidsLock.lock();
     try {
       CommandGenericHID[] hids =
-          m_hids.computeIfAbsent(
-              scheduler, k -> new CommandGenericHID[DriverStationBackend.JOYSTICK_PORTS]);
+          m_hids.computeIfAbsent(scheduler, k -> new CommandGenericHID[HIDDevice.MAX_DEVICES]);
       CommandGenericHID toRet = hids[port];
       if (toRet == null) {
         toRet = new CommandGenericHID(scheduler, port);

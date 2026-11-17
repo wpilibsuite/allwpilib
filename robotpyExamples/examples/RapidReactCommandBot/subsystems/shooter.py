@@ -6,6 +6,7 @@
 
 from commands2 import Command, InstantCommand, Subsystem, cmd
 import wpilib
+import wpilib_drivers
 import wpimath
 
 from constants import ShooterConstants
@@ -15,36 +16,40 @@ class Shooter(Subsystem):
     def __init__(self) -> None:
         """The shooter subsystem for the robot."""
         super().__init__()
-        self.shooterMotor = wpilib.PWMSparkMax(ShooterConstants.kShooterMotorPort)
-        self.feederMotor = wpilib.PWMSparkMax(ShooterConstants.kFeederMotorPort)
-        self.shooterEncoder = wpilib.Encoder(
-            ShooterConstants.kEncoderPorts[0],
-            ShooterConstants.kEncoderPorts[1],
-            ShooterConstants.kEncoderReversed,
+        self.shooter_motor = wpilib_drivers.PWMSparkMax(
+            ShooterConstants.SHOOTER_MOTOR_PORT
         )
-        self.shooterFeedforward = wpimath.SimpleMotorFeedforwardMeters(
-            ShooterConstants.kS, ShooterConstants.kV
+        self.feeder_motor = wpilib_drivers.PWMSparkMax(
+            ShooterConstants.FEEDER_MOTOR_PORT
         )
-        self.shooterFeedback = wpimath.PIDController(ShooterConstants.kP, 0.0, 0.0)
+        self.shooter_encoder = wpilib.Encoder(
+            ShooterConstants.ENCODER_PORTS[0],
+            ShooterConstants.ENCODER_PORTS[1],
+            ShooterConstants.ENCODER_REVERSED,
+        )
+        self.shooter_feedforward = wpimath.SimpleMotorFeedforwardMeters(
+            ShooterConstants.S, ShooterConstants.V
+        )
+        self.shooter_feedback = wpimath.PIDController(ShooterConstants.P, 0.0, 0.0)
 
-        self.shooterFeedback.setTolerance(ShooterConstants.kShooterToleranceRPS)
-        self.shooterEncoder.setDistancePerPulse(
-            ShooterConstants.kEncoderDistancePerPulse
+        self.shooter_feedback.set_tolerance(ShooterConstants.SHOOTER_TOLERANCE_RPS)
+        self.shooter_encoder.set_distance_per_pulse(
+            ShooterConstants.ENCODER_DISTANCE_PER_PULSE
         )
 
         # Set default command to turn off both the shooter and feeder motors, and then idle
-        self.setDefaultCommand(
-            self.runOnce(
+        self.set_default_command(
+            self.run_once(
                 lambda: (
-                    self.shooterMotor.disable(),
-                    self.feederMotor.disable(),
+                    self.shooter_motor.set_throttle(0.0),
+                    self.feeder_motor.set_throttle(0.0),
                 )
             )
-            .andThen(self.run(lambda: None))
-            .withName("Idle")
+            .and_then(self.run(lambda: None))
+            .with_name("Idle")
         )
 
-    def shootCommand(self, setpointRotationsPerSecond: float) -> Command:
+    def shoot_command(self, setpoint_rotations_per_second: float) -> Command:
         """Returns a command to shoot the balls currently stored in the robot. Spins the shooter
         flywheel up to the specified setpoint, and then runs the feeder motor.
 
@@ -52,10 +57,10 @@ class Shooter(Subsystem):
         """
 
         def _run_shooter() -> None:
-            self.shooterMotor.set(
-                self.shooterFeedforward.calculate(setpointRotationsPerSecond)
-                + self.shooterFeedback.calculate(
-                    self.shooterEncoder.getRate(), setpointRotationsPerSecond
+            self.shooter_motor.set(
+                self.shooter_feedforward.calculate(setpoint_rotations_per_second)
+                + self.shooter_feedback.calculate(
+                    self.shooter_encoder.get_rate(), setpoint_rotations_per_second
                 )
             )
 
@@ -63,7 +68,7 @@ class Shooter(Subsystem):
             # Run the shooter flywheel at the desired setpoint using feedforward and feedback
             self.run(_run_shooter),
             # Wait until the shooter has reached the setpoint, and then run the feeder
-            cmd.waitUntil(self.shooterFeedback.atSetpoint).andThen(
-                InstantCommand(lambda: self.feederMotor.set(1))
+            cmd.wait_until(self.shooter_feedback.at_setpoint).and_then(
+                InstantCommand(lambda: self.feeder_motor.set(1))
             ),
-        ).withName("Shoot")
+        ).with_name("Shoot")

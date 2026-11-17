@@ -4,14 +4,14 @@
 
 #include "wpi/commands2/WaitCommand.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi::cmd;
 
 WaitCommand::WaitCommand(wpi::units::second_t duration) : m_duration{duration} {
-  SetName(fmt::format("{}: {}", GetName(), duration));
+  SetName(std::format("{}: {}", GetName(), duration));
 }
 
 void WaitCommand::Initialize() {
@@ -30,8 +30,7 @@ bool WaitCommand::RunsWhenDisabled() const {
   return true;
 }
 
-void WaitCommand::InitSendable(wpi::util::SendableBuilder& builder) {
-  Command::InitSendable(builder);
-  builder.AddDoubleProperty(
-      "duration", [this] { return m_duration.value(); }, nullptr);
+void WaitCommand::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  Command::LogTo(table);
+  table.Log("duration", m_duration);
 }

@@ -3,17 +3,16 @@
 #pragma once
 
 #ifdef SLEIPNIR_PYTHON
+#include <format>
 #include <source_location>
 #include <stdexcept>
-
-#include <fmt/format.h>
 
 /// Throws an exception in Python.
 #define slp_assert(condition)                                        \
   do {                                                               \
     if (!(condition)) {                                              \
       auto location = std::source_location::current();               \
-      throw std::invalid_argument(fmt::format(                       \
+      throw std::invalid_argument(std::format(                       \
           "{}:{}: {}: Assertion `{}' failed.", location.file_name(), \
           location.line(), location.function_name(), #condition));   \
     }                                                                \

@@ -1,14 +1,13 @@
-from typing import Any, Dict, TypeVar, Type
-
 import inspect
+from typing import Any, TypeVar
 
 import commands2
-from wpilib.simulation import DriverStationSim, pauseTiming, resumeTiming, stepTiming
+from wpilib.simulation import pause_timing, resume_timing, step_timing
 
 Y = TypeVar("Y")
 
 
-def full_subclass_of(cls: Type[Y]) -> Type[Y]:
+def full_subclass_of(cls: type[Y]) -> type[Y]:
     # Pybind classes can't be monkeypatched.
     # This generates a subclass with every method filled out
     # so that it can be monkeypatched.
@@ -30,14 +29,14 @@ def full_subclass_of(cls: Type[Y]) -> Type[Y]:
 
 class ManualSimTime:
     def __enter__(self) -> "ManualSimTime":
-        pauseTiming()
+        pause_timing()
         return self
 
     def __exit__(self, *args):
-        resumeTiming()
+        resume_timing()
 
     def step(self, delta: float):
-        stepTiming(delta)
+        step_timing(delta)
 
 
 class OOInteger:
@@ -50,11 +49,11 @@ class OOInteger:
     def set(self, value: int):
         self.value = value
 
-    def incrementAndGet(self) -> int:
+    def increment_and_get(self) -> int:
         self.value += 1
         return self.value
 
-    def addAndGet(self, value: int) -> int:
+    def add_and_get(self, value: int) -> int:
         self.value += value
         return self.value
 
@@ -90,13 +89,13 @@ class OOBoolean:
 
 class InternalButton(commands2.button.Trigger):
     def __init__(self):
-        super().__init__(self.isPressed)
+        super().__init__(self.is_pressed)
         self.pressed = False
 
-    def isPressed(self) -> bool:
+    def is_pressed(self) -> bool:
         return self.pressed
 
-    def setPressed(self, value: bool):
+    def set_pressed(self, value: bool):
         self.pressed = value
 
     def __call__(self) -> bool:
@@ -113,11 +112,11 @@ class OOFloat:
     def set(self, value: float):
         self.value = value
 
-    def incrementAndGet(self) -> float:
+    def increment_and_get(self) -> float:
         self.value += 1
         return self.value
 
-    def addAndGet(self, value: float) -> float:
+    def add_and_get(self, value: float) -> float:
         self.value += value
         return self.value
 
@@ -138,7 +137,7 @@ class OOFloat:
 # Fakito Framework
 
 
-def _get_all_args_as_kwargs(method, *args, **kwargs) -> Dict[str, Any]:
+def _get_all_args_as_kwargs(method, *args, **kwargs) -> dict[str, Any]:
     try:
         import inspect
 

@@ -19,6 +19,7 @@
 
 #include <climits>
 #include <concepts>
+#include <expected>
 #include <ranges>
 #include <string>
 #include <string_view>
@@ -27,7 +28,6 @@
 #include <vector>
 
 #include "wpi/util/StringMap.hpp"
-#include "wpi/util/expected"
 
 namespace wpi::util {
 
@@ -153,7 +153,7 @@ class json
     };
 
   public:
-    static wpi::util::expected<json, const char*> parse(std::string_view);
+    static std::expected<json, const char*> parse(std::string_view);
     static json parse_or_throw(std::string_view);
 
     json(const json&);

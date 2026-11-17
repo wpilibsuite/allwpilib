@@ -200,6 +200,37 @@ public final class RoboRioSim {
   }
 
   /**
+   * Register a callback to be run whenever the brownout recovery voltage changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the {@link CallbackStore} object associated with this callback.
+   */
+  public static CallbackStore registerBrownoutRecoveryVoltageCallback(
+      NotifyCallback callback, boolean initialNotify) {
+    int uid = RoboRioDataJNI.registerBrownoutRecoveryVoltageCallback(callback, initialNotify);
+    return new CallbackStore(uid, RoboRioDataJNI::cancelBrownoutRecoveryVoltageCallback);
+  }
+
+  /**
+   * Measure the brownout recovery voltage.
+   *
+   * @return the brownout recovery voltage
+   */
+  public static double getBrownoutRecoveryVoltage() {
+    return RoboRioDataJNI.getBrownoutRecoveryVoltage();
+  }
+
+  /**
+   * Define the brownout recovery voltage.
+   *
+   * @param brownoutRecoveryVoltage the new voltage
+   */
+  public static void setBrownoutRecoveryVoltage(double brownoutRecoveryVoltage) {
+    RoboRioDataJNI.setBrownoutRecoveryVoltage(brownoutRecoveryVoltage);
+  }
+
+  /**
    * Register a callback to be run whenever the cpu temp changes.
    *
    * @param callback the callback
@@ -277,24 +308,6 @@ public final class RoboRioSim {
    */
   public static void setSerialNumber(String serialNumber) {
     RoboRioDataJNI.setSerialNumber(serialNumber);
-  }
-
-  /**
-   * Get the comments string.
-   *
-   * @return The comments string.
-   */
-  public static String getComments() {
-    return RoboRioDataJNI.getComments();
-  }
-
-  /**
-   * Set the comments string.
-   *
-   * @param comments The comments string.
-   */
-  public static void setComments(String comments) {
-    RoboRioDataJNI.setComments(comments);
   }
 
   /** Reset all simulation data. */

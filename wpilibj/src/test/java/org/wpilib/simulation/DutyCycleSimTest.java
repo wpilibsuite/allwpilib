@@ -32,7 +32,7 @@ class DutyCycleSimTest {
 
   @Test
   void setFrequencyTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (DutyCycle dc = new DutyCycle(2)) {
       DoubleCallback callback = new DoubleCallback();
@@ -49,7 +49,7 @@ class DutyCycleSimTest {
 
   @Test
   void setOutputTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (DutyCycle dc = new DutyCycle(2)) {
       DoubleCallback callback = new DoubleCallback();

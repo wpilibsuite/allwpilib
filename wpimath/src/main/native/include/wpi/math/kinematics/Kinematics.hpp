@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <concepts>
+
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"

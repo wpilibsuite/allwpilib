@@ -232,6 +232,15 @@ class MeasureTest {
   }
 
   @Test
+  void testMinReturnType() {
+    Distance a = Units.Feet.of(1);
+    Distance b = Units.Feet.of(3);
+
+    Distance min = Measure.min(a, b); // checking that this compiles
+    assertSame(a, min);
+  }
+
+  @Test
   void testMaxNoArgs() {
     var min = Measure.max();
     assertNull(min);
@@ -247,6 +256,15 @@ class MeasureTest {
 
     var max = Measure.max(one, two, zero, veryLarge);
     assertSame(veryLarge, max);
+  }
+
+  @Test
+  void testMaxReturnType() {
+    Distance a = Units.Feet.of(1);
+    Distance b = Units.Feet.of(3);
+
+    Distance max = Measure.max(a, b); // checking that this compiles
+    assertSame(b, max);
   }
 
   @Test

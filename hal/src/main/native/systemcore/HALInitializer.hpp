@@ -19,7 +19,6 @@ inline void CheckInit() {
 extern void InitializeCTREPCM();
 extern void InitializeREVPH();
 extern void InitializeAddressableLED();
-extern void InitializeAlert();
 extern void InitializeAnalogInput();
 extern void InitializeAnalogInternal();
 extern void InitializeCAN();
@@ -42,5 +41,4 @@ extern void InitializePWM();
 extern void InitializeSerialPort();
 extern void InitializeSmartIo();
 extern void InitializeThreads();
-extern void InitializeUsageReporting();
 }  // namespace wpi::hal::init

@@ -1,4 +1,4 @@
-if(WITH_GUI)
+if(WPILIB_WITH_GUI)
     add_subdirectory(halsim_gui)
 endif()
 

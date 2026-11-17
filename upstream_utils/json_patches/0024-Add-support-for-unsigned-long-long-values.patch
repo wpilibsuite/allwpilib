@@ -10,7 +10,7 @@ Make unsigned constructors constexpr
  2 files changed, 112 insertions(+), 39 deletions(-)
 
 diff --git a/json.cpp b/json.cpp
-index f8416f3723df70032d274f32cda36b4ef1c7ed90..7f23ece0e8fa09ccb5fef8226de39c55ef70efdd 100644
+index 27fb732b5af7a5ded9971c767e96e3f4f79a6566..c2a897f2ffe411fb6528741de1f4ea9e1a76a056 100644
 --- a/json.cpp
 +++ b/json.cpp
 @@ -247,28 +247,6 @@ LongToString(char* p, long long x)
@@ -218,7 +218,7 @@ index f8416f3723df70032d274f32cda36b4ef1c7ed90..7f23ece0e8fa09ccb5fef8226de39c55
              return lhs.float_value == rhs.float_value;
          case json::Type::Double:
 diff --git a/json.h b/json.h
-index e42ee96ac8697eaf17fd9d5298e877a45a4644a0..31c5ea39b67286df158a9d6e13ab5073498126b8 100644
+index a6a459fcda6015c2195b0a32611fc61525d5483c..ca7d76d837c9e0bdfb92e7c1b7bfd24cc8cb5ae2 100644
 --- a/json.h
 +++ b/json.h
 @@ -17,6 +17,7 @@
@@ -227,8 +227,8 @@ index e42ee96ac8697eaf17fd9d5298e877a45a4644a0..31c5ea39b67286df158a9d6e13ab5073
  
 +#include <climits>
  #include <concepts>
+ #include <expected>
  #include <ranges>
- #include <string>
 @@ -92,6 +93,7 @@ class json
          Null,
          Bool,

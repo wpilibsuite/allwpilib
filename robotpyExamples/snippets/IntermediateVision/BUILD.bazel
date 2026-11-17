@@ -1,0 +1,22 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_library")
+load("//robotpyExamples:project.bzl", "robotpy_project")
+
+py_library(
+    name = "vision",
+    srcs = ["vision.py"],
+    deps = [
+        # "//cscore:robotpy-cscore",
+        requirement("numpy"),
+        requirement("opencv-python"),
+    ],
+)
+
+robotpy_project(
+    name = "IntermediateVision",
+    srcs = ["robot.py"],
+    data = [":vision"],
+    main = "robot.py",
+    deps = [
+    ],
+)

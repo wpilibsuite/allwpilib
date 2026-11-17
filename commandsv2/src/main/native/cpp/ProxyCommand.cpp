@@ -4,22 +4,21 @@
 
 #include "wpi/commands2/ProxyCommand.hpp"
 
+#include <format>
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
-
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi::cmd;
 
 ProxyCommand::ProxyCommand(Command* command)
     : m_supplier([command] { return command; }) {
-  SetName(fmt::format("Proxy({})", command->GetName()));
+  SetName(std::format("Proxy({})", command->GetName()));
 }
 
 ProxyCommand::ProxyCommand(std::unique_ptr<Command> command) {
-  SetName(fmt::format("Proxy({})", command->GetName()));
+  SetName(std::format("Proxy({})", command->GetName()));
   m_supplier = [command = std::move(command)] { return command.get(); };
 }
 
@@ -42,16 +41,7 @@ bool ProxyCommand::IsFinished() {
   return m_command == nullptr || !m_command->IsScheduled();
 }
 
-void ProxyCommand::InitSendable(wpi::util::SendableBuilder& builder) {
-  Command::InitSendable(builder);
-  builder.AddStringProperty(
-      "proxied",
-      [this] {
-        if (m_command) {
-          return m_command->GetName();
-        } else {
-          return std::string{"null"};
-        }
-      },
-      nullptr);
+void ProxyCommand::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  Command::LogTo(table);
+  table.Log("proxied", m_command ? m_command->GetName() : std::string{"null"});
 }

@@ -21,7 +21,7 @@ public class Robot extends TimedRobot {
   AnalogPotentiometer pot = new AnalogPotentiometer(0, 180, 30);
 
   // Initializes an AnalogInput on port 1
-  AnalogInput input = new AnalogInput(0);
+  AnalogInput input = new AnalogInput(1);
   // Initializes an AnalogPotentiometer with the given AnalogInput
   // The full range of motion (in meaningful external units) is 0-180 (this could be degrees, for
   // instance)

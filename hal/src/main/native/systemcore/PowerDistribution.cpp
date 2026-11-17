@@ -31,16 +31,16 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
       return HAL_INVALID_HANDLE;
     }
 
-    uint64_t waitTime = wpi::hal::GetDSInitializeTime() + 400000;
+    int64_t waitTime = wpi::hal::GetDSInitializeTime() + 400'000'000;
 
     // Ensure we have been alive for long enough to receive a few Power packets.
     do {
-      uint64_t currentTime = HAL_GetMonotonicTime();
+      int64_t currentTime = HAL_GetMonotonicTime();
       if (currentTime >= waitTime) {
         break;
       }
       std::this_thread::sleep_for(
-          std::chrono::microseconds(waitTime - currentTime));
+          std::chrono::nanoseconds(waitTime - currentTime));
     } while (true);
 
     // Try PDP first
@@ -120,9 +120,9 @@ HAL_PowerDistributionType HAL_GetPowerDistributionType(
 int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
                                             int32_t* status) {
   if (IsCtre(handle)) {
-    return kNumCTREPDPChannels;
+    return NUM_CTREPDP_CHANNELS;
   } else {
-    return kNumREVPDHChannels;
+    return NUM_REVPDH_CHANNELS;
   }
 }
 
@@ -158,14 +158,14 @@ void HAL_GetPowerDistributionAllChannelCurrents(
     HAL_PowerDistributionHandle handle, double* currents,
     int32_t currentsLength, int32_t* status) {
   if (IsCtre(handle)) {
-    if (currentsLength < kNumCTREPDPChannels) {
+    if (currentsLength < NUM_CTREPDP_CHANNELS) {
       *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
                           "Output array not large enough");
       return;
     }
     return HAL_GetPDPAllChannelCurrents(handle, currents, status);
   } else {
-    if (currentsLength < kNumREVPDHChannels) {
+    if (currentsLength < NUM_REVPDH_CHANNELS) {
       *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
                           "Output array not large enough");
       return;

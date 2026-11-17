@@ -4,21 +4,43 @@
 
 #pragma once
 
+#include <deque>
 #include <vector>
 
 #include "IConnectionList.hpp"
-#include "gmock/gmock.h"
 
 namespace wpi::nt {
 
 class MockConnectionList : public IConnectionList {
  public:
-  MOCK_METHOD(int, AddConnection, (const ConnectionInfo& info), (override));
-  MOCK_METHOD(void, RemoveConnection, (int handle), (override));
-  MOCK_METHOD(void, ClearConnections, (), (override));
-  MOCK_METHOD(std::vector<ConnectionInfo>, GetConnections, (),
-              (const, override));
-  MOCK_METHOD(bool, IsConnected, (), (const, override));
+  int AddConnection(const ConnectionInfo& info) override {
+    addConnectionCalls.emplace_back(info);
+    if (!addConnectionReturns.empty()) {
+      int rv = addConnectionReturns.front();
+      addConnectionReturns.pop_front();
+      return rv;
+    }
+    return static_cast<int>(addConnectionCalls.size());
+  }
+
+  void RemoveConnection(int handle) override {
+    removeConnectionCalls.emplace_back(handle);
+  }
+
+  void ClearConnections() override { ++clearConnectionsCalls; }
+
+  std::vector<ConnectionInfo> GetConnections() const override {
+    return connections;
+  }
+
+  bool IsConnected() const override { return connected; }
+
+  std::deque<int> addConnectionReturns;
+  std::vector<ConnectionInfo> addConnectionCalls;
+  std::vector<int> removeConnectionCalls;
+  int clearConnectionsCalls = 0;
+  std::vector<ConnectionInfo> connections;
+  bool connected = false;
 };
 
 }  // namespace wpi::nt

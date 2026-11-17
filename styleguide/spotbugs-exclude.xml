@@ -5,6 +5,12 @@
     <Class name="org.wpilib.system.Watchdog" />
   </Match>
   <Match>
+    <!-- DSGamepadChooser's selected selectable index is not a cross-thread coordination primitive. -->
+    <Bug pattern="AT_NONATOMIC_OPERATIONS_ON_SHARED_VARIABLE" />
+    <Class name="org.wpilib.driverstation.DSGamepadChooser" />
+    <Field name="m_selectedSelectable" />
+  </Match>
+  <Match>
     <Bug pattern="AT_STALE_THREAD_WRITE_OF_PRIMITIVE" />
     <Or>
       <Class name="org.wpilib.driverstation.internal.DriverStationBackend" />
@@ -32,6 +38,11 @@
     <Class name="org.wpilib.framework.OpModeRobot" />
   </Match>
   <Match>
+    <!-- We explicitly call System.gc() in tests to test behavior when weak references are garbage collected. -->
+    <Bug pattern="DM_GC" />
+    <Class name="~org\.wpilib\..*Test" />
+  </Match>
+  <Match>
     <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME" />
     <Or>
       <Class name="org.wpilib.system.DataLogManager" />
@@ -49,6 +60,7 @@
       <Class name="org.wpilib.math.kinematics.SwerveDriveOdometry3dTest" />
       <Class name="org.wpilib.math.kinematics.SwerveDriveOdometryTest" />
       <Class name="org.wpilib.math.filter.LinearFilterTest" />
+      <Class name="org.wpilib.math.filter.BiquadFilterTest" />
     </Or>
   </Match>
   <Match>
@@ -90,6 +102,14 @@
     <Bug pattern="MS_MUTABLE_ARRAY" />
   </Match>
   <Match>
+    <!-- TelemetryTable intentionally reflects public test serializer fields by name. -->
+    <Bug pattern="MS_PKGPROTECT" />
+    <Or>
+      <Class name="org.wpilib.telemetry.TelemetryTableTest$CachedStructThing" />
+      <Class name="org.wpilib.telemetry.TelemetryTableTest$CachedProtoThing" />
+    </Or>
+  </Match>
+  <Match>
     <!--
     This seems to be a false positive from the &= used by these command compositions to determine runsWhenDisabled
     -->
@@ -108,6 +128,13 @@
   <Match>
     <Bug pattern="RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED" />
     <Class name="org.wpilib.networktables.NetworkTableInstance" />
+  </Match>
+  <Match>
+    <!--
+    Not a common case we expect to hit.
+    -->
+    <Bug pattern="SBSC_USE_STRINGBUFFER_CONCATENATION" />
+    <Class name="org.wpilib.driverstation.internal.DriverStationBackend" />
   </Match>
   <Match>
     <Bug pattern="SC_START_IN_CTOR" />
@@ -170,6 +197,7 @@
       <Class name="org.wpilib.math.system.LinearSystem" />
       <Class name="org.wpilib.math.trajectory.Trajectory" />
       <Class name="org.wpilib.command3.SchedulerTelemetryTests" />
+      <Class name="org.wpilib.javacplugin.OpModeAnnotationProcessorTest" />
     </Or>
   </Match>
 </FindBugsFilter>

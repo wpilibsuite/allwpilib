@@ -24,16 +24,16 @@ class IntakeTest {
 
   @BeforeEach // this method will run before each test
   void setup() {
-    assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
+    assert HAL.initialize(); // initialize the HAL, crash if failed
     intake = new Intake(); // create our intake
     simMotor =
         new PWMMotorControllerSim(
-            IntakeConstants.kMotorPort); // create our simulation PWM motor controller
+            IntakeConstants.MOTOR_PORT); // create our simulation PWM motor controller
     simPiston =
         new DoubleSolenoidSim(
             PneumaticsModuleType.CTRE_PCM,
-            IntakeConstants.kPistonFwdChannel,
-            IntakeConstants.kPistonRevChannel); // create our simulation solenoid
+            IntakeConstants.PISTON_FWD_CHANNEL,
+            IntakeConstants.PISTON_REV_CHANNEL); // create our simulation solenoid
   }
 
   @SuppressWarnings("PMD.SignatureDeclareThrowsException")

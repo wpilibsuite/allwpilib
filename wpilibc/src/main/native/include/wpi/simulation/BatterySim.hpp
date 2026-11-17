@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm>
+#include <initializer_list>
 #include <numeric>
 #include <span>
 

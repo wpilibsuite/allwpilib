@@ -9,7 +9,7 @@ using namespace wpi::hal;
 
 namespace wpi::hal::init {
 void InitializeAnalogInData() {
-  static AnalogInData sind[kNumAnalogInputs];
+  static AnalogInData sind[NUM_ANALOG_INPUTS];
   ::wpi::hal::SimAnalogInData = sind;
 }
 }  // namespace wpi::hal::init

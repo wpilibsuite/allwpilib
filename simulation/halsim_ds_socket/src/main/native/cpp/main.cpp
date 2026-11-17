@@ -18,10 +18,9 @@
 #include <cstdio>
 #include <cstring>
 #include <exception>
+#include <format>
 #include <memory>
 #include <string_view>
-
-#include <fmt/format.h>
 
 #include "mrclib/ApiVersion.h"
 #include "mrclib/DsComms.hpp"
@@ -32,6 +31,7 @@
 #include "wpi/hal/cpp/MrcLibDs.hpp"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/util/SafeThread.hpp"
+#include "wpi/util/print.hpp"
 
 static_assert(MRCLIB_MAX_AXES == HAL_MAX_JOYSTICK_AXES);
 static_assert(MRCLIB_MAX_POVS == HAL_MAX_JOYSTICK_POVS);
@@ -198,7 +198,7 @@ int HALSIM_InitExtension(void) {
 
   // Before initializing, we need to set up the fake system server
   if (!MRC_CHECK_API_VERSION()) {
-    fmt::print(
+    wpi::util::print(
         stderr,
         "Error: MRC API version mismatch. Restarting app and retrying...");
 
