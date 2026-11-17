@@ -36,9 +36,9 @@ class Rectangle2dTest {
     assertTrue(json.contains("\"yWidth\""));
     assertEquals(rectangle, type.fromJson(new ByteArrayInputStream(output.toByteArray())));
     var fixture =
-      "{\"center\":{\"translation\":{\"x\":1.0,\"y\":2.0},"
-        + "\"rotation\":{\"radians\":1.5707963267948966}},"
-        + "\"xWidth\":3.0,\"yWidth\":4.0}";
+        "{\"center\":{\"translation\":{\"x\":1.0,\"y\":2.0},"
+            + "\"rotation\":{\"radians\":1.5707963267948966}},"
+            + "\"xWidth\":3.0,\"yWidth\":4.0}";
     assertEquals(rectangle, type.fromJson(fixture));
     var invalid = fixture.replace("\"xWidth\":3.0", "\"xWidth\":-1.0");
     assertThrows(RuntimeException.class, () -> type.fromJson(invalid));

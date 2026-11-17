@@ -37,9 +37,9 @@ class Ellipse2dTest {
     assertTrue(json.contains("\"ySemiAxis\""));
     assertEquals(ellipse, type.fromJson(new ByteArrayInputStream(output.toByteArray())));
     var fixture =
-      "{\"center\":{\"translation\":{\"x\":1.0,\"y\":2.0},"
-        + "\"rotation\":{\"radians\":1.5707963267948966}},"
-        + "\"xSemiAxis\":3.0,\"ySemiAxis\":4.0}";
+        "{\"center\":{\"translation\":{\"x\":1.0,\"y\":2.0},"
+            + "\"rotation\":{\"radians\":1.5707963267948966}},"
+            + "\"xSemiAxis\":3.0,\"ySemiAxis\":4.0}";
     assertEquals(ellipse, type.fromJson(fixture));
     var invalid = fixture.replace("\"xSemiAxis\":3.0", "\"xSemiAxis\":0.0");
     assertThrows(RuntimeException.class, () -> type.fromJson(invalid));
