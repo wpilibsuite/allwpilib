@@ -50,7 +50,7 @@ template <class T>
   requires std::copy_constructible<T> && std::default_initializable<T>
 class Selectable final : public detail::SelectableBase {
   wpi::util::StringMap<T> m_map;
-  std::function<void(T)> m_listener;
+  std::function<void(std::string_view, T)> m_listener;
   template <class U>
   static U _unwrap_smart_ptr(const U& value) {
     return value;
@@ -188,19 +188,38 @@ class Selectable final : public detail::SelectableBase {
   }
 
   /**
+   * Returns the name of the selected option.
+   *
+   * If there is none or no valid option selected, it will return the default.
+   * If there is no valid option selected and no default, then it will return an
+   * empty string.
+   *
+   * @return The option selected
+   */
+  std::string GetSelectedName() const {
+    auto it = FindSelectedOrDefault(m_selected);
+    if (it == m_map.end()) {
+      return "";
+    }
+    return it->first;
+  }
+
+  /**
    * Bind a listener that's called when the selected value changes.
    * Only one listener can be bound. Calling this function will replace the
    * previous listener.
    * @param listener The function to call that accepts the new value
    */
-  void OnChange(std::function<void(T)> listener) { m_listener = listener; }
+  void OnChange(std::function<void(std::string_view, T)> listener) {
+    m_listener = listener;
+  }
 
  protected:
   void Changed(std::string_view val) override {
     if (m_listener) {
       auto it = FindSelectedOrDefault(val);
       if (it != m_map.end()) {
-        m_listener(it->second);
+        m_listener(it->first, it->second);
       }
     }
   }
