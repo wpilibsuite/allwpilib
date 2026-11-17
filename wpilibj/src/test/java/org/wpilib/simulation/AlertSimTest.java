@@ -110,8 +110,10 @@ class AlertSimTest {
       b.set(true);
       c.set(true);
 
+      // getAll() reports alerts in storage-slot order, and new alerts reuse
+      // slots freed by earlier tests, so only membership is checked here.
       var startState = List.of(getActiveAlerts(Level.LOW));
-      assertEquals(List.of("A", "B", "C"), startState);
+      assertEquals(Set.of("A", "B", "C"), Set.copyOf(startState));
 
       b.set(true);
       assertState(Level.LOW, startState);

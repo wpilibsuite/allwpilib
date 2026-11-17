@@ -12,6 +12,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import java.util.Arrays;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -25,6 +26,11 @@ import org.wpilib.simulation.SimHooks;
 import org.wpilib.util.Alert;
 
 class DriverStationTest {
+  @BeforeEach
+  void setUp() {
+    DriverStationBackend.clearUserProgramStarted();
+  }
+
   @AfterEach
   void tearDown() {
     DriverStationBackend.clearUserProgramStarted();
