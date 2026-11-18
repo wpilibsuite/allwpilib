@@ -83,11 +83,7 @@ def build_examples(folders, halsim_deps):
         wpilib_java_binary(
             name = folder + "-example",
             main_class = "org.wpilib.Executor",
-            # _EXAMPLE_DEPS is listed explicitly (not just via examples-java) so
-            # wpilib_java_binary can collect their `.native` JNI companions;
-            # examples-java is a plain same-package java_library with none.
-            runtime_deps = [":examples-java"] + _EXAMPLE_DEPS,
-            smoke_test = False,  # TODO(pjreiniger) enable smoke test when all examples actually boot correctly
+            runtime_deps = [":examples-java"],
             halsim_deps = halsim_deps,
             args = ["org.wpilib.examples." + folder + ".Robot"],
             tags = ["wpi-example"],
@@ -110,11 +106,10 @@ def build_snippets(folders, halsim_deps = []):
         wpilib_java_binary(
             name = folder + "-snippet",
             main_class = "org.wpilib.Executor",
-            runtime_deps = [":examples-java"] + _EXAMPLE_DEPS,
-            smoke_test = False,  # TODO(pjreiniger) enable smoke test when all examples actually boot correctly
+            runtime_deps = [":examples-java"],
             halsim_deps = halsim_deps,
-            tags = ["wpi-example"],
             args = ["org.wpilib.snippets." + folder + ".Robot"],
+            tags = ["wpi-example"],
         )
 
 def build_templates(folders):

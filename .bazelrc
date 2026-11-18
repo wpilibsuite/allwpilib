@@ -62,6 +62,7 @@ build:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-exampl
 test:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
 common:skip_robotpy --test_tag_filters=-robotpy --build_tag_filters=-robotpy
 common:imgui_tests --//shared/bazel/rules:with_imgui_tests=true
+common:java_smoke_tests --//shared/bazel/rules:with_java_smoke_tests=true
 
 # BuildBuddy BES Setup
 build:build_buddy_bes --bes_results_url=https://app.buildbuddy.io/invocation/

@@ -6,7 +6,7 @@ wpilib_java_junit5_test(
     srcs = glob(["**/*.java"]) + ["//wpilibj:generated-test-java-srcs"],
     resource_strip_prefix = "wpilibj/src/test/resources",
     resources = ["//wpilibj:test-resources"],
-    tags = ["exclusive"],
+    tags = ["exclusive-if-local"],
     deps = [
         "//datalog/src/main/java",
         "//hal/src/main/java",
