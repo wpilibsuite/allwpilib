@@ -286,6 +286,14 @@ class WPILIB_DLLEXPORT DCMotor {
     // From https://www.revrobotics.com/next-generation-spark-neo/
     return DCMotor(12_V, 3.60_Nm, 211_A, 3.615_A, 6784_rpm, numMotors);
   }
+
+  /**
+   * Return a gearbox of Neo 2.0 brushless motors.
+   */
+  static constexpr DCMotor NEO2(int numMotors = 1) {
+    // From https://docs.revrobotics.com/brushless/neo/2.0
+    return DCMotor(12_V, 3.75_Nm, 150_A, 1.8_A, 5676_rpm, numMotors);
+  }
 };
 
 }  // namespace wpi::math

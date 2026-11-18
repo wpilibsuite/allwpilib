@@ -339,4 +339,15 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
     // From https://www.revrobotics.com/next-generation-spark-neo/
     return new DCMotor(12, 3.60, 211, 3.6, rotationsPerMinuteToRadiansPerSecond(6784), numMotors);
   }
+
+  /**
+   * Return a gearbox of NEO 2.0 motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of NEO 2.0 motors.
+   */
+  public static DCMotor getNEO2(int numMotors) {
+    // From https://docs.revrobotics.com/brushless/neo/2.0
+    return new DCMotor(12, 3.75, 150, 1.8, rotationsPerMinuteToRadiansPerSecond(5676), numMotors);
+  }
 }
