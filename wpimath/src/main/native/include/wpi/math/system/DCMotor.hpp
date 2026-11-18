@@ -290,7 +290,7 @@ class WPILIB_DLLEXPORT DCMotor {
   /**
    * Return a gearbox of Neo 2.0 brushless motors.
    */
-  static constexpr DCMotor NEO2(int numMotors = 1) {
+  static constexpr DCMotor Neo2(int numMotors = 1) {
     // From https://docs.revrobotics.com/brushless/neo/2.0
     return DCMotor(12_V, 3.75_Nm, 150_A, 1.8_A, 5676_rpm, numMotors);
   }
