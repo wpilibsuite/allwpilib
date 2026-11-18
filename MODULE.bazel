@@ -5,7 +5,7 @@ module(
 
 include("//docs:doxygen.MODULE.bazel")
 include("//shared/bazel/thirdparty/ceres:ceres.MODULE.bazel")
-include("//shared/bazel/thirdparty/imgui_test_engine:imgui_test_engine.MODULE.bazel")
+include("//thirdparty/imgui_suite/imgui_test_engine:imgui_test_engine.MODULE.bazel")
 include("//shared/bazel/thirdparty/libssh:libssh.MODULE.bazel")
 include("//shared/bazel/thirdparty/libsdlgpu:libsdlgpu.MODULE.bazel")
 include("//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel")
@@ -176,11 +176,20 @@ archive_override(
 bazel_dep(name = "bzlmodrio-opencv", version = "")
 archive_override(
     module_name = "bzlmodrio-opencv",
-    integrity = "sha256-WPeLraGmt9Fv8tYXvyzxDAGTZ1BW5qb6g95bXIk6otw=",
-    urls = ["https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-3.bcr1/bzlmodRio-opencv-2027.4.13.0-3.bcr1.tar.gz"],
+    integrity = "sha256-BG0kkai/sJuLFJ4wDWdz/IxKTpeR5DM0WcYlUvOJSk8=",
+    urls = ["https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-4/bzlmodRio-opencv-2027.4.13.0-4.tar.gz"],
 )
 
-bazel_dep(name = "protobuf", version = "34.0.bcr.1")
+bazel_dep(name = "protobuf", version = "35.1")
+
+# protobuf's crate extension has no lockfile, which rules_rust 0.71 (from AOS)
+# rejects in a non-root module. Fixed in protobuf 37.
+single_version_override(
+    module_name = "protobuf",
+    patch_strip = 1,
+    patches = ["shared/bazel/patches/protobuf/0001-Make-the-crate-extension-a-dev-dependency.patch"],
+    version = "35.1",
+)
 
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
@@ -190,13 +199,7 @@ http_jar(
     urls = ["https://github.com/google/copybara/releases/download/v20251027/copybara_deploy.jar"],
 )
 
-bazel_dep(name = "aos")
-archive_override(
-    module_name = "aos",
-    integrity = "sha256-xc4s+K3WMYXWsQM4A5UdxiQ1yBBwA8gdws1pVWLW7yg=",
-    strip_prefix = "aos-86726cddc274d56d3d1d1dc33527a552f16f3897",
-    urls = ["https://github.com/AustinSchuh/aos/archive/86726cddc274d56d3d1d1dc33527a552f16f3897.tar.gz"],
-)
+bazel_dep(name = "aos", version = "1.0.0")
 
 # The flatbuffers AOS is built against, which aosnt reads reflection schemas
 # with. AOS patches it, so it is not the registry's flatbuffers.

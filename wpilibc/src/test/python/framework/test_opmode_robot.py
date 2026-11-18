@@ -1,12 +1,13 @@
 import importlib
-from pathlib import Path
 import sys
 import textwrap
 import threading
-import tunables
+from pathlib import Path
 from typing import get_args, get_origin, get_overloads, get_type_hints
 
 import pytest
+
+import tunables
 import wpilib
 import wpilib._impl.opmode as opmode_impl
 from wpilib import OpMode
@@ -18,19 +19,23 @@ from wpiutil import Color
 
 
 @pytest.fixture(autouse=True)
-def reset_decorated_opmodes(monkeypatch):
+def opmode_test_setup(monkeypatch, nt):
     monkeypatch.setattr(opmode_impl, "_decorated_opmodes", [])
-    RobotState.clear_opmodes()
+    wsim.pause_timing()
+    wsim.set_program_started(False)
+
     yield
+
     for module_name in tuple(sys.modules):
-        if (
-            module_name == "samplebot"
-            or module_name.startswith("samplebot.")
-            or module_name == "robot"
-            or module_name == "opmodes"
-            or module_name.startswith("opmodes.")
-        ):
-            sys.modules.pop(module_name)
+        if module_name in (
+            "samplebot",
+            "robot",
+            "opmodes",
+        ) or module_name.startswith(("samplebot.", "opmodes.")):
+            del sys.modules[module_name]
+
+    wsim.resume_timing()
+    RobotState.clear_opmodes()
 
 
 def import_robot_package(monkeypatch, tmp_path, robot_source, module_contents):
@@ -1517,15 +1522,6 @@ def test_robot_loop_refreshes_getter_backed_tunables():
         tunables.TunableRegistry.reset()
 
 
-@pytest.fixture(autouse=True)
-def sim_timing_setup():
-    wsim.pause_timing()
-    wsim.set_program_started(False)
-    yield
-    wsim.resume_timing()
-    RobotState.clear_opmodes()
-
-
 def test_add_opmode():
     class MyMockRobot(MockRobot):
         def __init__(self):
@@ -1605,7 +1601,7 @@ def test_remove_opmode():
 
 @pytest.mark.parametrize("started", [False, True])
 @pytest.mark.parametrize("self_cycle", [False, True])
-def test_opmode_close_with_retained_reference(started, self_cycle):
+def test_opmode_close_with_retained_reference(nt, started, self_cycle):
     instances = []
 
     class ClosingOpMode(wpilib.PeriodicOpMode):
@@ -1685,7 +1681,7 @@ def test_opmode_default_close():
 
 
 @pytest.fixture
-def periodic_robot_test_fixture():
+def periodic_robot_test_fixture(nt):
     class MyMockRobot(MockRobot):
         def __init__(self):
             super().__init__()

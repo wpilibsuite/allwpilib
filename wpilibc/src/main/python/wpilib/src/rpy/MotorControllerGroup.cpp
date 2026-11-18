@@ -35,12 +35,6 @@ bool PyMotorControllerGroup::GetInverted() const {
   return m_isInverted;
 }
 
-void PyMotorControllerGroup::Disable() {
-  for (auto motorController : m_motorControllers) {
-    motorController->Disable();
-  }
-}
-
 void PyMotorControllerGroup::LogTo(
     wpi::telemetry::TelemetryTable& table) const {
   table.Log("Value", GetThrottle());

@@ -1491,6 +1491,7 @@ SimpleMotorFeedforward = "wpi/math/controller/SimpleMotorFeedforward.hpp"
 
 # wpi/math/estimator
 # AngleStatistics = "wpi/math/estimator/AngleStatistics.hpp"
+DCMotorBiasEstimator = "wpi/math/estimator/DCMotorBiasEstimator.hpp"
 DifferentialDrivePoseEstimator = "wpi/math/estimator/DifferentialDrivePoseEstimator.hpp"
 DifferentialDrivePoseEstimator3d = "wpi/math/estimator/DifferentialDrivePoseEstimator3d.hpp"
 ExtendedKalmanFilter = "wpi/math/estimator/ExtendedKalmanFilter.hpp"

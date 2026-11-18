@@ -96,10 +96,3 @@ class ExampleSmartMotorController(wpilib.MotorController):
     @override
     def get_inverted(self) -> bool:
         return self._inverted
-
-    @override
-    def disable(self) -> None:
-        self._velocity = 0.0
-
-    def stop_motor(self) -> None:
-        self._velocity = 0.0

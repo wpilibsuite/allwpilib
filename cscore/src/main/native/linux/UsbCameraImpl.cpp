@@ -23,6 +23,7 @@
 #include <format>
 #include <memory>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -302,11 +303,15 @@ static bool IsVideoCaptureDevice(const char* cpath) {
 
 static int GetDeviceNum(const char* cpath) {
   fs::path path{cpath};
+  std::error_code ec;
 
   // it might be a symlink; if so, find the symlink target (e.g. /dev/videoN),
   // add that to the list and make it the keypath
-  if (fs::is_symlink(path)) {
-    path = fs::canonical(path);
+  if (fs::is_symlink(path, ec)) {
+    path = fs::canonical(path, ec);
+  }
+  if (ec) {
+    return -1;
   }
 
   std::string fn = path.filename();

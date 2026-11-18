@@ -19,7 +19,7 @@ classifiers = [
 
 [dependency-groups]
 dev = [
-    "black==25.12.0",
+    "black==26.10.1",
     "cxxheaderparser>=2.1.0",
     "grpcio-tools==1.68.0",
     "jinja2==3.1.6",
@@ -27,6 +27,23 @@ dev = [
     "pytest-order",
     "semiwrap==0.8.1",
 ]
+
+[tool.black]
+include = '''
+(?x)
+(
+    /src/main/python/.* |
+    /src/test/python/.* |
+    ^/robotpyExamples/.*
+)\.py$
+'''
+extend-exclude = '''
+(?x)
+/(
+    thirdparty |
+    bazel-[^/]*
+)/
+'''
 
 [tool.pyright]
 exclude = [

@@ -47,12 +47,6 @@ class PWMMotorController : public MotorController,
 
   bool GetInverted() const override;
 
-  void Disable() override;
-
-  // MotorSafety interface
-  void StopMotor() override;
-  std::string GetDescription() const override;
-
   int GetChannel() const;
 
   /**
@@ -88,6 +82,10 @@ class PWMMotorController : public MotorController,
   std::string_view GetTelemetryType() const override;
 
  protected:
+  // MotorSafety interface
+  void StopMotor() override;
+  std::string GetDescription() const override;
+
   /**
    * Constructor for a PWM Motor Controller connected via PWM.
    *

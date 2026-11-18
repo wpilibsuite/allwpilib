@@ -22,7 +22,7 @@ cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "native",
-    actual = ":halsim_ws_server_tests",
+    tests = [":halsim_ws_server_tests"],
 )

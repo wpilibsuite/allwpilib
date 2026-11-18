@@ -30,8 +30,6 @@ typedef HAL_Handle HAL_CounterHandle;
 
 typedef HAL_Handle HAL_DigitalHandle;
 
-typedef HAL_Handle HAL_DigitalPWMHandle;
-
 typedef HAL_Handle HAL_EncoderHandle;
 
 typedef HAL_Handle HAL_FPGAEncoderHandle;

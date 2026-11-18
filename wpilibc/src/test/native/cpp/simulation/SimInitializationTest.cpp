@@ -12,7 +12,6 @@
 #include "wpi/simulation/AnalogInputSim.hpp"
 #include "wpi/simulation/CTREPCMSim.hpp"
 #include "wpi/simulation/DIOSim.hpp"
-#include "wpi/simulation/DigitalPWMSim.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/DutyCycleSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
@@ -25,7 +24,6 @@ using namespace wpi::sim;
 TEST_CASE("SimInitializationTest AllInitialize", "[wpilibc][simulation]") {
   HAL_Initialize();
   AnalogInputSim aisim{0};
-  CHECK_THROWS_AS(DigitalPWMSim::CreateForChannel(0), std::out_of_range);
   DIOSim diosim{0};
   DriverStationSim dssim;
   (void)dssim;

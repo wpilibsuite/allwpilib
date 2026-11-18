@@ -26,11 +26,11 @@ class Storage(Subsystem):
 
         # Set default command to turn off the storage motor and then idle
         self.set_default_command(
-            self.run_once(self.motor.disable)
+            self.run_once(lambda: self.motor.set_throttle(0))
             .and_then(self.run(lambda: None))
             .with_name("Idle")
         )
 
     def run_command(self) -> Command:
         """Returns a command that runs the storage motor indefinitely."""
-        return self.run(lambda: self.motor.set(1)).with_name("run")
+        return self.run(lambda: self.motor.set_throttle(1)).with_name("run")

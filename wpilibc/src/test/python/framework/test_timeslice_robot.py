@@ -13,14 +13,6 @@ from wpilib.simulation import (
 )
 
 
-@pytest.fixture(autouse=True)
-def timeslice_setup(wpilib_state):
-    pause_timing()
-    set_program_started(False)
-    yield
-    resume_timing()
-
-
 class MockRobot(TimesliceRobot):
     def __init__(self):
         super().__init__(0.002, 0.005)
@@ -30,9 +22,15 @@ class MockRobot(TimesliceRobot):
         self.robot_periodic_count += 1
 
 
-def test_schedule():
-    robot = MockRobot()
+@pytest.fixture
+def robot(wpilib_state, nt):
+    pause_timing()
+    set_program_started(False)
+    yield MockRobot()
+    resume_timing()
 
+
+def test_schedule(robot: MockRobot):
     callback_count1 = 0
     callback_count2 = 0
 
@@ -82,9 +80,7 @@ def test_schedule():
     robot_thread.join()
 
 
-def test_schedule_overrun():
-    robot = MockRobot()
-
+def test_schedule_overrun(robot: MockRobot):
     robot.schedule(lambda: None, 0.0005)
     robot.schedule(lambda: None, 0.001)
 
