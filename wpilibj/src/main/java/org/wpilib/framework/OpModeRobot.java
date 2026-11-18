@@ -809,7 +809,9 @@ public abstract class OpModeRobot extends RobotBase {
             m_currentOpMode.disabledPeriodic();
             m_watchdog.addEpoch("OpMode::DisabledPeriodic()");
           }
-          m_selectListeners.values().forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
+          m_selectListeners
+              .values()
+              .forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
         }
       } else {
         DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
@@ -904,7 +906,9 @@ public abstract class OpModeRobot extends RobotBase {
     m_currentOpMode.start();
     m_watchdog.addEpoch("opMode.start()");
 
-    m_startListeners.values().forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
+    m_startListeners
+        .values()
+        .forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
   }
 
   private void runOpModePeriodic(OpMode opMode) {
@@ -921,7 +925,10 @@ public abstract class OpModeRobot extends RobotBase {
     if (m_currentOpModePeriodic != null) {
       System.out.println("********** Ending OpMode " + m_currentOpModeName + " **********");
 
-      m_stopListeners.sequencedValues().reversed().forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
+      m_stopListeners
+          .sequencedValues()
+          .reversed()
+          .forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
 
       m_currentOpMode.end();
       m_watchdog.addEpoch("opMode.end()");
@@ -936,7 +943,10 @@ public abstract class OpModeRobot extends RobotBase {
     m_callbacks.removeAll(m_activeOpModeCallbacks);
     m_activeOpModeCallbacks.clear();
 
-    m_closeListeners.sequencedValues().reversed().forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
+    m_closeListeners
+        .sequencedValues()
+        .reversed()
+        .forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
 
     // regardless of whether opmode was started, close it and set to null
     System.out.println("********** Closing OpMode " + m_currentOpModeName + " **********");

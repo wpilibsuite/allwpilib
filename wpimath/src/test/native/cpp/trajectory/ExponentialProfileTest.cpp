@@ -300,7 +300,7 @@ TEST_CASE("ExponentialProfileTest TestHeuristic", "[wpimath]") {
           {{0_m, -8_mps}, {-1_m, 0_mps}, {-0.562_m, -6.792_mps}},
           {{0_m, 8_mps}, {1_m, 0_mps}, {0.562_m, 6.792_mps}},
           {{0_m, 8_mps}, {-1_m, 0_mps}, {-0.785_m, -4.346_mps}},
-      };
+  };
 
   for (auto& testCase : testCases) {
     auto state = profile.CalculateInflectionPoint(std::get<0>(testCase),
