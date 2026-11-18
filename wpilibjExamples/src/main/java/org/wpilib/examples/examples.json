@@ -457,7 +457,8 @@
       "State-Space",
       "Simulation",
       "Mechanism2d",
-      "Profiled PID"
+      "Profiled PID",
+      "UnitTests"
     ],
     "foldername": "elevatorsimulation",
     "gradlebase": "java",
@@ -475,8 +476,7 @@
       "Simulation",
       "Mechanism2d",
       "PID",
-      "Exponential Profile",
-      "UnitTests"
+      "Exponential Profile"
     ],
     "foldername": "elevatorexponentialsimulation",
     "gradlebase": "java",
