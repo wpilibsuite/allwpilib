@@ -76,6 +76,29 @@ TEST_CASE("UvAsyncFunctionTest Basic", "[uv][async-function]") {
   REQUIRE(call1_check);
 }
 
+TEST_CASE("UvAsyncFunctionTest QueuedClose", "[uv][async-function]") {
+  for (int i = 0; i < 1000; ++i) {
+    auto loop = Loop::Create();
+    auto async = AsyncFunction<int(int)>::Create(loop);
+    async->wakeup = [&](wpi::util::promise<int> out, int value) {
+      if (value == 1) {
+        async->Close();
+      }
+      out.set_value(value);
+    };
+
+    std::thread thread{[&] { loop->Run(); }};
+    // The first wakeup can process both calls. The second call must finish
+    // signaling before its callback closes the handle.
+    auto first = async->Call(0);
+    auto second = async->Call(1);
+    thread.join();
+
+    CHECK(first.get() == 0);
+    CHECK(second.get() == 1);
+  }
+}
+
 TEST_CASE("UvAsyncFunctionTest Ref", "[uv][async-function]") {
   int prepare_cb_called = 0;
   int val = 0;

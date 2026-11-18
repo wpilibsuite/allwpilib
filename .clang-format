@@ -180,6 +180,7 @@ MacroBlockBegin: ''
 MacroBlockEnd:   ''
 Macros:
   - 'HAL_ENUM(name)=enum name'
+  - 'HAL_ENUM_WITH_UNDERLYING_TYPE(name, type)=enum name'
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: None
 ObjCBinPackProtocolList: Never

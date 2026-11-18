@@ -24,9 +24,9 @@ def test_put_double(table1):
 
 def test_put_boolean(table1):
     table1.put_boolean("boolean", True)
-    assert table1.get_boolean("boolean", None) == True
+    assert table1.get_boolean("boolean", None) is True
 
-    assert table1.get_boolean("Non-Existent", False) == False
+    assert table1.get_boolean("Non-Existent", False) is False
 
 
 def test_put_string(table1):
@@ -60,8 +60,8 @@ def test_multi_data_type(table1):
     assert table1.get_number("double1", None) == 1
     assert table1.get_number("double2", None) == 2
     assert table1.get_number("double3", None) == 3
-    assert table1.get_boolean("bool1", None) == False
-    assert table1.get_boolean("bool2", None) == True
+    assert table1.get_boolean("bool1", None) is False
+    assert table1.get_boolean("bool2", None) is True
     assert table1.get_string("string1", None) == "String 1"
     assert table1.get_string("string2", None) == "String 2"
     assert table1.get_string("string3", None) == "String 3"
@@ -78,8 +78,8 @@ def test_multi_data_type(table1):
     assert table1.get_number("double1", None) == 4
     assert table1.get_number("double2", None) == 5
     assert table1.get_number("double3", None) == 6
-    assert table1.get_boolean("bool1", None) == True
-    assert table1.get_boolean("bool2", None) == False
+    assert table1.get_boolean("bool1", None) is True
+    assert table1.get_boolean("bool2", None) is False
     assert table1.get_string("string1", None) == "String 4"
     assert table1.get_string("string2", None) == "String 5"
     assert table1.get_string("string3", None) == "String 6"
@@ -90,17 +90,17 @@ def test_multi_table(table1, table2):
     table1.put_boolean("table1boolean", True)
     table1.put_string("table1string", "Table 1")
 
-    assert table2.get_number("table1double", None) == None
-    assert table2.get_boolean("table1boolean", None) == None
-    assert table2.get_string("table1string", None) == None
+    assert table2.get_number("table1double", None) is None
+    assert table2.get_boolean("table1boolean", None) is None
+    assert table2.get_string("table1string", None) is None
 
     table2.put_number("table2double", 2)
     table2.put_boolean("table2boolean", False)
     table2.put_string("table2string", "Table 2")
 
-    assert table1.get_number("table2double", None) == None
-    assert table1.get_boolean("table2boolean", None) == None
-    assert table1.get_string("table2string", None) == None
+    assert table1.get_number("table2double", None) is None
+    assert table1.get_boolean("table2boolean", None) is None
+    assert table1.get_string("table2string", None) is None
 
 
 # def test_get_table(nt, table1, table2):
@@ -162,15 +162,15 @@ def test_flags(table1):
 
 # def test_delete(table1):
 #     table1.put_boolean("foo", True)
-#     assert table1.get_boolean("foo", None) == True
+#     assert table1.get_boolean("foo", None) is True
 
 #     table1.delete("foo")
-#     assert table1.get_boolean("foo", None) == None
+#     assert table1.get_boolean("foo", None) is None
 
 
 def test_different_type(table1):
     assert table1.put_boolean("foo", True)
-    assert table1.get_boolean("foo", None) == True
+    assert table1.get_boolean("foo", None) is True
 
     assert not table1.put_number("foo", 1)
-    assert table1.get_boolean("foo", None) == True
+    assert table1.get_boolean("foo", None) is True

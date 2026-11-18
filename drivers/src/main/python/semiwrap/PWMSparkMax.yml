@@ -1,0 +1,4 @@
+classes:
+  wpi::PWMSparkMax:
+    methods:
+      PWMSparkMax:

@@ -5,13 +5,13 @@
 package org.wpilib.examples.rebuiltcmdv3.constants;
 
 import java.util.Optional;
-import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.driverstation.MatchState;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.shape.Rectangle2d;
 
 public final class FieldConstants {
-  // TODO: Measurements
+  // TODO: Measurements in the centered field frame (+X toward blue).
   public static final Pose2d RED_HUB_CENTER = new Pose2d();
   public static final Pose2d BLUE_HUB_CENTER = new Pose2d();
   public static final Rectangle2d NEUTRAL_ZONE =
@@ -27,7 +27,7 @@ public final class FieldConstants {
    * @return The location of our hub.
    */
   public static Optional<Pose2d> targetHub() {
-    return DriverStationBackend.getAlliance()
+    return MatchState.getAlliance()
         .map(
             a -> {
               return switch (a) {

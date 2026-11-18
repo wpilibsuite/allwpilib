@@ -24,24 +24,6 @@ from shared.generation import (
 )
 
 
-def generate_hids(output_directory: Path, template_directory: Path, schema_file: Path):
-    with schema_file.open(encoding="utf-8") as f:
-        controllers = json.load(f)
-
-    # Java files
-    java_subdirectory = "main/java/org/wpilib/command3/button"
-    env = Environment(
-        loader=FileSystemLoader(template_directory / "main/java"),
-        autoescape=False,
-        keep_trailing_newline=True,
-    )
-    root_path = output_directory / java_subdirectory
-    template = env.get_template("commandhid.java.jinja")
-    for controller in controllers:
-        controllerName = f"Command{controller['ConsoleName']}Controller.java"
-        write_file(root_path, controllerName, template.render(controller))
-
-
 def _capitalize_first(name: str) -> str:
     return name[0].upper() + name[1:]
 
@@ -67,6 +49,23 @@ def _is_trigger_axis(name: str) -> bool:
         "ZL",
         "ZR",
     }
+
+
+def _with_constant_name(entry: dict):
+    normalized = dict(entry)
+    normalized["ConstantName"] = _constant_name(entry["name"])
+    return normalized
+
+
+def _normalize_hid_controller(controller: dict):
+    normalized = dict(controller)
+    normalized["buttons"] = [
+        _with_constant_name(button) for button in controller["buttons"]
+    ]
+    normalized["triggers"] = [
+        _with_constant_name(trigger) for trigger in controller.get("triggers", [])
+    ]
+    return normalized
 
 
 def _normalize_command_mapping(mapping: dict[str, int]):
@@ -133,7 +132,6 @@ def generate_first_ds_hids(
     template = env.get_template("first_ds_commandhid.java.jinja")
     for controller in controllers:
         controller_name = f"Command{controller['ClassName']}Controller.java"
-        print(root_path, controller_name)
         write_file(root_path, controller_name, template.render(controller))
 
 
@@ -142,18 +140,9 @@ def main():
     dirname = script_path.parent
 
     parser = make_arg_parser(dirname, dirname.parent, GeneratorTypes.QUICKBUF)
-    add_jinja_args(parser, dirname, "wpilibj/src/generate/hids.json")
-    parser.add_argument(
-        "--first_ds_schema_file",
-        help="Optional. If set, will use this file for the FIRST Driver Station HID schema",
-        default="wpilibj/src/generate/first_ds_hids.json",
-        type=Path,
-    )
+    add_jinja_args(parser, dirname, "wpilibj/src/generate/first_ds_hids.json")
     args = parser.parse_args()
-    generate_hids(args.output_directory, args.template_root, args.schema_file)
-    generate_first_ds_hids(
-        args.output_directory, args.template_root, args.first_ds_schema_file
-    )
+    generate_first_ds_hids(args.output_directory, args.template_root, args.schema_file)
     generate_quickbuf(
         args.protoc,
         args.quickbuf_plugin,

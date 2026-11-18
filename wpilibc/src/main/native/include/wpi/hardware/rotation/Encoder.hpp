@@ -6,9 +6,9 @@
 
 #include "wpi/hal/Encoder.h"
 #include "wpi/hardware/discrete/CounterBase.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 /**
@@ -26,9 +26,7 @@ namespace wpi {
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Encoder : public CounterBase,
-                public wpi::util::Sendable,
-                public wpi::util::SendableHelper<Encoder> {
+class Encoder : public CounterBase, public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Encoder constructor.
@@ -130,6 +128,14 @@ class Encoder : public CounterBase,
   double GetRate() const;
 
   /**
+   * Sets the time window used to calculate the encoder rate.
+   *
+   * @param window The rate calculation window. Valid values are 5 ms through
+   *               255 ms. The default is 50 ms.
+   */
+  void SetRateWindow(wpi::units::millisecond_t window);
+
+  /**
    * Set the distance per pulse for this encoder.
    *
    * This sets the multiplier used to determine the distance driven based on the
@@ -175,7 +181,9 @@ class Encoder : public CounterBase,
 
   int GetFPGAIndex() const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   /**
@@ -206,6 +214,7 @@ class Encoder : public CounterBase,
   double DecodingScaleFactor() const;
 
   wpi::util::Handle<HAL_EncoderHandle, HAL_FreeEncoder> m_encoder;
+  EncodingType m_type;
 };
 
 }  // namespace wpi

@@ -8,9 +8,9 @@
 #include <vector>
 
 #include "wpi/math/util/ComputerVisionUtil.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/system/Timer.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 
 Drivetrain::Drivetrain() {
   leftLeader.AddFollower(leftFollower);
@@ -27,15 +27,12 @@ Drivetrain::Drivetrain() {
   // distance traveled for one rotation of the wheel divided by the encoder
   // resolution.
   leftEncoder.SetDistancePerPulse(
-      (2 * std::numbers::pi * kWheelRadius / kEncoderResolution).value());
+      (2 * std::numbers::pi * WHEEL_RADIUS / ENCODER_RESOLUTION).value());
   rightEncoder.SetDistancePerPulse(
-      (2 * std::numbers::pi * kWheelRadius / kEncoderResolution).value());
+      (2 * std::numbers::pi * WHEEL_RADIUS / ENCODER_RESOLUTION).value());
 
   leftEncoder.Reset();
   rightEncoder.Reset();
-
-  wpi::SmartDashboard::PutData("FieldSim", &fieldSim);
-  wpi::SmartDashboard::PutData("Approximation", &fieldApproximation);
 }
 
 void Drivetrain::SetVelocities(
@@ -140,4 +137,7 @@ void Drivetrain::Periodic() {
   UpdateOdometry();
   fieldSim.SetRobotPose(drivetrainSimulator.GetPose());
   fieldApproximation.SetRobotPose(poseEstimator.GetEstimatedPosition());
+
+  wpi::telemetry::Log("Field", fieldSim);
+  wpi::telemetry::Log("Approximation", fieldApproximation);
 }

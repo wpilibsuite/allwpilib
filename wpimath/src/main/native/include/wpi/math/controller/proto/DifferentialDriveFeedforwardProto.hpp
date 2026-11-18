@@ -6,9 +6,9 @@
 
 #include "pb.h"
 #include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
+#include "wpi/math/protobuf/controller.npb.h"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/controller.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT

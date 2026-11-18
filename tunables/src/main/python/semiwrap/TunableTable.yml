@@ -1,0 +1,184 @@
+extra_includes:
+- optional
+- pybind11/stl.h
+- pybind11/typing.h
+- rpy/PyTunableTable.h
+
+defaults:
+  default_args_as_kw_only: true
+
+classes:
+  wpi::tunables::TunableTable:
+    methods:
+      TunableTable:
+      GetPath:
+      GetTable:
+        ignore: true
+      Publish:
+        ignore: true
+      Remove:
+        ignore: true
+    inline_code: |
+      .def("get_table", &wpi::tunables::python::table::GetTable,
+           py::arg("name"),
+           py::doc("Returns a child table rooted at name, relative to this table."))
+      .def("publish", &wpi::tunables::python::table::Publish,
+           py::arg("name"), py::arg("value"),
+           py::doc("Publishes an existing Tunable or complex tunable at name. "
+                   "Successful publications retain the value until removal."))
+      .def("remove", &wpi::tunables::python::table::Remove,
+           py::arg("name"),
+           py::doc("Removes the named tunable and its descendants, releasing "
+                   "retained Python values and callbacks."))
+      .def("add", &wpi::tunables::python::table::Add,
+           py::arg("name"), py::arg("value"), py::kw_only(),
+           py::arg("value_type") = py::none(),
+           py::arg("element_type") = py::none(),
+           py::arg("robust") = false, py::arg("mutable") = true,
+           py::arg("on_tune") = std::nullopt,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Creates and publishes a tunable whose type is inferred from "
+                   "value or the explicit type selectors. on_tune runs after an "
+                   "accepted remote update."))
+      .def("add_boolean", &wpi::tunables::python::table::AddBoolean,
+           py::arg("name"), py::arg("value"), py::kw_only(),
+           py::arg("robust") = false, py::arg("mutable") = true,
+           py::arg("on_tune") = std::nullopt,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Creates and publishes a boolean tunable. on_tune receives "
+                   "the boolean value after an accepted remote update."))
+      .def("add_int", &wpi::tunables::python::table::AddInt,
+           py::arg("name"), py::arg("value"), py::kw_only(),
+           py::arg("robust") = false, py::arg("mutable") = true,
+           py::arg("on_tune") = std::nullopt,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Creates and publishes a signed 32-bit integer tunable. "
+                   "Values outside the native range are rejected."))
+      .def("add_long", &wpi::tunables::python::table::AddLong,
+           py::arg("name"), py::arg("value"), py::kw_only(),
+           py::arg("robust") = false, py::arg("mutable") = true,
+           py::arg("on_tune") = std::nullopt,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Creates and publishes a signed 64-bit integer tunable. "
+                   "Values outside the native range are rejected."))
+      .def("add_float", &wpi::tunables::python::table::AddFloat,
+           py::arg("name"), py::arg("value"), py::kw_only(),
+           py::arg("robust") = false, py::arg("mutable") = true,
+           py::arg("on_tune") = std::nullopt,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Creates and publishes a 32-bit floating-point tunable. "
+                   "on_tune receives the stored float value."))
+      .def("add_double", &wpi::tunables::python::table::AddDouble,
+           py::arg("name"), py::arg("value"), py::kw_only(),
+           py::arg("robust") = false, py::arg("mutable") = true,
+           py::arg("on_tune") = std::nullopt,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Creates and publishes a 64-bit floating-point tunable. "
+                   "on_tune receives the stored float value."))
+      .def("publish_value", &wpi::tunables::python::table::PublishValue,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("value_type") = py::none(),
+           py::arg("element_type") = py::none(),
+           py::arg("robust") = false, py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a getter/setter-backed tunable with inferred or "
+                   "selected type. The callbacks are retained until removal."))
+      .def("publish_boolean", &wpi::tunables::python::table::PublishBoolean,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("robust") = false,
+           py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a getter/setter-backed boolean tunable. The getter "
+                   "supplies local values and the setter receives remote values."))
+      .def("publish_int", &wpi::tunables::python::table::PublishInt,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("robust") = false,
+           py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a getter/setter-backed signed 32-bit integer "
+                   "tunable, rejecting values outside the native range."))
+      .def("publish_long", &wpi::tunables::python::table::PublishLong,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("robust") = false,
+           py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a getter/setter-backed signed 64-bit integer "
+                   "tunable, rejecting values outside the native range."))
+      .def("publish_float", &wpi::tunables::python::table::PublishFloat,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("robust") = false,
+           py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a getter/setter-backed 32-bit floating-point "
+                   "tunable. The setter receives accepted remote values."))
+      .def("publish_double", &wpi::tunables::python::table::PublishDouble,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("robust") = false,
+           py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a getter/setter-backed 64-bit floating-point "
+                   "tunable. The setter receives accepted remote values."))
+      .def("publish_string", &wpi::tunables::python::table::PublishString,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("robust") = false,
+           py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a getter/setter-backed string tunable. The getter "
+                   "supplies local text and the setter receives remote text."))
+      .def("publish_boolean_array",
+           &wpi::tunables::python::table::PublishBooleanArray,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("robust") = false,
+           py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a boolean-array tunable backed by callbacks. The "
+                   "getter supplies a sequence and the setter receives a list."))
+      .def("publish_integer_array",
+           &wpi::tunables::python::table::PublishIntegerArray,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("robust") = false,
+           py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a 64-bit integer-array tunable backed by callbacks. "
+                   "The getter supplies a sequence and the setter receives a list."))
+      .def("publish_double_array",
+           &wpi::tunables::python::table::PublishDoubleArray,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("robust") = false,
+           py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a 64-bit floating-point array tunable backed by "
+                   "callbacks. The setter receives a list of floats."))
+      .def("publish_string_array",
+           &wpi::tunables::python::table::PublishStringArray,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("robust") = false,
+           py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a string-array tunable backed by callbacks. The "
+                   "getter supplies a sequence and the setter receives a list."))
+      .def("publish_raw", &wpi::tunables::python::table::PublishRaw,
+           py::arg("name"), py::arg("getter"), py::arg("setter"),
+           py::kw_only(), py::arg("robust") = false,
+           py::arg("mutable") = true,
+           py::arg("properties") = std::nullopt,
+           py::arg("type_string") = "",
+           py::doc("Publishes a raw byte tunable backed by callbacks. The getter "
+                   "supplies bytes and the setter receives bytes."))

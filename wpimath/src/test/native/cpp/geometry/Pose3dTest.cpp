@@ -41,7 +41,7 @@ TEST_CASE("Pose3dTest RotateBy", "[wpimath]") {
 }
 
 TEST_CASE("Pose3dTest TestTransformByRotations", "[wpimath]") {
-  constexpr double kEpsilon = 1E-9;
+  constexpr double EPSILON = 1E-9;
 
   const Pose3d initialPose{0_m, 0_m, 0_m, Rotation3d{0_deg, 0_deg, 0_deg}};
   const Transform3d transform1{Translation3d{0_m, 0_m, 0_m},
@@ -56,11 +56,11 @@ TEST_CASE("Pose3dTest TestTransformByRotations", "[wpimath]") {
                          .TransformBy(transform3);
 
   CHECK_NEAR(finalPose.Rotation().X().value(),
-             initialPose.Rotation().X().value(), kEpsilon);
+             initialPose.Rotation().X().value(), EPSILON);
   CHECK_NEAR(finalPose.Rotation().Y().value(),
-             initialPose.Rotation().Y().value(), kEpsilon);
+             initialPose.Rotation().Y().value(), EPSILON);
   CHECK_NEAR(finalPose.Rotation().Z().value(),
-             initialPose.Rotation().Z().value(), kEpsilon);
+             initialPose.Rotation().Z().value(), EPSILON);
 }
 
 TEST_CASE("Pose3dTest TransformBy", "[wpimath]") {

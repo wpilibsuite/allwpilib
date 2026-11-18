@@ -195,6 +195,7 @@
     "gradlebase": "java",
     "robotclass": "Robot",
     "extravendordeps": [
+      "apriltag",
       "cameraserver"
     ]
   },
@@ -204,7 +205,7 @@
     "tags": [
       "Hardware",
       "PDP",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "canpdp",
     "gradlebase": "java",
@@ -228,7 +229,7 @@
     "tags": [
       "Hardware",
       "Duty Cycle",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "dutycycleinput",
     "gradlebase": "java",
@@ -302,7 +303,7 @@
     "tags": [
       "Basic Robot",
       "Encoder",
-      "SmartDashboard",
+      "Telemetry",
       "Joystick"
     ],
     "foldername": "motorcontrol",
@@ -365,6 +366,26 @@
       "Joystick"
     ],
     "foldername": "mecanumdrive",
+    "gradlebase": "java",
+    "robotclass": "Robot"
+  },
+  {
+    "name": "Game Data 2026",
+    "description": "Demonstrate the use of game data for the 2026 season.",
+    "tags": [
+      "Driver Station"
+    ],
+    "foldername": "gamedata2026",
+    "gradlebase": "java",
+    "robotclass": "Robot"
+  },
+  {
+    "name": "DataLogCustom",
+    "description": "Log custom robot data to the WPILib data log.",
+    "tags": [
+      "DataLog"
+    ],
+    "foldername": "datalogcustom",
     "gradlebase": "java",
     "robotclass": "Robot"
   }

@@ -2,13 +2,17 @@ ext {
     nativeName = 'hal'
     setBaseName = 'wpiHal'
     devMain = 'org.wpilib.hardware.hal.DevMain'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
+    nativeCppSourceExcludes = ['mrclib/**/*.cpp']
     splitSetup = {
         if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
             it.sources {
                 systemCoreCpp(CppSourceSet) {
                     source {
-                        srcDirs = ['src/main/native/systemcore']
+                        srcDirs = [
+                            'src/main/native/systemcore',
+                            'src/main/native/cpp/mrclib'
+                        ]
                         include '**/*.cpp'
                     }
                     exportedHeaders {
@@ -35,20 +39,7 @@ ext {
 }
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
-
 apply from: "${rootDir}/shared/libmrclib.gradle"
-
-ext {
-    addHalDependency = { binary, shared->
-        nativeUtils.useRequiredLibrary(binary, 'mrclib')
-        binary.lib project: ':hal', library: 'hal', linkage: shared
-    }
-
-    addHalJniDependency = { binary->
-        nativeUtils.useRequiredLibrary(binary, 'mrclib')
-        binary.lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
-    }
-}
 
 cppSourcesZip {
     from('src/main/native/systemcore') {
@@ -73,12 +64,36 @@ nativeUtils.exportsConfigs {
 }
 
 model {
+    components {
+        halMrc(NativeLibrarySpec) {
+            sources.cpp {
+                source {
+                    srcDirs 'src/main/native/cpp/mrclib'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDir 'src/main/native/include'
+                }
+            }
+            binaries.all {
+                if (it instanceof SharedLibraryBinarySpec) {
+                    it.buildable = false
+                    return
+                }
+                nativeUtils.useRequiredLibrary(it, 'mrclib')
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            }
+        }
+    }
     binaries {
         all {
-            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+            if (!it.buildable || !(it instanceof NativeBinarySpec) || it.component.name == 'halMrc') {
                 return
             }
-            nativeUtils.useRequiredLibrary(it, 'mrclib')
+            nativeUtils.useRequiredLibrary(it, 'mrclibHeaders')
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                nativeUtils.useRequiredLibrary(it, 'mrclib')
+            }
             if (it.component.name == "${nativeName}JNI") {
                 project(':ntcore').addNtcoreDependency(it, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'

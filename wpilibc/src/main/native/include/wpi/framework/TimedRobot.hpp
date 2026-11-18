@@ -59,16 +59,16 @@ class TimedRobot : public IterativeRobotBase {
   ~TimedRobot() override;
 
   /**
-   * Return the system clock time in microseconds for the start of the current
+   * Return the system clock time in nanoseconds for the start of the current
    *  periodic loop. This is in the same time base as
    * Timer.GetMonotonicTimestamp(), but is stable through a loop. It is updated
    * at the beginning of every periodic callback (including the normal periodic
    * loop).
    *
-   * @return Robot running time in microseconds, as of the start of the current
+   * @return Robot running time in nanoseconds, as of the start of the current
    * periodic function.
    */
-  wpi::units::microsecond_t GetLoopStartTime() const {
+  wpi::units::nanosecond_t GetLoopStartTime() const {
     return m_callbacks.GetLoopStartTime();
   }
 
@@ -89,7 +89,7 @@ class TimedRobot : public IterativeRobotBase {
 
  protected:
   wpi::util::Handle<HAL_NotifierHandle, HAL_DestroyNotifier> m_notifier;
-  std::chrono::microseconds m_startTime;
+  std::chrono::nanoseconds m_startTime;
 
  private:
   wpi::internal::PeriodicPriorityQueue m_callbacks;

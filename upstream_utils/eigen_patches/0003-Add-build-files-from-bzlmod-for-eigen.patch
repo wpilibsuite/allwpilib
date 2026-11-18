@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Austin Schuh <austin.linux@gmail.com>
 Date: Sat, 9 Aug 2025 12:45:23 -0700
-Subject: [PATCH 3/3] Add build files from bzlmod for eigen
+Subject: [PATCH 3/4] Add build files from bzlmod for eigen
 
 This makes it so our vendored version of eigen matches the same API as
 the upstream eigen in bcr.

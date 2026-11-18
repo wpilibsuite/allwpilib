@@ -4,6 +4,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import commands2
 
 from subsystems.drivesubsystem import DriveSubsystem
@@ -13,8 +15,10 @@ class HalveDriveVelocity(commands2.Command):
     def __init__(self, drive: DriveSubsystem) -> None:
         self.drive = drive
 
+    @override
     def initialize(self) -> None:
         self.drive.set_max_output(0.5)
 
+    @override
     def end(self, interrupted: bool) -> None:
         self.drive.set_max_output(1.0)

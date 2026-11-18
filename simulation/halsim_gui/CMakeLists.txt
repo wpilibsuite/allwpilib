@@ -1,6 +1,7 @@
 project(halsim_gui)
 
 include(CompileWarnings)
+include(AddTest)
 include(LinkMacOSGUI)
 
 file(GLOB halsim_gui_src src/main/native/cpp/*.cpp)
@@ -18,3 +19,11 @@ set_property(TARGET halsim_gui PROPERTY FOLDER "libraries")
 
 install(TARGETS halsim_gui EXPORT halsim_gui)
 export(TARGETS halsim_gui FILE halsim_gui.cmake NAMESPACE halsim_gui::)
+
+if(WPILIB_WITH_IMGUI_TESTS)
+    wpilib_add_imgui_test(halsim_gui src/test/native/imgui)
+    wpilib_link_macos_gui(halsim_gui_imgui_test)
+    target_sources(halsim_gui_imgui_test PRIVATE ${halsim_gui_src})
+    target_include_directories(halsim_gui_imgui_test PRIVATE src/main/native/include)
+    target_link_libraries(halsim_gui_imgui_test hal wpimath libglassnt_for_tests libglass_for_tests)
+endif()

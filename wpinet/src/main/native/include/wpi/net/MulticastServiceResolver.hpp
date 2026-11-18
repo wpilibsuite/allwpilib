@@ -94,6 +94,8 @@ class MulticastServiceResolver {
   struct Impl;
 
  private:
+  friend class MulticastServiceResolverCTest;
+
   void PushData(ServiceData&& data) {
     std::scoped_lock lock{mutex};
 

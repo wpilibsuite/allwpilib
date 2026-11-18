@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
@@ -39,10 +41,10 @@ class WPILIB_DLLEXPORT Odometry {
    * @param wheelPositions The current distances measured by each wheel.
    * @param initialPose The starting position of the robot on the field.
    */
-  explicit Odometry(const Kinematics& kinematics, const Rotation2d& gyroAngle,
+  explicit Odometry(Kinematics kinematics, const Rotation2d& gyroAngle,
                     const WheelPositions& wheelPositions,
                     const Pose2d& initialPose = Pose2d{})
-      : m_kinematics(kinematics),
+      : m_kinematics(std::move(kinematics)),
         m_pose(initialPose),
         m_previousWheelPositions(wheelPositions),
         m_previousGyroAngle(gyroAngle) {}

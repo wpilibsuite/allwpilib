@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
 import commands2
 import pytest
+from wpilib.simulation import DriverStationSim
 
 
 def test_timeout(scheduler: commands2.CommandScheduler):

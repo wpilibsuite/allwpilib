@@ -6,7 +6,9 @@
 
 import math
 
+import telemetry
 import wpilib
+import wpilib_drivers
 import wpilib.simulation
 import wpimath
 
@@ -24,10 +26,10 @@ class Drivetrain:
     ENCODER_RESOLUTION = -4096
 
     def __init__(self) -> None:
-        self.left_leader = wpilib.PWMSparkMax(1)
-        self.left_follower = wpilib.PWMSparkMax(2)
-        self.right_leader = wpilib.PWMSparkMax(3)
-        self.right_follower = wpilib.PWMSparkMax(4)
+        self.left_leader = wpilib_drivers.PWMSparkMax(1)
+        self.left_follower = wpilib_drivers.PWMSparkMax(2)
+        self.right_leader = wpilib_drivers.PWMSparkMax(3)
+        self.right_follower = wpilib_drivers.PWMSparkMax(4)
 
         self.left_encoder = wpilib.Encoder(0, 1)
         self.right_encoder = wpilib.Encoder(2, 3)
@@ -86,7 +88,6 @@ class Drivetrain:
         self.right_encoder.reset()
 
         self.right_leader.set_inverted(True)
-        wpilib.SmartDashboard.put_data("Field", self.field_sim)
 
     def set_velocities(
         self, velocities: wpimath.DifferentialDriveWheelVelocities
@@ -166,3 +167,5 @@ class Drivetrain:
         """Update odometry - this should be run every robot loop."""
         self.update_odometry()
         self.field_sim.set_robot_pose(self.odometry.get_pose())
+
+        telemetry.log("Field", self.field_sim)

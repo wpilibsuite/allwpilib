@@ -12,7 +12,7 @@
 using namespace wpi::math;
 
 namespace {
-const DifferentialTrajectory kExpectedData =
+const DifferentialTrajectory EXPECTED_DATA =
     DifferentialTrajectory{std::vector<DifferentialSample>{
         DifferentialSample{
             0_s, Pose2d{}, ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
@@ -26,12 +26,12 @@ const DifferentialTrajectory kExpectedData =
 }  // namespace
 
 TEST_CASE("DifferentialTrajectoryProtoTest Roundtrip", "[wpimath]") {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
 
-  CHECK(kExpectedData == unpacked_data.value());
+  CHECK(EXPECTED_DATA == unpacked_data.value());
 }

@@ -1,0 +1,40 @@
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_pybind_build_info")
+load(":robotpy_pybind_build_info.bzl", "define_pybind_library", "halsim_gui_ext_extension")
+
+PKG_CONFIG_DEPS = [
+    "//datalog:native/datalog/robotpy-native-datalog.pc",
+    "//datalog/src/main/python:python.generated_pkgcfg_files",
+    "//hal:native/wpihal/robotpy-native-mrclib.pc",
+    "//hal:native/wpihal/robotpy-native-wpihal.pc",
+    "//hal/src/main/python:python.generated_pkgcfg_files",
+    "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
+    "//ntcore/src/main/python:python.generated_pkgcfg_files",
+    "//simulation/halsim_gui:native/halsim_gui/robotpy-native-halsim-gui.pc",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//telemetry/src/main/python:python.generated_pkgcfg_files",
+    "//tunables:native/tunables/robotpy-native-tunables.pc",
+    "//tunables/src/main/python:python.generated_pkgcfg_files",
+    "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
+    "//wpimath/src/main/python:python.generated_pkgcfg_files",
+    "//wpinet:native/wpinet/robotpy-native-wpinet.pc",
+    "//wpinet/src/main/python:python.generated_pkgcfg_files",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil/src/main/python:python.generated_pkgcfg_files",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-halsim-gui-generator",
+    additional_srcs = ["//simulation/halsim_gui:robotpy-native-halsim-gui.copy_headers"],
+    package_root_file = "halsim_gui/_ext/__init__.py",
+    pkgcfgs = PKG_CONFIG_DEPS,
+    pyproject_toml = "pyproject.toml",
+)
+
+halsim_gui_ext_extension(
+    srcs = glob(["halsim_gui/_ext/**/*.cpp"]),
+)
+
+define_pybind_library(
+    name = "python",
+    pkgcfgs = PKG_CONFIG_DEPS,
+)

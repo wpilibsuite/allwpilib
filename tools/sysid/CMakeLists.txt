@@ -34,7 +34,7 @@ elseif(APPLE)
 endif()
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test_catch2(sysid src/test/native/cpp)
+    wpilib_add_test(sysid src/test/native/cpp)
     wpilib_link_macos_gui(sysid_test)
     target_sources(sysid_test PRIVATE ${sysid_src})
     target_compile_definitions(sysid_test PRIVATE RUNNING_SYSID_TESTS)
@@ -43,4 +43,18 @@ if(WPILIB_WITH_TESTS)
     endif()
     target_include_directories(sysid_test PRIVATE src/main/native/cpp src/main/native/include)
     target_link_libraries(sysid_test wpimath libglass datalog)
+endif()
+
+if(WPILIB_WITH_IMGUI_TESTS)
+    wpilib_add_imgui_test(sysid src/test/native/imgui)
+    wpilib_link_macos_gui(sysid_imgui_test)
+    target_sources(
+        sysid_imgui_test
+        PRIVATE ${sysid_src} ${sysid_resources_src} ${sysid_rc} ${APP_ICON_MACOSX}
+    )
+    if(MSVC)
+        target_compile_options(sysid_imgui_test PRIVATE /utf-8)
+    endif()
+    target_include_directories(sysid_imgui_test PRIVATE src/main/native/cpp src/main/native/include)
+    target_link_libraries(sysid_imgui_test wpimath libglass_for_tests datalog)
 endif()

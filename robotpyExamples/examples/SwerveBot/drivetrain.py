@@ -49,6 +49,7 @@ class Drivetrain:
             ),
         )
 
+        # Start facing the blue alliance wall so yaw zero aligns with field +X.
         self.imu.reset_yaw()
 
     def drive(

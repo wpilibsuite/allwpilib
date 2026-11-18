@@ -35,7 +35,7 @@ namespace wpi::math {
  * odometry.
  */
 class WPILIB_DLLEXPORT MecanumDrivePoseEstimator3d
-    : public PoseEstimator3d<MecanumDriveKinematics, MecanumDriveWheelPositions,
+    : public PoseEstimator3d<MecanumDriveOdometry3d, MecanumDriveWheelPositions,
                              MecanumDriveWheelVelocities,
                              MecanumDriveWheelAccelerations> {
  public:
@@ -84,9 +84,6 @@ class WPILIB_DLLEXPORT MecanumDrivePoseEstimator3d
       const Pose3d& initialPose,
       const wpi::util::array<double, 4>& stateStdDevs,
       const wpi::util::array<double, 4>& visionMeasurementStdDevs);
-
- private:
-  MecanumDriveOdometry3d m_odometryImpl;
 };
 
 }  // namespace wpi::math

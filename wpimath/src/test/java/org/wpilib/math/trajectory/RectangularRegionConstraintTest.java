@@ -5,6 +5,7 @@
 package org.wpilib.math.trajectory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.math.util.UnitConversions.feetToMeters;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -12,16 +13,15 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.shape.Rectangle2d;
 import org.wpilib.math.trajectory.constraint.MaxVelocityConstraint;
 import org.wpilib.math.trajectory.constraint.RectangularRegionConstraint;
-import org.wpilib.math.util.Units;
 
 class RectangularRegionConstraintTest {
   @Test
   void testConstraint() {
-    double maxVelocity = Units.feetToMeters(2.0);
+    double maxVelocity = feetToMeters(2.0);
     var rectangle =
         new Rectangle2d(
-            new Translation2d(Units.feetToMeters(1.0), Units.feetToMeters(1.0)),
-            new Translation2d(Units.feetToMeters(5.0), Units.feetToMeters(27.0)));
+            new Translation2d(feetToMeters(1.0), feetToMeters(1.0)),
+            new Translation2d(feetToMeters(5.0), feetToMeters(27.0)));
 
     var trajectory =
         DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(

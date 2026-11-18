@@ -19,12 +19,12 @@
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
-#include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -42,13 +42,13 @@ namespace wpi::math {
  * AddVisionMeasurement() can be called as infrequently as you want; if you
  * never call it, then this class will behave like regular encoder odometry.
  *
- * @tparam Kinematics Kinematics type.
+ * @tparam Odometry Odometry type.
  * @tparam WheelPositions Wheel positions type.
  * @tparam WheelVelocities Wheel velocities type.
  * @tparam WheelAccelerations Wheel accelerations type.
  */
-template <typename Kinematics, typename WheelPositions,
-          typename WheelVelocities, typename WheelAccelerations>
+template <typename Odometry, typename WheelPositions, typename WheelVelocities,
+          typename WheelAccelerations>
 class WPILIB_DLLEXPORT PoseEstimator {
  public:
   /**
@@ -66,8 +66,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
    *     radians). Increase these numbers to trust the vision pose measurement
    *     less.
    */
-  PoseEstimator(Odometry<Kinematics, WheelPositions, WheelVelocities,
-                         WheelAccelerations>& odometry,
+  PoseEstimator(const Odometry& odometry,
                 const wpi::util::array<double, 3>& stateStdDevs,
                 const wpi::util::array<double, 3>& visionMeasurementStdDevs)
       : m_odometry(odometry) {
@@ -76,7 +75,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
     }
 
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
-    wpi::math::MathSharedStore::ReportUsage("PoseEstimator", "");
+    wpi::util::ReportUsage("PoseEstimator", "");
   }
 
   /**
@@ -275,7 +274,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
     // timespan, skip.
     if (m_odometryPoseBuffer.GetInternalBuffer().empty() ||
         m_odometryPoseBuffer.GetInternalBuffer().front().first -
-                kBufferDuration >
+                BUFFER_DURATION >
             timestamp) {
       return;
     }
@@ -462,10 +461,9 @@ class WPILIB_DLLEXPORT PoseEstimator {
     }
   };
 
-  static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
+  static constexpr wpi::units::second_t BUFFER_DURATION = 1.5_s;
 
-  Odometry<Kinematics, WheelPositions, WheelVelocities, WheelAccelerations>&
-      m_odometry;
+  Odometry m_odometry;
 
   // Diagonal of process noise covariance matrix Q
   wpi::util::array<double, 3> m_q{wpi::util::empty_array};
@@ -475,7 +473,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
       Eigen::DiagonalMatrix<double, 3>::Zero();
 
   // Maps timestamps to odometry-only pose estimates
-  TimeInterpolatableBuffer<Pose2d> m_odometryPoseBuffer{kBufferDuration};
+  TimeInterpolatableBuffer<Pose2d> m_odometryPoseBuffer{BUFFER_DURATION};
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer,
   // unless there have been no vision measurements after the last reset. May

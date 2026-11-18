@@ -1,8 +1,6 @@
-from typing import Optional
-
-import hal
 import subprocess
 import threading
+import wpiutil
 
 import logging
 
@@ -32,7 +30,7 @@ class CameraServer:
         return cls._alive
 
     @classmethod
-    def launch(cls, vision_py: Optional[str] = None) -> None:
+    def launch(cls, vision_py: str | None = None) -> None:
         """
         Launches the CameraServer process in autocapture mode or
         using a user-specified python script
@@ -72,12 +70,12 @@ class CameraServer:
             # who do not. cscore handle values indicate type with bits 24-30
 
             if vision_py:
-                hal.report_usage("RobotPy/CameraServer", vision_py)
+                wpiutil.report_usage("RobotPy/CameraServer", vision_py)
                 if not vision_py.startswith("/"):
                     vision_py = "/home/systemcore/py/" + vision_py
                 args.append(vision_py)
             else:
-                hal.report_usage("RobotPy/CameraServer", "")
+                wpiutil.report_usage("RobotPy/CameraServer", "")
 
             # We open a pipe to it so that when this process exits, it dies
             proc = subprocess.Popen(

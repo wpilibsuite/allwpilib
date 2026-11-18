@@ -400,6 +400,17 @@ class GenericHID final : public HIDDevice {
   void SetRumble(RumbleType type, double value);
 
   /**
+   * Set the raw rumble output for the HID.
+   *
+   * The DS currently supports 4 rumble values: left rumble, right rumble, left
+   * trigger rumble, and right trigger rumble.
+   *
+   * @param type  Which rumble value to set
+   * @param value The raw value (0 to 65535) to set the rumble to
+   */
+  void SetRawRumble(RumbleType type, int value);
+
+  /**
    * Check if a touchpad finger is available.
    * @param touchpad The touchpad to check.
    * @param finger The finger to check.

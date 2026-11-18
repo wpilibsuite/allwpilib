@@ -10,37 +10,24 @@ void cleanup_safethread_gil();
 void set_now_impl(py::object fn);
 void cleanup_now_impl();
 
-#ifndef __FIRST_SYSTEMCORE__
-
-namespace wpi::util::impl {
-void ResetSendableRegistry();
-}  // namespace wpi::util::impl
-
-void cleanup_sendable_registry() {
-  py::gil_scoped_release unlock;
-  wpi::util::impl::ResetSendableRegistry();
-}
-
-#else
-
-void cleanup_sendable_registry() {}
-
-#endif
+void set_report_usage_impl(py::object fn);
+void cleanup_report_usage_impl();
 
 SEMIWRAP_PYBIND11_MODULE(m) {
   initWrapper(m);
 
   static int unused;
   py::capsule cleanup(&unused, [](void*) {
-    cleanup_sendable_registry();
     cleanup_stack_trace_hook();
     cleanup_safethread_gil();
     cleanup_now_impl();
+    cleanup_report_usage_impl();
   });
 
   setup_safethread_gil();
 
   m.def("_setup_stack_trace_hook", &setup_stack_trace_hook);
   m.def("set_now_impl", &set_now_impl);
+  m.def("set_report_usage_impl", &set_report_usage_impl);
   m.add_object("_st_cleanup", cleanup);
 }

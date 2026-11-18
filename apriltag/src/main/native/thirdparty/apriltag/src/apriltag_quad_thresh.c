@@ -619,42 +619,45 @@ int quad_segment_agg(zarray_t *cluster, struct line_fit_pt *lfps, int indices[4]
  */
 struct line_fit_pt* compute_lfps(int sz, zarray_t* cluster, image_u8_t* im) {
     struct line_fit_pt *lfps = calloc(sz, sizeof(struct line_fit_pt));
+    double sum_Mx = 0, sum_My = 0, sum_Mxx = 0, sum_Myy = 0, sum_Mxy = 0, sum_W = 0;
 
     for (int i = 0; i < sz; i++) {
         struct pt *p;
         zarray_get_volatile(cluster, i, &p);
 
-        if (i > 0) {
-            memcpy(&lfps[i], &lfps[i-1], sizeof(struct line_fit_pt));
+        // we now undo our fixed-point arithmetic.
+        double delta = 0.5; // adjust for pixel center bias
+        double x = p->x * .5 + delta;
+        double y = p->y * .5 + delta;
+        int ix = x, iy = y;
+        double W = 1;
+
+        if (ix > 0 && ix+1 < im->width && iy > 0 && iy+1 < im->height) {
+            int grad_x = im->buf[iy * im->stride + ix + 1] -
+                im->buf[iy * im->stride + ix - 1];
+
+            int grad_y = im->buf[(iy+1) * im->stride + ix] -
+                im->buf[(iy-1) * im->stride + ix];
+
+            // XXX Tunable. How to shape the gradient magnitude?
+            W = sqrt(grad_x*grad_x + grad_y*grad_y) + 1;
         }
 
-        {
-            // we now undo our fixed-point arithmetic.
-            double delta = 0.5; // adjust for pixel center bias
-            double x = p->x * .5 + delta;
-            double y = p->y * .5 + delta;
-            int ix = x, iy = y;
-            double W = 1;
-
-            if (ix > 0 && ix+1 < im->width && iy > 0 && iy+1 < im->height) {
-                int grad_x = im->buf[iy * im->stride + ix + 1] -
-                    im->buf[iy * im->stride + ix - 1];
-
-                int grad_y = im->buf[(iy+1) * im->stride + ix] -
-                    im->buf[(iy-1) * im->stride + ix];
-
-                // XXX Tunable. How to shape the gradient magnitude?
-                W = sqrt(grad_x*grad_x + grad_y*grad_y) + 1;
-            }
-
-            double fx = x, fy = y;
-            lfps[i].Mx  += W * fx;
-            lfps[i].My  += W * fy;
-            lfps[i].Mxx += W * fx * fx;
-            lfps[i].Mxy += W * fx * fy;
-            lfps[i].Myy += W * fy * fy;
-            lfps[i].W   += W;
-        }
+        double fx = x, fy = y;
+        sum_Mx  += W * fx;
+        sum_My  += W * fy;
+        sum_Mxx += W * fx * fx;
+        sum_Mxy += W * fx * fy;
+        sum_Myy += W * fy * fy;
+        sum_W   += W;
+        
+        // Store cumulative sums
+        lfps[i].Mx = sum_Mx;
+        lfps[i].My = sum_My;
+        lfps[i].Mxx = sum_Mxx;
+        lfps[i].Mxy = sum_Mxy;
+        lfps[i].Myy = sum_Myy;
+        lfps[i].W = sum_W;
     }
     return lfps;
 }
@@ -713,8 +716,16 @@ static inline void ptsort(struct pt *pts, int sz)
 #undef MAYBE_SWAP
 
     // a merge sort with temp storage.
-
-    struct pt *tmp = malloc(sizeof(struct pt) * sz);
+    // Use stack allocation for small arrays to avoid malloc overhead
+    #define STACK_BUFFER_SIZE 256
+    struct pt stack_buffer[STACK_BUFFER_SIZE];
+    struct pt *tmp;
+    const bool use_heap = sz > STACK_BUFFER_SIZE;
+    if (use_heap) {
+        tmp = malloc(sizeof(struct pt) * sz);
+    } else {
+        tmp = stack_buffer;
+    }
 
     memcpy(tmp, pts, sizeof(struct pt) * sz);
 
@@ -748,7 +759,9 @@ static inline void ptsort(struct pt *pts, int sz)
     if (bpos < bsz)
         memcpy(&pts[outpos], &bs[bpos], (bsz-bpos)*sizeof(struct pt));
 
-    free(tmp);
+    if (use_heap) {
+        free(tmp);
+    }
 
 #undef MERGE
 }
@@ -763,10 +776,6 @@ int fit_quad(
         bool normal_border,
         bool reversed_border) {
     int res = 0;
-
-    int sz = zarray_size(cluster);
-    if (sz < 24) // Synchronize with later check.
-        return 0;
 
     /////////////////////////////////////////////////////////////
     // Step 1. Sort points so they wrap around the center of the
@@ -852,6 +861,7 @@ int fit_quad(
         ptsort((struct pt*) cluster->data, zarray_size(cluster));
     }
 
+    int sz = zarray_size(cluster);
     struct line_fit_pt *lfps = compute_lfps(sz, cluster, im);
 
     int indices[4];
@@ -962,7 +972,12 @@ int fit_quad(
             double dy1 = quad->p[i1][1] - quad->p[i0][1];
             double dx2 = quad->p[i2][0] - quad->p[i1][0];
             double dy2 = quad->p[i2][1] - quad->p[i1][1];
-            double cos_dtheta = (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2));
+            double denominator = sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2));
+            if (denominator == 0) {
+                res = 0;
+                goto finish;
+            }
+            double cos_dtheta = (dx1*dx2 + dy1*dy2) / denominator;
 
             if ((cos_dtheta > td->qtp.cos_critical_rad || cos_dtheta < -td->qtp.cos_critical_rad) || dx1*dy2 < dy1*dx2) {
                 res = 0;

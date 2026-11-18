@@ -7,6 +7,7 @@
 #include <chrono>
 #include <utility>
 
+#include "sleipnir/autodiff/variable.hpp"
 #include "sleipnir/autodiff/variable_matrix.hpp"
 #include "sleipnir/optimization/ocp/dynamics_type.hpp"
 #include "sleipnir/optimization/ocp/timestep_method.hpp"

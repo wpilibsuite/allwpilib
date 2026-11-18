@@ -11,15 +11,15 @@ using namespace wpi::math;
 
 namespace {
 
-const Rotation2d kExpectedData = Rotation2d{1.91_rad};
+const Rotation2d EXPECTED_DATA = Rotation2d{1.91_rad};
 }  // namespace
 
 TEST_CASE("Rotation2dProtoTest Roundtrip", "[wpimath]") {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
-  CHECK(kExpectedData.Radians().value() == unpacked_data->Radians().value());
+  CHECK(EXPECTED_DATA.Radians().value() == unpacked_data->Radians().value());
 }

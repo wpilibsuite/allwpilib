@@ -212,12 +212,10 @@ int32_t HAL_GetJoystickSupportedOutputs(int32_t joystickNum) {
 
 void HAL_GetJoystickName(struct WPI_String* name, int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
-  const char* cName = joystickDesc.name;
-  if (mrcLibDs->getJoystickDescriptor(joystickNum, &joystickDesc) == 0) {
-    cName = joystickDesc.name;
-  } else {
-    cName = "";
-  }
+  const char* cName =
+      mrcLibDs->getJoystickDescriptor(joystickNum, &joystickDesc) == 0
+          ? joystickDesc.name
+          : "";
   auto len = std::strlen(cName);
   auto write = WPI_AllocateString(name, len);
   std::memcpy(write, cName, len);

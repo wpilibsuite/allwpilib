@@ -4,12 +4,13 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-from typing import Callable
+from collections.abc import Callable
 
 from commands2 import Command, Subsystem
 from commands2.sysid import SysIdRoutine
-from wpilib import DifferentialDrive, Encoder, PWMSparkMax, RobotController
+from wpilib import DifferentialDrive, Encoder, RobotController
 from wpilib.sysid import SysIdRoutineLog
+from wpilib_drivers import PWMSparkMax
 
 from constants import DriveConstants
 

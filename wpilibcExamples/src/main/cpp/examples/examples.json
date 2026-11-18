@@ -10,7 +10,7 @@
       "Arm",
       "Analog",
       "Joystick",
-      "SmartDashboard",
+      "Telemetry",
       "Mechanism2d"
     ],
     "commandversion": 2
@@ -21,7 +21,7 @@
     "tags": [
       "Hardware",
       "Encoder",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "Encoder",
     "gradlebase": "cpp",
@@ -124,7 +124,8 @@
       "Commandv2",
       "Differential Drive",
       "Encoder",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
       "Pneumatics",
       "Gamepad"
@@ -141,7 +142,8 @@
       "Commandv2",
       "Differential Drive",
       "Encoder",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
       "Pneumatics",
       "Gamepad"
@@ -244,7 +246,7 @@
       "Hardware",
       "Duty Cycle",
       "Encoder",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "DutyCycleEncoder",
     "gradlebase": "cpp",

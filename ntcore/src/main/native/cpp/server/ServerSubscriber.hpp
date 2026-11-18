@@ -6,7 +6,6 @@
 
 #include <stdint.h>
 
-#include <cmath>
 #include <span>
 #include <string>
 #include <string_view>
@@ -29,10 +28,10 @@ class ServerSubscriber {
         m_topicNames{topicNames.begin(), topicNames.end()},
         m_subuid{subuid},
         m_options{options},
-        m_periodMs(std::lround(options.periodicMs / 10.0) * 10) {
+        m_periodMs(PubSubOptionsImpl::RoundPeriodicMs(options.periodicMs)) {
     UpdateMeta();
-    if (m_periodMs < kMinPeriodMs) {
-      m_periodMs = kMinPeriodMs;
+    if (m_periodMs < MIN_PERIOD_MS) {
+      m_periodMs = MIN_PERIOD_MS;
     }
   }
   ServerSubscriber(const ServerSubscriber&) = delete;
@@ -43,9 +42,9 @@ class ServerSubscriber {
     m_topicNames = {topicNames_.begin(), topicNames_.end()};
     m_options = options_;
     UpdateMeta();
-    m_periodMs = std::lround(options_.periodicMs / 10.0) * 10;
-    if (m_periodMs < kMinPeriodMs) {
-      m_periodMs = kMinPeriodMs;
+    m_periodMs = PubSubOptionsImpl::RoundPeriodicMs(options_.periodicMs);
+    if (m_periodMs < MIN_PERIOD_MS) {
+      m_periodMs = MIN_PERIOD_MS;
     }
   }
 

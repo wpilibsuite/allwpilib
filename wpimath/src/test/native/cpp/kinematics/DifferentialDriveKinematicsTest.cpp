@@ -21,7 +21,7 @@
 
 using namespace wpi::math;
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 TEST_CASE("DifferentialDriveKinematicsTest InverseKinematicsFromZero",
           "[wpimath]") {
@@ -29,8 +29,8 @@ TEST_CASE("DifferentialDriveKinematicsTest InverseKinematicsFromZero",
   const ChassisVelocities chassisVelocities;
   const auto wheelVelocities = kinematics.ToWheelVelocities(chassisVelocities);
 
-  CHECK_NEAR(wheelVelocities.left.value(), 0, kEpsilon);
-  CHECK_NEAR(wheelVelocities.right.value(), 0, kEpsilon);
+  CHECK_NEAR(wheelVelocities.left.value(), 0, EPSILON);
+  CHECK_NEAR(wheelVelocities.right.value(), 0, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveKinematicsTest ForwardKinematicsFromZero",
@@ -40,9 +40,9 @@ TEST_CASE("DifferentialDriveKinematicsTest ForwardKinematicsFromZero",
   const auto chassisVelocities =
       kinematics.ToChassisVelocities(wheelVelocities);
 
-  CHECK_NEAR(chassisVelocities.vx.value(), 0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.vy.value(), 0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.omega.value(), 0, kEpsilon);
+  CHECK_NEAR(chassisVelocities.vx.value(), 0, EPSILON);
+  CHECK_NEAR(chassisVelocities.vy.value(), 0, EPSILON);
+  CHECK_NEAR(chassisVelocities.omega.value(), 0, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveKinematicsTest InverseKinematicsForStraightLine",
@@ -51,8 +51,8 @@ TEST_CASE("DifferentialDriveKinematicsTest InverseKinematicsForStraightLine",
   const ChassisVelocities chassisVelocities{3.0_mps, 0_mps, 0_rad_per_s};
   const auto wheelVelocities = kinematics.ToWheelVelocities(chassisVelocities);
 
-  CHECK_NEAR(wheelVelocities.left.value(), 3, kEpsilon);
-  CHECK_NEAR(wheelVelocities.right.value(), 3, kEpsilon);
+  CHECK_NEAR(wheelVelocities.left.value(), 3, EPSILON);
+  CHECK_NEAR(wheelVelocities.right.value(), 3, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveKinematicsTest ForwardKinematicsForStraightLine",
@@ -62,9 +62,9 @@ TEST_CASE("DifferentialDriveKinematicsTest ForwardKinematicsForStraightLine",
   const auto chassisVelocities =
       kinematics.ToChassisVelocities(wheelVelocities);
 
-  CHECK_NEAR(chassisVelocities.vx.value(), 3, kEpsilon);
-  CHECK_NEAR(chassisVelocities.vy.value(), 0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.omega.value(), 0, kEpsilon);
+  CHECK_NEAR(chassisVelocities.vx.value(), 3, EPSILON);
+  CHECK_NEAR(chassisVelocities.vy.value(), 0, EPSILON);
+  CHECK_NEAR(chassisVelocities.omega.value(), 0, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveKinematicsTest InverseKinematicsForRotateInPlace",
@@ -74,9 +74,8 @@ TEST_CASE("DifferentialDriveKinematicsTest InverseKinematicsForRotateInPlace",
       0.0_mps, 0.0_mps, wpi::units::radians_per_second_t{std::numbers::pi}};
   const auto wheelVelocities = kinematics.ToWheelVelocities(chassisVelocities);
 
-  CHECK_NEAR(wheelVelocities.left.value(), -0.381 * std::numbers::pi, kEpsilon);
-  CHECK_NEAR(wheelVelocities.right.value(), +0.381 * std::numbers::pi,
-             kEpsilon);
+  CHECK_NEAR(wheelVelocities.left.value(), -0.381 * std::numbers::pi, EPSILON);
+  CHECK_NEAR(wheelVelocities.right.value(), +0.381 * std::numbers::pi, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveKinematicsTest ForwardKinematicsForRotateInPlace",
@@ -88,9 +87,9 @@ TEST_CASE("DifferentialDriveKinematicsTest ForwardKinematicsForRotateInPlace",
   const auto chassisVelocities =
       kinematics.ToChassisVelocities(wheelVelocities);
 
-  CHECK_NEAR(chassisVelocities.vx.value(), 0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.vy.value(), 0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.omega.value(), -std::numbers::pi, kEpsilon);
+  CHECK_NEAR(chassisVelocities.vx.value(), 0, EPSILON);
+  CHECK_NEAR(chassisVelocities.vy.value(), 0, EPSILON);
+  CHECK_NEAR(chassisVelocities.omega.value(), -std::numbers::pi, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveKinematicsTest InverseAccelerationsForZeros",
@@ -100,8 +99,8 @@ TEST_CASE("DifferentialDriveKinematicsTest InverseAccelerationsForZeros",
   const auto wheelAccelerations =
       kinematics.ToWheelAccelerations(chassisAccelerations);
 
-  CHECK_NEAR(wheelAccelerations.left.value(), 0, kEpsilon);
-  CHECK_NEAR(wheelAccelerations.right.value(), 0, kEpsilon);
+  CHECK_NEAR(wheelAccelerations.left.value(), 0, EPSILON);
+  CHECK_NEAR(wheelAccelerations.right.value(), 0, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveKinematicsTest ForwardAccelerationsForZeros",
@@ -111,9 +110,9 @@ TEST_CASE("DifferentialDriveKinematicsTest ForwardAccelerationsForZeros",
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
-  CHECK_NEAR(chassisAccelerations.ax.value(), 0, kEpsilon);
-  CHECK_NEAR(chassisAccelerations.ay.value(), 0, kEpsilon);
-  CHECK_NEAR(chassisAccelerations.alpha.value(), 0, kEpsilon);
+  CHECK_NEAR(chassisAccelerations.ax.value(), 0, EPSILON);
+  CHECK_NEAR(chassisAccelerations.ay.value(), 0, EPSILON);
+  CHECK_NEAR(chassisAccelerations.alpha.value(), 0, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveKinematicsTest InverseAccelerationsForStraightLine",
@@ -124,8 +123,8 @@ TEST_CASE("DifferentialDriveKinematicsTest InverseAccelerationsForStraightLine",
   const auto wheelAccelerations =
       kinematics.ToWheelAccelerations(chassisAccelerations);
 
-  CHECK_NEAR(wheelAccelerations.left.value(), 3, kEpsilon);
-  CHECK_NEAR(wheelAccelerations.right.value(), 3, kEpsilon);
+  CHECK_NEAR(wheelAccelerations.left.value(), 3, EPSILON);
+  CHECK_NEAR(wheelAccelerations.right.value(), 3, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveKinematicsTest ForwardAccelerationsForStraightLine",
@@ -136,9 +135,9 @@ TEST_CASE("DifferentialDriveKinematicsTest ForwardAccelerationsForStraightLine",
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
-  CHECK_NEAR(chassisAccelerations.ax.value(), 3, kEpsilon);
-  CHECK_NEAR(chassisAccelerations.ay.value(), 0, kEpsilon);
-  CHECK_NEAR(chassisAccelerations.alpha.value(), 0, kEpsilon);
+  CHECK_NEAR(chassisAccelerations.ax.value(), 3, EPSILON);
+  CHECK_NEAR(chassisAccelerations.ay.value(), 0, EPSILON);
+  CHECK_NEAR(chassisAccelerations.alpha.value(), 0, EPSILON);
 }
 
 TEST_CASE(
@@ -152,9 +151,9 @@ TEST_CASE(
       kinematics.ToWheelAccelerations(chassisAccelerations);
 
   CHECK_NEAR(wheelAccelerations.left.value(), -0.381 * std::numbers::pi,
-             kEpsilon);
+             EPSILON);
   CHECK_NEAR(wheelAccelerations.right.value(), +0.381 * std::numbers::pi,
-             kEpsilon);
+             EPSILON);
 }
 
 TEST_CASE(
@@ -167,7 +166,7 @@ TEST_CASE(
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
-  CHECK_NEAR(chassisAccelerations.ax.value(), 0, kEpsilon);
-  CHECK_NEAR(chassisAccelerations.ay.value(), 0, kEpsilon);
-  CHECK_NEAR(chassisAccelerations.alpha.value(), -std::numbers::pi, kEpsilon);
+  CHECK_NEAR(chassisAccelerations.ax.value(), 0, EPSILON);
+  CHECK_NEAR(chassisAccelerations.ay.value(), 0, EPSILON);
+  CHECK_NEAR(chassisAccelerations.alpha.value(), -std::numbers::pi, EPSILON);
 }

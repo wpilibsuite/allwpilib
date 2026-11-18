@@ -24,22 +24,22 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   private static final long serialVersionUID = 0L;
 
   /**
-   * <code>optional double kv_linear = 1;</code>
+   * <code>optional double kvLinear = 1;</code>
    */
   private double kvLinear;
 
   /**
-   * <code>optional double ka_linear = 2;</code>
+   * <code>optional double kaLinear = 2;</code>
    */
   private double kaLinear;
 
   /**
-   * <code>optional double kv_angular = 3;</code>
+   * <code>optional double kvAngular = 3;</code>
    */
   private double kvAngular;
 
   /**
-   * <code>optional double ka_angular = 4;</code>
+   * <code>optional double kaAngular = 4;</code>
    */
   private double kaAngular;
 
@@ -54,7 +54,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double kv_linear = 1;</code>
+   * <code>optional double kvLinear = 1;</code>
    * @return whether the kvLinear field is set
    */
   public boolean hasKvLinear() {
@@ -62,7 +62,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double kv_linear = 1;</code>
+   * <code>optional double kvLinear = 1;</code>
    * @return this
    */
   public ProtobufDifferentialDriveFeedforward clearKvLinear() {
@@ -72,7 +72,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double kv_linear = 1;</code>
+   * <code>optional double kvLinear = 1;</code>
    * @return the kvLinear
    */
   public double getKvLinear() {
@@ -80,7 +80,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double kv_linear = 1;</code>
+   * <code>optional double kvLinear = 1;</code>
    * @param value the kvLinear to set
    * @return this
    */
@@ -91,7 +91,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double ka_linear = 2;</code>
+   * <code>optional double kaLinear = 2;</code>
    * @return whether the kaLinear field is set
    */
   public boolean hasKaLinear() {
@@ -99,7 +99,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double ka_linear = 2;</code>
+   * <code>optional double kaLinear = 2;</code>
    * @return this
    */
   public ProtobufDifferentialDriveFeedforward clearKaLinear() {
@@ -109,7 +109,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double ka_linear = 2;</code>
+   * <code>optional double kaLinear = 2;</code>
    * @return the kaLinear
    */
   public double getKaLinear() {
@@ -117,7 +117,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double ka_linear = 2;</code>
+   * <code>optional double kaLinear = 2;</code>
    * @param value the kaLinear to set
    * @return this
    */
@@ -128,7 +128,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double kv_angular = 3;</code>
+   * <code>optional double kvAngular = 3;</code>
    * @return whether the kvAngular field is set
    */
   public boolean hasKvAngular() {
@@ -136,7 +136,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double kv_angular = 3;</code>
+   * <code>optional double kvAngular = 3;</code>
    * @return this
    */
   public ProtobufDifferentialDriveFeedforward clearKvAngular() {
@@ -146,7 +146,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double kv_angular = 3;</code>
+   * <code>optional double kvAngular = 3;</code>
    * @return the kvAngular
    */
   public double getKvAngular() {
@@ -154,7 +154,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double kv_angular = 3;</code>
+   * <code>optional double kvAngular = 3;</code>
    * @param value the kvAngular to set
    * @return this
    */
@@ -165,7 +165,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double ka_angular = 4;</code>
+   * <code>optional double kaAngular = 4;</code>
    * @return whether the kaAngular field is set
    */
   public boolean hasKaAngular() {
@@ -173,7 +173,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double ka_angular = 4;</code>
+   * <code>optional double kaAngular = 4;</code>
    * @return this
    */
   public ProtobufDifferentialDriveFeedforward clearKaAngular() {
@@ -183,7 +183,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double ka_angular = 4;</code>
+   * <code>optional double kaAngular = 4;</code>
    * @return the kaAngular
    */
   public double getKaAngular() {
@@ -191,7 +191,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
   }
 
   /**
-   * <code>optional double ka_angular = 4;</code>
+   * <code>optional double kaAngular = 4;</code>
    * @param value the kaAngular to set
    * @return this
    */
@@ -398,8 +398,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
     }
     while (!input.isAtEnd()) {
       switch (input.readFieldHash()) {
-        case 1424526448:
-        case 974889081: {
+        case 1424526448: {
           if (input.isAtField(FieldNames.kvLinear)) {
             if (!input.trySkipNullValue()) {
               kvLinear = input.readDouble();
@@ -410,8 +409,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
           }
           break;
         }
-        case -33181669:
-        case -1264389586: {
+        case -33181669: {
           if (input.isAtField(FieldNames.kaLinear)) {
             if (!input.trySkipNullValue()) {
               kaLinear = input.readDouble();
@@ -422,8 +420,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
           }
           break;
         }
-        case 175208951:
-        case -878647538: {
+        case 175208951: {
           if (input.isAtField(FieldNames.kvAngular)) {
             if (!input.trySkipNullValue()) {
               kvAngular = input.readDouble();
@@ -434,8 +431,7 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
           }
           break;
         }
-        case -2064069716:
-        case -1576809479: {
+        case -2064069716: {
           if (input.isAtField(FieldNames.kaAngular)) {
             if (!input.trySkipNullValue()) {
               kaAngular = input.readDouble();
@@ -508,12 +504,12 @@ public final class ProtobufDifferentialDriveFeedforward extends ProtoMessage<Pro
    * Contains name constants used for serializing JSON
    */
   static class FieldNames {
-    static final FieldName kvLinear = FieldName.forField("kvLinear", "kv_linear");
+    static final FieldName kvLinear = FieldName.forField("kvLinear");
 
-    static final FieldName kaLinear = FieldName.forField("kaLinear", "ka_linear");
+    static final FieldName kaLinear = FieldName.forField("kaLinear");
 
-    static final FieldName kvAngular = FieldName.forField("kvAngular", "kv_angular");
+    static final FieldName kvAngular = FieldName.forField("kvAngular");
 
-    static final FieldName kaAngular = FieldName.forField("kaAngular", "ka_angular");
+    static final FieldName kaAngular = FieldName.forField("kaAngular");
   }
 }

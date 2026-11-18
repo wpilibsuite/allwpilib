@@ -4,6 +4,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import typing
 import commands2
 from subsystems.drivesubsystem import DriveSubsystem
@@ -23,5 +25,6 @@ class DefaultDrive(commands2.Command):
 
         self.add_requirements(self.drive)
 
+    @override
     def execute(self) -> None:
         self.drive.arcade_drive(self.forward(), self.rotation())

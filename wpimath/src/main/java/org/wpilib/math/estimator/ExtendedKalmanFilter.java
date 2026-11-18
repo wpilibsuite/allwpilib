@@ -12,10 +12,10 @@ import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystemUtil;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.NumericalJacobian;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.util.UsageReporting;
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an estimate of the
@@ -166,7 +166,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     m_P = m_initP;
 
-    MathSharedStore.getMathShared().reportUsage("ExtendedKalmanFilter", "");
+    UsageReporting.reportUsage("ExtendedKalmanFilter", "");
   }
 
   /**

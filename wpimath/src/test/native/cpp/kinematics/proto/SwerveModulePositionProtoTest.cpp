@@ -11,18 +11,18 @@ using namespace wpi::math;
 
 namespace {
 
-const SwerveModulePosition kExpectedData =
+const SwerveModulePosition EXPECTED_DATA =
     SwerveModulePosition{3.504_m, Rotation2d{17.4_rad}};
 }  // namespace
 
 TEST_CASE("SwerveModulePositionProtoTest Roundtrip", "[wpimath]") {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
 
-  CHECK(kExpectedData.distance.value() == unpacked_data->distance.value());
-  CHECK(kExpectedData.angle == unpacked_data->angle);
+  CHECK(EXPECTED_DATA.distance.value() == unpacked_data->distance.value());
+  CHECK(EXPECTED_DATA.angle == unpacked_data->angle);
 }

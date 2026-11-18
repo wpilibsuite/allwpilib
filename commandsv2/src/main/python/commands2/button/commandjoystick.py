@@ -1,5 +1,4 @@
 # validated: 2024-01-20 DS 92aecab2ef05 button/CommandJoystick.java
-from typing import Optional
 
 from wpilib import EventLoop, Joystick
 
@@ -45,7 +44,7 @@ class CommandJoystick:
         """
         return self._joystick
 
-    def trigger(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def trigger(self, loop: EventLoop | None = None) -> Trigger:
         """
         Constructs an event instance around the trigger button's digital signal.
 
@@ -59,7 +58,7 @@ class CommandJoystick:
             loop = CommandScheduler.get_instance().get_default_button_loop()
         return Trigger(loop, lambda: self._joystick.get_trigger())
 
-    def top(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def top(self, loop: EventLoop | None = None) -> Trigger:
         """
         Constructs an event instance around the top button's digital signal.
 

@@ -168,16 +168,20 @@ void GenericHID::SetLeds(int r, int g, int b) {
 
 void GenericHID::SetRumble(RumbleType type, double value) {
   value = std::clamp(value, 0.0, 1.0);
-  double rumbleValue = value * 65535;
+  SetRawRumble(type, static_cast<int>(value * 65535));
+}
+
+void GenericHID::SetRawRumble(RumbleType type, int value) {
+  value = std::clamp(value, 0, 65535);
 
   if (type == RumbleType::LEFT_RUMBLE) {
-    m_leftRumble = rumbleValue;
+    m_leftRumble = value;
   } else if (type == RumbleType::RIGHT_RUMBLE) {
-    m_rightRumble = rumbleValue;
+    m_rightRumble = value;
   } else if (type == RumbleType::LEFT_TRIGGER_RUMBLE) {
-    m_leftTriggerRumble = rumbleValue;
+    m_leftTriggerRumble = value;
   } else if (type == RumbleType::RIGHT_TRIGGER_RUMBLE) {
-    m_rightTriggerRumble = rumbleValue;
+    m_rightTriggerRumble = value;
   }
 
   HAL_SetJoystickRumble(m_port, m_leftRumble, m_rightRumble,

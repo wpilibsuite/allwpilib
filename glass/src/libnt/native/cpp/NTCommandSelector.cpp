@@ -7,6 +7,7 @@
 #include <format>
 #include <utility>
 
+#include "wpi/glass/networktables/NTTunableTopic.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::glass;
@@ -20,7 +21,7 @@ NTCommandSelectorModel::NTCommandSelectorModel(
     : m_inst{inst},
       m_running{inst.GetBooleanTopic(std::format("{}/running", path))
                     .GetEntry(false)},
-      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
+      m_name{inst.GetStringTopic(std::format("{}/name", path)).Subscribe("")},
       m_runningData{std::format("NTCmd:{}", path)},
       m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
@@ -39,4 +40,8 @@ void NTCommandSelectorModel::Update() {
 
 bool NTCommandSelectorModel::Exists() {
   return m_running.Exists();
+}
+
+bool NTCommandSelectorModel::IsReadOnly() {
+  return !IsTunableTopicMutable(m_running.GetTopic());
 }

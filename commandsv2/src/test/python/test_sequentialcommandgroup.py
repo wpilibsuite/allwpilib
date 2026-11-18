@@ -8,8 +8,6 @@ if TYPE_CHECKING:
     from .util import *
     from .compositiontestbase import MultiCompositionTestBase
 
-import pytest
-
 
 class TestSequentialCommandGroupComposition(MultiCompositionTestBase):
     def compose(self, *members: commands2.Command):

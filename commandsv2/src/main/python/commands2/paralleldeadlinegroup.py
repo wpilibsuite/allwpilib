@@ -1,9 +1,7 @@
 # validated: 2024-01-19 DS e07de37e64f2 ParallelDeadlineGroup.java
 from __future__ import annotations
 
-from typing import Dict
-
-from wpiutil import SendableBuilder
+from telemetry import TelemetryTable
 
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler
@@ -36,7 +34,7 @@ class ParallelDeadlineGroup(Command):
         :raises IllegalCommandUse: if the deadline command is also in the commands argument
         """
         super().__init__()
-        self._commands: Dict[Command, bool] = {}
+        self._commands: dict[Command, bool] = {}
         self._runs_when_disabled = True
         self._finished = True
         self._interrupt_behavior = InterruptionBehavior.CANCEL_INCOMING
@@ -132,9 +130,6 @@ class ParallelDeadlineGroup(Command):
     def get_interruption_behavior(self) -> InterruptionBehavior:
         return self._interrupt_behavior
 
-    def init_sendable(self, builder: SendableBuilder):
-        super().init_sendable(builder)
-
-        builder.add_string_property(
-            "deadline", lambda: self._deadline.get_name(), lambda _: None
-        )
+    def log_to(self, table: TelemetryTable) -> None:
+        super().log_to(table)
+        table.log("deadline", self._deadline.get_name())

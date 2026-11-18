@@ -71,7 +71,6 @@ void DataLogWriter::Stop() {
 }
 
 bool DataLogWriter::BufferFull() {
-  Flush();
   return false;
 }
 

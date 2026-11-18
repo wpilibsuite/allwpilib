@@ -4,8 +4,10 @@
 
 #include <algorithm>
 #include <concepts>
+#include <cstddef>
 #include <initializer_list>
 #include <source_location>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -14,6 +16,7 @@
 
 #include "sleipnir/autodiff/expression.hpp"
 #include "sleipnir/autodiff/expression_graph.hpp"
+#include "sleipnir/autodiff/expression_type.hpp"
 #include "sleipnir/autodiff/sleipnir_base.hpp"
 #include "sleipnir/util/assert.hpp"
 #include "sleipnir/util/concepts.hpp"
@@ -1039,6 +1042,8 @@ struct NumTraits<slp::Variable<Scalar>> : NumTraits<Scalar> {
   using NonInteger = slp::Variable<Scalar>;
   /// Nested type.
   using Nested = slp::Variable<Scalar>;
+  /// Literal type.
+  using Literal = slp::Variable<Scalar>;
 
   /// Is complex.
   static constexpr int IsComplex = 0;

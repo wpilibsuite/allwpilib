@@ -16,7 +16,6 @@
 #include "wpi/net/EventLoopRunner.hpp"
 #include "wpi/net/HttpServerConnection.hpp"
 #include "wpi/net/HttpUtil.hpp"
-#include "wpi/net/UrlParser.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/GetAddrInfo.hpp"
 #include "wpi/net/uv/Stream.hpp"
@@ -26,6 +25,7 @@
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/Signal.h"
 #include "wpi/util/SmallString.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
@@ -226,17 +226,16 @@ void MyHttpConnection::SendFileResponse(int code, std::string_view codeText,
 
 void MyHttpConnection::ProcessRequest() {
   // wpi::util::print(stderr, "HTTP request: '{}'\n", m_request.GetUrl());
-  wpi::net::UrlParser url{m_request.GetUrl(),
-                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
-  if (!url.IsValid()) {
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
+  if (!url) {
     // failed to parse URL
     SendError(400);
     return;
   }
 
   std::string_view path;
-  if (url.HasPath()) {
-    path = url.GetPath();
+  if (url->get_pathname_length() > 0) {
+    path = url->get_pathname();
   }
   // wpi::util::print(stderr, "path: \"{}\"\n", path);
 
@@ -249,13 +248,13 @@ void MyHttpConnection::ProcessRequest() {
   }
 
   std::string_view query;
-  if (url.HasQuery()) {
-    query = url.GetQuery();
+  if (url->has_search()) {
+    query = url->get_search();
   }
   // wpi::util::print(stderr, "query: \"{}\"\n", query);
-  HttpQueryMap qmap{query};
+  ada::url_search_params qmap{query};
 
-  const bool isGET = m_request.GetMethod() == wpi::net::HTTP_GET;
+  const bool isGET = m_request.GetMethod() == HTTP_GET;
   if (isGET && wpi::util::starts_with(path, '/') &&
       !wpi::util::contains(path, "..")) {
     fs::path fullpath = std::format("{}{}", m_path, path);
@@ -269,12 +268,13 @@ void MyHttpConnection::ProcessRequest() {
         return;
       }
       // generate directory listing
-      wpi::util::SmallString<64> formatBuf;
       fs::path indexpath = fs::path{fullpath} / "index.html";
-      if (qmap.Get("format", formatBuf).value_or("") == "json") {
+      if (qmap.get("format").value_or("") == "json") {
         wpi::util::json dirs = wpi::util::json::array();
         wpi::util::json files = wpi::util::json::array();
-        for (auto&& entry : fs::directory_iterator{fullpath}) {
+        for (fs::directory_iterator it{fullpath, ec}, end; !ec && it != end;
+             it.increment(ec)) {
+          auto&& entry = *it;
           bool subdir = entry.is_directory(ec);
           std::string name = entry.path().filename().string();
           if (subdir) {
@@ -289,13 +289,15 @@ void MyHttpConnection::ProcessRequest() {
                      wpi::util::json::object("dirs", std::move(dirs), "files",
                                              std::move(files))
                          .to_string());
-      } else if (fs::exists(indexpath)) {
+      } else if (fs::exists(indexpath, ec) && !ec) {
         SendFileResponse(200, "OK", GetMimeType("html"), indexpath,
                          "Content-Disposition: filename=\"index.html\"\r\n");
       } else {
         wpi::util::StringMap<std::string> dirs;
         wpi::util::StringMap<std::string> files;
-        for (auto&& entry : fs::directory_iterator{fullpath}) {
+        for (fs::directory_iterator it{fullpath, ec}, end; !ec && it != end;
+             it.increment(ec)) {
+          auto&& entry = *it;
           bool subdir = entry.is_directory(ec);
           std::string name = entry.path().filename().string();
           wpi::util::SmallString<128> nameUriBuf, nameHtmlBuf;

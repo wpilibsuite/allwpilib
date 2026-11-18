@@ -129,6 +129,16 @@ public class EncoderJNI extends JNIWrapper {
   public static native double getEncoderRate(int encoderHandle);
 
   /**
+   * Sets the time window used to calculate the encoder rate.
+   *
+   * @param encoderHandle the encoder handle
+   * @param windowMilliseconds the rate calculation window in milliseconds; valid values are 5
+   *     through 255
+   * @see "HAL_SetEncoderRateWindow"
+   */
+  public static native void setEncoderRateWindow(int encoderHandle, int windowMilliseconds);
+
+  /**
    * Sets the distance traveled per encoder pulse. This is used as a scaling factor for the rate and
    * distance calls.
    *

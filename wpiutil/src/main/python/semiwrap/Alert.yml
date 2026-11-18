@@ -7,14 +7,32 @@ functions:
     overloads:
       Alert&:
         ignore: true
+  ReleaseAlertHandle:
+    overloads:
+      Alert&:
+        ignore: true
 
 classes:
   wpi::util::Alert:
+    doc_code_blocks:
+    - |
+      from wpiutil import Alert
+
+      class Component:
+          def __init__(self):
+              self.alert = Alert(
+                  "robot-fault", "Something went wrong", Alert.Level.MEDIUM
+              )
+
+          def fault_detected(self, fault_detected: bool):
+              self.alert.set(fault_detected)
     enums:
       Level:
     methods:
       Alert:
         overloads:
+          "":
+            ignore: true
           std::string_view, std::string_view, Level:
             cpp_code: |
               [](std::string_view id, std::string_view text,

@@ -11,8 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.driverstation.POVDirection;
-import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.EventLoop;
 import org.wpilib.util.Pair;
 
@@ -23,8 +23,7 @@ import org.wpilib.util.Pair;
  */
 public final class CommandGenericHID {
   private static final Lock m_hidsLock = new ReentrantLock();
-  private static final CommandGenericHID[] m_hids =
-      new CommandGenericHID[DriverStationBackend.JOYSTICK_PORTS];
+  private static final CommandGenericHID[] m_hids = new CommandGenericHID[HIDDevice.MAX_DEVICES];
 
   private final GenericHID m_hid;
   private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();

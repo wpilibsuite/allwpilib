@@ -4,21 +4,22 @@
 
 #include "wpi/hardware/range/SharpIR.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/simulation/SharpIRSim.hpp"
 
 using namespace wpi;
 
-TEST(SharpIRTest, SimDevices) {
+TEST_CASE("SharpIRTest SimDevices", "[wpilibc]") {
   SharpIR s = SharpIR::GP2Y0A02YK0F(1);
   SharpIRSim sim(s);
 
-  EXPECT_EQ(0.2, s.GetRange().value());
+  CHECK(0.2 == s.GetRange().value());
 
   sim.SetRange(30_cm);
-  EXPECT_EQ(0.3, s.GetRange().value());
+  CHECK(0.3 == s.GetRange().value());
 
   sim.SetRange(300_cm);
-  EXPECT_EQ(1.5, s.GetRange().value());
+  CHECK(1.5 == s.GetRange().value());
 }

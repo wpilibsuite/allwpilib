@@ -10,6 +10,9 @@ This example shows how to use a duty cycle encoder for devices such as
 an arm or elevator.
 """
 
+from typing import override
+
+import telemetry
 import wpilib
 import wpimath
 
@@ -43,6 +46,7 @@ class MyRobot(wpilib.TimedRobot):
         # much more stable.
         self.duty_cycle_encoder.set_assumed_frequency(967.8)
 
+    @override
     def robot_periodic(self):
         # Connected can be checked, and uses the frequency of the encoder
         connected = self.duty_cycle_encoder.is_connected()
@@ -68,7 +72,7 @@ class MyRobot(wpilib.TimedRobot):
             output, 0 - percent_of_range, FULL_RANGE - percent_of_range
         )
 
-        wpilib.SmartDashboard.put_boolean("Connected", connected)
-        wpilib.SmartDashboard.put_number("Frequency", frequency)
-        wpilib.SmartDashboard.put_number("Output", output)
-        wpilib.SmartDashboard.put_number("ShiftedOutput", shifted_output)
+        telemetry.log("Connected", connected)
+        telemetry.log("Frequency", frequency)
+        telemetry.log("Output", output)
+        telemetry.log("ShiftedOutput", shifted_output)

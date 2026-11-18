@@ -9,15 +9,13 @@
 
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/hardware/MotorController.hpp"
-#include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/nt/StringTopic.hpp"
 
 namespace wpi::glass {
 class NTMotorControllerModel : public MotorControllerModel {
  public:
-  static constexpr const char* kType = "Motor Controller";
+  static constexpr const char* TYPE = "Motor Controller";
 
   explicit NTMotorControllerModel(std::string_view path);
   NTMotorControllerModel(wpi::nt::NetworkTableInstance inst,
@@ -31,16 +29,13 @@ class NTMotorControllerModel : public MotorControllerModel {
 
   void Update() override;
   bool Exists() override;
-  bool IsReadOnly() override { return !m_controllableValue; }
+  bool IsReadOnly() override;
 
  private:
   wpi::nt::NetworkTableInstance m_inst;
   wpi::nt::DoubleEntry m_value;
-  wpi::nt::StringSubscriber m_name;
-  wpi::nt::BooleanSubscriber m_controllable;
 
   DoubleSource m_valueData;
   std::string m_nameValue;
-  bool m_controllableValue = false;
 };
 }  // namespace wpi::glass

@@ -6,7 +6,10 @@
 #
 
 import math
+from typing import override
+
 import wpilib
+import wpilib_drivers
 import wpimath
 import wpimath.units
 
@@ -54,7 +57,7 @@ class MyRobot(wpilib.TimedRobot):
         # Outputs (what we can measure): [position], in meters.
 
         # This elevator is driven by two NEO motors.
-        self.elevator_plant = wpimath.Models.elevator_from_physical_constants(
+        self.elevator_plant = wpimath.Models.linear_position_from_physical_constants(
             wpimath.DCMotor.neo(2),
             CARRIAGE_MASS,
             DRUM_RADIUS,
@@ -102,7 +105,7 @@ class MyRobot(wpilib.TimedRobot):
         # An encoder set up to measure elevator height in meters.
         self.encoder = wpilib.Encoder(ENCODER_A_CHANNEL, ENCODER_B_CHANNEL)
 
-        self.motor = wpilib.PWMSparkMax(MOTOR_PORT)
+        self.motor = wpilib_drivers.PWMSparkMax(MOTOR_PORT)
 
         # A joystick to read the trigger from.
         self.joystick = wpilib.Joystick(JOYSTICK_PORT)
@@ -110,6 +113,7 @@ class MyRobot(wpilib.TimedRobot):
         # Circumference = pi * d, so distance per click = pi * d / counts
         self.encoder.set_distance_per_pulse(math.tau * DRUM_RADIUS / 4096)
 
+    @override
     def teleop_init(self) -> None:
         # Reset our loop to make sure it's in a known state.
         self.loop.reset([self.encoder.get_distance(), self.encoder.get_rate()])
@@ -119,6 +123,7 @@ class MyRobot(wpilib.TimedRobot):
             self.encoder.get_distance(), self.encoder.get_rate()
         )
 
+    @override
     def teleop_periodic(self) -> None:
         # Sets the target position of our arm. This is similar to setting the setpoint of a
         # PID controller.

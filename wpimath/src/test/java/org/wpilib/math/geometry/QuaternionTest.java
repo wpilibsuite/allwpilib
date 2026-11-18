@@ -7,9 +7,9 @@ package org.wpilib.math.geometry;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.math.util.Units;
 
 class QuaternionTest {
   @Test
@@ -106,8 +106,8 @@ class QuaternionTest {
   @Test
   void testTimes() {
     // 90° CCW rotations around each axis
-    double c = Math.cos(Units.degreesToRadians(90.0) / 2.0);
-    double s = Math.sin(Units.degreesToRadians(90.0) / 2.0);
+    double c = Math.cos(degreesToRadians(90.0) / 2.0);
+    double s = Math.sin(degreesToRadians(90.0) / 2.0);
     var xRot = new Quaternion(c, s, 0.0, 0.0);
     var yRot = new Quaternion(c, 0.0, s, 0.0);
     var zRot = new Quaternion(c, 0.0, 0.0, s);

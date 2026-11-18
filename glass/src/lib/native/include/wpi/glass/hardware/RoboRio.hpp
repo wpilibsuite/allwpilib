@@ -31,9 +31,11 @@ class RoboRioModel : public Model {
 
   virtual DoubleSource* GetVInVoltageData() = 0;
   virtual DoubleSource* GetBrownoutVoltage() = 0;
+  virtual DoubleSource* GetBrownoutRecoveryVoltage() = 0;
 
   virtual void SetVInVoltage(double val) = 0;
   virtual void SetBrownoutVoltage(double val) = 0;
+  virtual void SetBrownoutRecoveryVoltage(double val) = 0;
 };
 
 void DisplayRoboRio(RoboRioModel* model);

@@ -146,9 +146,9 @@ TEST_CASE("S3UKFTest DriveConvergence", "[wpimath]") {
       wpi::math::Vectord<2>::Zero());
 
   observer.SetXhat(wpi::math::Vectord<5>{
-      trajectory.InitialPose().Translation().X().value(),
-      trajectory.InitialPose().Translation().Y().value(),
-      trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
+      trajectory.Start().pose.Translation().X().value(),
+      trajectory.Start().pose.Translation().Y().value(),
+      trajectory.Start().pose.Rotation().Radians().value(), 0.0, 0.0});
 
   auto trueXhat = observer.Xhat();
 
@@ -203,8 +203,8 @@ TEST_CASE("S3UKFTest DriveConvergence", "[wpimath]") {
 
 TEST_CASE("S3UKFTest LinearUKF", "[wpimath]") {
   constexpr wpi::units::second_t dt = 20_ms;
-  auto plant = wpi::math::Models::FlywheelFromSysId(0.02_V / 1_rad_per_s,
-                                                    0.006_V / 1_rad_per_s_sq);
+  auto plant = wpi::math::Models::AngularVelocityFromSysId(
+      0.02_V / 1_rad_per_s, 0.006_V / 1_rad_per_s_sq);
   wpi::math::S3UKF<1, 1, 1> observer{
       [&](const wpi::math::Vectord<1>& x, const wpi::math::Vectord<1>& u) {
         return plant.A() * x + plant.B() * u;

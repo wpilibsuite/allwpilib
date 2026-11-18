@@ -49,7 +49,13 @@ classes:
 
 inline_code: |
   cls_Rotation3d
+    .def_static("from_radians", [](wpi::units::radian_t roll, wpi::units::radian_t pitch, wpi::units::radian_t yaw) {
+      return std::make_unique<Rotation3d>(roll, pitch, yaw);
+    }, py::arg("roll"), py::arg("pitch"), py::arg("yaw"))
     .def_static("from_degrees", [](wpi::units::degree_t roll, wpi::units::degree_t pitch, wpi::units::degree_t yaw) {
+      return std::make_unique<Rotation3d>(roll, pitch, yaw);
+    }, py::arg("roll"), py::arg("pitch"), py::arg("yaw"))
+    .def_static("from_rotations", [](wpi::units::turn_t roll, wpi::units::turn_t pitch, wpi::units::turn_t yaw) {
       return std::make_unique<Rotation3d>(roll, pitch, yaw);
     }, py::arg("roll"), py::arg("pitch"), py::arg("yaw"))
     .def_property_readonly("x", &Rotation3d::X)

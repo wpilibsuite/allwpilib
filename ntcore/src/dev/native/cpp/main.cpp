@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <format>
+#include <functional>
 #include <limits>
 #include <numeric>
 #include <random>
@@ -64,11 +65,12 @@ void PrintTimes(std::vector<int64_t>& times) {
   std::sort(times.begin(), times.end());
   int64_t min = times[0];
   int64_t max = times[times.size() - 1];
-  double mean =
-      static_cast<double>(std::accumulate(times.begin(), times.end(), 0)) /
-      times.size();
-  double sq_sum =
-      std::inner_product(times.begin(), times.end(), times.begin(), 0);
+  double mean = std::accumulate(times.begin(), times.end(), 0.0) / times.size();
+  double sq_sum = std::inner_product(
+      times.begin(), times.end(), times.begin(), 0.0, std::plus<>(),
+      [](int64_t lhs, int64_t rhs) {
+        return static_cast<double>(lhs) * static_cast<double>(rhs);
+      });
   double stdev = std::sqrt(sq_sum / times.size() - mean * mean);
 
   wpi::util::print("min: {} max: {}, mean: {}, stdev: {}\n", min, max, mean,

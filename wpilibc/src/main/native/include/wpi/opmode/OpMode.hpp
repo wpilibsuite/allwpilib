@@ -18,7 +18,10 @@ namespace wpi {
  * <p><b>Lifecycle</b>:
  * <ul>
  *   <li>constructed when opmode selected on driver station
- *   <li>DisabledPeriodic() called periodically as long as DS is disabled
+ *   <li>DisabledPeriodic() called periodically as long as DS is disabled. If
+ *       the opmode is selected while the DS is already enabled,
+ *       DisabledPeriodic() is called exactly once, immediately after
+ *       construction and before Start()
  *   <li>when DS transitions from disabled to enabled, Start() is called once
  *   <li>while DS is enabled, Periodic() is called periodically and additional
  *       periodic callbacks added via GetCallbacks() are called periodically
@@ -42,6 +45,9 @@ class OpMode {
    * This function is called periodically while the opmode is selected on the
    * DS (robot is disabled). Code that should only run once when the opmode is
    * selected should go in the opmode constructor.
+   *
+   * If the opmode is selected while the robot is already enabled, this is
+   * called exactly once, right after construction and before Start().
    */
   virtual void DisabledPeriodic() {}
 
@@ -59,6 +65,17 @@ class OpMode {
    * promptly.
    */
   virtual void End() {}
+
+  /**
+   * Called when the opmode is no longer selected on the DS or after an enabled
+   * run ends, even if the opmode was never started. The framework removes the
+   * opmode's periodic callbacks before calling this method and will not reuse
+   * the object afterward.
+   *
+   * This lifecycle cleanup does not depend on object destruction; other
+   * references may keep the object alive after this method returns.
+   */
+  virtual void Close() {}
 
   /**
    * Returns a vector of custom periodic callbacks to be executed while the

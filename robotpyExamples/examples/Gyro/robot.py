@@ -5,7 +5,10 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
+import wpilib_drivers
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -27,8 +30,8 @@ class MyRobot(wpilib.TimedRobot):
         """Robot initialization function"""
         super().__init__()
 
-        self.left_drive = wpilib.PWMSparkMax(self.LEFT_MOTOR_PORT)
-        self.right_drive = wpilib.PWMSparkMax(self.RIGHT_MOTOR_PORT)
+        self.left_drive = wpilib_drivers.PWMSparkMax(self.LEFT_MOTOR_PORT)
+        self.right_drive = wpilib_drivers.PWMSparkMax(self.RIGHT_MOTOR_PORT)
         self.my_robot = wpilib.DifferentialDrive(self.left_drive, self.right_drive)
         self.imu = wpilib.OnboardIMU(self.IMU_MOUNT_ORIENTATION)
         self.joystick = wpilib.Joystick(self.JOYSTICK_PORT)
@@ -38,6 +41,7 @@ class MyRobot(wpilib.TimedRobot):
         # gearbox is constructed, you might have to invert the left side instead.
         self.right_drive.set_inverted(True)
 
+    @override
     def teleop_periodic(self) -> None:
         # The motor velocity is set from the joystick while the DifferentialDrive turning value is assigned
         # from the error between the setpoint and the gyro angle.

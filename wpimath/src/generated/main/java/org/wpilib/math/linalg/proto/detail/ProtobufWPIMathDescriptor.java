@@ -9,24 +9,24 @@ import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedByte;
 
 public final class ProtobufWPIMathDescriptor {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(639,
-    "Ch53cGltYXRoL3Byb3RvYnVmL3dwaW1hdGgucHJvdG8SCXdwaS5wcm90byJaCg5Qcm90b2J1Zk1hdHJp" + 
-    "eBIZCghudW1fcm93cxgBIAEoDVIHbnVtUm93cxIZCghudW1fY29scxgCIAEoDVIHbnVtQ29scxISCgRk" + 
-    "YXRhGAMgAygBUgRkYXRhIiQKDlByb3RvYnVmVmVjdG9yEhIKBHJvd3MYASADKAFSBHJvd3NCQgojb3Jn" + 
-    "LndwaWxpYi5tYXRoLmxpbmFsZy5wcm90by5kZXRhaWxCGVByb3RvYnVmV1BJTWF0aERlc2NyaXB0b3JQ" + 
-    "AUqDAwoGEgQAABIBCggKAQwSAwAAEgoICgECEgMCABIKCAoBCBIDBAA8CgkKAggBEgMEADwKCAoBCBID" + 
-    "BgA6CgkKAggIEgMGADoKCAoBCBIDCAAiCgkKAggKEgMIACIKCgoCBAASBAoADgEKCgoDBAABEgMKCBYK" + 
-    "CwoEBAACABIDCwIWCgwKBQQAAgAFEgMLAggKDAoFBAACAAESAwsJEQoMCgUEAAIAAxIDCxQVCgsKBAQA" + 
-    "AgESAwwCFgoMCgUEAAIBBRIDDAIICgwKBQQAAgEBEgMMCREKDAoFBAACAQMSAwwUFQoLCgQEAAICEgMN" + 
-    "AhsKDAoFBAACAgQSAw0CCgoMCgUEAAICBRIDDQsRCgwKBQQAAgIBEgMNEhYKDAoFBAACAgMSAw0ZGgoK" + 
-    "CgIEARIEEAASAQoKCgMEAQESAxAIFgoLCgQEAQIAEgMRAhsKDAoFBAECAAQSAxECCgoMCgUEAQIABRID" + 
-    "EQsRCgwKBQQBAgABEgMREhYKDAoFBAECAAMSAxEZGmIGcHJvdG8z");
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(640,
+    "Ch93cGkvbWF0aC9wcm90b2J1Zi93cGltYXRoLnByb3RvEgl3cGkucHJvdG8iWgoOUHJvdG9idWZNYXRy" + 
+    "aXgSGQoIbnVtX3Jvd3MYASABKA1SB251bVJvd3MSGQoIbnVtX2NvbHMYAiABKA1SB251bUNvbHMSEgoE" + 
+    "ZGF0YRgDIAMoAVIEZGF0YSIkCg5Qcm90b2J1ZlZlY3RvchISCgRyb3dzGAEgAygBUgRyb3dzQkIKI29y" + 
+    "Zy53cGlsaWIubWF0aC5saW5hbGcucHJvdG8uZGV0YWlsQhlQcm90b2J1ZldQSU1hdGhEZXNjcmlwdG9y" + 
+    "UAFKgwMKBhIEAAASAQoICgEMEgMAABIKCAoBAhIDAgASCggKAQgSAwQAPAoJCgIIARIDBAA8CggKAQgS" + 
+    "AwYAOgoJCgIICBIDBgA6CggKAQgSAwgAIgoJCgIIChIDCAAiCgoKAgQAEgQKAA4BCgoKAwQAARIDCggW" + 
+    "CgsKBAQAAgASAwsCFgoMCgUEAAIABRIDCwIICgwKBQQAAgABEgMLCREKDAoFBAACAAMSAwsUFQoLCgQE" + 
+    "AAIBEgMMAhYKDAoFBAACAQUSAwwCCAoMCgUEAAIBARIDDAkRCgwKBQQAAgEDEgMMFBUKCwoEBAACAhID" + 
+    "DQIbCgwKBQQAAgIEEgMNAgoKDAoFBAACAgUSAw0LEQoMCgUEAAICARIDDRIWCgwKBQQAAgIDEgMNGRoK" + 
+    "CgoCBAESBBAAEgEKCgoDBAEBEgMQCBYKCwoEBAECABIDEQIbCgwKBQQBAgAEEgMRAgoKDAoFBAECAAUS" + 
+    "AxELEQoMCgUEAQIAARIDERIWCgwKBQQBAgADEgMRGRpiBnByb3RvMw==");
 
-  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("wpimath/protobuf/wpimath.proto", "wpi.proto", descriptorData);
+  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("wpi/math/protobuf/wpimath.proto", "wpi.proto", descriptorData);
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufMatrix_descriptor = descriptor.internalContainedType(45, 90, "ProtobufMatrix", "wpi.proto.ProtobufMatrix");
+  static final Descriptors.Descriptor wpi_proto_ProtobufMatrix_descriptor = descriptor.internalContainedType(46, 90, "ProtobufMatrix", "wpi.proto.ProtobufMatrix");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufVector_descriptor = descriptor.internalContainedType(137, 36, "ProtobufVector", "wpi.proto.ProtobufVector");
+  static final Descriptors.Descriptor wpi_proto_ProtobufVector_descriptor = descriptor.internalContainedType(138, 36, "ProtobufVector", "wpi.proto.ProtobufVector");
 
   /**
    * @return this proto file's descriptor.

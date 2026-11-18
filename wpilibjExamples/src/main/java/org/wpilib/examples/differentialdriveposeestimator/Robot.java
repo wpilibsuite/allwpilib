@@ -42,13 +42,13 @@ public class Robot extends TimedRobot {
     // Get the x velocity. We are inverting this because gamepad return
     // negative values when we push forward.
     final var xVelocity =
-        -velocityLimiter.calculate(controller.getLeftY()) * Drivetrain.kMaxVelocity;
+        -velocityLimiter.calculate(controller.getLeftY()) * Drivetrain.MAX_VELOCITY;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Gamepads return positive values when you pull to
     // the right by default.
-    final var rot = -rotLimiter.calculate(controller.getRightX()) * Drivetrain.kMaxAngularVelocity;
+    final var rot = -rotLimiter.calculate(controller.getRightX()) * Drivetrain.MAX_ANGULAR_VELOCITY;
 
     drive.drive(xVelocity, rot);
   }

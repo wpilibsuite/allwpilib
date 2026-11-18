@@ -30,7 +30,7 @@ cc_library(
     name = "headers",
     hdrs = glob(["ceres/**", "glog/**", "suitesparse/**", "openblas/**"]),
     includes = ["."],
-    deps = ["@//wpimath:eigen-headers"],
+    deps = ["@eigen"],
     visibility = ["//visibility:public"],
 )
 """,

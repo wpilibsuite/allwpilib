@@ -27,7 +27,7 @@
 using namespace wpi::math;
 
 const DrivetrainSplineTrajectory
-    DrivetrainSplineTrajectoryGenerator::kDoNothingTrajectory(
+    DrivetrainSplineTrajectoryGenerator::DO_NOTHING_TRAJECTORY(
         std::vector<DrivetrainSplineSample>{DrivetrainSplineSample{
             0_s, Pose2d{}, ChassisVelocities{}, ChassisAccelerations{},
             wpi::units::curvature_t{0.0}}});
@@ -65,7 +65,7 @@ DrivetrainSplineTrajectory DrivetrainSplineTrajectoryGenerator::Generate(
             initial, interiorWaypoints, end));
   } catch (SplineParameterizer::MalformedSplineException& e) {
     ReportError(e.what());
-    return kDoNothingTrajectory;
+    return DO_NOTHING_TRAJECTORY;
   }
 
   // After trajectory generation, flip theta back so it's relative to the
@@ -109,7 +109,7 @@ DrivetrainSplineTrajectory DrivetrainSplineTrajectoryGenerator::Generate(
         SplineHelper::QuinticSplinesFromControlVectors(controlVectors));
   } catch (SplineParameterizer::MalformedSplineException& e) {
     ReportError(e.what());
-    return kDoNothingTrajectory;
+    return DO_NOTHING_TRAJECTORY;
   }
 
   // After trajectory generation, flip theta back so it's relative to the
@@ -142,7 +142,7 @@ DrivetrainSplineTrajectory DrivetrainSplineTrajectoryGenerator::Generate(
         SplineHelper::QuinticSplinesFromWaypoints(newWaypoints)));
   } catch (SplineParameterizer::MalformedSplineException& e) {
     ReportError(e.what());
-    return kDoNothingTrajectory;
+    return DO_NOTHING_TRAJECTORY;
   }
 
   // After trajectory generation, flip theta back so it's relative to the

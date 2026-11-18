@@ -47,7 +47,7 @@ class RawSink : public ImageSink {
    *        unusual circumstances) WaitForImage().
    */
   RawSink(std::string_view name,
-          std::function<void(uint64_t time)> processFrame) {
+          std::function<void(int64_t time)> processFrame) {
     m_handle = CreateRawSinkCallback(name, false, processFrame, &m_status);
   }
 
@@ -59,10 +59,10 @@ class RawSink : public ImageSink {
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as
-   * wpi::util::Now(), and is in 1 us increments.
+   * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrame(wpi::util::RawFrame& image, double timeout = 0.225) const {
+  int64_t GrabFrame(wpi::util::RawFrame& image, double timeout = 0.225) const {
     m_status = 0;
     return GrabSinkFrameTimeout(m_handle, image, timeout, &m_status);
   }
@@ -73,10 +73,10 @@ class RawSink : public ImageSink {
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as
-   * wpi::util::Now(), and is in 1 us increments.
+   * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameNoTimeout(wpi::util::RawFrame& image) const {
+  int64_t GrabFrameNoTimeout(wpi::util::RawFrame& image) const {
     m_status = 0;
     return GrabSinkFrame(m_handle, image, &m_status);
   }
@@ -93,11 +93,11 @@ class RawSink : public ImageSink {
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as
-   * wpi::util::Now(), and is in 1 us increments.
+   * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameLastTime(wpi::util::RawFrame& image, uint64_t lastFrameTime,
-                             double timeout = 0.225) const {
+  int64_t GrabFrameLastTime(wpi::util::RawFrame& image, int64_t lastFrameTime,
+                            double timeout = 0.225) const {
     m_status = 0;
     return GrabSinkFrameTimeoutLastTime(m_handle, image, timeout, lastFrameTime,
                                         &m_status);

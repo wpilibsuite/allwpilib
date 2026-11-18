@@ -39,7 +39,7 @@ struct Encoder {
   bool hasDirection{false};
 };
 
-DigitalHandleResource<HAL_EncoderHandle, Encoder, kNumSmartIo>* encoderHandles;
+DigitalHandleResource<HAL_EncoderHandle, Encoder, NUM_SMART_IO>* encoderHandles;
 
 int EncodingScaleFactor(const Encoder& encoder) {
   switch (encoder.encodingType) {
@@ -74,7 +74,7 @@ bool IsValidEncodingType(HAL_EncoderEncodingType encodingType) {
 }
 
 bool IsValidChannelPair(int32_t aChannel, int32_t bChannel) {
-  return aChannel >= 0 && aChannel < kNumSmartIo && aChannel % 2 == 0 &&
+  return aChannel >= 0 && aChannel < NUM_SMART_IO && aChannel % 2 == 0 &&
          bChannel == aChannel + 1;
 }
 
@@ -148,7 +148,7 @@ void ReleaseEncoderPorts(const std::shared_ptr<Encoder>& encoder) {
 
 namespace wpi::hal::init {
 void InitializeEncoder() {
-  static DigitalHandleResource<HAL_EncoderHandle, Encoder, kNumSmartIo> eH;
+  static DigitalHandleResource<HAL_EncoderHandle, Encoder, NUM_SMART_IO> eH;
   encoderHandles = &eH;
 }
 }  // namespace wpi::hal::init
@@ -356,6 +356,16 @@ double HAL_GetEncoderRate(HAL_EncoderHandle encoderHandle, int32_t* status) {
   double scaledRate = static_cast<double>(rate) *
                       DecodingScaleFactor(*encoder) * encoder->distancePerPulse;
   return encoder->reverseDirection ? -scaledRate : scaledRate;
+}
+
+void HAL_SetEncoderRateWindow(HAL_EncoderHandle encoderHandle,
+                              int32_t windowMilliseconds, int32_t* status) {
+  auto encoder = GetEncoder(encoderHandle, status);
+  if (encoder == nullptr) {
+    return;
+  }
+
+  *status = encoder->aPort->SetRateWindow(windowMilliseconds);
 }
 
 void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,

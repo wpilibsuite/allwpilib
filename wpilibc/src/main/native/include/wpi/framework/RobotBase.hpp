@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
 #include <string>
 #include <thread>
 
@@ -13,6 +14,7 @@
 #include "wpi/hal/Main.h"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTable.hpp"
+#include "wpi/nt/StringTopic.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RuntimeType.hpp"
 #include "wpi/util/RuntimeCheck.h"
@@ -289,15 +291,20 @@ class RobotBase {
    */
   RobotBase();
 
-  virtual ~RobotBase() = default;
+  /** Destructor. */
+  virtual ~RobotBase();
 
  protected:
   RobotBase(RobotBase&&) = default;
   RobotBase& operator=(RobotBase&&) = default;
 
  private:
+  struct WarningReporter;
+
   static std::thread::id m_threadId;
+  std::shared_ptr<WarningReporter> m_warningReporter;
   wpi::nt::IntegerPublisher m_programStartTimePublisher;
+  wpi::nt::StringPublisher m_wpilibVersionPublisher;
   NT_Listener connListenerHandle;
 };
 

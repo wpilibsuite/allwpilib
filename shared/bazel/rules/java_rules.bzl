@@ -50,12 +50,28 @@ def _internal_native_companions(labels):
         if not label.startswith("@") and _has_native_companion(label)
     ]
 
+def patch_module(module_name, patch_dirs):
+    """
+    Returns a platform-aware --patch-module javacopt.
+    """
+    patch_str = ":".join(patch_dirs)
+    patch_str_win = ";".join([d.replace("/", "\\\\") for d in patch_dirs])
+
+    return select({
+        "@bazel_tools//src/conditions:windows": ["--patch-module={}={}".format(module_name, patch_str_win)],
+        "//conditions:default": ["--patch-module={}={}".format(module_name, patch_str)],
+    })
+
 def wpilib_java_library(
         name,
         maven_group_id,
         maven_artifact_name,
         tags = [],
         extra_source_pkgs = [],
+        java_srcs_root = "",
+        generated_java_srcs = None,
+        resource_srcs = None,
+        proto_srcs = None,
         native_libs = [],
         deps = [],
         runtime_deps = [],
@@ -73,7 +89,14 @@ def wpilib_java_library(
         **kwargs
     )
 
-    zip_java_srcs(name = name, extra_pkgs = extra_source_pkgs)
+    zip_java_srcs(
+        name = name,
+        extra_pkgs = extra_source_pkgs,
+        java_srcs_root = java_srcs_root,
+        generated_java_srcs = generated_java_srcs,
+        resource_srcs = resource_srcs,
+        proto_srcs = proto_srcs,
+    )
 
     wpilib_maven_export(
         name = "{}_publish".format(name),
@@ -95,6 +118,20 @@ def wpilib_java_library(
         visibility = kwargs.get("visibility"),
         srcs = native_libs + _internal_native_companions(deps) + _internal_native_companions(runtime_deps),
     )
+
+    # Packages under src/main/java expose their primary library through a
+    # hand-written `alias(name = "java")`, and consumers depend on it via the
+    # shorthand label (e.g. "//wpimath/src/main/java"), which
+    # _native_companion_label maps to ":java.native". Mirror that alias for the
+    # native companion; the first library declared in the package is the one
+    # the `java` alias points at by convention.
+    if native.package_name().endswith("/src/main/java") and native.existing_rule("java.native") == None:
+        native.alias(
+            name = "java.native",
+            actual = ":" + name + ".native",
+            testonly = kwargs.get("testonly"),
+            visibility = kwargs.get("visibility"),
+        )
 
 def wpilib_java_junit5_test(
         name,

@@ -12,29 +12,17 @@
 namespace wpi::hal {
 
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                      kNumDigitalChannels + kNumPWMHeaders>*
+                      NUM_DIGITAL_CHANNELS + NUM_PWM_HEADERS>*
     digitalChannelHandles;
 
 namespace init {
 void InitializeDigitalInternal() {
   static DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                               kNumDigitalChannels + kNumPWMHeaders>
+                               NUM_DIGITAL_CHANNELS + NUM_PWM_HEADERS>
       dcH;
   digitalChannelHandles = &dcH;
 }
 }  // namespace init
-
-int32_t remapMXPChannel(int32_t channel) {
-  return channel - 10;
-}
-
-int32_t remapMXPPWMChannel(int32_t channel) {
-  if (channel < 14) {
-    return channel - 10;  // first block of 4 pwms (MXP 0-3)
-  } else {
-    return channel - 6;  // block of PWMs after SPI
-  }
-}
 
 int32_t GetDigitalInputChannel(HAL_DigitalHandle handle, int32_t* status) {
   auto digital = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);

@@ -14,8 +14,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from wpilibc.generate_first_ds_hids import generate_first_ds_hids
-from wpilibc.generate_hids import generate_hids
-from wpilibc.generate_pwm_motor_controllers import generate_pwm_motor_controllers
 
 
 def main():
@@ -48,9 +46,6 @@ def main():
     )
     args = parser.parse_args()
 
-    generate_hids(
-        args.output_directory, args.template_root, args.schema_root / "hids.json"
-    )
     test_output_directory = (
         None
         if args.test_output_directory.name == "__none__"
@@ -61,11 +56,6 @@ def main():
         args.template_root,
         args.schema_root / "first_ds_hids.json",
         test_output_directory,
-    )
-    generate_pwm_motor_controllers(
-        args.output_directory,
-        args.template_root,
-        args.schema_root / "pwm_motor_controllers.json",
     )
 
 

@@ -19,6 +19,7 @@ classes:
   wpi::math::HolonomicSample:
     force_no_trampoline: true
     attributes:
+      time:
       pose:
       velocity:
       acceleration:

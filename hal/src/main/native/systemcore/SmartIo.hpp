@@ -12,8 +12,8 @@
 
 namespace wpi::hal {
 
-constexpr int32_t kPwmDisabled = 0;
-constexpr int32_t kPwmAlwaysHigh = 0xFFFF;
+constexpr int32_t PWM_DISABLED = 0;
+constexpr int32_t PWM_ALWAYS_HIGH = 0xFFFF;
 
 struct SmartIo {
   ~SmartIo() noexcept;
@@ -22,9 +22,12 @@ struct SmartIo {
   std::string previousAllocation;
   MRC_SmartIOMode currentMode{MRC_SmartIOMode::MRC_SmartIOMode_DigitalInput};
   uint16_t setPwmOutputMicrosecondsValue{0};
+  int32_t counterResetCount{0};
 
   int32_t InitializeMode(MRC_SmartIOMode mode);
   int32_t SwitchDioDirection(bool input);
+  int32_t SwitchCounterEdge(bool risingEdge);
+  int32_t SetRateWindow(int32_t windowMilliseconds);
 
   int32_t SetDigitalOutput(bool value);
   int32_t GetDigitalInput(bool* value);
@@ -38,7 +41,10 @@ struct SmartIo {
 
   int32_t GetAnalogInput(uint16_t* value);
 
+  int32_t ResetCounter();
   int32_t GetCounter(int32_t* count);
+  int32_t GetCounterRate(int32_t* rate);
+
   int32_t GetQuadrature(int32_t* count);
   int32_t GetQuadratureRate(int32_t* rate);
 
@@ -46,7 +52,7 @@ struct SmartIo {
   int32_t SetLedLength(int32_t length);
 };
 
-extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo>*
+extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, NUM_SMART_IO>*
     smartIoHandles;
 
 extern wpi::util::mutex smartIoMutex;

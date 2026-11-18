@@ -39,7 +39,7 @@ public class IntakeWrist implements Mechanism {
     double tolerance = Radians.convertFrom(0.5, Degrees);
 
     return run(coroutine -> {
-          motor.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition, targetRads);
+          motor.setSetpoint(ExampleSmartMotorController.PIDMode.POSITION, targetRads);
 
           coroutine.waitUntil(() -> Math.abs(motor.getEncoderDistance() - targetRads) <= tolerance);
         })
@@ -57,7 +57,7 @@ public class IntakeWrist implements Mechanism {
     double targetRads = target.in(Radians);
 
     return run(coroutine -> {
-          motor.setSetpoint(ExampleSmartMotorController.PIDMode.kPosition, targetRads);
+          motor.setSetpoint(ExampleSmartMotorController.PIDMode.POSITION, targetRads);
           coroutine.park();
         })
         .named("Intake.Wrist.HoldAngle[" + target.toLongString() + "]");

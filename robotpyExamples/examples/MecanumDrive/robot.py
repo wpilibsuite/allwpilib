@@ -6,7 +6,10 @@
 #
 
 
+from typing import override
+
 import wpilib
+import wpilib_drivers
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -29,10 +32,10 @@ class MyRobot(wpilib.TimedRobot):
         self.imu = wpilib.OnboardIMU(self.IMU_MOUNT_ORIENTATION)
         self.joystick = wpilib.Joystick(self.JOYSTICK_PORT)
 
-        front_left = wpilib.PWMSparkMax(self.FRONT_LEFT_CHANNEL)
-        rear_left = wpilib.PWMSparkMax(self.REAR_LEFT_CHANNEL)
-        front_right = wpilib.PWMSparkMax(self.FRONT_RIGHT_CHANNEL)
-        rear_right = wpilib.PWMSparkMax(self.REAR_RIGHT_CHANNEL)
+        front_left = wpilib_drivers.PWMSparkMax(self.FRONT_LEFT_CHANNEL)
+        rear_left = wpilib_drivers.PWMSparkMax(self.REAR_LEFT_CHANNEL)
+        front_right = wpilib_drivers.PWMSparkMax(self.FRONT_RIGHT_CHANNEL)
+        rear_right = wpilib_drivers.PWMSparkMax(self.REAR_RIGHT_CHANNEL)
 
         front_right.set_inverted(True)
         rear_right.set_inverted(True)
@@ -41,6 +44,7 @@ class MyRobot(wpilib.TimedRobot):
             front_left, rear_left, front_right, rear_right
         )
 
+    @override
     def teleop_periodic(self) -> None:
         self.robot_drive.drive_cartesian(
             -self.joystick.get_y(),

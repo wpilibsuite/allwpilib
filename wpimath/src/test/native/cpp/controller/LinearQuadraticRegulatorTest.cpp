@@ -30,7 +30,8 @@ TEST_CASE("LinearQuadraticRegulatorTest ElevatorGains", "[wpimath]") {
     // Gear ratio
     constexpr double G = 40.0 / 40.0;
 
-    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+    return wpi::math::Models::LinearPositionFromPhysicalConstants(motors, m, r,
+                                                                  G)
         .Slice(0);
   }();
   Matrixd<1, 2> K =
@@ -53,7 +54,7 @@ TEST_CASE("LinearQuadraticRegulatorTest ArmGains", "[wpimath]") {
     // Gear ratio
     constexpr double G = 100.0;
 
-    return wpi::math::Models::SingleJointedArmFromPhysicalConstants(
+    return wpi::math::Models::AngularPositionFromPhysicalConstants(
                motors, 1.0 / 3.0 * m * r * r, G)
         .Slice(0);
   }();
@@ -79,7 +80,8 @@ TEST_CASE("LinearQuadraticRegulatorTest FourMotorElevator", "[wpimath]") {
     // Gear ratio
     constexpr double G = 14.67;
 
-    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+    return wpi::math::Models::LinearPositionFromPhysicalConstants(motors, m, r,
+                                                                  G)
         .Slice(0);
   }();
   Matrixd<1, 2> K =
@@ -154,21 +156,23 @@ TEST_CASE("LinearQuadraticRegulatorTest MatrixOverloadsWithDoubleIntegrator",
   double Kv = 3.02;
   double Ka = 0.642;
 
+  // QR overload
   Matrixd<2, 2> A{{0, 1}, {0, -Kv / Ka}};
   Matrixd<2, 1> B{{0}, {1.0 / Ka}};
   Matrixd<2, 2> Q{{1, 0}, {0, 0.2}};
   Matrixd<1, 1> R{0.25};
-
-  // QR overload
   Matrixd<1, 2> K = LinearQuadraticRegulator<2, 1>{A, B, Q, R, 5_ms}.K();
   CHECK_NEAR(1.9960017786537287, K(0, 0), 1e-10);
   CHECK_NEAR(0.51182128351092726, K(0, 1), 1e-10);
 
   // QRN overload
-  Matrixd<2, 2> Aref{{0, 1}, {0, -Kv / (Ka * 5.0)}};
-  Matrixd<1, 2> Kimf = GetImplicitModelFollowingK<2, 1>(A, B, Q, R, Aref, 5_ms);
-  CHECK_NEAR(0.0, Kimf(0, 0), 1e-10);
-  CHECK_NEAR(-6.9190500116751458e-05, Kimf(0, 1), 1e-10);
+  Matrixd<1, 1> Avel{-Kv / Ka};
+  Matrixd<1, 1> Bvel{1.0 / Ka};
+  Matrixd<1, 1> Qvel{0.2};
+  Matrixd<1, 1> Avelref{-Kv / (Ka * 5.0)};
+  Matrixd<1, 1> Kimf =
+      GetImplicitModelFollowingK<1, 1>(Avel, Bvel, Qvel, R, Avelref, 5_ms);
+  CHECK_NEAR(-6.918832047696e-05, Kimf(0, 0), 1e-10);
 }
 
 TEST_CASE("LinearQuadraticRegulatorTest LatencyCompensate", "[wpimath]") {
@@ -184,7 +188,8 @@ TEST_CASE("LinearQuadraticRegulatorTest LatencyCompensate", "[wpimath]") {
     // Gear ratio
     constexpr double G = 14.67;
 
-    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+    return wpi::math::Models::LinearPositionFromPhysicalConstants(motors, m, r,
+                                                                  G)
         .Slice(0);
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.1, 0.2}, {12.0}, 20_ms};
@@ -193,6 +198,43 @@ TEST_CASE("LinearQuadraticRegulatorTest LatencyCompensate", "[wpimath]") {
 
   CHECK_NEAR(8.97115941, controller.K(0, 0), 1e-3);
   CHECK_NEAR(0.07904881, controller.K(0, 1), 1e-3);
+}
+
+TEST_CASE("LinearQuadraticRegulatorTest AtReference", "[wpimath]") {
+  LinearSystem<2, 1, 1> plant = [] {
+    auto motors = DCMotor::Vex775Pro(2);
+
+    // Carriage mass
+    constexpr auto m = 5_kg;
+
+    // Radius of pulley
+    constexpr auto r = 0.0181864_m;
+
+    // Gear ratio
+    constexpr double G = 40.0 / 40.0;
+
+    return wpi::math::Models::LinearPositionFromPhysicalConstants(motors, m, r,
+                                                                  G)
+        .Slice(0);
+  }();
+  LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, 5_ms};
+
+  // Default tolerance is zero; with zero error the controller is at reference.
+  controller.Calculate(Vectord<2>{0.0, 0.0}, Vectord<2>{0.0, 0.0});
+  CHECK(controller.AtReference());
+
+  controller.SetTolerance(Vectord<2>{0.1, 0.2});
+
+  // The error is r - x, so with r = 0 the error is -x.
+  controller.Calculate(Vectord<2>{0.05, 0.1}, Vectord<2>{0.0, 0.0});
+  CHECK(controller.AtReference());
+
+  controller.Calculate(Vectord<2>{0.2, 0.1}, Vectord<2>{0.0, 0.0});
+  CHECK_FALSE(controller.AtReference());
+
+  // Error exactly at the tolerance boundary is considered at reference.
+  controller.Calculate(Vectord<2>{0.1, 0.2}, Vectord<2>{0.0, 0.0});
+  CHECK(controller.AtReference());
 }
 
 }  // namespace wpi::math

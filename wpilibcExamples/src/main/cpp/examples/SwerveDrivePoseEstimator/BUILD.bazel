@@ -1,0 +1,26 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+
+filegroup(
+    name = "sources",
+    srcs = glob([
+        "cpp/**/*.cpp",
+        "include/**/*.hpp",
+    ]),
+    visibility = [
+        "//wpilibcExamples/src/main/cpp/examples:__pkg__",
+    ],
+)
+
+cc_binary(
+    name = "SwerveDrivePoseEstimator",
+    srcs = [":sources"],
+    includes = ["include"],
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        "//drivers",
+        "//wpilibc",
+        "//wpimath",
+    ],
+)

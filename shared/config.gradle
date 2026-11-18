@@ -20,7 +20,7 @@ if (project.hasProperty('ciDebugOnly')) {
 
 nativeUtils.addWpiNativeUtils()
 nativeUtils.withCrossLinuxArm64()
-nativeUtils.withCrossSystemCore()
+nativeUtils.withCrossSystemcore()
 nativeUtils {
     wpi {
         configureDependencies {
@@ -54,6 +54,11 @@ nativeUtils.platformConfigs.each {
         // Make warning from Google Benchmark not an error
         it.cppCompiler.args.add("-Wno-error=restrict")
     } else {
+        // /d2prunedbinfo removes unused debug info from PDBs, which saves space in wpimath PDBs
+        // See https://devblogs.microsoft.com/cppblog/linker-throughput-improvement-in-visual-studio-2019/#debug-info-pruning
+        // and https://github.com/wpilibsuite/allwpilib/pull/9195
+        it.cCompiler.args.add("/d2prunedbinfo")
+        it.cppCompiler.args.add("/d2prunedbinfo")
         // On windows, for ntcoreffi, use static runtime
         if (project.hasProperty('ntcoreffibuild')) {
             it.cCompiler.releaseArgs.remove('/MD')
@@ -176,14 +181,36 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
     return taskList
 }
 
+ext.includeSharedLibraryDebugSymbols = { task, binary ->
+    def linkTask = binary.tasks.link
+    def debugFile = new File(binary.sharedLibraryFile.absolutePath + '.debug')
+    if (binary.targetPlatform.operatingSystem.macOsX) {
+        // Link DWARF before buildServer deletes the object files. Keep it with
+        // the link outputs so up-to-date checks and build-cache restores include it.
+        linkTask.outputs.file(debugFile).withPropertyName('macDebugSymbols')
+        linkTask.doLast {
+            def symbols = providers.exec {
+                commandLine 'dsymutil', '--flat', '-o', debugFile, binary.sharedLibraryFile
+                ignoreExitValue = true
+            }
+            def diagnostics = symbols.standardError.asText.get()
+            if (!diagnostics.isBlank()) {
+                logger.warn(diagnostics)
+            }
+            symbols.result.get().assertNormalExitValue()
+        }
+    }
+    task.dependsOn linkTask
+    task.from(debugFile) {
+        into nativeUtils.getPlatformPath(binary) + '/shared'
+    }
+}
+
 ext.includeStandardZipFormat = { task, value ->
     value.each { binary ->
         if (binary.buildable) {
             if (binary instanceof SharedLibraryBinarySpec) {
-                task.dependsOn binary.tasks.link
-                task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
-                    into nativeUtils.getPlatformPath(binary) + '/shared'
-                }
+                includeSharedLibraryDebugSymbols(task, binary)
                 def sharedPath = binary.sharedLibraryFile.absolutePath
                 sharedPath = sharedPath.substring(0, sharedPath.length() - 4)
 

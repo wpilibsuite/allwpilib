@@ -38,6 +38,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 cmake_minimum_required(VERSION 3.21)
+
 project(allwpilib)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
@@ -54,8 +55,9 @@ include(OptionValidation)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+set(IS_CLANG $<CXX_COMPILER_ID:Clang>)
 if(MSVC)
-    add_compile_options(/Zc:__cplusplus)
+    add_compile_options($<$<NOT:${IS_CLANG}>:/Zc:__cplusplus>)
 endif()
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -90,19 +92,32 @@ option(WPILIB_WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WPILIB_WITH_NTCORE "Build ntcore" ON)
 option(WPILIB_WITH_WPICAL "Build wpical" OFF)
 option(WPILIB_WITH_WPIMATH "Build wpimath" ON)
-option(WPILIB_WITH_WPILIB "Build hal, wpilibc/j, and developerRobot (needs OpenCV)" ON)
+option(WPILIB_WITH_WPILIB "Build hal, wpilibc/j, drivers, and developerRobot (needs OpenCV)" ON)
 option(WPILIB_WITH_EXAMPLES "Build examples" OFF)
-option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ON)
+option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ${PROJECT_IS_TOP_LEVEL})
+option(WPILIB_WITH_GUI "Build GUI items (needs SDL3)" OFF)
+option(
+    WPILIB_WITH_IMGUI_TESTS
+    "Build ImGui GUI tests (clones imgui_test_engine; see its license)"
+    OFF
+)
+cmake_dependent_option(
+    WPILIB_IMGUI_TESTS_HEADLESS
+    "Run ImGui GUI tests with SDL's dummy video backend"
+    ON
+    WPILIB_WITH_IMGUI_TESTS
+    OFF
+)
 cmake_dependent_option(
     WPILIB_WITH_FIELDS
     "Build the fields target"
     OFF
-    "NOT WPILIB_WITH_GUI"
+    "NOT WPILIB_WITH_GUI;NOT WPILIB_WITH_EXAMPLES"
     ON
 )
-option(WPILIB_WITH_GUI "Build GUI items (needs SDL3)" OFF)
 option(WPILIB_WITH_SIMULATION_MODULES "Build simulation modules" ON)
-option(WPILIB_WITH_BENCHMARK "Build the benchmark project" ON)
+option(WPILIB_WITH_BENCHMARK "Build the benchmark project" ${PROJECT_IS_TOP_LEVEL})
+option(WPILIB_WITH_EXECUTABLES "Build executables" ${PROJECT_IS_TOP_LEVEL})
 
 # Options for using a package manager (e.g., vcpkg) for certain dependencies.
 option(WPILIB_USE_SYSTEM_EIGEN "Use system Eigen" OFF)
@@ -123,6 +138,16 @@ wpilib_config(OPTIONS WPILIB_WITH_CSCORE REQUIRES WPILIB_WITH_NTCORE)
 wpilib_config(OPTIONS WPILIB_WITH_GUI REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
 
 wpilib_config(OPTIONS WPILIB_WITH_WPILIB REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
+
+wpilib_config(OPTIONS WPILIB_WITH_FIELDS REQUIRES WPILIB_WITH_WPIMATH)
+
+wpilib_config(OPTIONS WPILIB_WITH_IMGUI_TESTS REQUIRES WPILIB_WITH_GUI WPILIB_WITH_TESTS)
+
+# These projects build executables
+wpilib_config(OPTIONS WPILIB_WITH_WPICAL REQUIRES WPILIB_WITH_EXECUTABLES)
+wpilib_config(OPTIONS WPILIB_WITH_BENCHMARK REQUIRES WPILIB_WITH_EXECUTABLES)
+wpilib_config(OPTIONS WPILIB_WITH_TESTS REQUIRES WPILIB_WITH_EXECUTABLES)
+wpilib_config(OPTIONS WPILIB_WITH_EXAMPLES REQUIRES WPILIB_WITH_EXECUTABLES)
 
 set(include_dest include)
 
@@ -250,11 +275,20 @@ set(CMAKE_SHARED_LINKER_FLAGS_UBSAN
 
 if(WPILIB_WITH_TESTS)
     enable_testing()
-    add_subdirectory(thirdparty/googletest)
-    include(GoogleTest)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/catch2/extras")
     add_subdirectory(thirdparty/catch2)
     include(Catch)
+endif()
+
+if(WPILIB_WITH_IMGUI_TESTS)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        imgui_test_engine
+        GIT_REPOSITORY https://github.com/ocornut/imgui_test_engine.git
+        GIT_TAG fdc1cb0930fa9bc2bef1d884bf2c10b570d29170
+    )
+    FetchContent_MakeAvailable(imgui_test_engine)
 endif()
 
 if(WPILIB_USE_SYSTEM_LIBUV)
@@ -268,9 +302,13 @@ endif()
 set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIST_FILE\}\" PATH)")
 set(SELF_DIR "$\{SELF_DIR\}")
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
+set(TELEMETRY_DEP_REPLACE "find_dependency(telemetry)")
+set(TUNABLE_DEP_REPLACE "find_dependency(tunables)")
 
 add_subdirectory(wpiutil)
 
+add_subdirectory(telemetry)
+add_subdirectory(tunables)
 if(WPILIB_WITH_NTCORE OR WPILIB_WITH_GUI OR WPILIB_WITH_WPILIB)
     set(DATALOG_DEP_REPLACE "find_dependency(datalog)")
     add_subdirectory(datalog)
@@ -288,6 +326,10 @@ if(WPILIB_WITH_WPIMATH)
     add_subdirectory(wpimath)
 endif()
 
+if(WPILIB_WITH_WPILIB OR WPILIB_WITH_WPICAL)
+    add_subdirectory(apriltag)
+endif()
+
 if(WPILIB_WITH_FIELDS)
     add_subdirectory(fields)
 endif()
@@ -297,13 +339,16 @@ if(WPILIB_WITH_GUI)
     add_subdirectory(thirdparty/imgui_suite)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
-    add_subdirectory(tools/outlineviewer)
-    add_subdirectory(tools/sysid)
     if(WPILIB_WITH_WPICAL)
         add_subdirectory(tools/wpical)
     endif()
-    if(LIBSSH_FOUND)
-        add_subdirectory(tools/datalogtool)
+
+    if(WPILIB_WITH_EXECUTABLES)
+        add_subdirectory(tools/outlineviewer)
+        add_subdirectory(tools/sysid)
+        if(LIBSSH_FOUND)
+            add_subdirectory(tools/datalogtool)
+        endif()
     endif()
 endif()
 
@@ -319,11 +364,11 @@ if(WPILIB_WITH_CSCORE)
 endif()
 
 if(WPILIB_WITH_WPILIB)
-    set(APRILTAG_DEP_REPLACE "find_dependency(apriltag)")
+    set(DRIVERS_DEP_REPLACE "find_dependency(drivers)")
     set(WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
     set(COMMAND_DEP_REPLACE "find_dependency(commandsv2)")
-    add_subdirectory(apriltag)
     add_subdirectory(wpilibc)
+    add_subdirectory(drivers)
     if(WPILIB_WITH_CSCORE)
         add_subdirectory(cameraserver)
     endif()
@@ -333,7 +378,10 @@ if(WPILIB_WITH_WPILIB)
     if(WPILIB_WITH_EXAMPLES)
         add_subdirectory(wpilibcExamples)
     endif()
-    add_subdirectory(developerRobot)
+
+    if(WPILIB_WITH_EXECUTABLES)
+        add_subdirectory(developerRobot)
+    endif()
 endif()
 
 if(WPILIB_WITH_BENCHMARK)

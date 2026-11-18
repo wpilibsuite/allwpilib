@@ -33,7 +33,7 @@ class RobotContainer:
         )
 
         # The driver's controller
-        self.driver_controller = commands2.button.CommandNiDsXboxController(
+        self.driver_controller = commands2.button.CommandXboxController(
             constants.OIConstants.DRIVER_CONTROLLER_PORT
         )
 
@@ -58,7 +58,7 @@ class RobotContainer:
         """
         Use this method to define your button->command mappings. Buttons can be created via the button
         factories on commands2.button.CommandGenericHID or one of its
-        subclasses (commands2.button.CommandJoystick or command2.button.CommandNiDsXboxController).
+        subclasses (commands2.button.CommandJoystick or command2.button.CommandXboxController).
         """
 
         # Configure your button bindings here

@@ -48,7 +48,7 @@ class priority_queue {
 
   template <typename InputIterator>
   priority_queue(InputIterator first, InputIterator last, const Compare& comp,
-                 const Sequence& c)
+                 const Sequence& c)  // NOLINT(modernize-pass-by-value)
       : c(c), comp(comp) {
     this->c.insert(this->c.end(), first, last);
     std::make_heap(this->c.begin(), this->c.end(), comp);

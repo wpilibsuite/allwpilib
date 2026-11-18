@@ -176,6 +176,33 @@ class RoboRioSim {
   static void SetBrownoutVoltage(wpi::units::volt_t brownoutVoltage);
 
   /**
+   * Register a callback to be run whenever the brownout recovery voltage
+   * changes.
+   *
+   * @param callback the callback
+   * @param initialNotify whether to call the callback with the initial state
+   * @return the CallbackStore object associated with this callback
+   */
+  [[nodiscard]]
+  static std::unique_ptr<CallbackStore> RegisterBrownoutRecoveryVoltageCallback(
+      NotifyCallback callback, bool initialNotify);
+
+  /**
+   * Measure the brownout recovery voltage.
+   *
+   * @return the brownout recovery voltage
+   */
+  static wpi::units::volt_t GetBrownoutRecoveryVoltage();
+
+  /**
+   * Define the brownout recovery voltage.
+   *
+   * @param brownoutRecoveryVoltage the new voltage
+   */
+  static void SetBrownoutRecoveryVoltage(
+      wpi::units::volt_t brownoutRecoveryVoltage);
+
+  /**
    * Register a callback to be run whenever the cpu temp changes.
    *
    * @param callback the callback
@@ -238,20 +265,6 @@ class RoboRioSim {
    * @param serialNumber The serial number.
    */
   static void SetSerialNumber(std::string_view serialNumber);
-
-  /**
-   * Get the comments.
-   *
-   * @return The comments.
-   */
-  static std::string GetComments();
-
-  /**
-   * Set the comments.
-   *
-   * @param comments The comments.
-   */
-  static void SetComments(std::string_view comments);
 
   /**
    * Reset all simulation data.

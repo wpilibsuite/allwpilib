@@ -2,7 +2,37 @@ load("@rules_java//java:defs.bzl", "java_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_binary", "wpilib_java_junit5_test")
-load("//wpilibjExamples:example_projects.bzl", "COMMANDS_V2_FOLDERS", "EXAMPLE_FOLDERS", "EXAMPLE_TESTS_FOLDERS", "SNIPPET_FOLDERS", "SNIPPET_TESTS_FOLDERS", "TEMPLATE_FOLDERS")
+
+_EXAMPLE_DEPS = [
+    "//allwpilib-java/src/main/java",
+    "//apriltag/src/main/java",
+    "//cameraserver/src/main/java",
+    "//cscore/src/main/java",
+    "//datalog/src/main/java",
+    "//drivers/src/main/java",
+    "//fields/src/main/java",
+    "//hal/src/main/java",
+    "//ntcore/src/main/java",
+    "//telemetry/src/main/java",
+    "//tunables/src/main/java",
+    "//wpimath/src/main/java",
+    "//wpilibj/src/main/java",
+    "//commandsv2/src/main/java",
+    "//commandsv3/src/main/java",
+    "//wpiutil/src/main/java",
+    "//romiVendordep/src/main/java",
+    "//xrpVendordep/src/main/java",
+    "//wpiunits/src/main/java",
+    "//epilogue-runtime/src/main/java",
+    "@bzlmodrio-opencv//libraries/java/opencv",
+]
+
+def first_level_folders(paths, prefix):
+    output = {}
+    for path in paths:
+        rel = path[len(prefix):]
+        output[rel.split("/", 1)[0]] = True
+    return sorted(output.keys())
 
 def _package_type(package_type):
     pkg_files(
@@ -12,6 +42,14 @@ def _package_type(package_type):
     )
 
     pkgs = ["//:license_pkg_files", ":" + package_type + "-pkg"]
+    if package_type in ["examples", "templates"]:
+        pkg_files(
+            name = package_type + "-main-pkg",
+            srcs = ["src/main/java/org/wpilib/Main.java"],
+            strip_prefix = "src/main/java/org/wpilib",
+        )
+        pkgs.append(package_type + "-main-pkg")
+
     if package_type == "examples":
         pkg_files(
             name = package_type + "-tests-pkg",
@@ -27,163 +65,81 @@ def _package_type(package_type):
         tags = ["manual"],
     )
 
-def build_examples(halsim_deps):
+def build_java_sources():
+    # The module descriptor lists all generated Epilogue services, so compile the
+    # complete module once and share it across the per-folder targets.
+    java_library(
+        name = "examples-java",
+        srcs = native.glob(["src/main/java/**/*.java"]),
+        plugins = ["//epilogue-processor/src/main/java:plugin"],
+        deps = _EXAMPLE_DEPS,
+        tags = ["wpi-example"],
+    )
+
+def build_examples(folders, halsim_deps):
     _package_type("examples")
 
-    for folder in EXAMPLE_FOLDERS:
+    for folder in folders:
         wpilib_java_binary(
             name = folder + "-example",
-            srcs = ["src/main/java/org/wpilib/Executor.java"] + native.glob(["src/main/java/org/wpilib/examples/" + folder + "/**/*.java"]),
             main_class = "org.wpilib.Executor",
-            plugins = [
-                "//epilogue-processor:plugin",
-            ],
-            deps = [
-                "//apriltag:apriltag-java",
-                "//cameraserver:cameraserver-java",
-                "//cscore:cscore-java",
-                "//hal:hal-java",
-                "//ntcore:ntcore-java",
-                "//wpimath:wpimath-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//commandsv3:commandsv3-java",
-                "//wpiutil:wpiutil-java",
-                "//romiVendordep:romiVendordep-java",
-                "//xrpVendordep:xrpVendordep-java",
-                "//wpiunits:wpiunits-java",
-                "//epilogue-runtime:epilogue-java",
-                "@bzlmodrio-opencv//libraries/java/opencv",
-            ],
+            # _EXAMPLE_DEPS is listed explicitly (not just via examples-java) so
+            # wpilib_java_binary can collect their `.native` JNI companions;
+            # examples-java is a plain same-package java_library with none.
+            runtime_deps = [":examples-java"] + _EXAMPLE_DEPS,
             smoke_test = False,  # TODO(pjreiniger) enable smoke test when all examples actually boot correctly
             halsim_deps = halsim_deps,
             args = ["org.wpilib.examples." + folder + ".Robot"],
             tags = ["wpi-example"],
         )
 
-def build_commands():
+def build_commands(folders):
     _package_type("commands")
 
-    for folder in COMMANDS_V2_FOLDERS:
+    for folder in folders:
         java_library(
             name = folder + "-command",
-            srcs = native.glob(["src/main/java/org/wpilib/commands/" + folder + "/**/*.java"]),
-            deps = [
-                "//hal:hal-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//wpimath:wpimath-java",
-            ],
+            exports = [":examples-java"],
             tags = ["wpi-example"],
         )
 
-def build_snippets(halsim_deps = []):
+def build_snippets(folders, halsim_deps = []):
     _package_type("snippets")
 
-    for folder in SNIPPET_FOLDERS:
+    for folder in folders:
         wpilib_java_binary(
             name = folder + "-snippet",
-            srcs = ["src/main/java/org/wpilib/Executor.java"] + native.glob(["src/main/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
             main_class = "org.wpilib.Executor",
-            plugins = [
-                "//epilogue-processor:plugin",
-            ],
-            deps = [
-                "//apriltag:apriltag-java",
-                "//cameraserver:cameraserver-java",
-                "//cscore:cscore-java",
-                "//hal:hal-java",
-                "//ntcore:ntcore-java",
-                "//wpimath:wpimath-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//commandsv3:commandsv3-java",
-                "//wpiutil:wpiutil-java",
-                "//romiVendordep:romiVendordep-java",
-                "//xrpVendordep:xrpVendordep-java",
-                "//wpiunits:wpiunits-java",
-                "//epilogue-runtime:epilogue-java",
-                "@bzlmodrio-opencv//libraries/java/opencv",
-            ],
+            runtime_deps = [":examples-java"] + _EXAMPLE_DEPS,
             smoke_test = False,  # TODO(pjreiniger) enable smoke test when all examples actually boot correctly
             halsim_deps = halsim_deps,
             tags = ["wpi-example"],
             args = ["org.wpilib.snippets." + folder + ".Robot"],
         )
 
-def build_templates():
+def build_templates(folders):
     _package_type("templates")
 
-    for folder in TEMPLATE_FOLDERS:
+    for folder in folders:
         java_library(
             name = folder + "-template",
-            srcs = native.glob(["src/main/java/org/wpilib/templates/" + folder + "/**/*.java"]),
-            plugins = [
-                "//epilogue-processor:plugin",
-            ],
-            deps = [
-                "//hal:hal-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//commandsv3:commandsv3-java",
-                "//wpimath:wpimath-java",
-                "//wpiutil:wpiutil-java",
-                "//epilogue-runtime:epilogue-java",
-                "//xrpVendordep:xrpVendordep-java",
-                "//wpiunits:wpiunits-java",
-            ],
+            exports = [":examples-java"],
             tags = ["wpi-example"],
         )
 
-def build_tests():
-    for folder in EXAMPLE_TESTS_FOLDERS:
+def build_tests(example_test_folders, snippet_test_folders):
+    for folder in example_test_folders:
         wpilib_java_junit5_test(
             name = folder + "-test",
             srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]),
-            plugins = [
-                "//epilogue-processor:plugin",
-            ],
-            deps = [
-                # -example is an sh_binary wrapper (see wpilib_java_binary);
-                # its _java_impl sub-target is the underlying java_binary and
-                # is what actually provides JavaInfo (the Robot class) for
-                # compilation here.
-                ":" + folder + "-example_java_impl",
-                "//hal:hal-java",
-                "//ntcore:ntcore-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//commandsv3:commandsv3-java",
-                "//wpimath:wpimath-java",
-                "//wpiutil:wpiutil-java",
-                "//epilogue-runtime:epilogue-java",
-                "//wpiunits:wpiunits-java",
-            ],
+            deps = [":examples-java"] + _EXAMPLE_DEPS,
             tags = ["wpi-example"],
         )
 
-    for folder in SNIPPET_TESTS_FOLDERS:
+    for folder in snippet_test_folders:
         wpilib_java_junit5_test(
             name = folder + "-test",
             srcs = native.glob(["src/test/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
-            plugins = [
-                "//epilogue-processor:plugin",
-            ],
-            deps = [
-                # -snippet is an sh_binary wrapper (see wpilib_java_binary);
-                # its _java_impl sub-target is the underlying java_binary and
-                # is what actually provides JavaInfo (the Robot class) for
-                # compilation here.
-                ":" + folder + "-snippet_java_impl",
-                "//hal:hal-java",
-                "//ntcore:ntcore-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//commandsv3:commandsv3-java",
-                "//wpimath:wpimath-java",
-                "//wpiutil:wpiutil-java",
-                "//epilogue-runtime:epilogue-java",
-                "//wpiunits:wpiunits-java",
-            ],
+            deps = [":examples-java"] + _EXAMPLE_DEPS,
             tags = ["wpi-example"],
         )

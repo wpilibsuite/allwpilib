@@ -5,10 +5,14 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib
 import math
+from typing import override
 
+import telemetry
+import tunables
+import wpilib
 import wpilib.simulation
+import wpilib_drivers
 import wpimath
 import wpimath.units
 
@@ -46,7 +50,7 @@ class MyRobot(wpilib.TimedRobot):
         """Robot initialization function"""
         super().__init__()
 
-        self.flywheel_motor = wpilib.PWMSparkMax(self.MOTOR_PORT)
+        self.flywheel_motor = wpilib_drivers.PWMSparkMax(self.MOTOR_PORT)
         self.encoder = wpilib.Encoder(self.ENCODER_A_CHANNEL, self.ENCODER_B_CHANNEL)
 
         self.bang_bang_controler = wpimath.BangBangController()
@@ -63,16 +67,20 @@ class MyRobot(wpilib.TimedRobot):
 
         self.gearbox = wpimath.DCMotor.neo(1)
 
-        self.plant = wpimath.Models.flywheel_from_physical_constants(
+        self.plant = wpimath.Models.angular_velocity_from_physical_constants(
             self.gearbox, self.FLYWHEEL_GEARING, self.FLYWHEEL_MOMENT_OF_INERTIA
         )
 
         self.flywheel_sim = wpilib.simulation.FlywheelSim(self.plant, self.gearbox)
         self.encoder_sim = wpilib.simulation.EncoderSim(self.encoder)
 
-        # Add bang-bang controller to SmartDashboard and networktables.
-        wpilib.SmartDashboard.put_data(self.bang_bang_controler)
+        tunables.publish("BangBang Controller", self.bang_bang_controler)
 
+    @override
+    def robot_periodic(self) -> None:
+        telemetry.log("BangBang Controller", self.bang_bang_controler)
+
+    @override
     def teleop_periodic(self) -> None:
         """Controls flywheel to a set velocity (RPM) controlled by a joystick."""
 
@@ -97,6 +105,7 @@ class MyRobot(wpilib.TimedRobot):
             bang_output + 0.9 * self.feedforward.calculate(setpoint)
         )
 
+    @override
     def simulation_periodic(self) -> None:
         """Update our simulation. This should be run every robot loop in simulation."""
         # To update our simulation, we set motor voltage inputs, update the

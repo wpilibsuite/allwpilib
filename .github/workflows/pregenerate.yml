@@ -14,7 +14,7 @@ concurrency:
 jobs:
   update:
     name: "Update"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
       - uses: actions/checkout@v7
         with:

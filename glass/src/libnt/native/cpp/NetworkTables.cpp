@@ -439,6 +439,8 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
     bool isEmptyOptional = upb_FieldDef_HasPresence(field) &&
                            !upb_Message_HasFieldByDef(msg, field);
     if (isEmptyArray || isEmptyOptional) {
+      child.value = wpi::nt::Value();
+      child.UpdateFromValue(model, child.path, "");
       continue;
     }
     switch (upb_FieldDef_CType(field)) {
@@ -937,18 +939,12 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
           valueChildren.clear();
         }
       } else if (auto filename = wpi::util::remove_prefix(typeStr, "proto:")) {
-        const upb_MessageDef* messageDef = upb_DefPool_FindMessageByName(
-            model.GetProtobufDatabase(), filename->data());
+        const upb_MessageDef* messageDef =
+            model.GetProtobufDatabase().Find(filename->data());
         if (messageDef) {
-          auto raw = value.GetRaw();
-          const upb_MiniTable* miniTable = upb_MessageDef_MiniTable(messageDef);
-
           upb_Message* message =
-              upb_Message_New(miniTable, model.GetProtobufArena());
-          upb_DecodeStatus status = upb_Decode(
-              reinterpret_cast<const char*>(raw.data()), raw.size(), message,
-              miniTable, nullptr, 0, model.GetProtobufArena());
-          if (status == kUpb_DecodeStatus_Ok) {
+              model.GetProtobufDatabase().Decode(messageDef, value.GetRaw());
+          if (message != nullptr) {
             UpdateProtobufValueSource(model, this, message, messageDef, name,
                                       value.last_change());
           } else {
@@ -1091,16 +1087,7 @@ void NetworkTablesModel::Update() {
                    entry->value.IsRaw() && filename &&
                    entry->info.type_str == "proto:FileDescriptorProto") {
           // protobuf descriptor handling
-          upb_Status status;
-          status.ok = true;
-          auto descriptor = entry->value.GetRaw();
-          upb_DefPool_AddFile(
-              m_protoPool,
-              google_protobuf_FileDescriptorProto_parse(
-                  reinterpret_cast<const char*>(descriptor.data()),
-                  descriptor.size(), m_arena),
-              &status);
-          if (!status.ok) {
+          if (!m_protoDb.Add(entry->value.GetRaw())) {
             wpi::util::print("could not decode protobuf '{}' filename '{}'\n",
                              entry->info.name, *filename);
           } else {
@@ -1402,7 +1389,7 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
       break;
     case NT_DOUBLE: {
       unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
-                                kNetworkTablesFlags_PrecisionBitShift;
+                                NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1443,11 +1430,11 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
   }
 }
 
-static constexpr size_t kTextBufferSize = 4096;
+static constexpr size_t TEXT_BUFFER_SIZE = 4096;
 
 static char* GetTextBuffer(std::string_view in) {
-  static char textBuffer[kTextBufferSize];
-  size_t len = (std::min)(in.size(), kTextBufferSize - 1);
+  static char textBuffer[TEXT_BUFFER_SIZE];
+  size_t len = (std::min)(in.size(), TEXT_BUFFER_SIZE - 1);
   std::memcpy(textBuffer, in.data(), len);
   textBuffer[len] = '\0';
   return textBuffer;
@@ -1505,7 +1492,7 @@ bool ArrayEditorImpl<NTType, T>::Emit() {
           ImGui::InputFloat(label, &m_arr[row], 0, 0, "%.6f");
         } else if constexpr (NTType == NT_DOUBLE_ARRAY) {
           unsigned char precision = (m_flags & NetworkTablesFlags_Precision) >>
-                                    kNetworkTablesFlags_PrecisionBitShift;
+                                    NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1647,7 +1634,7 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     case NT_DOUBLE: {
       double v = val.GetDouble();
       unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
-                                kNetworkTablesFlags_PrecisionBitShift;
+                                NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1668,7 +1655,7 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_STRING: {
       char* v = GetTextBuffer(entry.valueStr);
-      ImGui::InputText(typeStr, v, kTextBufferSize,
+      ImGui::InputText(typeStr, v, TEXT_BUFFER_SIZE,
                        ImGuiInputTextFlags_EnterReturnsTrue);
       if (ImGui::IsItemDeactivatedAfterEdit()) {
         if (v[0] == '"') {
@@ -1818,7 +1805,7 @@ static void CreateTopicMenuItem(NetworkTablesModel* model,
 void wpi::glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
                                              std::string_view path,
                                              NetworkTablesFlags flags) {
-  static char nameBuffer[kTextBufferSize];
+  static char nameBuffer[TEXT_BUFFER_SIZE];
 
   if (ImGui::BeginMenu("Add new...")) {
     if (ImGui::IsWindowAppearing()) {
@@ -1826,7 +1813,7 @@ void wpi::glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
     }
 
     ImGui::InputTextWithHint("New item name", "example", nameBuffer,
-                             kTextBufferSize);
+                             TEXT_BUFFER_SIZE);
     std::string fullNewPath;
     if (path == "/") {
       path = "";
@@ -1872,11 +1859,51 @@ static void EmitParentContextMenu(NetworkTablesModel* model,
   }
 }
 
+static constexpr std::string_view NT_TOPIC_DRAG_DROP_PREFIX = "NT:";
+static constexpr size_t IMGUI_DRAG_DROP_TYPE_MAX_LENGTH = 32;
+
+static bool IsNTStructTopicType(NT_Type type, std::string_view typeStr) {
+  return type == NT_RAW && wpi::util::starts_with(typeStr, "struct:");
+}
+
+static bool GetNTTopicDragDropType(NT_Type type, std::string_view typeStr,
+                                   std::string* out) {
+  if (!IsNTStructTopicType(type, typeStr)) {
+    return false;
+  }
+
+  out->clear();
+  out->reserve(NT_TOPIC_DRAG_DROP_PREFIX.size() + typeStr.size());
+  out->append(NT_TOPIC_DRAG_DROP_PREFIX);
+  out->append(typeStr);
+
+  // ImGui payload type strings must fit in ImGuiPayload::DataType.
+  return out->size() <= IMGUI_DRAG_DROP_TYPE_MAX_LENGTH;
+}
+
+static void EmitNTTopicDragDropPayload(const std::string& dragDropType,
+                                       std::string_view path,
+                                       std::string_view typeStr) {
+  if (!ImGui::BeginDragDropSource()) {
+    return;
+  }
+
+  ImGui::SetDragDropPayload(dragDropType.c_str(), path.data(), path.size());
+  ImGui::TextUnformatted(path.data(), path.data() + path.size());
+  ImGui::TextUnformatted(typeStr.data(), typeStr.data() + typeStr.size());
+  ImGui::EndDragDropSource();
+}
+
 static void EmitValueName(DataSource* source, const char* name,
-                          const char* path) {
+                          const char* path, NT_Type type,
+                          std::string_view typeStr) {
   if (source) {
     ImGui::Selectable(name);
     source->EmitDrag();
+  } else if (std::string dragDropType;
+             GetNTTopicDragDropType(type, typeStr, &dragDropType)) {
+    ImGui::Selectable(name);
+    EmitNTTopicDragDropPayload(dragDropType, path, typeStr);
   } else {
     ImGui::TextUnformatted(name);
   }
@@ -1892,7 +1919,8 @@ static void EmitValueTree(
   for (auto&& child : children) {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    EmitValueName(child.source.get(), child.name.c_str(), child.path.c_str());
+    EmitValueName(child.source.get(), child.name.c_str(), child.path.c_str(),
+                  NT_UNASSIGNED, {});
 
     ImGui::TableNextColumn();
     if (!child.valueChildren.empty()) {
@@ -1934,7 +1962,8 @@ static void EmitEntry(NetworkTablesModel* model,
   bool valueChildrenOpen = false;
   ImGui::TableNextRow();
   ImGui::TableNextColumn();
-  EmitValueName(entry.source.get(), name, entry.info.name.c_str());
+  EmitValueName(entry.source.get(), name, entry.info.name.c_str(),
+                entry.info.type, entry.info.type_str);
 
   ImGui::TableNextColumn();
   if (!entry.valueChildren.empty()) {
@@ -2295,7 +2324,7 @@ void NetworkTablesFlagsSettings::Update() {
         m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
     m_pPrecision = &storage.GetInt(
         "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >>
-                         kNetworkTablesFlags_PrecisionBitShift);
+                         NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT);
   }
 
   m_flags &= ~(
@@ -2313,7 +2342,7 @@ void NetworkTablesFlagsSettings::Update() {
       (*m_pShowServerTimestamp ? NetworkTablesFlags_ShowServerTimestamp : 0) |
       (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
                                   : 0) |
-      (*m_pPrecision << kNetworkTablesFlags_PrecisionBitShift);
+      (*m_pPrecision << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT);
 }
 
 void NetworkTablesFlagsSettings::DisplayMenu() {

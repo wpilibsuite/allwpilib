@@ -91,7 +91,7 @@ class SequentialCommandGroup
 
   Command::InterruptionBehavior GetInterruptionBehavior() const override;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands);
@@ -100,7 +100,7 @@ class SequentialCommandGroup
   size_t m_currentCommandIndex{invalid_index};
   bool m_runWhenDisabled{true};
   Command::InterruptionBehavior m_interruptBehavior{
-      Command::InterruptionBehavior::kCancelIncoming};
+      Command::InterruptionBehavior::CANCEL_INCOMING};
 };
 }  // namespace wpi::cmd
 

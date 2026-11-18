@@ -5,9 +5,6 @@
 #include "wpi/glass/networktables/NTDigitalInput.hpp"
 
 #include <format>
-#include <utility>
-
-#include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::glass;
 
@@ -19,16 +16,11 @@ NTDigitalInputModel::NTDigitalInputModel(wpi::nt::NetworkTableInstance inst,
     : m_inst{inst},
       m_value{
           inst.GetBooleanTopic(std::format("{}/Value", path)).Subscribe(false)},
-      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
-      m_valueData{std::format("NT_DIn:{}", path)},
-      m_nameValue{wpi::util::rsplit(path, '/').second} {}
+      m_valueData{std::format("NT_DIn:{}", path)} {}
 
 void NTDigitalInputModel::Update() {
   for (auto&& v : m_value.ReadQueue()) {
     m_valueData.SetValue(v.value, v.time);
-  }
-  for (auto&& v : m_name.ReadQueue()) {
-    m_nameValue = std::move(v.value);
   }
 }
 

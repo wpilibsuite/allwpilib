@@ -251,12 +251,12 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
         "Calculated Ka gain of: {0:.3f} is erroneous! Ka should be > 0.", Ka);
   }
 
-  if (analysisType == analysis::kSimple) {
+  if (analysisType == analysis::SIMPLE) {
     return FeedforwardGains{
         .olsResult = ff, .Ks = KsGain, .Kv = KvGain, .Ka = KaGain};
   }
 
-  if (analysisType == analysis::kElevator || analysisType == analysis::kArm) {
+  if (analysisType == analysis::ELEVATOR || analysisType == analysis::ARM) {
     const auto& Kg = ff.coeffs[3];
     FeedforwardGain KgGain = {
         Kg, "Voltage needed to counteract the force of gravity."};
@@ -268,7 +268,7 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
     }
 
     // Elevator analysis only requires Kg
-    if (analysisType == analysis::kElevator) {
+    if (analysisType == analysis::ELEVATOR) {
       return FeedforwardGains{.olsResult = ff,
                               .Ks = KsGain,
                               .Kv = KvGain,
@@ -292,7 +292,7 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
 sysid::FeedbackGains AnalysisManager::CalculateFeedback(
     const FeedforwardGain& Kv, const FeedforwardGain& Ka) {
   FeedbackGains fb;
-  if (m_settings.type == FeedbackControllerLoopType::kPosition) {
+  if (m_settings.type == FeedbackControllerLoopType::POSITION) {
     fb = sysid::CalculatePositionFeedbackGains(
         m_settings.preset, m_settings.lqr, Kv.gain, Ka.gain);
   } else {

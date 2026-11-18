@@ -325,12 +325,7 @@ static const WPI_AlertBackend mrcLibBackend = {
 }  // namespace
 
 namespace wpi::hal {
-int32_t SetMrcLibAlertBackend() {
-  MRC_Status status = MRC_Alert_Initialize();
-  if (status != 0) {
-    return ALERT_ERROR;
-  }
+void SetMrcLibAlertBackend() {
   WPI_SetAlertBackend(&mrcLibBackend);
-  return 0;
 }
 }  // namespace wpi::hal

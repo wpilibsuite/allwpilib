@@ -17,6 +17,7 @@
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 namespace wpi::math {
 
@@ -70,7 +71,7 @@ class WPILIB_DLLEXPORT MecanumDriveKinematics
     SetInverseKinematics(frontLeftWheel, frontRightWheel, rearLeftWheel,
                          rearRightWheel);
     m_forwardKinematics = m_inverseKinematics.householderQr();
-    wpi::math::MathSharedStore::ReportUsage("MecanumDriveKinematics", "");
+    wpi::util::ReportUsage("MecanumDriveKinematics", "");
   }
 
   MecanumDriveKinematics(const MecanumDriveKinematics&) = default;

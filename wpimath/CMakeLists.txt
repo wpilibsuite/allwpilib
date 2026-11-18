@@ -6,12 +6,7 @@ include(AddTest)
 
 file(
     GLOB wpimath_jni_src
-    src/main/native/cpp/jni/DAREJNI.cpp
     src/main/native/cpp/jni/EigenJNI.cpp
-    src/main/native/cpp/jni/Exceptions.cpp
-    src/main/native/cpp/jni/LinearSystemUtilJNI.cpp
-    src/main/native/cpp/jni/Transform3dJNI.cpp
-    src/main/native/cpp/jni/Twist3dJNI.cpp
     src/main/native/cpp/jni/autodiff/GradientJNI.cpp
     src/main/native/cpp/jni/autodiff/HessianJNI.cpp
     src/main/native/cpp/jni/autodiff/JacobianJNI.cpp
@@ -27,14 +22,14 @@ file(GLOB_RECURSE sleipnir_native_src src/main/native/thirdparty/sleipnir/src/*.
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
 
-file(GLOB_RECURSE wpimath_protobuf_native_src src/generated/main/native/cpp/wpimath/protobuf/*.cpp)
+file(GLOB_RECURSE wpimath_protobuf_native_src src/generated/main/native/cpp/wpi/math/protobuf/*.cpp)
 
 add_library(protobuf OBJECT ${wpimath_protobuf_native_src})
 target_link_libraries(protobuf wpiutil)
 
 target_include_directories(
     protobuf
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/cpp>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
 )
 
 add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
@@ -64,14 +59,16 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
-target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
+if(BUILD_SHARED_LIBS)
+    target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
+endif()
 
 target_compile_features(wpimath PUBLIC cxx_std_23)
 if(MSVC)
     target_compile_options(wpimath PUBLIC /utf-8 /bigobj)
 endif()
 wpilib_target_warnings(wpimath)
-target_link_libraries(wpimath wpiutil)
+target_link_libraries(wpimath telemetry tunables wpiutil)
 
 if(NOT WPILIB_USE_SYSTEM_EIGEN)
     install(
@@ -121,18 +118,13 @@ else()
     endif()
 endif()
 
-install(
-    DIRECTORY src/generated/main/native/cpp/
-    DESTINATION "${include_dest}/wpimath"
-    FILES_MATCHING
-    PATTERN "*.h"
-)
+install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/wpimath")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(
     wpimath
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/cpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/wpimath>
 )
 
@@ -144,7 +136,7 @@ install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimat
 install(EXPORT wpimath DESTINATION share/wpimath)
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test_catch2(wpimath src/test/native/cpp)
+    wpilib_add_test(wpimath src/test/native/cpp)
     target_include_directories(wpimath_test PRIVATE src/test/native/include)
     target_link_libraries(wpimath_test wpimath)
 endif()

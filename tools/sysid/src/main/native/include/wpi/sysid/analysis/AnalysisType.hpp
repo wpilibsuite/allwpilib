@@ -52,18 +52,18 @@ struct AnalysisType {
 };
 
 namespace analysis {
-inline constexpr AnalysisType kElevator{4, 4, "Elevator"};
-inline constexpr AnalysisType kArm{5, 4, "Arm"};
-inline constexpr AnalysisType kSimple{3, 4, "Simple"};
+inline constexpr AnalysisType ELEVATOR{4, 4, "Elevator"};
+inline constexpr AnalysisType ARM{5, 4, "Arm"};
+inline constexpr AnalysisType SIMPLE{3, 4, "Simple"};
 
 constexpr AnalysisType FromName(std::string_view name) {
   if (name == "Elevator") {
-    return sysid::analysis::kElevator;
+    return sysid::analysis::ELEVATOR;
   }
   if (name == "Arm") {
-    return sysid::analysis::kArm;
+    return sysid::analysis::ARM;
   }
-  return sysid::analysis::kSimple;
+  return sysid::analysis::SIMPLE;
 }
 }  // namespace analysis
 }  // namespace sysid

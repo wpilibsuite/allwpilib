@@ -179,6 +179,16 @@ def test_user_unpack():
     assert wpistruct.unpack(MyStruct, b"\x02\x00\x00\x00\x01\x00\x00\x60\x40") == v
 
 
+@wpistruct.make_wpistruct(name="SingleFieldStruct")
+@dataclasses.dataclass
+class SingleFieldStruct:
+    value: wpistruct.uint8 = 0
+
+
+def test_user_single_field_unpack():
+    assert wpistruct.unpack(SingleFieldStruct, b"\x01") == SingleFieldStruct(1)
+
+
 @wpistruct.make_wpistruct(name="VectorStruct")
 @dataclasses.dataclass
 class VectorStruct:

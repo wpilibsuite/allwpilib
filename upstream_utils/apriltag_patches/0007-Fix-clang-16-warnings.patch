@@ -42,10 +42,10 @@ Subject: [PATCH 7/8] Fix clang 16 warnings
  35 files changed, 40 insertions(+), 40 deletions(-)
 
 diff --git a/apriltag.c b/apriltag.c
-index 2f9846437619897c871d267963f143886f71b577..b7e24c4bc279643f478d810d494345216be991f1 100644
+index 9b9d2c7467cbe7d97cdc529c93e52aee5833610f..061ccdfbfa357b60fc6cf8f2ce966e120384f676 100644
 --- a/apriltag.c
 +++ b/apriltag.c
-@@ -349,7 +349,7 @@ void apriltag_detector_clear_families(apriltag_detector_t *td)
+@@ -367,7 +367,7 @@ void apriltag_detector_clear_families(apriltag_detector_t *td)
      zarray_clear(td->tag_families);
  }
  
@@ -55,7 +55,7 @@ index 2f9846437619897c871d267963f143886f71b577..b7e24c4bc279643f478d810d49434521
      apriltag_detector_t *td = (apriltag_detector_t*) calloc(1, sizeof(apriltag_detector_t));
  
 diff --git a/apriltag.h b/apriltag.h
-index 164ad8618f10ab2cbe489b813c9eed64be6e96e0..895b3459b8a84064989378fe533fd676964a1687 100644
+index 39ef282f6a0118e9056f4f279c9d2df5d78a2776..23c95bb8b772d87f04bf4fcaef707f1169b6ba07 100644
 --- a/apriltag.h
 +++ b/apriltag.h
 @@ -231,7 +231,7 @@ struct apriltag_detection
@@ -140,7 +140,7 @@ index aa08883608a8aca5cc7828134ecb4cd6e9f06a61..a68ed8bf8eda0a9e23cc4d2784ccc6b7
      return randf()*2 - 1;
  }
 diff --git a/common/pthreads_cross.c b/common/pthreads_cross.c
-index 3403863f385c96d089db9652079b038fea3e5f51..d48b81a1bbafa15f1c8a5b4fec6a755847947ce6 100644
+index 04e556cf4ca2ddfaf36a4aef398abd64d8d63337..a7f76c5abec58f4cf1e75b789b5159fcb75b28f7 100644
 --- a/common/pthreads_cross.c
 +++ b/common/pthreads_cross.c
 @@ -218,7 +218,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
@@ -171,7 +171,7 @@ index 3403863f385c96d089db9652079b038fea3e5f51..d48b81a1bbafa15f1c8a5b4fec6a7558
      return (unsigned int)sysconf(_SC_NPROCESSORS_ONLN);
  }
 diff --git a/common/pthreads_cross.h b/common/pthreads_cross.h
-index 5970c679316037505ee4dc1e96ab9fda1f4f60d5..89ff7cc79ba93a5676fbc8663fcd7127cd1757d9 100644
+index fc40c9ba6ba80a3ee3f5f717e527890fb5774b2c..39d28729bbd297970cdc9d95cae7062a92424215 100644
 --- a/common/pthreads_cross.h
 +++ b/common/pthreads_cross.h
 @@ -71,7 +71,7 @@ int sched_yield(void);
@@ -210,10 +210,10 @@ index 6b5835553617ba16fc987edee5d2bc19e2824766..765f5a1d75e9327e6005e6d04db0c1da
  /**
   * Frees the resources associated with a string buffer object, including space
 diff --git a/common/time_util.c b/common/time_util.c
-index 7a25f424068d798a8c65c69c6c17dd05b2e2b950..f3e3b0849bb8442ca1be6fda29ffcc79d52ec949 100644
+index 52c1bcb108bf4d678cb65727348b5191fdab3c2f..519a328ff31459b487bf7fbfb6064761e63cba85 100644
 --- a/common/time_util.c
 +++ b/common/time_util.c
-@@ -35,7 +35,7 @@ struct timeutil_rest
+@@ -54,7 +54,7 @@ struct timeutil_rest
      int64_t start_time;
  };
  
@@ -222,20 +222,20 @@ index 7a25f424068d798a8c65c69c6c17dd05b2e2b950..f3e3b0849bb8442ca1be6fda29ffcc79
  {
      timeutil_rest_t *rest = calloc(1, sizeof(timeutil_rest_t));
      return rest;
-@@ -46,7 +46,7 @@ void timeutil_rest_destroy(timeutil_rest_t *rest)
+@@ -65,7 +65,7 @@ void timeutil_rest_destroy(timeutil_rest_t *rest)
      free(rest);
  }
  
 -int64_t utime_now() // blacklist-ignore
 +int64_t utime_now(void) // blacklist-ignore
  {
-     struct timeval tv;
-     gettimeofday (&tv, NULL); // blacklist-ignore
+     #ifdef _MSC_VER
+     
 diff --git a/common/time_util.h b/common/time_util.h
-index c1840495a370e196e30d0ab432ddda12f4cc4819..58da911010f0030e81c2a33d6a5002f671d38145 100644
+index be7ec5f2b53553786ff827e300e2f4d8af0b9fa7..df6138413ad7fbf2fdcdf370ca0fc3c237a84fa6 100644
 --- a/common/time_util.h
 +++ b/common/time_util.h
-@@ -58,10 +58,10 @@ extern "C" {
+@@ -50,10 +50,10 @@ extern "C" {
  #endif
  
  typedef struct timeutil_rest timeutil_rest_t;
@@ -262,10 +262,10 @@ index 8016386ed214de371eae619f4e887aef01852408..197d6ceb330a4414483bd9db66e091d4
      timeprofile_t *tp = (timeprofile_t*) calloc(1, sizeof(timeprofile_t));
      tp->stamps = zarray_create(sizeof(struct timeprofile_entry));
 diff --git a/common/workerpool.c b/common/workerpool.c
-index 6b73541c09025ef907e2c3c598343955a14c3e7e..25dccd0a341cfb3991e735d7a3b2bd6b8f6c299a 100644
+index 58380ed5c176012242dfb6d427d152c679a38b0b..fc4304350498aa42d56c76ed492c5a114912f8d4 100644
 --- a/common/workerpool.c
 +++ b/common/workerpool.c
-@@ -213,7 +213,7 @@ void workerpool_run(workerpool_t *wp)
+@@ -212,7 +212,7 @@ void workerpool_run(workerpool_t *wp)
      }
  }
  

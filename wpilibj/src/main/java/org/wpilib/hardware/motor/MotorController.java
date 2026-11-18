@@ -70,7 +70,4 @@ public interface MotorController {
    * @return The inversion state.
    */
   boolean getInverted();
-
-  /** Disables the motor controller. */
-  void disable();
 }

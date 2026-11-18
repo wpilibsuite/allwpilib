@@ -29,7 +29,9 @@
 
 #include <atomic>
 #include <functional>
+#include <memory>
 #include <thread>
+#include <utility>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -197,6 +199,27 @@ TEST_CASE("UvAsyncTest DataRef", "[uv][async]") {
   if (theThread.joinable()) {
     theThread.join();
   }
+}
+
+TEST_CASE("UvAsyncTest SendAfterLoopDestroyed", "[uv][async]") {
+  auto loop = Loop::Create();
+  REQUIRE(loop);
+  auto async = Async<std::shared_ptr<int>>::Create(loop);
+  REQUIRE(async);
+  bool called = false;
+  async->wakeup.connect([&](auto) { called = true; });
+
+  async->Close();
+  loop->Run();
+  loop.reset();
+
+  auto value = std::make_shared<int>(42);
+  std::weak_ptr<int> weakValue = value;
+  async->Send(std::move(value));
+  value.reset();
+  CHECK_FALSE(called);
+  // Dropped sends must not retain their arguments in the pending queue.
+  CHECK(weakValue.expired());
 }
 
 }  // namespace wpi::net::uv

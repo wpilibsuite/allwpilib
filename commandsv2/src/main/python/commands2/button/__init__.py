@@ -6,8 +6,6 @@ from .commandgamepad import CommandGamepad
 from .commandgamecubecontroller import CommandGameCubeController
 from .commandjoystick import CommandJoystick
 from .commandlogitechf310controller import CommandLogitechF310Controller
-from .commandnidsps4controller import CommandNiDsPS4Controller
-from .commandnidsxboxcontroller import CommandNiDsXboxController
 from .commandsteamcontroller import CommandSteamController
 from .commandswitch2gccontroller import CommandSwitch2GCController
 from .commandswitch2procontroller import CommandSwitch2ProController
@@ -29,8 +27,6 @@ __all__ = [
     "CommandGameCubeController",
     "CommandJoystick",
     "CommandLogitechF310Controller",
-    "CommandNiDsPS4Controller",
-    "CommandNiDsXboxController",
     "CommandSteamController",
     "CommandSwitch2GCController",
     "CommandSwitch2ProController",

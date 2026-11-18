@@ -14,7 +14,6 @@
 namespace {
 class DefaultCameraServerShared : public wpi::CameraServerShared {
  public:
-  void ReportUsage(std::string_view resource, std::string_view data) override {}
   void SetCameraServerErrorV(std::string_view format,
                              std::format_args args) override {}
   void SetVisionRunnerErrorV(std::string_view format,

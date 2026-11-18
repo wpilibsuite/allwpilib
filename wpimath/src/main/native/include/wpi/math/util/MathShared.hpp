@@ -19,8 +19,6 @@ class WPILIB_DLLEXPORT MathShared {
   virtual void ReportErrorV(std::string_view format, std::format_args args) = 0;
   virtual void ReportWarningV(std::string_view format,
                               std::format_args args) = 0;
-  virtual void ReportUsage(std::string_view resource,
-                           std::string_view data) = 0;
   virtual wpi::units::second_t GetTimestamp() = 0;
 
   template <typename S, typename... Args>
@@ -56,10 +54,6 @@ class WPILIB_DLLEXPORT MathSharedStore {
   template <typename S, typename... Args>
   static inline void ReportWarning(const S& format, Args&&... args) {
     ReportWarningV(format, std::make_format_args(args...));
-  }
-
-  static void ReportUsage(std::string_view resource, std::string_view data) {
-    GetMathShared().ReportUsage(resource, data);
   }
 
   static wpi::units::second_t GetTimestamp() {

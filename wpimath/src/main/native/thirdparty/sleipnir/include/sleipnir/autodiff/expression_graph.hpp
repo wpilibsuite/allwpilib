@@ -3,11 +3,13 @@
 #pragma once
 
 #include <ranges>
+#include <utility>
 
 #include <Eigen/SparseCore>
 #include <gch/small_vector.hpp>
 
 #include "sleipnir/autodiff/expression.hpp"
+#include "sleipnir/autodiff/expression_type.hpp"
 
 namespace slp::detail {
 

@@ -6,6 +6,7 @@
 
 #include <concepts>
 #include <limits>
+#include <utility>
 
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/shape/Rectangle2d.hpp"
@@ -27,8 +28,8 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
    *     region.
    */
   constexpr RectangularRegionConstraint(const Rectangle2d& rectangle,
-                                        const Constraint& constraint)
-      : m_rectangle{rectangle}, m_constraint{constraint} {}
+                                        Constraint constraint)
+      : m_rectangle{rectangle}, m_constraint{std::move(constraint)} {}
 
   constexpr wpi::units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, wpi::units::curvature_t curvature,

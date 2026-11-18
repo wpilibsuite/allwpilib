@@ -22,6 +22,7 @@ import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.POVDirection;
 import org.wpilib.driverstation.TouchpadFinger;
 import org.wpilib.framework.OpModeRobot;
+import org.wpilib.framework.RobotBase;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.ControlWord;
@@ -36,8 +37,10 @@ import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.networktables.StringPublisher;
 import org.wpilib.networktables.StringTopic;
 import org.wpilib.networktables.StructPublisher;
-import org.wpilib.system.Timer;
+import org.wpilib.util.Alert;
+import org.wpilib.util.AlertException;
 import org.wpilib.util.Color;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.util.concurrent.EventVector;
 
@@ -132,9 +135,6 @@ public final class DriverStationBackend {
     }
   }
 
-  private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
-  private static double m_nextMessageTime;
-
   private static String opModeToString(long id) {
     if (id == 0) {
       return "";
@@ -152,7 +152,7 @@ public final class DriverStationBackend {
   }
 
   private static class MatchDataSender {
-    private static final String kSmartDashboardType = "DriverStation";
+    private static final String SMART_DASHBOARD_TYPE = "DriverStation";
 
     final StringPublisher gameData;
     final StringPublisher eventName;
@@ -180,8 +180,8 @@ public final class DriverStationBackend {
       table
           .getStringTopic(".type")
           .publishEx(
-              StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}")
-          .set(kSmartDashboardType);
+              StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + SMART_DASHBOARD_TYPE + "\"}")
+          .set(SMART_DASHBOARD_TYPE);
       gameData = table.getStringTopic("GameData").publish();
       gameData.set("");
       eventName = table.getStringTopic("EventName").publish();
@@ -471,9 +471,261 @@ public final class DriverStationBackend {
 
   private static final ReentrantLock m_cacheDataMutex = new ReentrantLock();
 
-  private static boolean m_silenceJoystickWarning;
+  private enum JoystickResourceAlert {
+    BUTTON("ButtonUnavailable", "Button"),
+    AXIS("AxisUnavailable", "axis"),
+    POV("POVUnavailable", "POV");
 
-  private static boolean m_userProgramStarted = false;
+    final String idSuffix;
+    final String label;
+
+    JoystickResourceAlert(String idSuffix, String label) {
+      this.idSuffix = idSuffix;
+      this.label = label;
+    }
+
+    boolean isAvailable(int stick, int resource) {
+      return switch (this) {
+        case BUTTON -> (getStickButtonsAvailable(stick) & (1L << resource)) != 0;
+        case AXIS -> (getStickAxesAvailable(stick) & (1 << resource)) != 0;
+        case POV -> (getStickPOVsAvailable(stick) & (1 << resource)) != 0;
+      };
+    }
+
+    String getText(int stick, int resource) {
+      return "Joystick " + label + " " + resource + " on port " + stick + " not available";
+    }
+  }
+
+  private static final JoystickResourceAlert[] JOYSTICK_RESOURCE_ALERTS =
+      JoystickResourceAlert.values();
+
+  private static final class JoystickAlertState {
+    Alert alert;
+    boolean active;
+  }
+
+  private static final class JoystickAlerts {
+    final int stick;
+    final String connectionText;
+    final JoystickAlertState connectionAlert = new JoystickAlertState();
+    final JoystickAlertState[] resourceAlerts =
+        new JoystickAlertState[JOYSTICK_RESOURCE_ALERTS.length];
+    final JoystickAlertState touchpadFingerAlert = new JoystickAlertState();
+    final int[] resourceAlertValues = new int[JOYSTICK_RESOURCE_ALERTS.length];
+    int touchpadFingerAlertTouchpad;
+    int touchpadFingerAlertFinger;
+    boolean initialized;
+
+    JoystickAlerts(int stick) {
+      this.stick = stick;
+      connectionText =
+          "Joystick on port " + stick + " not available, check if controller is plugged in";
+      for (int i = 0; i < resourceAlerts.length; i++) {
+        resourceAlerts[i] = new JoystickAlertState();
+      }
+      initializeAlerts();
+    }
+
+    boolean initializeAlerts() {
+      closeAlerts();
+
+      Alert newConnectionAlert = null;
+      Alert[] newResourceAlerts = new Alert[JOYSTICK_RESOURCE_ALERTS.length];
+      Alert newTouchpadFingerAlert = null;
+
+      try {
+        newConnectionAlert =
+            new Alert(
+                "DriverStation",
+                "joystick" + stick + "Disconnected",
+                connectionText,
+                Alert.Level.HIGH);
+        for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
+          newResourceAlerts[resourceAlert.ordinal()] =
+              new Alert(
+                  "DriverStation",
+                  "joystick" + stick + resourceAlert.idSuffix,
+                  "",
+                  Alert.Level.MEDIUM);
+        }
+        newTouchpadFingerAlert =
+            new Alert(
+                "DriverStation",
+                "joystick" + stick + "TouchpadFingerUnavailable",
+                "",
+                Alert.Level.MEDIUM);
+      } catch (AlertException ex) {
+        closeAlert(newConnectionAlert);
+        for (Alert alert : newResourceAlerts) {
+          closeAlert(alert);
+        }
+        closeAlert(newTouchpadFingerAlert);
+        initialized = false;
+        return false;
+      }
+
+      connectionAlert.alert = newConnectionAlert;
+      for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
+        resourceAlerts[resourceAlert.ordinal()].alert = newResourceAlerts[resourceAlert.ordinal()];
+      }
+      touchpadFingerAlert.alert = newTouchpadFingerAlert;
+      initialized = true;
+      return true;
+    }
+
+    void closeAlerts() {
+      closeAlert(connectionAlert);
+      for (JoystickAlertState alertState : resourceAlerts) {
+        closeAlert(alertState);
+      }
+      closeAlert(touchpadFingerAlert);
+      initialized = false;
+    }
+
+    static void closeAlert(JoystickAlertState alertState) {
+      closeAlert(alertState.alert);
+      alertState.alert = null;
+      alertState.active = false;
+    }
+
+    static void closeAlert(Alert alert) {
+      if (alert == null) {
+        return;
+      }
+
+      try {
+        alert.close();
+      } catch (AlertException ex) {
+        // Ignore stale handles while cleaning up a failed initialization attempt.
+      }
+    }
+
+    boolean prepareForReport() {
+      if (isJoystickConnected(stick)) {
+        setAlert(connectionAlert, false, connectionText, true);
+        return true;
+      }
+
+      clearResourceAlerts();
+      setAlert(connectionAlert, true, connectionText, true);
+      return false;
+    }
+
+    void refresh() {
+      if (!isJoystickConnected(stick)) {
+        clearResourceAlerts();
+        return;
+      }
+
+      if (connectionAlert.active) {
+        setAlert(connectionAlert, false, connectionText, true);
+      }
+
+      for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
+        refreshResourceAlert(resourceAlert);
+      }
+
+      if (touchpadFingerAlert.active
+          && getStickTouchpadFingerAvailable(
+              stick, touchpadFingerAlertTouchpad, touchpadFingerAlertFinger)) {
+        setAlert(touchpadFingerAlert, false);
+      }
+    }
+
+    void clearAllAlerts() {
+      setAlert(connectionAlert, false, connectionText, true);
+      clearResourceAlerts();
+    }
+
+    void clearResourceAlerts() {
+      for (JoystickAlertState alertState : resourceAlerts) {
+        setAlert(alertState, false);
+      }
+      setAlert(touchpadFingerAlert, false);
+    }
+
+    void refreshResourceAlert(JoystickResourceAlert resourceAlert) {
+      int alertIndex = resourceAlert.ordinal();
+      JoystickAlertState alertState = resourceAlerts[alertIndex];
+      if (alertState.active && resourceAlert.isAvailable(stick, resourceAlertValues[alertIndex])) {
+        setAlert(alertState, false);
+      }
+    }
+
+    void reportResourceWarning(JoystickResourceAlert resourceAlert, int resource) {
+      int alertIndex = resourceAlert.ordinal();
+      resourceAlertValues[alertIndex] = resource;
+      setAlert(resourceAlerts[alertIndex], true, resourceAlert.getText(stick, resource), false);
+    }
+
+    void reportTouchpadFingerWarning(int touchpad, int finger) {
+      String text =
+          "Joystick touchpad finger "
+              + finger
+              + " on touchpad "
+              + touchpad
+              + " on port "
+              + stick
+              + " not available";
+      touchpadFingerAlertTouchpad = touchpad;
+      touchpadFingerAlertFinger = finger;
+      setAlert(touchpadFingerAlert, true, text, false);
+    }
+
+    boolean applyAlert(
+        JoystickAlertState alertState, boolean active, String text, boolean verifyActive) {
+      if (alertState.alert == null) {
+        return false;
+      }
+
+      try {
+        if (active && !text.isEmpty()) {
+          alertState.alert.setText(text);
+        }
+        alertState.alert.set(active);
+        return !active || !verifyActive || alertState.alert.get();
+      } catch (AlertException ex) {
+        return false;
+      }
+    }
+
+    boolean setAlert(JoystickAlertState alertState, boolean active) {
+      return setAlert(alertState, active, "", false);
+    }
+
+    boolean setAlert(
+        JoystickAlertState alertState, boolean active, String text, boolean verifyActive) {
+      if (!active && !alertState.active) {
+        return true;
+      }
+
+      if (active && !initialized && !initializeAlerts()) {
+        return false;
+      }
+
+      if (!applyAlert(alertState, active, text, verifyActive)) {
+        if (!active) {
+          alertState.active = false;
+          return true;
+        }
+        if (!initializeAlerts()) {
+          return false;
+        }
+        if (!applyAlert(alertState, active, text, verifyActive)) {
+          return false;
+        }
+      }
+      alertState.active = active;
+      return true;
+    }
+  }
+
+  private static final ReentrantLock m_joystickAlertMutex = new ReentrantLock();
+  private static boolean m_silenceJoystickAlerts;
+  private static final JoystickAlerts[] m_joystickAlerts = new JoystickAlerts[JOYSTICK_PORTS];
+
+  private static volatile boolean m_userProgramStarted = false;
   private static final Map<Long, OpModeOption> m_opModes = new HashMap<>();
   private static final ReentrantLock m_opModesMutex = new ReentrantLock();
 
@@ -647,8 +899,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick, "Joystick Button " + button + " on port " + stick + " not available");
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.BUTTON, button);
     return false;
   }
 
@@ -712,8 +963,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick, "Joystick Button " + button + " on port " + stick + " not available");
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.BUTTON, button);
     return false;
   }
 
@@ -749,8 +999,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick, "Joystick Button " + button + " on port " + stick + " not available");
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.BUTTON, button);
     return false;
   }
 
@@ -781,7 +1030,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(stick, "Joystick axis " + axis + " on port " + stick + " not available");
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.AXIS, axis);
     return 0.0;
   }
 
@@ -819,15 +1068,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick,
-        "Joystick touchpad finger "
-            + finger
-            + " on touchpad "
-            + touchpad
-            + " on port "
-            + stick
-            + " not available");
+    reportJoystickTouchpadFingerWarning(stick, touchpad, finger);
     return new TouchpadFinger(false, 0.0f, 0.0f);
   }
 
@@ -923,7 +1164,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(stick, "Joystick POV " + pov + " on port " + stick + " not available");
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.POV, pov);
     return POVDirection.CENTER;
   }
 
@@ -1146,9 +1387,18 @@ public final class DriverStationBackend {
    *
    * <p>Note that this does not indicate whether the robot is enabled or disabled.
    *
+   * <p>This method always returns {@link RobotMode#UNKNOWN} while the main robot class is being
+   * constructed and initialized (more specifically, it returns {@link RobotMode#UNKNOWN} until
+   * {@link #observeUserProgramStarting()} is called, which the WPILib framework will automatically
+   * call during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return robot mode
    */
   public static RobotMode getRobotMode() {
+    if (!m_userProgramStarted) {
+      return RobotMode.UNKNOWN;
+    }
+
     m_cacheDataMutex.lock();
     try {
       return m_controlWord.getRobotMode();
@@ -1161,27 +1411,32 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * autonomous mode.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if autonomous mode should be enabled, false otherwise.
    */
   public static boolean isAutonomous() {
-    m_cacheDataMutex.lock();
-    try {
-      return m_controlWord.isAutonomous();
-    } finally {
-      m_cacheDataMutex.unlock();
-    }
+    return getRobotMode() == RobotMode.AUTONOMOUS;
   }
 
   /**
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * autonomous mode and enabled.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if autonomous should be set and the robot should be enabled.
    */
   public static boolean isAutonomousEnabled() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.isAutonomousEnabled();
+      return isAutonomous() && isEnabled();
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -1191,22 +1446,32 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * operator-controlled mode.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if operator-controlled mode should be enabled, false otherwise.
    */
   public static boolean isTeleop() {
-    return m_controlWord.isTeleop();
+    return getRobotMode() == RobotMode.TELEOPERATED;
   }
 
   /**
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * operator-controller mode and enabled.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if operator-controlled mode should be set and the robot should be enabled.
    */
   public static boolean isTeleopEnabled() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.isTeleopEnabled();
+      return isTeleop() && isEnabled();
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -1216,27 +1481,32 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in Utility
    * mode.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if utility mode should be enabled, false otherwise.
    */
   public static boolean isUtility() {
-    m_cacheDataMutex.lock();
-    try {
-      return m_controlWord.isUtility();
-    } finally {
-      m_cacheDataMutex.unlock();
-    }
+    return getRobotMode() == RobotMode.UTILITY;
   }
 
   /**
    * Gets a value indicating whether the Driver Station requires the robot to be running in Utility
    * mode and enabled.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if utility mode should be set and the robot should be enabled.
    */
   public static boolean isUtilityEnabled() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.isUtilityEnabled();
+      return isUtility() && isEnabled();
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -1395,7 +1665,8 @@ public final class DriverStationBackend {
             .collect(Collectors.groupingBy(OpModeOption::getMode, Collectors.counting()));
 
     for (RobotMode mode : RobotMode.values()) {
-      HAL.reportUsage("OpMode/" + mode, String.valueOf(modeCounts.getOrDefault(mode, 0L)));
+      UsageReporting.reportUsage(
+          "OpMode/" + mode, String.valueOf(modeCounts.getOrDefault(mode, 0L)));
     }
   }
 
@@ -1430,6 +1701,28 @@ public final class DriverStationBackend {
   public static void observeUserProgramStarting() {
     m_userProgramStarted = true;
     DriverStationJNI.observeUserProgramStarting();
+  }
+
+  /**
+   * For internal unit testing in WPILib. Not for team use. Has no effect unless called in
+   * simulation mode.
+   *
+   * <p>Resets the {@code m_userProgramStarted} flag for unit tests. Does not reset anything in the
+   * JNI layer.
+   */
+  public static void clearUserProgramStarted() {
+    if (!RobotBase.isSimulation()) {
+      // NOP unless running in sim. We don't want teams to call this; it would prevent their
+      // programs from transitioning between modes and from detecting opmode selections.
+      reportWarning(
+          "DriverStationBackend.clearUserProgramStarted() was called! "
+              + "This method exists solely for internal WPILib unit tests "
+              + "and does nothing in team code.",
+          true);
+      return;
+    }
+
+    m_userProgramStarted = false;
   }
 
   /**
@@ -1688,10 +1981,8 @@ public final class DriverStationBackend {
    * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
    * dispute ref calls or guarantee that a function will trigger before the match ends).
    *
-   * <p>When connected to the real field, this number only changes in full integer increments, and
-   * always counts down.
-   *
-   * <p>When the DS is in practice mode, this number is a floating point number, and counts down.
+   * <p>This number only changes in full integer increments and always counts down, both when
+   * connected to the real field and when the DS is in match mode.
    *
    * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
    *
@@ -1704,24 +1995,36 @@ public final class DriverStationBackend {
   }
 
   /**
-   * Allows the user to specify whether they want joystick connection warnings to be printed to the
-   * console. This setting is ignored when the FMS is connected -- warnings will always be on in
-   * that scenario.
+   * Allows the user to specify whether they want joystick connection alerts to be shown. This
+   * setting is ignored when the FMS is connected -- alerts will always be on in that scenario.
    *
-   * @param silence Whether warning messages should be silenced.
+   * @param silence Whether joystick connection alerts should be silenced.
    */
-  public static void silenceJoystickConnectionWarning(boolean silence) {
-    m_silenceJoystickWarning = silence;
+  public static void silenceJoystickConnectionAlert(boolean silence) {
+    m_joystickAlertMutex.lock();
+    try {
+      m_silenceJoystickAlerts = silence;
+      if (silence && !isFMSAttached()) {
+        clearJoystickAlertsLocked();
+      }
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
   }
 
   /**
-   * Returns whether joystick connection warnings are silenced. This will always return false when
+   * Returns whether joystick connection alerts are silenced. This will always return false when
    * connected to the FMS.
    *
-   * @return Whether joystick connection warnings are silenced.
+   * @return Whether joystick connection alerts are silenced.
    */
-  public static boolean isJoystickConnectionWarningSilenced() {
-    return !isFMSAttached() && m_silenceJoystickWarning;
+  public static boolean isJoystickConnectionAlertSilenced() {
+    m_joystickAlertMutex.lock();
+    try {
+      return !isFMSAttached() && m_silenceJoystickAlerts;
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
   }
 
   /**
@@ -1838,6 +2141,8 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
+    clearJoystickAlerts();
+
     m_refreshEvents.wakeup();
 
     m_matchDataSender.sendMatchData();
@@ -1864,25 +2169,74 @@ public final class DriverStationBackend {
     m_refreshEvents.remove(handle);
   }
 
-  /**
-   * Reports errors related to joystick availability. Throttles the errors so that they don't
-   * overwhelm the DS.
-   *
-   * @param stick The joystick port.
-   * @param message The message to report if the joystick is connected.
-   */
-  private static void reportJoystickWarning(int stick, String message) {
-    if (isFMSAttached() || !m_silenceJoystickWarning) {
-      double currentTime = Timer.getTimestamp();
-      if (currentTime > m_nextMessageTime) {
-        if (isJoystickConnected(stick)) {
-          reportWarning(message, false);
-        } else {
-          reportWarning(
-              "Joystick on port " + stick + " not available, check if controller is plugged in",
-              false);
+  private static JoystickAlerts getJoystickAlertsLocked(int stick) {
+    JoystickAlerts alerts = m_joystickAlerts[stick];
+    if (alerts == null) {
+      alerts = new JoystickAlerts(stick);
+      m_joystickAlerts[stick] = alerts;
+    }
+    return alerts;
+  }
+
+  private static void reportJoystickResourceWarning(
+      int stick, JoystickResourceAlert resourceAlert, int resource) {
+    m_joystickAlertMutex.lock();
+    try {
+      if (!isFMSAttached() && m_silenceJoystickAlerts) {
+        return;
+      }
+
+      JoystickAlerts alerts = getJoystickAlertsLocked(stick);
+      if (!alerts.prepareForReport()) {
+        return;
+      }
+
+      alerts.reportResourceWarning(resourceAlert, resource);
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
+  }
+
+  private static void reportJoystickTouchpadFingerWarning(int stick, int touchpad, int finger) {
+    m_joystickAlertMutex.lock();
+    try {
+      if (!isFMSAttached() && m_silenceJoystickAlerts) {
+        return;
+      }
+
+      JoystickAlerts alerts = getJoystickAlertsLocked(stick);
+      if (!alerts.prepareForReport()) {
+        return;
+      }
+
+      alerts.reportTouchpadFingerWarning(touchpad, finger);
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
+  }
+
+  private static void clearJoystickAlerts() {
+    m_joystickAlertMutex.lock();
+    try {
+      clearJoystickAlertsLocked();
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
+  }
+
+  private static void clearJoystickAlertsLocked() {
+    if (!isFMSAttached() && m_silenceJoystickAlerts) {
+      for (JoystickAlerts alerts : m_joystickAlerts) {
+        if (alerts != null) {
+          alerts.clearAllAlerts();
         }
-        m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+      }
+      return;
+    }
+
+    for (JoystickAlerts alerts : m_joystickAlerts) {
+      if (alerts != null) {
+        alerts.refresh();
       }
     }
   }

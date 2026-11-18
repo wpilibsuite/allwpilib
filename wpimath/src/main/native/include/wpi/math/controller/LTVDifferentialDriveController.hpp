@@ -34,9 +34,6 @@ namespace wpi::math {
  * velocity command outputs, and the low-level controller has wheel velocity
  * references and voltage outputs. Flat hierarchies are easier to tune in one
  * shot.
- *
- * See section 8.7 in Controls Engineering in FRC for a derivation of the
- * control law we used shown in theorem 8.7.4.
  */
 class WPILIB_DLLEXPORT LTVDifferentialDriveController {
  public:

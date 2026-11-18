@@ -119,8 +119,8 @@ using namespace wpi::cs;
 
   // There is room for quirk handling improvement here, but I will leave it
   // for now.
-  if (property == sharedThis->GetPropertyIndex(kPropertyAutoExposure)) {
-    return value == kPropertyAutoExposureOn;
+  if (property == sharedThis->GetPropertyIndex(PROPERTY_AUTO_EXPOSURE)) {
+    return value == PROPERTY_AUTO_EXPOSURE_ON;
   }
 
   return value != 0;
@@ -268,7 +268,7 @@ using namespace wpi::cs;
   }
 
   // Get the property index and set it
-  int prop = sharedThis->GetPropertyIndex(kPropertyBrightness);
+  int prop = sharedThis->GetPropertyIndex(PROPERTY_BRIGHTNESS);
   sharedThis->SetProperty(prop, brightness, status);
 }
 
@@ -285,7 +285,7 @@ using namespace wpi::cs;
   }
 
   // Get the property index and its value
-  int prop = sharedThis->GetPropertyIndex(kPropertyBrightness);
+  int prop = sharedThis->GetPropertyIndex(PROPERTY_BRIGHTNESS);
   return sharedThis->GetProperty(prop, status);
 }
 
@@ -301,7 +301,7 @@ using namespace wpi::cs;
     [self deviceCacheProperties];
   }
 
-  int prop = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
+  int prop = sharedThis->GetPropertyIndex(PROPERTY_AUTO_WHITE_BALANCE);
   sharedThis->SetProperty(prop, 1, status);
 }
 
@@ -317,7 +317,7 @@ using namespace wpi::cs;
     [self deviceCacheProperties];
   }
 
-  int prop = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
+  int prop = sharedThis->GetPropertyIndex(PROPERTY_AUTO_WHITE_BALANCE);
   sharedThis->SetProperty(prop, 0, status);
 }
 
@@ -334,14 +334,14 @@ using namespace wpi::cs;
   }
 
   // First disable auto white balance
-  int autoProp = sharedThis->GetPropertyIndex(kPropertyAutoWhiteBalance);
+  int autoProp = sharedThis->GetPropertyIndex(PROPERTY_AUTO_WHITE_BALANCE);
   sharedThis->SetProperty(autoProp, 0, status);
   if (*status != 0) {
     return;
   }
 
   // Then set the white balance value
-  int prop = sharedThis->GetPropertyIndex(kPropertyWhiteBalance);
+  int prop = sharedThis->GetPropertyIndex(PROPERTY_WHITE_BALANCE);
   sharedThis->SetProperty(prop, value, status);
 }
 
@@ -358,8 +358,8 @@ using namespace wpi::cs;
   }
 
   // Set the auto exposure property to enabled (1)
-  int prop = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
-  sharedThis->SetProperty(prop, kPropertyAutoExposureOn, status);
+  int prop = sharedThis->GetPropertyIndex(PROPERTY_AUTO_EXPOSURE);
+  sharedThis->SetProperty(prop, PROPERTY_AUTO_EXPOSURE_ON, status);
 }
 
 - (void)setExposureHoldCurrent:(CS_Status*)status {
@@ -375,8 +375,8 @@ using namespace wpi::cs;
   }
 
   // Set the auto exposure property to disabled (0)
-  int prop = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
-  sharedThis->SetProperty(prop, kPropertyAutoExposureOff, status);
+  int prop = sharedThis->GetPropertyIndex(PROPERTY_AUTO_EXPOSURE);
+  sharedThis->SetProperty(prop, PROPERTY_AUTO_EXPOSURE_OFF, status);
 }
 
 - (void)setExposureManual:(int)value status:(CS_Status*)status {
@@ -392,14 +392,14 @@ using namespace wpi::cs;
   }
 
   // First disable auto exposure
-  int autoProp = sharedThis->GetPropertyIndex(kPropertyAutoExposure);
-  sharedThis->SetProperty(autoProp, kPropertyAutoExposureOff, status);
+  int autoProp = sharedThis->GetPropertyIndex(PROPERTY_AUTO_EXPOSURE);
+  sharedThis->SetProperty(autoProp, PROPERTY_AUTO_EXPOSURE_OFF, status);
   if (*status != 0) {
     return;
   }
 
   // Then set the exposure value
-  int prop = sharedThis->GetPropertyIndex(kPropertyExposure);
+  int prop = sharedThis->GetPropertyIndex(PROPERTY_EXPOSURE);
   sharedThis->SetProperty(prop, value, status);
 }
 
@@ -567,24 +567,24 @@ using namespace wpi::cs;
     }
 
     // Cache basic properties
-    [self cacheProperty:CAPPROPID_BRIGHTNESS withName:@kPropertyBrightness];
-    [self cacheProperty:CAPPROPID_WHITEBALANCE withName:@kPropertyWhiteBalance];
-    [self cacheProperty:CAPPROPID_EXPOSURE withName:@kPropertyExposure];
-    [self cacheProperty:CAPPROPID_CONTRAST withName:@kPropertyContrast];
-    [self cacheProperty:CAPPROPID_SATURATION withName:@kPropertySaturation];
-    [self cacheProperty:CAPPROPID_SHARPNESS withName:@kPropertySharpness];
-    [self cacheProperty:CAPPROPID_GAIN withName:@kPropertyGain];
-    [self cacheProperty:CAPPROPID_GAMMA withName:@kPropertyGamma];
-    [self cacheProperty:CAPPROPID_HUE withName:@kPropertyHue];
-    [self cacheProperty:CAPPROPID_FOCUS withName:@kPropertyFocus];
-    [self cacheProperty:CAPPROPID_ZOOM withName:@kPropertyZoom];
-    [self cacheProperty:CAPPROPID_BACKLIGHTCOMP withName:@kPropertyBackLightCompensation];
-    [self cacheProperty:CAPPROPID_POWERLINEFREQ withName:@kPropertyPowerLineFrequency];
+    [self cacheProperty:CAPPROPID_BRIGHTNESS withName:@PROPERTY_BRIGHTNESS];
+    [self cacheProperty:CAPPROPID_WHITEBALANCE withName:@PROPERTY_WHITE_BALANCE];
+    [self cacheProperty:CAPPROPID_EXPOSURE withName:@PROPERTY_EXPOSURE];
+    [self cacheProperty:CAPPROPID_CONTRAST withName:@PROPERTY_CONTRAST];
+    [self cacheProperty:CAPPROPID_SATURATION withName:@PROPERTY_SATURATION];
+    [self cacheProperty:CAPPROPID_SHARPNESS withName:@PROPERTY_SHARPNESS];
+    [self cacheProperty:CAPPROPID_GAIN withName:@PROPERTY_GAIN];
+    [self cacheProperty:CAPPROPID_GAMMA withName:@PROPERTY_GAMMA];
+    [self cacheProperty:CAPPROPID_HUE withName:@PROPERTY_HUE];
+    [self cacheProperty:CAPPROPID_FOCUS withName:@PROPERTY_FOCUS];
+    [self cacheProperty:CAPPROPID_ZOOM withName:@PROPERTY_ZOOM];
+    [self cacheProperty:CAPPROPID_BACKLIGHTCOMP withName:@PROPERTY_BACK_LIGHT_COMPENSATION];
+    [self cacheProperty:CAPPROPID_POWERLINEFREQ withName:@PROPERTY_POWER_LINE_FREQUENCY];
 
     // Cache auto properties
-    [self cacheAutoProperty:CAPPROPID_EXPOSURE withName:@kPropertyAutoExposure];
-    [self cacheAutoProperty:CAPPROPID_WHITEBALANCE withName:@kPropertyAutoWhiteBalance];
-    [self cacheAutoProperty:CAPPROPID_FOCUS withName:@kPropertyAutoFocus];
+    [self cacheAutoProperty:CAPPROPID_EXPOSURE withName:@PROPERTY_AUTO_EXPOSURE];
+    [self cacheAutoProperty:CAPPROPID_WHITEBALANCE withName:@PROPERTY_AUTO_WHITE_BALANCE];
+    [self cacheAutoProperty:CAPPROPID_FOCUS withName:@PROPERTY_AUTO_FOCUS];
 
     self.propertiesCached = true;
 }

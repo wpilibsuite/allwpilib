@@ -11,17 +11,17 @@ using namespace wpi::math;
 namespace {
 
 using StructType = wpi::util::Struct<wpi::math::Translation3d>;
-const Translation3d kExpectedData{Translation3d{35.04_m, 22.9_m, 3.504_m}};
+const Translation3d EXPECTED_DATA{Translation3d{35.04_m, 22.9_m, 3.504_m}};
 }  // namespace
 
 TEST_CASE("Translation3dStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   Translation3d unpacked_data = StructType::Unpack(buffer);
 
-  CHECK(kExpectedData.X() == unpacked_data.X());
-  CHECK(kExpectedData.Y() == unpacked_data.Y());
-  CHECK(kExpectedData.Z() == unpacked_data.Z());
+  CHECK(EXPECTED_DATA.X() == unpacked_data.X());
+  CHECK(EXPECTED_DATA.Y() == unpacked_data.Y());
+  CHECK(EXPECTED_DATA.Z() == unpacked_data.Z());
 }

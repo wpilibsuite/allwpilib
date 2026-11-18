@@ -19,6 +19,7 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -116,7 +117,7 @@ class UnscentedKalmanFilter {
     m_dt = dt;
 
     Reset();
-    wpi::math::MathSharedStore::ReportUsage("UnscentedKalmanFilter", "");
+    wpi::util::ReportUsage("UnscentedKalmanFilter", "");
   }
 
   /**
@@ -176,7 +177,7 @@ class UnscentedKalmanFilter {
     m_dt = dt;
 
     Reset();
-    wpi::math::MathSharedStore::ReportUsage("UnscentedKalmanFilter", "");
+    wpi::util::ReportUsage("UnscentedKalmanFilter", "");
   }
 
   /**

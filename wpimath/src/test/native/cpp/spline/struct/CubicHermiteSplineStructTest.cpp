@@ -12,7 +12,7 @@ using namespace wpi::math;
 struct CubicHermiteSplineStructTestData {
   using Type = CubicHermiteSpline;
 
-  inline static const Type kTestData{wpi::util::array<double, 2>{{0.1, 0.2}},
+  inline static const Type TEST_DATA{wpi::util::array<double, 2>{{0.1, 0.2}},
                                      wpi::util::array<double, 2>{{0.3, 0.4}},
                                      wpi::util::array<double, 2>{{0.5, 0.6}},
                                      wpi::util::array<double, 2>{{0.7, 0.8}}};

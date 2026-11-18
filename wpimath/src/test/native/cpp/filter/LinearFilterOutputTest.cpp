@@ -19,20 +19,20 @@
 #include "wpi/util/array.hpp"
 
 // Filter constants
-static constexpr auto kFilterStep = 5_ms;
-static constexpr auto kFilterTime = 2_s;
-static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
-static constexpr double kSinglePoleIIRExpectedOutput = -3.2172003;
-static constexpr double kHighPassTimeConstant = 0.006631;
-static constexpr double kHighPassExpectedOutput = 10.074717;
-static constexpr int32_t kMovAvgTaps = 6;
-static constexpr double kMovAvgExpectedOutput = -10.191644;
+static constexpr auto FILTER_STEP = 5_ms;
+static constexpr auto FILTER_TIME = 2_s;
+static constexpr double SINGLE_POLE_IIR_TIME_CONSTANT = 0.015915;
+static constexpr double SINGLE_POLE_IIR_EXPECTED_OUTPUT = -3.2172003;
+static constexpr double HIGH_PASS_TIME_CONSTANT = 0.006631;
+static constexpr double HIGH_PASS_EXPECTED_OUTPUT = 10.074717;
+static constexpr int32_t MOV_AVG_TAPS = 6;
+static constexpr double MOV_AVG_EXPECTED_OUTPUT = -10.191644;
 
 enum LinearFilterOutputTestType {
-  kTestSinglePoleIIR,
-  kTestHighPass,
-  kTestMovAvg,
-  kTestPulse
+  TEST_SINGLE_POLE_IIR,
+  TEST_HIGH_PASS,
+  TEST_MOV_AVG,
+  TEST_PULSE
 };
 
 static double GetData(double t) {
@@ -51,18 +51,18 @@ static double GetPulseData(double t) {
 static wpi::math::LinearFilter<double> MakeFilter(
     LinearFilterOutputTestType testType) {
   switch (testType) {
-    case kTestSinglePoleIIR:
+    case TEST_SINGLE_POLE_IIR:
       return wpi::math::LinearFilter<double>::SinglePoleIIR(
-          kSinglePoleIIRTimeConstant, kFilterStep);
-    case kTestHighPass:
-      return wpi::math::LinearFilter<double>::HighPass(kHighPassTimeConstant,
-                                                       kFilterStep);
-    case kTestMovAvg:
-    case kTestPulse:
-      return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+          SINGLE_POLE_IIR_TIME_CONSTANT, FILTER_STEP);
+    case TEST_HIGH_PASS:
+      return wpi::math::LinearFilter<double>::HighPass(HIGH_PASS_TIME_CONSTANT,
+                                                       FILTER_STEP);
+    case TEST_MOV_AVG:
+    case TEST_PULSE:
+      return wpi::math::LinearFilter<double>::MovingAverage(MOV_AVG_TAPS);
   }
 
-  return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+  return wpi::math::LinearFilter<double>::MovingAverage(MOV_AVG_TAPS);
 }
 
 static void CheckFilterOutput(LinearFilterOutputTestType testType,
@@ -70,7 +70,7 @@ static void CheckFilterOutput(LinearFilterOutputTestType testType,
                               double expectedOutput) {
   auto filter = MakeFilter(testType);
   double filterOutput = 0.0;
-  for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
+  for (auto t = 0_s; t < FILTER_TIME; t += FILTER_STEP) {
     filterOutput = filter.Calculate(data(t.value()));
   }
 
@@ -82,20 +82,20 @@ static void CheckFilterOutput(LinearFilterOutputTestType testType,
  */
 TEST_CASE("LinearFilterOutputTest Output", "[wpimath]") {
   SECTION("SinglePoleIIR") {
-    CheckFilterOutput(kTestSinglePoleIIR, GetData,
-                      kSinglePoleIIRExpectedOutput);
+    CheckFilterOutput(TEST_SINGLE_POLE_IIR, GetData,
+                      SINGLE_POLE_IIR_EXPECTED_OUTPUT);
   }
 
   SECTION("HighPass") {
-    CheckFilterOutput(kTestHighPass, GetData, kHighPassExpectedOutput);
+    CheckFilterOutput(TEST_HIGH_PASS, GetData, HIGH_PASS_EXPECTED_OUTPUT);
   }
 
   SECTION("MovingAverage") {
-    CheckFilterOutput(kTestMovAvg, GetData, kMovAvgExpectedOutput);
+    CheckFilterOutput(TEST_MOV_AVG, GetData, MOV_AVG_EXPECTED_OUTPUT);
   }
 
   SECTION("Pulse") {
-    CheckFilterOutput(kTestPulse, GetPulseData, 0.0);
+    CheckFilterOutput(TEST_PULSE, GetPulseData, 0.0);
   }
 }
 

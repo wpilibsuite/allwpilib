@@ -5,6 +5,9 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
+import telemetry
 import wpilib
 
 
@@ -15,6 +18,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.duty_cycle = wpilib.DutyCycle(0)
 
+    @override
     def robot_periodic(self):
         # Duty Cycle Frequency in Hz
         frequency = self.duty_cycle.get_frequency()
@@ -23,5 +27,5 @@ class MyRobot(wpilib.TimedRobot):
         # 1 is fully on, 0 is fully off
         output = self.duty_cycle.get_output()
 
-        wpilib.SmartDashboard.put_number("Frequency", frequency)
-        wpilib.SmartDashboard.put_number("Duty Cycle", output)
+        telemetry.log("Frequency", frequency)
+        telemetry.log("Duty Cycle", output)

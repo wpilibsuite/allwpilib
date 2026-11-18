@@ -321,6 +321,57 @@ Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_setBrownoutVoltage
 
 /*
  * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
+ * Method:    registerBrownoutRecoveryVoltageCallback
+ * Signature: (Ljava/lang/Object;Z)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_registerBrownoutRecoveryVoltageCallback
+  (JNIEnv* env, jclass, jobject callback, jboolean initialNotify)
+{
+  return sim::AllocateCallbackNoIndex(
+      env, callback, initialNotify,
+      &HALSIM_RegisterRoboRioBrownoutRecoveryVoltageCallback);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
+ * Method:    cancelBrownoutRecoveryVoltageCallback
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_cancelBrownoutRecoveryVoltageCallback
+  (JNIEnv* env, jclass, jint handle)
+{
+  return sim::FreeCallbackNoIndex(
+      env, handle, &HALSIM_CancelRoboRioBrownoutRecoveryVoltageCallback);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
+ * Method:    getBrownoutRecoveryVoltage
+ * Signature: ()D
+ */
+JNIEXPORT jdouble JNICALL
+Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_getBrownoutRecoveryVoltage
+  (JNIEnv*, jclass)
+{
+  return HALSIM_GetRoboRioBrownoutRecoveryVoltage();
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
+ * Method:    setBrownoutRecoveryVoltage
+ * Signature: (D)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_setBrownoutRecoveryVoltage
+  (JNIEnv*, jclass, jdouble value)
+{
+  HALSIM_SetRoboRioBrownoutRecoveryVoltage(value);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
  * Method:    registerCPUTempCallback
  * Signature: (Ljava/lang/Object;Z)I
  */
@@ -447,36 +498,6 @@ Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_setSerialNumber
   JStringRef serialNumberJString{env, serialNumber};
   auto str = wpi::util::make_string(serialNumberJString);
   HALSIM_SetRoboRioSerialNumber(&str);
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
- * Method:    getComments
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL
-Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_getComments
-  (JNIEnv* env, jclass)
-{
-  WPI_String str;
-  HALSIM_GetRoboRioComments(&str);
-  auto jstr = MakeJString(env, wpi::util::to_string_view(&str));
-  WPI_FreeString(&str);
-  return jstr;
-}
-
-/*
- * Class:     org_wpilib_hardware_hal_simulation_RoboRioDataJNI
- * Method:    setComments
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_hardware_hal_simulation_RoboRioDataJNI_setComments
-  (JNIEnv* env, jclass, jstring comments)
-{
-  JStringRef commentsJString{env, comments};
-  auto str = wpi::util::make_string(commentsJString);
-  HALSIM_SetRoboRioComments(&str);
 }
 
 /*

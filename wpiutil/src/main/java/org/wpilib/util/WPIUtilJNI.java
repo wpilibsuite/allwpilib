@@ -29,7 +29,7 @@ public class WPIUtilJNI extends WPIUtilJNIWrapper {
   /**
    * Set mock time.
    *
-   * @param time The desired time in microseconds.
+   * @param time The desired time in nanoseconds.
    */
   public static native void setMockTime(long time);
 
@@ -43,7 +43,7 @@ public class WPIUtilJNI extends WPIUtilJNIWrapper {
   /**
    * Returns the timestamp at which the program started.
    *
-   * @return The program start timestamp in microseconds.
+   * @return The program start timestamp in nanoseconds.
    */
   public static native long getProgramStartTime();
 

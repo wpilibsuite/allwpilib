@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_binary_cc_project", "package_static_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
@@ -17,7 +17,6 @@ wpilib_cc_library(
     srcs = glob(["src/lib/native/cpp/**/*.cpp"]),
     hdrs = glob(["src/lib/native/include/**"]),
     hdrs_pkg_root = "src/lib/native/include",
-    include_license_files = True,
     srcs_pkg_root = "src/lib/native/cpp",
     strip_include_prefix = "src/lib/native/include",
     tags = [
@@ -29,6 +28,7 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//fields",
+        "//fields:fieldimages",
         "//wpigui",
         "//wpimath",
         "//wpiutil",
@@ -42,23 +42,11 @@ wpilib_cc_static_library(
         "//wpimath:static/wpimath",
         "//wpiutil:static/wpiutil",
         "//fields:static/fields",
+        "//fields:static/fieldimages",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":glass",
-    ],
-)
-
-cc_test(
-    name = "glass-test",
-    size = "small",
-    srcs = glob(["src/test/native/**/*.cpp"]),
-    tags = [
-        "wpi-cpp-gui",
-    ],
-    deps = [
-        ":glass",
-        "//thirdparty/catch2",
     ],
 )
 
@@ -67,7 +55,6 @@ wpilib_cc_library(
     srcs = glob(["src/libnt/native/cpp/*.cpp"]),
     hdrs = glob(["src/libnt/native/include/**/*.hpp"]),
     hdrs_pkg_root = "src/libnt/native/include",
-    include_license_files = True,
     srcs_pkg_root = "src/libnt/native/cpp",
     strip_include_prefix = "src/libnt/native/include",
     tags = [
@@ -96,6 +83,7 @@ generate_version_file(
     name = "generate-version",
     output_file = "WPILibVersion.cpp",
     template = "src/app/generate/WPILibVersion.cpp.in",
+    visibility = ["//glass/src/test/native/imgui:__pkg__"],
 )
 
 generate_resources(
@@ -103,6 +91,13 @@ generate_resources(
     namespace = "wpi::glass",
     prefix = "GLASS",
     resource_files = glob(["src/app/native/resources/*"]),
+    visibility = ["//glass/src/test/native/imgui:__pkg__"],
+)
+
+filegroup(
+    name = "app-native-srcs",
+    srcs = glob(["src/app/native/cpp/**"]),
+    visibility = ["//glass/src/test/native/imgui:__pkg__"],
 )
 
 cc_binary(

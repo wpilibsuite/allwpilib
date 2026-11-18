@@ -1,0 +1,5 @@
+# This code is vendored from hatch-nativelib.
+target-version = "py310"
+
+[lint.isort]
+known-first-party = ["shared"]

@@ -5,12 +5,20 @@
 #pragma once
 
 #include <array>
+#include <concepts>
 
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/DCMotor.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/simulation/LinearSystemSim.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/current.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/mass.hpp"
+#include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace wpi::sim {
 /**
@@ -32,7 +40,8 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * Constructs a simulated elevator mechanism.
    *
    * @param plant The linear system that represents the elevator. This system
-   *     can be created with wpi::math::Models::ElevatorFromPhysicalConstants().
+   *     can be created with
+   *     wpi::math::Models::LinearPositionFromPhysicalConstants().
    * @param gearbox The type of and number of motors in your elevator gearbox.
    * @param minHeight The minimum allowed height of the elevator.
    * @param maxHeight The maximum allowed height of the elevator.

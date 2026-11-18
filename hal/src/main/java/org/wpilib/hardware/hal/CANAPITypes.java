@@ -16,7 +16,7 @@ public final class CANAPITypes {
    * FIRST CAN device type.
    *
    * <p>This enum represents different types of CAN devices. Teams are encouraged to use the
-   * kMiscellaneous for custom or miscellaneous devices.
+   * MISCELLANEOUS for custom or miscellaneous devices.
    *
    * @see <a href=
    *     "https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html">CAN
@@ -66,7 +66,7 @@ public final class CANAPITypes {
    * FIRST CAN manufacturer ID.
    *
    * <p>This enum represents different manufacturer IDs for CAN devices. Teams are encouraged to use
-   * the kTeamUse manufacturer ID for custom or team-specific devices.
+   * the TEAM_USE manufacturer ID for custom or team-specific devices.
    *
    * @see <a href=
    *     "https://docs.wpilib.org/en/stable/docs/software/can-devices/can-addressing.html">CAN

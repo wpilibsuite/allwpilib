@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <functional>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -29,11 +30,16 @@ struct SavedSettings {
   int userScale = 100;
   int style = 0;
   int fps = 120;
-  std::string defaultFontName = "Proggy Dotted";
+  std::string defaultFontName = "Roboto Regular";
 };
 
 struct Context : public SavedSettings {
   std::atomic_bool exit{false};
+
+  // Scale the style metrics were last built at, and the pre-scale style they
+  // were built from. The baseline carries any fields the app set itself.
+  float styleScale = 1.0f;
+  std::optional<ImGuiStyle> unscaledStyle;
 
   std::string title;
   int defaultWidth;
@@ -72,6 +78,8 @@ struct Context : public SavedSettings {
   std::vector<std::function<void(SDL_Event& event)>> eventHandlers;
   std::vector<std::function<void()>> earlyExecutors;
   std::vector<std::function<void()>> lateExecutors;
+  std::vector<std::function<void()>> preSwapExecutors;
+  std::vector<std::function<void()>> postSwapExecutors;
 
   std::vector<SDL_Surface*> icons;
 

@@ -12,8 +12,7 @@ template <>
 struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::HolonomicSample> {
   static constexpr std::string_view GetTypeName() { return "HolonomicSample"; }
   static constexpr size_t GetSize() {
-    return wpi::util::GetStructSize<wpi::math::TrajectorySample>() +
-           wpi::util::GetStructSize<wpi::math::Pose2d>() +
+    return sizeof(double) + wpi::util::GetStructSize<wpi::math::Pose2d>() +
            wpi::util::GetStructSize<wpi::math::ChassisVelocities>() +
            wpi::util::GetStructSize<wpi::math::ChassisAccelerations>();
   }

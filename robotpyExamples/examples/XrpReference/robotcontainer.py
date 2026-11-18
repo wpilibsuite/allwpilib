@@ -4,10 +4,9 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import typing
-
 import commands2
 import commands2.button
+import tunables
 import wpilib
 import xrp
 
@@ -36,8 +35,8 @@ class RobotContainer:
         # Assumes a gamepad plugged into channnel 0
         self.controller = wpilib.Joystick(0)
 
-        # Create SmartDashboard chooser for autonomous routines
-        self.chooser = wpilib.SendableChooser()
+        # Create a tunable selector for autonomous routines.
+        self.chooser = tunables.Selectable()
 
         self._configure_button_bindings()
 
@@ -75,14 +74,14 @@ class RobotContainer:
             commands2.InstantCommand(lambda: self.arm.set_angle(0.0), self.arm)
         )
 
-        # Setup SmartDashboard options
-        self.chooser.set_default_option(
+        # Set up autonomous options.
+        self.chooser.add_default(
             "Auto Routine Distance", AutonomousDistance(self.drivetrain)
         )
-        self.chooser.add_option("Auto Routine Time", AutonomousTime(self.drivetrain))
-        wpilib.SmartDashboard.put_data(self.chooser)
+        self.chooser.add("Auto Routine Time", AutonomousTime(self.drivetrain))
+        tunables.publish("Autonomous", self.chooser)
 
-    def get_autonomous_command(self) -> typing.Optional[commands2.Command]:
+    def get_autonomous_command(self) -> commands2.Command | None:
         return self.chooser.get_selected()
 
     def get_arcade_drive_command(self) -> ArcadeDrive:

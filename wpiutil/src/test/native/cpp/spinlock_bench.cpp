@@ -8,7 +8,11 @@
 #include <mutex>
 #include <thread>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/print.hpp"
@@ -22,7 +26,7 @@ static wpi::util::recursive_spinlock1 recursive_spinlock1;
 static wpi::util::recursive_spinlock2 recursive_spinlock2;
 static wpi::util::recursive_spinlock recursive_spinlock;
 
-TEST(SpinlockTest, Benchmark) {
+TEST_CASE("SpinlockTest Benchmark", "[wpiutil]") {
   using std::chrono::duration_cast;
   using std::chrono::high_resolution_clock;
   using std::chrono::microseconds;

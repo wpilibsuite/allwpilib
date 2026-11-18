@@ -92,7 +92,7 @@ final class StructEntryImpl<T> extends EntryBase implements StructEntry<T> {
       int i = 0;
       for (TimestampedObject<T> e : arr) {
         if (e.value != null) {
-          arr[i] = e;
+          newArr[i] = e;
           i++;
         }
       }
@@ -122,7 +122,7 @@ final class StructEntryImpl<T> extends EntryBase implements StructEntry<T> {
       int i = 0;
       for (T e : arr) {
         if (e != null) {
-          arr[i] = e;
+          newArr[i] = e;
           i++;
         }
       }

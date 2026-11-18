@@ -6,6 +6,7 @@
 
 #include <concepts>
 #include <limits>
+#include <utility>
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
@@ -29,8 +30,8 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
    *     region.
    */
   constexpr EllipticalRegionConstraint(const Ellipse2d& ellipse,
-                                       const Constraint& constraint)
-      : m_ellipse{ellipse}, m_constraint{constraint} {}
+                                       Constraint constraint)
+      : m_ellipse{ellipse}, m_constraint{std::move(constraint)} {}
 
   constexpr wpi::units::meters_per_second_t MaxVelocity(
       const Pose2d& pose, wpi::units::curvature_t curvature,

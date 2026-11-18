@@ -16,8 +16,7 @@ static wpi::units::second_t now = 0_s;
 class EdgeCounterFilterTest {
  protected:
   EdgeCounterFilterTest() {
-    WPI_SetNowImpl(
-        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
+    WPI_SetNowImpl([] { return wpi::units::nanosecond_t{now}.to<int64_t>(); });
     now = 0_ms;
   }
 

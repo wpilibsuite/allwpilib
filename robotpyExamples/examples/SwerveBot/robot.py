@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 import wpimath
 import drivetrain
@@ -14,7 +16,7 @@ class MyRobot(wpilib.TimedRobot):
     def __init__(self) -> None:
         """Robot initialization function"""
         super().__init__()
-        self.controller = wpilib.NiDsXboxController(0)
+        self.controller = wpilib.XboxController(0)
         self.swerve = drivetrain.Drivetrain()
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
@@ -22,10 +24,12 @@ class MyRobot(wpilib.TimedRobot):
         self.y_velocity_limiter = wpimath.SlewRateLimiter(3)
         self.rot_limiter = wpimath.SlewRateLimiter(3)
 
+    @override
     def autonomous_periodic(self) -> None:
         self.drive_with_joystick(False)
         self.swerve.update_odometry()
 
+    @override
     def teleop_periodic(self) -> None:
         self.drive_with_joystick(True)
 

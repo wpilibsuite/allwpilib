@@ -4,9 +4,11 @@
 
 #include "wpi/glass/networktables/NTCommandScheduler.hpp"
 
+#include <array>
 #include <format>
 #include <utility>
 
+#include "wpi/glass/networktables/NTTunableTopic.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::glass;
@@ -18,25 +20,35 @@ NTCommandSchedulerModel::NTCommandSchedulerModel(std::string_view path)
 NTCommandSchedulerModel::NTCommandSchedulerModel(
     wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
       m_commands{inst.GetStringArrayTopic(std::format("{}/Names", path))
                      .Subscribe({})},
       m_ids{
           inst.GetIntegerArrayTopic(std::format("{}/Ids", path)).Subscribe({})},
-      m_cancel{
-          inst.GetIntegerArrayTopic(std::format("{}/Cancel", path)).Publish()},
+      m_cancelTopic{inst.GetIntegerArrayTopic(std::format("{}/Cancel", path))},
+      m_cancelTuneTopic{
+          inst.GetIntegerArrayTopic(std::format("{}/Cancel/tune", path))},
+      m_cancelValueTopic{
+          inst.GetIntegerArrayTopic(std::format("{}/Cancel/value", path))},
       m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTCommandSchedulerModel::CancelCommand(size_t index) {
   if (index < m_idsValue.size()) {
-    m_cancel.Set({{m_idsValue[index]}});
+    std::array<int64_t, 1> toCancel{m_idsValue[index]};
+    if (IsTunableTopicMutable(m_cancelValueTopic)) {
+      if (!m_cancelTune) {
+        m_cancelTune = m_cancelTuneTopic.Publish();
+      }
+      m_cancelTune.Set(toCancel);
+    } else if (IsTunableTopicMutable(m_cancelTopic)) {
+      if (!m_cancel) {
+        m_cancel = m_cancelTopic.Publish();
+      }
+      m_cancel.Set(toCancel);
+    }
   }
 }
 
 void NTCommandSchedulerModel::Update() {
-  for (auto&& v : m_name.ReadQueue()) {
-    m_nameValue = std::move(v.value);
-  }
   for (auto&& v : m_commands.ReadQueue()) {
     m_commandsValue = std::move(v.value);
   }
@@ -47,4 +59,9 @@ void NTCommandSchedulerModel::Update() {
 
 bool NTCommandSchedulerModel::Exists() {
   return m_commands.Exists();
+}
+
+bool NTCommandSchedulerModel::IsReadOnly() {
+  return !IsTunableTopicMutable(m_cancelValueTopic) &&
+         !IsTunableTopicMutable(m_cancelTopic);
 }

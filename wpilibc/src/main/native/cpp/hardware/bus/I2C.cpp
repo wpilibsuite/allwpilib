@@ -8,8 +8,8 @@
 #include <format>
 
 #include "wpi/hal/I2C.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -20,8 +20,8 @@ I2C::I2C(Port port, int deviceAddress)
   HAL_InitializeI2C(m_port, &status);
   WPILIB_CheckErrorStatus(status, "Port {}", static_cast<int>(port));
 
-  HAL_ReportUsage(
-      std::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress), "");
+  wpi::util::ReportUsage(std::format("I2C[{}]", static_cast<int>(port)),
+                         deviceAddress, "");
 }
 
 I2C::Port I2C::GetPort() const {

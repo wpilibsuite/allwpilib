@@ -23,8 +23,8 @@ void HALSIM_RestartTiming(void);
 void HALSIM_PauseTiming(void);
 void HALSIM_ResumeTiming(void);
 HAL_Bool HALSIM_IsTimingPaused(void);
-void HALSIM_StepTiming(uint64_t delta);
-void HALSIM_StepTimingAsync(uint64_t delta);
+void HALSIM_StepTiming(int64_t delta);       // delta in nanoseconds
+void HALSIM_StepTimingAsync(int64_t delta);  // delta in nanoseconds
 
 typedef int32_t (*HALSIM_SendErrorHandler)(HAL_Bool isError, int32_t errorCode,
                                            const struct WPI_String* details,

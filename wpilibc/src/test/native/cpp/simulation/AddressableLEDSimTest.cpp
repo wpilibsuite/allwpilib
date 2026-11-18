@@ -6,7 +6,8 @@
 
 #include <array>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/hal/HAL.h"
@@ -14,22 +15,23 @@
 
 namespace wpi::sim {
 
-TEST(AddressableLEDSimTest, InitializationCallback) {
+TEST_CASE("AddressableLEDSimTest InitializationCallback",
+          "[wpilibc][simulation]") {
   HAL_Initialize();
 
   BooleanCallback callback;
   AddressableLEDSim sim{0};
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  EXPECT_FALSE(callback.WasTriggered());
+  CHECK_FALSE(callback.WasTriggered());
   AddressableLED led{0};
 
-  EXPECT_TRUE(sim.GetInitialized());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetInitialized());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(AddressableLEDSimTest, SetStart) {
+TEST_CASE("AddressableLEDSimTest SetStart", "[wpilibc][simulation]") {
   HAL_Initialize();
 
   AddressableLED led{0};
@@ -38,18 +40,18 @@ TEST(AddressableLEDSimTest, SetStart) {
 
   auto cb = sim.RegisterStartCallback(callback.GetCallback(), false);
 
-  EXPECT_EQ(0, sim.GetStart());  // Defaults to 0
+  CHECK(0 == sim.GetStart());  // Defaults to 0
 
   std::array<AddressableLED::LEDData, 50> ledData;
   led.SetStart(1);
   led.SetData(ledData);
 
-  EXPECT_EQ(1, sim.GetStart());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(1, callback.GetLastValue());
+  CHECK(1 == sim.GetStart());
+  CHECK(callback.WasTriggered());
+  CHECK(1 == callback.GetLastValue());
 }
 
-TEST(AddressableLEDSimTest, SetLength) {
+TEST_CASE("AddressableLEDSimTest SetLength", "[wpilibc][simulation]") {
   HAL_Initialize();
 
   AddressableLED led{0};
@@ -58,18 +60,18 @@ TEST(AddressableLEDSimTest, SetLength) {
 
   auto cb = sim.RegisterLengthCallback(callback.GetCallback(), false);
 
-  EXPECT_EQ(0, sim.GetLength());  // Defaults to 0 leds
+  CHECK(0 == sim.GetLength());  // Defaults to 0 leds
 
   std::array<AddressableLED::LEDData, 50> ledData;
   led.SetLength(ledData.max_size());
   led.SetData(ledData);
 
-  EXPECT_EQ(50, sim.GetLength());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(50, callback.GetLastValue());
+  CHECK(50 == sim.GetLength());
+  CHECK(callback.WasTriggered());
+  CHECK(50 == callback.GetLastValue());
 }
 
-TEST(AddressableLEDSimTest, SetData) {
+TEST_CASE("AddressableLEDSimTest SetData", "[wpilibc][simulation]") {
   AddressableLED led{0};
   AddressableLEDSim sim{0};
 
@@ -77,18 +79,18 @@ TEST(AddressableLEDSimTest, SetData) {
   std::array<AddressableLED::LEDData, 3> setData;
   auto cb = sim.RegisterDataCallback(
       [&](std::string_view, const unsigned char* buffer, unsigned int count) {
-        ASSERT_EQ(count, 9u);
-        EXPECT_EQ(255u, buffer[0]);
-        EXPECT_EQ(0, buffer[1]);
-        EXPECT_EQ(0, buffer[2]);
+        REQUIRE(count == 9u);
+        CHECK(255u == buffer[0]);
+        CHECK(0 == buffer[1]);
+        CHECK(0 == buffer[2]);
 
-        EXPECT_EQ(0, buffer[3]);
-        EXPECT_EQ(255u, buffer[4]);
-        EXPECT_EQ(0, buffer[5]);
+        CHECK(0 == buffer[3]);
+        CHECK(255u == buffer[4]);
+        CHECK(0 == buffer[5]);
 
-        EXPECT_EQ(0, buffer[6]);
-        EXPECT_EQ(0, buffer[7]);
-        EXPECT_EQ(255u, buffer[8]);
+        CHECK(0 == buffer[6]);
+        CHECK(0 == buffer[7]);
+        CHECK(255u == buffer[8]);
 
         callbackHit = true;
       },
@@ -102,22 +104,22 @@ TEST(AddressableLEDSimTest, SetData) {
   ledData[2].SetRGB(0, 0, 255);
   led.SetData(ledData);
 
-  EXPECT_TRUE(callbackHit);
+  CHECK(callbackHit);
 
   std::array<HAL_AddressableLEDData, 3> simData;
   sim.GetData(simData.data());
 
-  EXPECT_EQ(0xFF, simData[0].r);
-  EXPECT_EQ(0x00, simData[0].g);
-  EXPECT_EQ(0x00, simData[0].b);
+  CHECK(0xFF == simData[0].r);
+  CHECK(0x00 == simData[0].g);
+  CHECK(0x00 == simData[0].b);
 
-  EXPECT_EQ(0x00, simData[1].r);
-  EXPECT_EQ(0xFF, simData[1].g);
-  EXPECT_EQ(0x00, simData[1].b);
+  CHECK(0x00 == simData[1].r);
+  CHECK(0xFF == simData[1].g);
+  CHECK(0x00 == simData[1].b);
 
-  EXPECT_EQ(0x00, simData[2].r);
-  EXPECT_EQ(0x00, simData[2].g);
-  EXPECT_EQ(0xFF, simData[2].b);
+  CHECK(0x00 == simData[2].r);
+  CHECK(0x00 == simData[2].g);
+  CHECK(0xFF == simData[2].b);
 }
 
 }  // namespace wpi::sim

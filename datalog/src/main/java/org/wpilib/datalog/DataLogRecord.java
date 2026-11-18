@@ -18,9 +18,9 @@ import java.util.InputMismatchException;
  * Used only for reading (e.g. with DataLogReader).
  */
 public class DataLogRecord {
-  private static final int kControlStart = 0;
-  private static final int kControlFinish = 1;
-  private static final int kControlSetMetadata = 2;
+  private static final int CONTROL_START = 0;
+  private static final int CONTROL_FINISH = 1;
+  private static final int CONTROL_SET_METADATA = 2;
 
   DataLogRecord(int entry, long timestamp, ByteBuffer data) {
     m_entry = entry;
@@ -41,7 +41,7 @@ public class DataLogRecord {
   /**
    * Gets the record timestamp.
    *
-   * @return Timestamp, in integer microseconds
+   * @return Timestamp, in integer nanoseconds
    */
   public long getTimestamp() {
     return m_timestamp;
@@ -97,7 +97,7 @@ public class DataLogRecord {
    * @return True if start control record, false otherwise.
    */
   public boolean isStart() {
-    return m_entry == 0 && m_data.remaining() >= 17 && m_data.get(0) == kControlStart;
+    return m_entry == 0 && m_data.remaining() >= 17 && m_data.get(0) == CONTROL_START;
   }
 
   /**
@@ -107,7 +107,7 @@ public class DataLogRecord {
    * @return True if finish control record, false otherwise.
    */
   public boolean isFinish() {
-    return m_entry == 0 && m_data.remaining() == 5 && m_data.get(0) == kControlFinish;
+    return m_entry == 0 && m_data.remaining() == 5 && m_data.get(0) == CONTROL_FINISH;
   }
 
   /**
@@ -117,7 +117,7 @@ public class DataLogRecord {
    * @return True if set metadata control record, false otherwise.
    */
   public boolean isSetMetadata() {
-    return m_entry == 0 && m_data.remaining() >= 9 && m_data.get(0) == kControlSetMetadata;
+    return m_entry == 0 && m_data.remaining() >= 9 && m_data.get(0) == CONTROL_SET_METADATA;
   }
 
   /**
@@ -397,14 +397,18 @@ public class DataLogRecord {
   public String[] getStringArray() {
     ByteBuffer buf = getRawBuffer();
     try {
-      int size = buf.getInt();
+      long size = Integer.toUnsignedLong(buf.getInt());
       // sanity check size
       if (size > (buf.remaining() / 4)) {
         throw new InputMismatchException("invalid size");
       }
-      String[] arr = new String[size];
-      for (int i = 0; i < size; i++) {
+      int checkedSize = (int) size;
+      String[] arr = new String[checkedSize];
+      for (int i = 0; i < checkedSize; i++) {
         arr[i] = readInnerString(buf);
+      }
+      if (buf.hasRemaining()) {
+        throw new InputMismatchException("unexpected trailing data");
       }
       return arr;
     } catch (BufferUnderflowException | IndexOutOfBoundsException ex) {
@@ -413,13 +417,17 @@ public class DataLogRecord {
   }
 
   private String readInnerString(ByteBuffer buf) {
-    int size = buf.getInt();
-    if (size > buf.remaining()) {
-      throw new InputMismatchException("invalid string size");
+    try {
+      long size = Integer.toUnsignedLong(buf.getInt());
+      if (size > buf.remaining()) {
+        throw new InputMismatchException("invalid string size");
+      }
+      byte[] arr = new byte[(int) size];
+      buf.get(arr);
+      return new String(arr, StandardCharsets.UTF_8);
+    } catch (BufferUnderflowException | IndexOutOfBoundsException ex) {
+      throw new InputMismatchException();
     }
-    byte[] arr = new byte[size];
-    buf.get(arr);
-    return new String(arr, StandardCharsets.UTF_8);
   }
 
   private final int m_entry;

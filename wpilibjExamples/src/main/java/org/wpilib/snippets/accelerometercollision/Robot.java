@@ -7,7 +7,7 @@ package org.wpilib.snippets.accelerometercollision;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /**
  * Collision detection snippets for wpilib-docs.
@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
     prevXAccel = xAccel;
     prevYAccel = yAccel;
 
-    SmartDashboard.putNumber("X Jerk", xJerk);
-    SmartDashboard.putNumber("Y Jerk", yJerk);
+    Telemetry.log("X Jerk", xJerk);
+    Telemetry.log("Y Jerk", yJerk);
   }
 }

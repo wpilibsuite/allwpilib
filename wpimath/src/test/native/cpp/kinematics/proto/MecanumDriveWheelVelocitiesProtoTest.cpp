@@ -11,20 +11,20 @@ using namespace wpi::math;
 
 namespace {
 
-const MecanumDriveWheelVelocities kExpectedData =
+const MecanumDriveWheelVelocities EXPECTED_DATA =
     MecanumDriveWheelVelocities{2.29_mps, 17.4_mps, 4.4_mps, 0.229_mps};
 }  // namespace
 
 TEST_CASE("MecanumDriveWheelVelocitiesProtoTest Roundtrip", "[wpimath]") {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
 
-  CHECK(kExpectedData.frontLeft.value() == unpacked_data->frontLeft.value());
-  CHECK(kExpectedData.frontRight.value() == unpacked_data->frontRight.value());
-  CHECK(kExpectedData.rearLeft.value() == unpacked_data->rearLeft.value());
-  CHECK(kExpectedData.rearRight.value() == unpacked_data->rearRight.value());
+  CHECK(EXPECTED_DATA.frontLeft.value() == unpacked_data->frontLeft.value());
+  CHECK(EXPECTED_DATA.frontRight.value() == unpacked_data->frontRight.value());
+  CHECK(EXPECTED_DATA.rearLeft.value() == unpacked_data->rearLeft.value());
+  CHECK(EXPECTED_DATA.rearRight.value() == unpacked_data->rearRight.value());
 }

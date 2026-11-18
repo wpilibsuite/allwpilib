@@ -16,8 +16,7 @@ static wpi::units::second_t now = 0_s;
 class DebouncerTest {
  public:
   DebouncerTest() {
-    WPI_SetNowImpl(
-        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
+    WPI_SetNowImpl([] { return wpi::units::nanosecond_t{now}.to<int64_t>(); });
   }
 
   ~DebouncerTest() { WPI_SetNowImpl(nullptr); }
@@ -36,7 +35,7 @@ TEST_CASE_METHOD(DebouncerTest, "DebouncerTest DebounceRising", "[wpimath]") {
 
 TEST_CASE_METHOD(DebouncerTest, "DebouncerTest DebounceFalling", "[wpimath]") {
   wpi::math::Debouncer debouncer{20_ms,
-                                 wpi::math::Debouncer::DebounceType::kFalling};
+                                 wpi::math::Debouncer::DebounceType::FALLING};
 
   debouncer.Calculate(true);
   CHECK(debouncer.Calculate(false));
@@ -48,7 +47,7 @@ TEST_CASE_METHOD(DebouncerTest, "DebouncerTest DebounceFalling", "[wpimath]") {
 
 TEST_CASE_METHOD(DebouncerTest, "DebouncerTest DebounceBoth", "[wpimath]") {
   wpi::math::Debouncer debouncer{20_ms,
-                                 wpi::math::Debouncer::DebounceType::kBoth};
+                                 wpi::math::Debouncer::DebounceType::BOTH};
 
   debouncer.Calculate(false);
   CHECK_FALSE(debouncer.Calculate(true));
@@ -65,20 +64,20 @@ TEST_CASE_METHOD(DebouncerTest, "DebouncerTest DebounceBoth", "[wpimath]") {
 
 TEST_CASE_METHOD(DebouncerTest, "DebouncerTest DebounceParams", "[wpimath]") {
   wpi::math::Debouncer debouncer{20_ms,
-                                 wpi::math::Debouncer::DebounceType::kBoth};
+                                 wpi::math::Debouncer::DebounceType::BOTH};
 
   CHECK(debouncer.GetDebounceTime() == 20_ms);
   CHECK(debouncer.GetDebounceType() ==
-        wpi::math::Debouncer::DebounceType::kBoth);
+        wpi::math::Debouncer::DebounceType::BOTH);
 
   debouncer.SetDebounceTime(100_ms);
 
   CHECK(debouncer.GetDebounceTime() == 100_ms);
 
-  debouncer.SetDebounceType(wpi::math::Debouncer::DebounceType::kFalling);
+  debouncer.SetDebounceType(wpi::math::Debouncer::DebounceType::FALLING);
 
   CHECK(debouncer.GetDebounceType() ==
-        wpi::math::Debouncer::DebounceType::kFalling);
+        wpi::math::Debouncer::DebounceType::FALLING);
 
   CHECK(debouncer.Calculate(false));
 }

@@ -11,7 +11,7 @@ using namespace wpi::hal;
 
 namespace wpi::hal::init {
 void InitializeAddressableLEDData() {
-  static AddressableLEDData sad[kNumAddressableLEDs];
+  static AddressableLEDData sad[NUM_ADDRESSABLE_LE_DS];
   ::wpi::hal::SimAddressableLEDData = sad;
   static AddressableLEDDataBuffer buf;
   ::wpi::hal::SimAddressableLEDDataBuffer = &buf;

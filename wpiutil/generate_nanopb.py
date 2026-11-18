@@ -11,7 +11,7 @@ from pathlib import Path
 # Add the repo root so absolute package imports still work.
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
-from shared.generation import make_arg_parser, generate_nanopb, GeneratorTypes
+from shared.generation import GeneratorTypes, generate_nanopb, make_arg_parser
 
 
 def main():
@@ -21,11 +21,16 @@ def main():
     parser = make_arg_parser(dirname, dirname.parent, GeneratorTypes.NANOPB)
     parser.set_defaults(
         proto_directory=dirname / "src/test/proto",
-        output_directory=dirname / "src/generated/test/native/cpp",
+        output_directory=dirname / "src/generated/test",
     )
     args = parser.parse_args()
 
-    generate_nanopb(args.nanopb, args.output_directory, args.proto_directory)
+    generate_nanopb(
+        args.nanopb,
+        args.output_directory / "native/cpp",
+        args.output_directory / "native/include",
+        args.proto_directory,
+    )
 
 
 if __name__ == "__main__":

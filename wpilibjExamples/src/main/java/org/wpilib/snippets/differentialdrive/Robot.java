@@ -5,9 +5,9 @@
 package org.wpilib.snippets.differentialdrive;
 
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Gamepad;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.motor.PWMSparkMax;
 
 /**
  * DifferentialDrive snippets for wpilib-docs. Runs the motors with tank drive, arcade drive, and

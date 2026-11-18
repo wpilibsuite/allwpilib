@@ -1,5 +1,4 @@
 import pytest
-import math
 import random
 
 from wpimath import (

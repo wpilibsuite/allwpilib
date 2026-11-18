@@ -5,6 +5,7 @@
 package org.wpilib.math.optimization.solver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.wpilib.math.autodiff.Variable.sqrt;
 import static org.wpilib.math.optimization.Constraints.eq;
 import static org.wpilib.math.optimization.Constraints.ge;
@@ -105,6 +106,45 @@ class ExitStatusTest {
       assertEquals(ExpressionType.LINEAR, problem.inequalityConstraintType());
 
       assertEquals(ExitStatus.LOCALLY_INFEASIBLE, problem.solve());
+    }
+
+    assertEquals(0, Variable.totalNativeMemoryUsage());
+  }
+
+  @Test
+  void testSmallConstraintScalingIsFeasible() {
+    assertEquals(0, Variable.totalNativeMemoryUsage());
+
+    // Equality constraints
+    try (var problem = new Problem()) {
+      var x = problem.decisionVariable();
+      x.setValue(5005);
+
+      problem.subjectTo(eq(x.minus(5).times(1e-5), 0));
+
+      assertEquals(ExpressionType.NONE, problem.costFunctionType());
+      assertEquals(ExpressionType.LINEAR, problem.equalityConstraintType());
+      assertEquals(ExpressionType.NONE, problem.inequalityConstraintType());
+
+      assertEquals(ExitStatus.SUCCESS, problem.solve());
+      assertEquals(5, x.value(), 1e-3);
+    }
+
+    assertEquals(0, Variable.totalNativeMemoryUsage());
+
+    // Inequality constraints
+    try (var problem = new Problem()) {
+      var x = problem.decisionVariable();
+      x.setValue(5005);
+
+      problem.subjectTo(ge(new Variable(5).minus(x).times(1e-5), 0));
+
+      assertEquals(ExpressionType.NONE, problem.costFunctionType());
+      assertEquals(ExpressionType.NONE, problem.equalityConstraintType());
+      assertEquals(ExpressionType.LINEAR, problem.inequalityConstraintType());
+
+      assertEquals(ExitStatus.SUCCESS, problem.solve());
+      assertTrue(x.value() <= 5 + 1e-3);
     }
 
     assertEquals(0, Variable.totalNativeMemoryUsage());

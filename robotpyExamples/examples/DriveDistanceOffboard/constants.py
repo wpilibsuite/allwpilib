@@ -10,8 +10,6 @@ This offers a convenient resources to teams who need to make both quick and univ
 changes.
 """
 
-import math
-
 
 class DriveConstants:
     DT = 0.02

@@ -6,10 +6,10 @@ classes:
     methods:
       Add:
         overloads:
-          std::function<void ()>, std::chrono::microseconds, std::chrono::microseconds:
-          std::function<void ()>, std::chrono::microseconds, std::chrono::microseconds, std::chrono::microseconds:
-          std::function<void ()>, std::chrono::microseconds, wpi::units::second_t:
-          std::function<void ()>, std::chrono::microseconds, wpi::units::second_t, wpi::units::second_t:
+          std::function<void ()>, std::chrono::nanoseconds, std::chrono::nanoseconds:
+          std::function<void ()>, std::chrono::nanoseconds, std::chrono::nanoseconds, std::chrono::nanoseconds:
+          std::function<void ()>, std::chrono::nanoseconds, wpi::units::second_t:
+          std::function<void ()>, std::chrono::nanoseconds, wpi::units::second_t, wpi::units::second_t:
           Callback:
       Remove:
       Clear:
@@ -26,8 +26,8 @@ classes:
     methods:
       Callback:
         overloads:
-          std::function<void ()>, std::chrono::microseconds, std::chrono::microseconds, std::chrono::microseconds:
-          std::function<void ()>, std::chrono::microseconds, wpi::units::second_t, wpi::units::second_t:
-          std::function<void ()>, std::chrono::microseconds, wpi::units::second_t:
+          std::function<void ()>, std::chrono::nanoseconds, std::chrono::nanoseconds, std::chrono::nanoseconds:
+          std::function<void ()>, std::chrono::nanoseconds, wpi::units::second_t, wpi::units::second_t:
+          std::function<void ()>, std::chrono::nanoseconds, wpi::units::second_t:
       operator>:
       operator==:

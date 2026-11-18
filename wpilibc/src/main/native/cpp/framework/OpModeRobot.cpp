@@ -4,6 +4,7 @@
 
 #include "wpi/framework/OpModeRobot.hpp"
 
+#include <cstdio>
 #include <cstdlib>
 #include <format>
 #include <memory>
@@ -17,13 +18,13 @@
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Notifier.hpp"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/opmode/OpMode.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
 #include "wpi/util/SafeThread.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/print.hpp"
 
 using namespace wpi;
@@ -31,28 +32,43 @@ using namespace wpi;
 OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
     : m_period{period},
       m_loopOverrunAlert{
-          "opmode-loop-overrun",
+          "opmoderobot-loop-overrun",
           std::format("Loop time of {:.6f}s overrun", m_period.value()),
           wpi::util::Alert::Level::MEDIUM},
-      m_watchdog{period, [this] { m_loopOverrunAlert.Set(true); }} {
+      m_watchdog{period, [this] { m_loopOverrunAlert.Set(true); }},
+      m_opModePeriodicOverrunAlert{
+          "opmode-periodic-overrun",
+          std::format("OpMode Periodic() time of {:.6f}s overrun",
+                      m_period.value()),
+          wpi::util::Alert::Level::MEDIUM},
+      m_opModeWatchdog{period,
+                       [this] { m_opModePeriodicOverrunAlert.Set(true); }} {
   // Create our own notifier and callback queue
   int32_t status = 0;
   m_notifier = HAL_CreateNotifier(&status);
   HAL_SetNotifierName(m_notifier, "OpModeRobot", &status);
 
-  m_startTime = std::chrono::microseconds{RobotController::GetMonotonicTime()};
+  m_startTime = std::chrono::nanoseconds{RobotController::GetMonotonicTime()};
 
   // Add LoopFunc as periodic callback
   AddPeriodic([this] { LoopFunc(); }, period);
 
-  HAL_ReportUsage("Framework", "OpModeRobot");
+  wpi::util::ReportUsage("Framework", "OpModeRobot");
 }
+
+OpModeRobotBase::OpModeRobotBase(wpi::units::hertz_t frequency)
+    : OpModeRobotBase{1 / frequency} {}
 
 OpModeRobotBase::OpModeRobotBase() : OpModeRobotBase(DEFAULT_PERIOD) {}
 
 void OpModeRobotBase::AddPeriodic(std::function<void()> callback,
-                                  wpi::units::second_t period) {
-  m_callbacks.Add(std::move(callback), m_startTime, period);
+                                  wpi::units::second_t period,
+                                  wpi::units::second_t offset) {
+  m_callbacks.Add(std::move(callback), m_startTime, period, offset);
+}
+
+void OpModeRobotBase::PrintWatchdogEpochs() {
+  m_watchdog.PrintEpochs();
 }
 
 void OpModeRobotBase::LoopFunc() {
@@ -63,6 +79,8 @@ void OpModeRobotBase::LoopFunc() {
       wpi::internal::DriverStationBackend::GetControlWord();
   m_watchdog.Reset();
   const bool enabled = word.IsEnabled();
+  // Treat disabled as unknown
+  const RobotMode mode = enabled ? word.GetRobotMode() : RobotMode::UNKNOWN;
   int64_t modeId = word.IsDSAttached() ? word.GetOpModeId() : 0;
 
   bool modeChanged = modeId != m_lastModeId;
@@ -71,7 +89,6 @@ void OpModeRobotBase::LoopFunc() {
   if (!m_calledDriverStationConnected && word.IsDSAttached()) {
     m_calledDriverStationConnected = true;
     DriverStationConnected();
-    m_watchdog.AddEpoch("DriverStationConnected()");
   }
 
   // Handle OpMode changes
@@ -80,7 +97,6 @@ void OpModeRobotBase::LoopFunc() {
   }
 
   // Set up new opmode
-  bool justCreatedOpMode = false;
   if (modeId != 0 && !m_currentOpMode && modeChanged) {
     auto data = m_opModes.lookup(modeId);
     if (data.factory) {
@@ -97,24 +113,24 @@ void OpModeRobotBase::LoopFunc() {
           m_callbacks.Add(cb);
         }
 
-        // Call DisabledPeriodic immediately for newly created OpMode
-        m_currentOpMode->DisabledPeriodic();
-        m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
-        justCreatedOpMode = true;
+        // extra DisabledPeriodic call
+        if (enabled) {
+          m_currentOpMode->DisabledPeriodic();
+          m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
+        }
       }
     } else {
       WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
     }
   }
 
-  // Handle enabled state changes
-  bool justCalledDisabledInit = false;
-  if (m_lastEnabledState != enabled) {
-    if (enabled) {
-      // Transitioning to enabled
+  // If mode changed, call disabled exit and entry functions
+  if (m_lastMode != mode) {
+    if (m_lastMode == RobotMode::UNKNOWN) {
+      // Transitioning out of disabled
       DisabledExit();
-      m_watchdog.AddEpoch("DisabledExit()");
-    } else {
+    }
+    if (mode == RobotMode::UNKNOWN) {
       // Transitioning to disabled. Only tear down an opmode that was actually
       // running; a freshly selected opmode entering its disabled phase must
       // persist so it can be started on the next enable.
@@ -124,9 +140,8 @@ void OpModeRobotBase::LoopFunc() {
       }
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
-      justCalledDisabledInit = true;
     }
-    m_lastEnabledState = enabled;
+    m_lastMode = mode;
   }
 
   // Start the opmode if enabled and not already started. This single check
@@ -137,15 +152,13 @@ void OpModeRobotBase::LoopFunc() {
   }
 
   // Call periodic functions based on current state
+  HAL_ObserveUserProgram(word.GetValue());
   if (!enabled) {
-    // Only call DisabledPeriodic if we didn't just call DisabledInit
-    if (!justCalledDisabledInit) {
-      DisabledPeriodic();
-      m_watchdog.AddEpoch("DisabledPeriodic()");
-    }
+    DisabledPeriodic();
+    m_watchdog.AddEpoch("DisabledPeriodic()");
 
     // Call opmode DisabledPeriodic if we have one
-    if (m_currentOpMode && !justCreatedOpMode) {
+    if (m_currentOpMode) {
       m_currentOpMode->DisabledPeriodic();
       m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
     }
@@ -161,11 +174,8 @@ void OpModeRobotBase::LoopFunc() {
   RobotPeriodic();
   m_watchdog.AddEpoch("RobotPeriodic()");
 
-  // Always observe user program state
-  HAL_ObserveUserProgram(word.GetValue());
-
-  SmartDashboard::UpdateValues();
-  m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
+  wpi::tunables::TunableRegistry::Update();
+  m_watchdog.AddEpoch("TunableRegistry::Update()");
 
   if constexpr (IsSimulation()) {
     HAL_SimPeriodicBefore();
@@ -179,20 +189,21 @@ void OpModeRobotBase::LoopFunc() {
   // Flush NetworkTables
   wpi::nt::NetworkTableInstance::GetDefault().FlushLocal();
 
-  // Warn on loop time overruns
+  // Warn on loop time overruns, and clear the alert once the loop is back on
+  // time
   if (m_watchdog.IsExpired()) {
     m_watchdog.PrintEpochs();
   }
+  m_loopOverrunAlert.Set(m_watchdog.IsExpired());
 }
 
 void OpModeRobotBase::StartCompetition() {
-  wpi::util::print("********** Robot program startup complete **********\n");
-
   if constexpr (IsSimulation()) {
     SimulationInit();
   }
 
   // Tell the DS that the robot is ready to be enabled
+  std::puts("\n********** Robot program startup complete **********");
   wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
 
   // Loop forever, calling the callback system which handles periodic functions
@@ -209,11 +220,12 @@ void OpModeRobotBase::EndCompetition() {
   }
 }
 
-void OpModeRobotBase::AddOpModeFactory(
-    OpModeFactory factory, RobotMode mode, std::string_view name,
-    std::string_view group, std::string_view description,
-    const wpi::util::Color& textColor,
-    const wpi::util::Color& backgroundColor) {
+void OpModeRobotBase::AddOpModeFactory(RobotMode mode, std::string_view name,
+                                       std::string_view group,
+                                       std::string_view description,
+                                       const wpi::util::Color& textColor,
+                                       const wpi::util::Color& backgroundColor,
+                                       OpModeFactory factory) {
   int64_t id = RobotState::AddOpMode(mode, name, group, description, textColor,
                                      backgroundColor);
   if (id != 0) {
@@ -221,14 +233,19 @@ void OpModeRobotBase::AddOpModeFactory(
   }
 }
 
-void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
-                                       std::string_view name,
+void OpModeRobotBase::AddOpModeFactory(RobotMode mode, std::string_view name,
                                        std::string_view group,
-                                       std::string_view description) {
+                                       std::string_view description,
+                                       OpModeFactory factory) {
   int64_t id = RobotState::AddOpMode(mode, name, group, description);
   if (id != 0) {
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
   }
+}
+
+void OpModeRobotBase::AddOpModeFactory(RobotMode mode, std::string_view name,
+                                       OpModeFactory factory) {
+  AddOpModeFactory(mode, name, {}, {}, std::move(factory));
 }
 
 void OpModeRobotBase::RemoveOpMode(RobotMode mode, std::string_view name) {
@@ -257,9 +274,15 @@ void OpModeRobotBase::StartCurrentOpMode() {
   // Register the main opmode periodic callback. Capture a weak_ptr so a queued
   // callback can never resurrect or outlive a destroyed opmode.
   m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
-      [op = std::weak_ptr<OpMode>{m_currentOpMode}] {
+      [this, op = std::weak_ptr<OpMode>{m_currentOpMode}] {
         if (auto shared_op = op.lock()) {
+          m_opModeWatchdog.Reset();
           shared_op->Periodic();
+          m_opModeWatchdog.Disable();
+
+          // Alert on opmode Periodic() overruns, and clear the alert once it's
+          // back on time
+          m_opModePeriodicOverrunAlert.Set(m_opModeWatchdog.IsExpired());
         }
       },
       m_startTime, m_period};
@@ -283,6 +306,7 @@ void OpModeRobotBase::EndCurrentOpMode() {
 
     m_callbacks.Remove(*m_opmodePeriodic);
     m_opmodePeriodic.reset();
+    m_opModePeriodicOverrunAlert.Set(false);
   }
 
   // The additional GetCallbacks() callbacks are registered immediately on
@@ -293,7 +317,8 @@ void OpModeRobotBase::EndCurrentOpMode() {
   }
   m_activeOpModeCallbacks.clear();
 
-  // Regardless of whether opmode was started, destroy it
+  // Regardless of whether opmode was started, close it and release it
   std::print("********** Closing OpMode {} **********\n", m_currentOpModeName);
+  m_currentOpMode->Close();
   m_currentOpMode.reset();
 }

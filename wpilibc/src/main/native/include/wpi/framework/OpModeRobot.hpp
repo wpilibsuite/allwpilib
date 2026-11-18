@@ -7,6 +7,7 @@
 #include <concepts>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,7 @@
 #include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/Watchdog.hpp"
+#include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Alert.hpp"
 #include "wpi/util/DenseMap.hpp"
@@ -57,6 +59,25 @@ concept ConstructibleOpMode =
  * selected. When no opmode is selected, NonePeriodic() is called. The
  * DriverStationConnected() function is called the first time the driver station
  * connects to the robot.
+ *
+ * Every period, the robot's loop function runs first, calling these in order:
+ *
+ * 1. DisabledPeriodic(), only while disabled
+ * 2. DisabledPeriodic() of the selected opmode, only while disabled
+ * 3. NonePeriodic(), only when no opmode is selected
+ * 4. RobotPeriodic()
+ * 5. SimulationPeriodic(), only in simulation
+ *
+ * Then, while enabled, the opmode's Periodic() runs. Both are scheduled on the
+ * same period, and the loop function was registered first, so RobotPeriodic()
+ * and SimulationPeriodic() always run before the opmode's Periodic() in a given
+ * period. Additional callbacks from AddPeriodic() or the opmode run on their
+ * own schedules.
+ *
+ * One exception to the list above: if an opmode is selected while the robot is
+ * already enabled, its DisabledPeriodic() is called once, right after
+ * construction and before Start(), even though the robot is not disabled. That
+ * call happens before RobotPeriodic() in that loop.
  */
 class OpModeRobotBase : public RobotBase {
  public:
@@ -83,6 +104,13 @@ class OpModeRobotBase : public RobotBase {
   explicit OpModeRobotBase(wpi::units::second_t period);
 
   /**
+   * Constructor.
+   *
+   * @param frequency The frequency of the robot loop function.
+   */
+  explicit OpModeRobotBase(wpi::units::hertz_t frequency);
+
+  /**
    * Constructor for an OpModeRobot with a default loop time of 0.02 seconds.
    */
   explicit OpModeRobotBase();
@@ -101,6 +129,10 @@ class OpModeRobotBase : public RobotBase {
   /**
    * Function called periodically every loop, regardless of enabled state or
    * OpMode selection.
+   *
+   * Runs after DisabledPeriodic(), the opmode's DisabledPeriodic(), and
+   * NonePeriodic(), and before SimulationPeriodic(). When an opmode is enabled,
+   * this runs before its Periodic() in the same period.
    */
   virtual void RobotPeriodic() {}
 
@@ -111,6 +143,9 @@ class OpModeRobotBase : public RobotBase {
 
   /**
    * Function called periodically in simulation.
+   *
+   * Runs after RobotPeriodic() and before the enabled opmode's Periodic() in
+   * the same period.
    */
   virtual void SimulationPeriodic() {}
 
@@ -121,6 +156,9 @@ class OpModeRobotBase : public RobotBase {
 
   /**
    * Function called periodically while the robot is disabled.
+   *
+   * Runs first in the loop, before the selected opmode's DisabledPeriodic(),
+   * NonePeriodic(), and RobotPeriodic(). Never runs while enabled.
    */
   virtual void DisabledPeriodic() {}
 
@@ -132,31 +170,47 @@ class OpModeRobotBase : public RobotBase {
   /**
    * Function called periodically anytime when no opmode is selected, including
    * when the Driver Station is disconnected.
+   *
+   * Runs after DisabledPeriodic() and before RobotPeriodic().
    */
   virtual void NonePeriodic() {}
 
   /**
-   * Add a callback to run at a specific period.
+   * Add a callback to run at a specific period with a starting time offset.
    *
    * This callback will be registered with the framework immediately when this
    * method is called and will begin executing as soon as it is registered.
    *
    * @param callback The callback to run.
-   * @param period The period at which to run the callback.
+   * @param period   The period at which to run the callback.
+   * @param offset   The offset from the common starting time. This is useful
+   *                 for scheduling a callback in a different timeslot relative
+   *                 to OpModeRobot.
    */
-  void AddPeriodic(std::function<void()> callback, wpi::units::second_t period);
+  void AddPeriodic(std::function<void()> callback, wpi::units::second_t period,
+                   wpi::units::second_t offset = 0_s);
 
   /**
-   * Return the system clock time in microseconds for the start of the current
+   * Gets time period between calls to Periodic() functions.
+   */
+  wpi::units::second_t GetPeriod() const { return m_period; }
+
+  /**
+   * Prints list of epochs added so far and their times.
+   */
+  void PrintWatchdogEpochs();
+
+  /**
+   * Return the system clock time in nanoseconds for the start of the current
    * periodic loop. This is in the same time base as
    * Timer.getMonotonicTimeStamp(), but is stable through a loop. It is updated
    * at the beginning of every periodic callback (including the normal periodic
    * loop).
    *
-   * @return Robot running time in microseconds, as of the start of the current
+   * @return Robot running time in nanoseconds, as of the start of the current
    * periodic function.
    */
-  wpi::units::microsecond_t GetLoopStartTime() const {
+  wpi::units::nanosecond_t GetLoopStartTime() const {
     return m_callbacks.GetLoopStartTime();
   }
 
@@ -165,34 +219,46 @@ class OpModeRobotBase : public RobotBase {
    * opmode. It's necessary to call PublishOpModes() to make the added modes
    * visible to the driver station.
    *
-   * @param factory factory function
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
    * @param textColor text color
    * @param backgroundColor background color
+   * @param factory factory function
    */
-  void AddOpModeFactory(OpModeFactory factory, RobotMode mode,
-                        std::string_view name, std::string_view group,
-                        std::string_view description,
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        std::string_view group, std::string_view description,
                         const wpi::util::Color& textColor,
-                        const wpi::util::Color& backgroundColor);
+                        const wpi::util::Color& backgroundColor,
+                        OpModeFactory factory);
 
   /**
    * Adds an operating mode option using a factory function that creates the
    * opmode. It's necessary to call PublishOpModes() to make the added modes
    * visible to the driver station.
    *
-   * @param factory factory function
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
+   * @param factory factory function
    */
-  void AddOpModeFactory(OpModeFactory factory, RobotMode mode,
-                        std::string_view name, std::string_view group = {},
-                        std::string_view description = {});
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        std::string_view group, std::string_view description,
+                        OpModeFactory factory);
+
+  /**
+   * Adds an operating mode option using a factory function that creates the
+   * opmode. It's necessary to call PublishOpModes() to make the added modes
+   * visible to the driver station.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param factory factory function
+   */
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        OpModeFactory factory);
 
   /**
    * Removes an operating mode option. It's necessary to call PublishOpModes()
@@ -244,14 +310,17 @@ class OpModeRobotBase : public RobotBase {
   wpi::internal::PeriodicPriorityQueue m_callbacks;
   HAL_NotifierHandle m_notifier;
   wpi::units::second_t m_period;
-  std::chrono::microseconds m_startTime;
+  std::chrono::nanoseconds m_startTime;
   wpi::util::Alert m_loopOverrunAlert;
   Watchdog m_watchdog;
+  wpi::util::Alert m_opModePeriodicOverrunAlert;
+  Watchdog m_opModeWatchdog;
 
   // OpMode lifecycle state
   int64_t m_lastModeId = -1;
   bool m_calledDriverStationConnected = false;
-  bool m_lastEnabledState = false;
+  // Empty until the first loop, so that DisabledInit() runs on startup
+  std::optional<RobotMode> m_lastMode;
   std::shared_ptr<OpMode> m_currentOpMode;
   std::string m_currentOpModeName;
   std::vector<wpi::internal::PeriodicPriorityQueue::Callback>
@@ -286,6 +355,14 @@ class OpModeRobot : public OpModeRobotBase {
   explicit OpModeRobot(wpi::units::second_t period) : OpModeRobotBase{period} {}
 
   /**
+   * Constructor.
+   *
+   * @param frequency The frequency of the robot loop function.
+   */
+  explicit OpModeRobot(wpi::units::hertz_t frequency)
+      : OpModeRobotBase{frequency} {}
+
+  /**
    * Constructor for an OpModeRobot with a default loop time of 0.02 seconds.
    */
   explicit OpModeRobot() : OpModeRobotBase{} {}
@@ -311,11 +388,11 @@ class OpModeRobot : public OpModeRobotBase {
                  const wpi::util::Color& backgroundColor) {
     if constexpr (detail::OneArgOpMode<T, Derived>) {
       AddOpModeFactory(
-          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); },
-          mode, name, group, description, textColor, backgroundColor);
+          mode, name, group, description, textColor, backgroundColor,
+          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); });
     } else if constexpr (detail::NoArgOpMode<T>) {
-      AddOpModeFactory([] { return std::make_unique<T>(); }, mode, name, group,
-                       description, textColor, backgroundColor);
+      AddOpModeFactory(mode, name, group, description, textColor,
+                       backgroundColor, [] { return std::make_unique<T>(); });
     }
   }
 
@@ -336,12 +413,12 @@ class OpModeRobot : public OpModeRobotBase {
                  std::string_view group = {},
                  std::string_view description = {}) {
     if constexpr (detail::OneArgOpMode<T, Derived>) {
-      AddOpModeFactory(
-          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); },
-          mode, name, group, description);
+      AddOpModeFactory(mode, name, group, description, [this] {
+        return std::make_unique<T>(*static_cast<Derived*>(this));
+      });
     } else if constexpr (detail::NoArgOpMode<T>) {
-      AddOpModeFactory([] { return std::make_unique<T>(); }, mode, name, group,
-                       description);
+      AddOpModeFactory(mode, name, group, description,
+                       [] { return std::make_unique<T>(); });
     }
   }
 };

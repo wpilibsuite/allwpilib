@@ -1,15 +1,14 @@
 # validated: 2024-02-20 DV ee15cc172a5e sysid/SysIdRoutine.java
-from dataclasses import dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass
 from enum import Enum
 
-from wpilib.sysid import SysIdRoutineLog, State
-from ..command import Command
-from ..subsystem import Subsystem
 from wpilib import Timer
-
+from wpilib.sysid import State, SysIdRoutineLog
 from wpimath.units import seconds, volts
 
-from typing import Callable, Optional
+from ..command import Command
+from ..subsystem import Subsystem
 
 volts_per_second = float
 
@@ -51,7 +50,7 @@ class SysIdRoutine(SysIdRoutineLog):
         ramp_rate: volts_per_second = 1.0
         step_voltage: volts = 7.0
         timeout: seconds = 10.0
-        record_state: Optional[Callable[[State], None]] = None
+        record_state: Callable[[State], None] | None = None
 
     @dataclass
     class Mechanism:

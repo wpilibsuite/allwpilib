@@ -1,10 +1,5 @@
 import typing
-
-if typing.TYPE_CHECKING:
-    from typing_extensions import Buffer
-else:
-    # Avoiding typing_extensions runtime dependency
-    Buffer = bytearray
+from collections.abc import Buffer, Callable
 
 
 class StructDescriptor(typing.NamedTuple):
@@ -30,19 +25,17 @@ class StructDescriptor(typing.NamedTuple):
     size: int
 
     #: A function that converts the type to bytes
-    pack: typing.Callable[[typing.Any], bytes]
+    pack: Callable[[typing.Any], bytes]
 
     #: A function that converts the type to bytes
-    pack_into: typing.Callable[[typing.Any, Buffer], None]
+    pack_into: Callable[[typing.Any, Buffer], None]
 
     #: A function that converts bytes to an instance
-    unpack: typing.Callable[[Buffer], typing.Any]
+    unpack: Callable[[Buffer], typing.Any]
 
     #: A function that updates the given instance using the deserialized bytes
     #: .. not supported
-    # unpack_into: typing.Callable[[typing.Any, Buffer], None]
+    # unpack_into: Callable[[typing.Any, Buffer], None]
 
     #: If this contains nested structs, calls wpiutil.wpistruct.for_each_nested for each
-    for_each_nested: typing.Optional[
-        typing.Callable[[typing.Callable[[str, str], None]], None]
-    ]
+    for_each_nested: Callable[[Callable[[str, str], None]], None] | None

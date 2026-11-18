@@ -5,10 +5,10 @@
 #include "wpi/glass/networktables/NTDifferentialDrive.hpp"
 
 #include <format>
-#include <utility>
 
 #include <imgui.h>
 
+#include "wpi/glass/networktables/NTTunableTopic.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::glass;
@@ -20,9 +20,6 @@ NTDifferentialDriveModel::NTDifferentialDriveModel(std::string_view path)
 NTDifferentialDriveModel::NTDifferentialDriveModel(
     wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(std::format("{}/.controllable", path))
-                         .Subscribe(false)},
       m_lPercent{
           inst.GetDoubleTopic(std::format("{}/Left Motor Velocity", path))
               .GetEntry(0)},
@@ -40,17 +37,11 @@ NTDifferentialDriveModel::NTDifferentialDriveModel(
 }
 
 void NTDifferentialDriveModel::Update() {
-  for (auto&& v : m_name.ReadQueue()) {
-    m_nameValue = std::move(v.value);
-  }
   for (auto&& v : m_lPercent.ReadQueue()) {
     m_lPercentData.SetValue(v.value, v.time);
   }
   for (auto&& v : m_rPercent.ReadQueue()) {
     m_rPercentData.SetValue(v.value, v.time);
-  }
-  for (auto&& v : m_controllable.ReadQueue()) {
-    m_controllableValue = v.value;
   }
 
   double l = m_lPercentData.GetValue();
@@ -62,4 +53,9 @@ void NTDifferentialDriveModel::Update() {
 
 bool NTDifferentialDriveModel::Exists() {
   return m_lPercent.Exists();
+}
+
+bool NTDifferentialDriveModel::IsReadOnly() {
+  return !IsTunableTopicMutable(m_lPercent.GetTopic()) ||
+         !IsTunableTopicMutable(m_rPercent.GetTopic());
 }

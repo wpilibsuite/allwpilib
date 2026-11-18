@@ -1,4 +1,4 @@
-project(wpical LANGUAGES C CXX Fortran)
+project(wpical)
 
 include(CompileWarnings)
 include(GenResources)
@@ -11,7 +11,7 @@ generate_resources(src/main/native/resources generated/main/cpp WPIcal wpical wp
 file(GLOB wpical_src src/main/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
 file(
     GLOB_RECURSE wpical_thirdparty_src
-    src/main/native/thirdparty/libdogleg/src/*.cpp
+    src/main/native/thirdparty/libdogleg/src/*.c
     src/main/native/thirdparty/mrcal/src/*.c
     src/main/native/thirdparty/mrcal/src/*.cpp
     src/main/native/thirdparty/mrcal_java/src/*.cpp
@@ -48,7 +48,6 @@ target_include_directories(
 
 if(MSVC)
     set(compile_flags
-        /wd4047
         /wd4098
         /wd4267
         /wd4068
@@ -113,6 +112,7 @@ endif()
 target_link_libraries(
     wpical
     apriltag
+    fields
     wpimath
     opencv_highgui
     opencv_imgproc
@@ -139,7 +139,7 @@ elseif(APPLE)
 endif()
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test_catch2(wpical src/test/native/cpp)
+    wpilib_add_test(wpical src/test/native/cpp)
     wpilib_link_macos_gui(wpical_test)
     target_sources(wpical_test PRIVATE ${wpical_src} ${wpical_thirdparty_src})
     target_compile_definitions(wpical_test PRIVATE RUNNING_WPICAL_TESTS)
@@ -169,12 +169,61 @@ if(WPILIB_WITH_TESTS)
     target_link_libraries(
         wpical_test
         apriltag
+        fields
         wpimath
         opencv_highgui
         opencv_objdetect
         opencv_videoio
         libglass
         wpigui
+        wpiutil
+        ${cholmod_target}
+        ${suitesparse_target}
+        Ceres::ceres
+    )
+endif()
+
+if(WPILIB_WITH_IMGUI_TESTS)
+    wpilib_add_imgui_test(wpical src/test/native/imgui)
+    wpilib_link_macos_gui(wpical_imgui_test)
+    target_sources(
+        wpical_imgui_test
+        PRIVATE
+            ${wpical_src}
+            ${wpical_thirdparty_src}
+            ${wpical_resources_src}
+            ${wpical_rc}
+            ${APP_ICON_MACOSX}
+    )
+    if(MSVC)
+        target_compile_options(wpical_imgui_test PRIVATE /utf-8)
+    endif()
+    target_compile_options(wpical_imgui_test PRIVATE ${compile_flags})
+    target_include_directories(
+        wpical_imgui_test
+        SYSTEM
+        PRIVATE
+            src/main/native/include
+            src/main/native/thirdparty/libdogleg/include
+            src/main/native/thirdparty/mrcal/include
+            src/main/native/thirdparty/mrcal/generated
+            src/main/native/thirdparty/mrcal_java/include
+    )
+    target_compile_definitions(wpical_imgui_test PUBLIC OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT)
+    target_compile_definitions(
+        wpical_imgui_test
+        PUBLIC PROJECT_ROOT_PATH="${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/assets"
+    )
+    target_link_libraries(
+        wpical_imgui_test
+        apriltag
+        fields
+        wpimath
+        opencv_highgui
+        opencv_objdetect
+        opencv_videoio
+        libglass_for_tests
+        wpigui_for_tests
         wpiutil
         ${cholmod_target}
         ${suitesparse_target}

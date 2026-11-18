@@ -27,6 +27,14 @@ classes:
       NormalizeKey:
         overloads:
           std::string_view, bool:
+            doc_code_blocks:
+            - |
+              from ntcore import NetworkTable
+
+              assert NetworkTable.normalize_key("/foo/bar", True) == "/foo/bar"
+              assert NetworkTable.normalize_key("foo/bar", True) == "/foo/bar"
+              assert NetworkTable.normalize_key("/foo/bar", False) == "foo/bar"
+              assert NetworkTable.normalize_key("foo//bar", False) == "foo/bar"
           std::string_view, wpi::util::SmallVectorImpl<char>&, bool:
             ignore: true
       GetHierarchy:

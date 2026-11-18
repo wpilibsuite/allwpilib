@@ -5,8 +5,10 @@
 #include "WireDecoder.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <concepts>
 #include <format>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -14,6 +16,7 @@
 #include "Message.hpp"
 #include "MessageHandler.hpp"
 #include "wpi/util/Logger.hpp"
+#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SpanExtras.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/mpack.h"
@@ -137,7 +140,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
       }
 
       if constexpr (std::same_as<T, ClientMessageHandler>) {
-        if (*method == PublishMsg::kMethodStr) {
+        if (*method == PublishMsg::METHOD_STR) {
           // name
           auto name = ObjGetString(*params, "name", &error);
           if (!name) {
@@ -178,7 +181,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           // complete
           out.ClientPublish(pubuid, *name, *typeStr, *properties, {});
           rv = true;
-        } else if (*method == UnpublishMsg::kMethodStr) {
+        } else if (*method == UnpublishMsg::METHOD_STR) {
           // pubuid
           int64_t pubuid;
           if (!ObjGetNumber(*params, "pubuid", &error, &pubuid)) {
@@ -195,7 +198,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           // complete
           out.ClientUnpublish(pubuid);
           rv = true;
-        } else if (*method == SetPropertiesMsg::kMethodStr) {
+        } else if (*method == SetPropertiesMsg::METHOD_STR) {
           // name
           auto name = ObjGetString(*params, "name", &error);
           if (!name) {
@@ -215,7 +218,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 
           // complete
           out.ClientSetProperties(*name, *update);
-        } else if (*method == SubscribeMsg::kMethodStr) {
+        } else if (*method == SubscribeMsg::METHOD_STR) {
           // subuid
           int64_t subuid;
           if (!ObjGetNumber(*params, "subuid", &error, &subuid)) {
@@ -244,8 +247,15 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
                 error = "periodic value must be a number";
                 goto err;
               }
+              if (!std::isfinite(val) || val < 0 ||
+                  val > static_cast<double>(
+                            std::numeric_limits<unsigned int>::max()) /
+                            1000.0) {
+                error = "periodic value out of range";
+                goto err;
+              }
               options.periodic = val;
-              options.periodicMs = val * 1000;
+              options.periodicMs = static_cast<unsigned int>(val * 1000.0);
             }
 
             // send all changes
@@ -285,7 +295,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           // complete
           out.ClientSubscribe(subuid, topicNames, options);
           rv = true;
-        } else if (*method == UnsubscribeMsg::kMethodStr) {
+        } else if (*method == UnsubscribeMsg::METHOD_STR) {
           // subuid
           int64_t subuid;
           if (!ObjGetNumber(*params, "subuid", &error, &subuid)) {
@@ -307,7 +317,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           goto err;
         }
       } else if constexpr (std::same_as<T, ServerMessageHandler>) {
-        if (*method == AnnounceMsg::kMethodStr) {
+        if (*method == AnnounceMsg::METHOD_STR) {
           // name
           auto name = ObjGetString(*params, "name", &error);
           if (!name) {
@@ -365,7 +375,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 
           // complete
           out.ServerAnnounce(*name, id, *typeStr, *properties, pubuid);
-        } else if (*method == UnannounceMsg::kMethodStr) {
+        } else if (*method == UnannounceMsg::METHOD_STR) {
           // name
           auto name = ObjGetString(*params, "name", &error);
           if (!name) {
@@ -387,7 +397,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 
           // complete
           out.ServerUnannounce(*name, id);
-        } else if (*method == PropertiesUpdateMsg::kMethodStr) {
+        } else if (*method == PropertiesUpdateMsg::METHOD_STR) {
           // name
           auto name = ObjGetString(*params, "name", &error);
           if (!name) {
@@ -450,7 +460,7 @@ bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
                          in->size());
   mpack_expect_array_match(&reader, 4);
   *outId = mpack_expect_int(&reader);
-  auto time = mpack_expect_i64(&reader);
+  auto wireTime = mpack_expect_i64(&reader);
   int type = mpack_expect_int(&reader);
   switch (type) {
     case 0:  // boolean
@@ -582,8 +592,23 @@ bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
     return false;
   }
   // set time
-  outValue->SetServerTime(time);
-  outValue->SetTime(time == 0 ? 0 : time + localTimeOffset);
+  int64_t serverTime = 0;
+  if (wireTime != 0 &&
+      wpi::util::MulOverflow(wireTime, int64_t{1000}, serverTime)) {
+    *error = "timestamp out of range";
+    return false;
+  }
+  outValue->SetServerTime(serverTime);
+  if (serverTime == 0) {
+    outValue->SetTime(0);
+  } else {
+    int64_t localTime;
+    if (wpi::util::AddOverflow(serverTime, localTimeOffset, localTime)) {
+      *error = "timestamp out of range";
+      return false;
+    }
+    outValue->SetTime(localTime);
+  }
   // update input range
   *in = wpi::util::take_back(*in, remaining);
   return true;

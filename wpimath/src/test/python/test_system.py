@@ -2,7 +2,6 @@ import math
 
 import wpimath
 
-import pytest
 import numpy as np
 
 
@@ -101,7 +100,7 @@ def test_rkdp_time_varying():
     )
 
     expected = 12.0 * math.exp(6.0) / math.pow(math.exp(6.0) + 1.0, 2.0)
-    assert math.isclose(y1[0, 0], expected, abs_tol=1e-3)
+    assert math.isclose(y1[0, 0], expected, abs_tol=1e-10)
 
 
 def test_numerical_jacobian():

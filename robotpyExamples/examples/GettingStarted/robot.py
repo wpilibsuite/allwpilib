@@ -5,7 +5,10 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
+import wpilib_drivers
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -15,8 +18,8 @@ class MyRobot(wpilib.TimedRobot):
         should be used for any initialization code.
         """
         super().__init__()
-        self.left_drive = wpilib.PWMSparkMax(0)
-        self.right_drive = wpilib.PWMSparkMax(1)
+        self.left_drive = wpilib_drivers.PWMSparkMax(0)
+        self.right_drive = wpilib_drivers.PWMSparkMax(1)
         self.robot_drive = wpilib.DifferentialDrive(self.left_drive, self.right_drive)
         self.controller = wpilib.Gamepad(0)
         self.timer = wpilib.Timer()
@@ -26,10 +29,12 @@ class MyRobot(wpilib.TimedRobot):
         # gearbox is constructed, you might have to invert the left side instead.
         self.right_drive.set_inverted(True)
 
+    @override
     def autonomous_init(self):
         """This function is run once each time the robot enters autonomous mode."""
         self.timer.restart()
 
+    @override
     def autonomous_periodic(self):
         """This function is called periodically during autonomous."""
 
@@ -40,17 +45,21 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.robot_drive.arcade_drive(0, 0)  # Stop robot
 
+    @override
     def teleop_init(self):
         """This function is called once each time the robot enters teleoperated mode."""
 
+    @override
     def teleop_periodic(self):
         """This function is called periodically during teleoperated mode."""
         self.robot_drive.arcade_drive(
             -self.controller.get_left_y(), -self.controller.get_right_x()
         )
 
+    @override
     def utility_init(self):
         """This function is called once each time the robot enters utility mode."""
 
+    @override
     def utility_periodic(self):
         """This function is called periodically during utility mode."""

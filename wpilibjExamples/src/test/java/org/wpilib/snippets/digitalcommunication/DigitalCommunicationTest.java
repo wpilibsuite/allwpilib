@@ -25,10 +25,10 @@ import org.wpilib.simulation.SimHooks;
 class DigitalCommunicationTest {
   private Robot robot;
   private Thread thread;
-  private final DIOSim allianceOutput = new DIOSim(Robot.kAlliancePort);
-  private final DIOSim enabledOutput = new DIOSim(Robot.kEnabledPort);
-  private final DIOSim autonomousOutput = new DIOSim(Robot.kAutonomousPort);
-  private final DIOSim alertOutput = new DIOSim(Robot.kAlertPort);
+  private final DIOSim allianceOutput = new DIOSim(Robot.ALLIANCE_PORT);
+  private final DIOSim enabledOutput = new DIOSim(Robot.ENABLED_PORT);
+  private final DIOSim autonomousOutput = new DIOSim(Robot.AUTONOMOUS_PORT);
+  private final DIOSim alertOutput = new DIOSim(Robot.ALERT_PORT);
 
   @BeforeEach
   void startThread() {

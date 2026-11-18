@@ -152,7 +152,6 @@ constexpr auto const_string() {
     return wpi::util::ct_string<char, std::char_traits<char>, 3>{{'#', '1', '2'}};
 }
 
-void sendable_test(py::module &m);
 void struct_test(py::module &m);
 
 /* WPI_String tests */
@@ -179,9 +178,11 @@ StructWithWPI_String cast_struct_with_wpi_string() {
     return output;
 }
 
+void span_safety_test(py::module_& m);
+
 PYBIND11_MODULE(module, m) {
-    sendable_test(m);
     struct_test(m);
+    span_safety_test(m);
 
     // array
     m.def("load_array_int", &load_array_int);

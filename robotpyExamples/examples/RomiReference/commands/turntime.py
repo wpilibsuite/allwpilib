@@ -4,6 +4,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import commands2
 import wpilib
 
@@ -30,19 +32,23 @@ class TurnTime(commands2.Command):
 
         self.start_time = 0.0
 
+    @override
     def initialize(self) -> None:
         """Called when the command is initially scheduled."""
         self.start_time = wpilib.Timer.get_timestamp()
         self.drive.arcade_drive(0, 0)
 
+    @override
     def execute(self) -> None:
         """Called every time the scheduler runs while the command is scheduled."""
         self.drive.arcade_drive(0, self.rotational_velocity)
 
+    @override
     def end(self, interrupted: bool) -> None:
         """Called once the command ends or is interrupted."""
         self.drive.arcade_drive(0, 0)
 
+    @override
     def is_finished(self) -> bool:
         """Returns true when the command should end"""
         return wpilib.Timer.get_timestamp() - self.start_time >= self.duration

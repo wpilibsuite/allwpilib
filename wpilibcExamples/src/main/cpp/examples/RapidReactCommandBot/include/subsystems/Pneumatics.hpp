@@ -32,11 +32,12 @@ class Pneumatics : wpi::cmd::SubsystemBase {
   // the scale parameter in the AnalogPotentiometer constructor is scaled from
   // 1 instead of 5, so if r is the raw AnalogPotentiometer output, the
   // pressure is 250r-25
-  static constexpr double kScale = 250;
-  static constexpr double kOffset = -25;
-  wpi::AnalogPotentiometer pressureTransducer{/* the AnalogIn port*/ 2, kScale,
-                                              kOffset};
+  static constexpr double SCALE = 250;
+  static constexpr double OFFSET = -25;
+  wpi::AnalogPotentiometer pressureTransducer{/* the AnalogIn port*/ 2, SCALE,
+                                              OFFSET};
 
   // Compressor connected to a PH with a default CAN ID
-  wpi::Compressor compressor{0, wpi::PneumaticsModuleType::CTRE_PCM};
+  wpi::Compressor compressor{wpi::CANPort::CAN_S0,
+                             wpi::PneumaticsModuleType::CTRE_PCM};
 };

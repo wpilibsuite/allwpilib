@@ -12,8 +12,11 @@ ext {
 apply from: "${rootDir}/shared/opencv.gradle"
 
 dependencies {
+    implementation project(':allwpilib-java')
+    implementation project(':drivers')
     implementation project(':wpilibj')
     implementation project(':apriltag')
+    implementation project(':fields')
     implementation project(':wpimath')
     implementation project(':hal')
     implementation project(':wpiutil')
@@ -23,6 +26,8 @@ dependencies {
     implementation project(':cameraserver')
     implementation project(':commandsv2')
     implementation project(':commandsv3')
+    implementation project(':telemetry')
+    implementation project(':tunables')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
     implementation project(':epilogue-runtime')
@@ -51,9 +56,11 @@ tasks.withType(JavaExec).configureEach {
     // Commands v3 needs reflective access to the continuation classes
     jvmArgs += [
         '--add-opens',
-        'java.base/jdk.internal.vm=ALL-UNNAMED',
+        'java.base/jdk.internal.vm=wpilib.command3',
         '--add-opens',
-        'java.base/java.lang=ALL-UNNAMED',
+        'java.base/java.lang=wpilib.command3',
+        // Explicitly permit native access to WPILib JNI wrappers
+        '--enable-native-access=wpilib.util,wpilib.hal,wpilib.ntcore'
     ]
 }
 
@@ -103,7 +110,7 @@ apply plugin: 'cpp'
 apply plugin: 'org.wpilib.NativeUtils'
 
 apply from: '../shared/config.gradle'
-
+apply from: "${rootDir}/shared/libmrclib.gradle"
 
 model {
     components {
@@ -129,12 +136,15 @@ model {
                 project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
-                project(':hal').addHalDependency(binary, 'shared')
-                project(':hal').addHalJniDependency(binary)
+                nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                lib project: ':hal', library: 'hal', linkage: 'shared'
+                lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
 
                 def systemArch = getCurrentArch()
                 if (binary.targetPlatform.name == systemArch) {
@@ -194,7 +204,7 @@ model {
                                     doFirst { doFirstTask(run) }
 
                                     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-                                        run.jvmArgs = ['-XstartOnFirstThread']
+                                        run.jvmArgs += ['-XstartOnFirstThread']
                                     }
                                 }
                                 project.tasks.create("test${entry.foldername}", Test) { testTask ->
@@ -242,7 +252,7 @@ model {
                                     doFirst { doFirstTask(run) }
 
                                     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-                                        run.jvmArgs = ['-XstartOnFirstThread']
+                                        run.jvmArgs += ['-XstartOnFirstThread']
                                     }
                                 }
                                 project.tasks.create("testSnippet${entry.foldername}", Test) { testTask ->

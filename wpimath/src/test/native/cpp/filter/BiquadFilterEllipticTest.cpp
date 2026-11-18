@@ -83,20 +83,20 @@ TEST_CASE("BiquadFilterEllipticTest LowPassEquirippleInPassbandAndStopband",
           "[wpimath][filter]") {
   // Even order: |H(0)| = -rippleDb at DC; odd order: |H(0)| = 0 dB.
   // Both share a stopband floor at -stopAttenDb.
-  constexpr double kRipple = 1.0;
-  constexpr double kAtten = 40.0;
+  constexpr double RIPPLE = 1.0;
+  constexpr double ATTEN = 40.0;
   auto filter = BiquadFilter::Elliptic(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz,
-                                       kRipple, kAtten);
+                                       RIPPLE, ATTEN);
   auto sections = filter.Sections();
 
   double dcDb = 20.0 * std::log10(CascadeMagnitude(sections, 0.0, 1000.0));
   double fcDb = 20.0 * std::log10(CascadeMagnitude(sections, 50.0, 1000.0));
-  CHECK_NEAR(dcDb, -kRipple, 0.01);
-  CHECK_NEAR(fcDb, -kRipple, 0.01);
+  CHECK_NEAR(dcDb, -RIPPLE, 0.01);
+  CHECK_NEAR(fcDb, -RIPPLE, 0.01);
 
   // Past the transition band the response stays at -rs floor.
   double stopDb = 20.0 * std::log10(CascadeMagnitude(sections, 100.0, 1000.0));
-  CHECK(stopDb < -kAtten + 0.5);
+  CHECK(stopDb < -ATTEN + 0.5);
 }
 
 TEST_CASE("BiquadFilterEllipticTest OddOrderHasUnityDcGain",
@@ -110,22 +110,22 @@ TEST_CASE("BiquadFilterEllipticTest OddOrderHasUnityDcGain",
 TEST_CASE("BiquadFilterEllipticTest HighPassResponse", "[wpimath][filter]") {
   // Section ordering may differ from scipy for HP, like Cheby2 — verify the
   // total response instead.
-  constexpr double kRipple = 1.0;
-  constexpr double kAtten = 40.0;
+  constexpr double RIPPLE = 1.0;
+  constexpr double ATTEN = 40.0;
   auto filter = BiquadFilter::Elliptic(Kind::HighPass, 4, 1000.0_Hz, 100.0_Hz,
-                                       kRipple, kAtten);
+                                       RIPPLE, ATTEN);
   auto sections = filter.Sections();
 
   double passbandDb =
       20.0 * std::log10(CascadeMagnitude(sections, 400.0, 1000.0));
-  CHECK_NEAR(passbandDb, 0.0, kRipple + 0.01);
+  CHECK_NEAR(passbandDb, 0.0, RIPPLE + 0.01);
 
   double cutoffDb =
       20.0 * std::log10(CascadeMagnitude(sections, 100.0, 1000.0));
-  CHECK_NEAR(cutoffDb, -kRipple, 0.01);
+  CHECK_NEAR(cutoffDb, -RIPPLE, 0.01);
 
   double dcDb = 20.0 * std::log10(CascadeMagnitude(sections, 0.0, 1000.0));
-  CHECK(dcDb < -kAtten + 0.5);
+  CHECK(dcDb < -ATTEN + 0.5);
 }
 
 TEST_CASE("BiquadFilterEllipticTest BandPass4thOrderMatchesScipy",
@@ -156,21 +156,21 @@ TEST_CASE("BiquadFilterEllipticTest BandPass4thOrderMatchesScipy",
 }
 
 TEST_CASE("BiquadFilterEllipticTest BandPassResponse", "[wpimath][filter]") {
-  constexpr double kRipple = 1.0;
-  constexpr double kAtten = 40.0;
+  constexpr double RIPPLE = 1.0;
+  constexpr double ATTEN = 40.0;
   auto filter = BiquadFilter::Elliptic(Kind::BandPass, 3, 1000.0_Hz, 80.0_Hz,
-                                       120.0_Hz, kRipple, kAtten);
+                                       120.0_Hz, RIPPLE, ATTEN);
   auto sections = filter.Sections();
 
   double centerDb =
       20.0 * std::log10(CascadeMagnitude(sections, 100.0, 1000.0));
-  CHECK_NEAR(centerDb, 0.0, kRipple + 0.01);
+  CHECK_NEAR(centerDb, 0.0, RIPPLE + 0.01);
 
   // Outside the band: deeply attenuated.
   CHECK(20.0 * std::log10(CascadeMagnitude(sections, 0.0, 1000.0)) <
-        -kAtten + 1.0);
+        -ATTEN + 1.0);
   CHECK(20.0 * std::log10(CascadeMagnitude(sections, 400.0, 1000.0)) <
-        -kAtten + 1.0);
+        -ATTEN + 1.0);
 }
 
 TEST_CASE("BiquadFilterEllipticTest RejectsInvalidArgs", "[wpimath][filter]") {

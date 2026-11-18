@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 
 import constants
@@ -23,6 +25,7 @@ class MyRobot(wpilib.TimedRobot):
         self.intake = Intake()
         self.joystick = wpilib.Joystick(constants.JOYSTICK_INDEX)
 
+    @override
     def teleop_periodic(self) -> None:
         """This function is called periodically during operator control."""
         # Activate the intake while the trigger is held

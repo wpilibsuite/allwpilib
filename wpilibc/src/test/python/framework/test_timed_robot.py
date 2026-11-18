@@ -2,6 +2,7 @@ import threading
 
 import pytest
 
+import tunables
 from wpilib import TimedRobot
 from wpilib.simulation import (
     DriverStationSim,
@@ -14,14 +15,6 @@ from wpilib.simulation import (
 from hal import RobotMode
 
 _PERIOD = 0.02  # 20 ms
-
-
-@pytest.fixture(autouse=True)
-def timed_robot_setup(wpilib_state):
-    pause_timing()
-    set_program_started(False)
-    yield
-    resume_timing()
 
 
 class MockRobot(TimedRobot):
@@ -91,8 +84,53 @@ class MockRobot(TimedRobot):
         self.utility_exit_count += 1
 
 
-def test_disabled_mode():
+@pytest.fixture
+def robot(wpilib_state, nt):
+    pause_timing()
+    set_program_started(False)
+    yield MockRobot()
+    resume_timing()
+
+
+def test_constructor_publishes_wpilib_version(nt):
+    topic = nt.get_string_topic("/Robot/WPILibVersion")
     robot = MockRobot()
+    with topic.subscribe("") as sub:
+        assert sub.get()
+    del robot
+    assert not topic.exists()
+
+
+def test_robot_loop_refreshes_getter_backed_tunables(robot: MockRobot):
+    backend = tunables.MockTunableBackend()
+    value = [1]
+    robot_thread = threading.Thread(target=robot.start_competition, daemon=True)
+
+    tunables.TunableRegistry.reset()
+    try:
+        tunables.TunableRegistry.register_backend("", backend)
+        tunables.get_table().publish_int(
+            "getter",
+            lambda: value[0],
+            lambda tuned: value.__setitem__(0, tuned),
+        )
+
+        value[0] = 7
+        robot_thread.start()
+        wait_for_program_start()
+        DriverStationSim.set_enabled(False)
+        DriverStationSim.notify_new_data()
+        step_timing(_PERIOD)
+
+        assert backend.get_value("/getter") == 7
+    finally:
+        robot.end_competition()
+        if robot_thread.is_alive():
+            robot_thread.join()
+        tunables.TunableRegistry.reset()
+
+
+def test_disabled_mode(robot: MockRobot):
     robot_thread = threading.Thread(target=robot.start_competition, daemon=True)
     robot_thread.start()
     wait_for_program_start()
@@ -133,8 +171,7 @@ def test_disabled_mode():
     robot_thread.join()
 
 
-def test_autonomous_mode():
-    robot = MockRobot()
+def test_autonomous_mode(robot: MockRobot):
     robot_thread = threading.Thread(target=robot.start_competition, daemon=True)
     robot_thread.start()
     wait_for_program_start()
@@ -175,8 +212,7 @@ def test_autonomous_mode():
     robot_thread.join()
 
 
-def test_teleop_mode():
-    robot = MockRobot()
+def test_teleop_mode(robot: MockRobot):
     robot_thread = threading.Thread(target=robot.start_competition, daemon=True)
     robot_thread.start()
     wait_for_program_start()
@@ -212,8 +248,7 @@ def test_teleop_mode():
     robot_thread.join()
 
 
-def test_utility_mode():
-    robot = MockRobot()
+def test_utility_mode(robot: MockRobot):
     robot_thread = threading.Thread(target=robot.start_competition, daemon=True)
     robot_thread.start()
     wait_for_program_start()
@@ -250,8 +285,7 @@ def test_utility_mode():
     robot_thread.join()
 
 
-def test_mode_change():
-    robot = MockRobot()
+def test_mode_change(robot: MockRobot):
     robot_thread = threading.Thread(target=robot.start_competition, daemon=True)
     robot_thread.start()
     wait_for_program_start()
@@ -314,8 +348,7 @@ def test_mode_change():
     robot_thread.join()
 
 
-def test_add_periodic():
-    robot = MockRobot()
+def test_add_periodic(robot: MockRobot):
     callback_count = 0
 
     def on_periodic() -> None:
@@ -351,8 +384,7 @@ def test_add_periodic():
     robot_thread.join()
 
 
-def test_add_periodic_with_offset():
-    robot = MockRobot()
+def test_add_periodic_with_offset(robot: MockRobot):
     callback_count = 0
 
     def on_periodic() -> None:

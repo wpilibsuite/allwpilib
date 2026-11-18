@@ -8,7 +8,6 @@ import static org.wpilib.units.Units.MetersPerSecond;
 import static org.wpilib.units.Units.Radians;
 import static org.wpilib.units.Units.RadiansPerSecond;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Mechanism;
@@ -76,11 +75,26 @@ public class SwerveDrive implements Mechanism {
    * @return An array of module positions.
    */
   public SwerveModulePosition[] getModulePositions() {
-    return getSwerveData(SwerveModule::getPosition);
+    return new SwerveModulePosition[] {
+      frontLeft.getPosition(),
+      frontRight.getPosition(),
+      rearLeft.getPosition(),
+      rearRight.getPosition()
+    };
   }
 
+  /**
+   * Gets the velocities of all swerve modules. Used for telemetry.
+   *
+   * @return An array of module velocities.
+   */
   public SwerveModuleVelocity[] getModuleVelocities() {
-    return getSwerveData(SwerveModule::getVelocity);
+    return new SwerveModuleVelocity[] {
+      frontLeft.getVelocity(),
+      frontRight.getVelocity(),
+      rearLeft.getVelocity(),
+      rearRight.getVelocity()
+    };
   }
 
   @Override
@@ -158,8 +172,7 @@ public class SwerveDrive implements Mechanism {
           double y = -controller.getLeftX();
 
           // ... but heading is controlled automatically based on the relative position of the robot
-          // and
-          // the target.
+          // and the target.
           Pose2d robot = robotPose.get();
           Pose2d target = targetPose.get();
           Angle targetHeading = angleBetweenPoses(robot, target);
@@ -228,15 +241,5 @@ public class SwerveDrive implements Mechanism {
           coroutine.waitUntil(follower::isDone);
         })
         .named("Drive.FollowPath[" + pathName + "]");
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> T[] getSwerveData(Function<SwerveModule, ? extends T> extractor) {
-    T[] data = (T[]) new Object[4];
-    data[0] = extractor.apply(frontLeft);
-    data[1] = extractor.apply(frontRight);
-    data[2] = extractor.apply(rearLeft);
-    data[3] = extractor.apply(rearRight);
-    return data;
   }
 }

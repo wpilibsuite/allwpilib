@@ -51,6 +51,7 @@ def eigen_inclusions(dp: Path, f: str):
             or "SSE" in dp.parts
         )
 
+    # Ceres still includes StdVector, even though it shouldn't
     if (
         "StlSupport" in dp.parts
         and not f.endswith("StdList.h")
@@ -76,6 +77,7 @@ def eigen_inclusions(dp: Path, f: str):
         "SparseCore",
         "SparseLU",
         "SparseQR",
+        # Ceres still includes StdVector, even though it shouldn't
         "StdVector",
         "Version",
         "misc",

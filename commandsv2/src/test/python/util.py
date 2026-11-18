@@ -1,14 +1,13 @@
-from typing import Any, Dict, TypeVar, Type
-
 import inspect
+from typing import Any, TypeVar
 
 import commands2
-from wpilib.simulation import DriverStationSim, pause_timing, resume_timing, step_timing
+from wpilib.simulation import pause_timing, resume_timing, step_timing
 
 Y = TypeVar("Y")
 
 
-def full_subclass_of(cls: Type[Y]) -> Type[Y]:
+def full_subclass_of(cls: type[Y]) -> type[Y]:
     # Pybind classes can't be monkeypatched.
     # This generates a subclass with every method filled out
     # so that it can be monkeypatched.
@@ -138,7 +137,7 @@ class OOFloat:
 # Fakito Framework
 
 
-def _get_all_args_as_kwargs(method, *args, **kwargs) -> Dict[str, Any]:
+def _get_all_args_as_kwargs(method, *args, **kwargs) -> dict[str, Any]:
     try:
         import inspect
 

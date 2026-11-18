@@ -1,32 +1,23 @@
-import hal
-import wpilib
+import importlib.metadata
 import logging
 import os.path
 import sys
 import threading
 import time
-import typing
+from importlib.metadata import entry_points
 
-import importlib.metadata
+import hal
+import wpiutil
 
-if sys.version_info < (3, 10):
-
-    def entry_points(group):
-        eps = importlib.metadata.entry_points()
-        return eps.get(group, [])
-
-else:
-    entry_points = importlib.metadata.entry_points
-
+import wpilib
 
 from .report_error import report_error, report_error_internal
 
 
-def _log_versions(robotpy_version: typing.Optional[str]):
-    import wpilib
-    import wpilib.deployinfo
-
+def _log_versions(robotpy_version: str | None):
     import logging
+
+    import wpilib.deployinfo
 
     data = wpilib.deployinfo.get_deploy_data()
     if data:
@@ -85,7 +76,7 @@ class RobotStarter:
         self._robotpy_version = None
 
     @property
-    def robotpy_version(self) -> typing.Optional[str]:
+    def robotpy_version(self) -> str | None:
         if not self._robotpy_version:
             try:
                 pkg = importlib.metadata.metadata("robotpy")
@@ -155,7 +146,8 @@ class RobotStarter:
             return False
 
     def _start(self, robot_cls: wpilib.RobotBase) -> bool:
-        hal.report_usage("Language", "Python")
+        wpiutil.set_report_usage_impl(hal.report_usage)
+        wpiutil.report_usage("Language", "Python")
         hal.publish_wpilib_version(f"{wpilib.__version__} (Python)")
 
         is_simulation = wpilib.RobotBase.is_simulation()
@@ -189,8 +181,6 @@ class RobotStarter:
             report_error_internal(
                 "timed out while waiting for NT server to start", is_warning=True
             )
-
-        wpilib.SmartDashboard.init()
 
         # Call DriverStationBackend.refresh_data() to kick things off
         wpilib.DriverStationBackend.refresh_data()

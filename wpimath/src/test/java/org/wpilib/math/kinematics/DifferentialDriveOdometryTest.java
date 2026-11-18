@@ -12,18 +12,18 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 
 class DifferentialDriveOdometryTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
   private final DifferentialDriveOdometry m_odometry =
-      new DifferentialDriveOdometry(Rotation2d.kZero, 0, 0);
+      new DifferentialDriveOdometry(Rotation2d.ZERO, 0, 0);
 
   @Test
   void testOdometryWithEncoderDistances() {
-    m_odometry.resetPosition(Rotation2d.fromDegrees(45), 0, 0, Pose2d.kZero);
+    m_odometry.resetPosition(Rotation2d.fromDegrees(45), 0, 0, Pose2d.ZERO);
     var pose = m_odometry.update(Rotation2d.fromDegrees(135.0), 0.0, 5 * Math.PI);
 
     assertAll(
-        () -> assertEquals(5.0, pose.getX(), kEpsilon),
-        () -> assertEquals(5.0, pose.getY(), kEpsilon),
-        () -> assertEquals(90.0, pose.getRotation().getDegrees(), kEpsilon));
+        () -> assertEquals(5.0, pose.getX(), EPSILON),
+        () -> assertEquals(5.0, pose.getY(), EPSILON),
+        () -> assertEquals(90.0, pose.getRotation().getDegrees(), EPSILON));
   }
 }

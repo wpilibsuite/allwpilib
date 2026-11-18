@@ -22,6 +22,11 @@ enum BindingType {
    */
   SCHEDULE_ON_FALLING_EDGE,
   /**
+   * Attempts to schedule (fork) a command on every poll where the signal is high. The command will
+   * run until it completes or is interrupted by another command requiring the same mechanisms.
+   */
+  SCHEDULE_WHILE_HIGH,
+  /**
    * Schedules (forks) a command on a rising edge signal. If the command is still running on the
    * next rising edge, it will be canceled then; otherwise, it will be scheduled again.
    */

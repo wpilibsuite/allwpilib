@@ -18,18 +18,6 @@ functions:
         WPI_FreeString(&s);
         return ss;
       }
-  HAL_GetComments:
-    param_override:
-      comments:
-        ignore: true
-    cpp_code: |
-      []() {
-        WPI_String s;
-        HAL_GetComments(&s);
-        std::string ss(wpi::util::to_string_view(&s));
-        WPI_FreeString(&s);
-        return ss;
-      }
   HAL_GetTeamNumber:
   HAL_GetRuntimeType:
   HAL_GetSystemActive:

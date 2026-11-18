@@ -1,9 +1,7 @@
 # validated: 2024-01-19 DS aaea85ff1656 SequentialCommandGroup.java
 from __future__ import annotations
 
-from typing import List
-
-from wpiutil import SendableBuilder
+from telemetry import TelemetryTable
 
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler
@@ -28,7 +26,7 @@ class SequentialCommandGroup(Command):
         :param commands: the commands to include in this composition.
         """
         super().__init__()
-        self._commands: List[Command] = []
+        self._commands: list[Command] = []
         self._current_command_index = -1
         self._runs_when_disabled = True
         self._interrupt_behavior = InterruptionBehavior.CANCEL_INCOMING
@@ -94,8 +92,6 @@ class SequentialCommandGroup(Command):
     def get_interruption_behavior(self) -> InterruptionBehavior:
         return self._interrupt_behavior
 
-    def init_sendable(self, builder: SendableBuilder) -> None:
-        super().init_sendable(builder)
-        builder.add_integer_property(
-            "index", lambda: self._current_command_index, lambda _: None
-        )
+    def log_to(self, table: TelemetryTable) -> None:
+        super().log_to(table)
+        table.log("index", self._current_command_index)

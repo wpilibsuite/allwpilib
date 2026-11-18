@@ -1,20 +1,17 @@
 {
-  "game": "2021 FRC Slalom Path",
-  "field-image": "2021-slalompath.png",
-  "field-corners": {
-    "top-left": [
-      20,
-      20
-    ],
-    "bottom-right": [
-      780,
-      400
-    ]
+  "name": "2021 FRC Slalom Path",
+  "season": "2021",
+  "game": "Slalom Path",
+  "field-image": {
+    "path": "2021-slalompath.png",
+    "top": 20,
+    "left": 20,
+    "bottom": 400,
+    "right": 780
   },
-  "field-size": [
-    30,
-    15
-  ],
-  "field-unit": "foot",
+  "field-dimensions": {
+    "length": 9.144,
+    "width": 4.572
+  },
   "program": "frc"
 }

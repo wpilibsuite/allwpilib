@@ -11,6 +11,7 @@ def __update_yaml_files_impl(ctx):
     args.add("update-yaml")
     args.add("--write")
     args.add("-v")
+    args.add("-q")
     args.add("--project_file=" + ctx.files.pyproject_toml[0].path)
     args.add("--override_output_directory=" + output_dir.path)
 

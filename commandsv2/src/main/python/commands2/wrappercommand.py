@@ -1,8 +1,6 @@
 # validated: 2024-01-20 DS ad0859a8c9ec WrapperCommand.java
 from __future__ import annotations
 
-from typing import Set
-
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler
 
@@ -63,7 +61,7 @@ class WrapperCommand(Command):
         """
         return self._command.is_finished()
 
-    def get_requirements(self) -> Set:
+    def get_requirements(self) -> set:
         """
         Specifies the set of subsystems used by this command. Two commands cannot use the same
         subsystem at the same time. If the command is scheduled as interruptible and another command is

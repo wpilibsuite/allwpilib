@@ -8,8 +8,7 @@
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -22,10 +21,7 @@ class EventLoop;
  * This class handles Xbox input that comes from the Driver Station.
  * Each time a value is requested the most recent value is returned.
  */
-class XboxController
-    : public HIDDevice,
-      public wpi::util::Sendable,
-      public wpi::util::SendableHelper<XboxController> {
+class XboxController : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /** The number of touchpads supported by this controller. */
   static constexpr int TOUCHPAD_COUNT = 0;
@@ -149,44 +145,116 @@ class XboxController
   /**
    * Get the Left X value of the controller.
    *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftXDeadband() to change it.
+   *
    * @return the axis value.
    */
   double GetLeftX() const;
 
   /**
+   * Set the deadband for the Left X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftXDeadband(double deadband);
+
+  /**
    * Get the Left Y value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftYDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetLeftY() const;
 
   /**
+   * Set the deadband for the Left Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftYDeadband(double deadband);
+
+  /**
    * Get the Right X value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetRightXDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetRightX() const;
 
   /**
+   * Set the deadband for the Right X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightXDeadband(double deadband);
+
+  /**
    * Get the Right Y value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetRightYDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetRightY() const;
 
   /**
+   * Set the deadband for the Right Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightYDeadband(double deadband);
+
+  /**
    * Get the Left Trigger value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetLeftTriggerDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetLeftTrigger() const;
 
   /**
+   * Set the deadband for the Left Trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftTriggerDeadband(double deadband);
+
+  /**
    * Get the Right Trigger value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetRightTriggerDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetRightTrigger() const;
+
+  /**
+   * Set the deadband for the Right Trigger axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetRightTriggerDeadband(double deadband);
 
   /**
    * Get the value of the axis.
@@ -737,9 +805,16 @@ class XboxController
    */
   void SetRumble(GenericHID::RumbleType type, double value);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  std::string_view GetTelemetryType() const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
+  double m_leftXDeadband = 0.1;
+  double m_leftYDeadband = 0.1;
+  double m_rightXDeadband = 0.1;
+  double m_rightYDeadband = 0.1;
+  double m_leftTriggerDeadband = 0.01;
+  double m_rightTriggerDeadband = 0.01;
   GenericHID* m_hid;
 };
 

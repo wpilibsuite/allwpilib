@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.pneumatic.CompressorConfigType;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
@@ -20,6 +21,8 @@ import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.EnumCallback;
 
 class REVPHSimTest {
+  private static final CANPort BUS = CANPort.CAN_S1;
+
   @Test
   void testInitialization() {
     HAL.initialize();
@@ -31,7 +34,7 @@ class REVPHSimTest {
     BooleanCallback callback = new BooleanCallback();
 
     try (CallbackStore cb = sim.registerInitializedCallback(callback, false);
-        PneumaticHub ph = new PneumaticHub(1)) {
+        PneumaticHub ph = new PneumaticHub(BUS)) {
       assertTrue(sim.getInitialized());
     }
     assertFalse(sim.getInitialized());
@@ -41,8 +44,9 @@ class REVPHSimTest {
   void solenoidOutputTest() {
     HAL.initialize();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
-        DoubleSolenoid doubleSolenoid = new DoubleSolenoid(1, PneumaticsModuleType.REV_PH, 3, 4)) {
+    try (PneumaticHub ph = new PneumaticHub(BUS);
+        DoubleSolenoid doubleSolenoid =
+            new DoubleSolenoid(BUS, PneumaticsModuleType.REV_PH, 3, 4)) {
       REVPHSim sim = new REVPHSim(ph);
       sim.resetData();
 
@@ -95,9 +99,10 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(BUS);
         CallbackStore cb = sim.registerCompressorOnCallback(callback, false)) {
       assertFalse(ph.getCompressor());
       assertFalse(sim.getCompressorOn());
@@ -114,9 +119,10 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     EnumCallback callback = new EnumCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(BUS);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
       assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
@@ -134,9 +140,10 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     EnumCallback callback = new EnumCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(BUS);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
       assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
@@ -154,9 +161,10 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     EnumCallback callback = new EnumCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(BUS);
         CallbackStore cb = sim.registerCompressorConfigTypeCallback(callback, false)) {
       ph.disableCompressor();
       assertEquals(ph.getCompressorConfigType(), CompressorConfigType.DISABLED);
@@ -174,9 +182,10 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     BooleanCallback callback = new BooleanCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(BUS);
         CallbackStore cb = sim.registerPressureSwitchCallback(callback, false)) {
       assertFalse(ph.getPressureSwitch());
 
@@ -193,9 +202,10 @@ class REVPHSimTest {
     HAL.initialize();
 
     REVPHSim sim = new REVPHSim(1);
+    sim.resetData();
     DoubleCallback callback = new DoubleCallback();
 
-    try (PneumaticHub ph = new PneumaticHub(1);
+    try (PneumaticHub ph = new PneumaticHub(BUS);
         CallbackStore cb = sim.registerCompressorCurrentCallback(callback, false)) {
       assertFalse(ph.getPressureSwitch());
 

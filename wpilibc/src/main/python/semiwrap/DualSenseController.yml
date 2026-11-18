@@ -1,13 +1,10 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
 - wpi/driverstation/internal/DriverStationBackend.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
   wpi::DualSenseController:
     force_no_trampoline: true
-    ignored_bases:
-    - wpi::util::SendableHelper<DualSenseController>
     enums:
       Button:
       Axis:
@@ -32,9 +29,13 @@ classes:
       GetPort:
       IsConnected:
       GetLeftX:
+      SetLeftXDeadband:
       GetLeftY:
+      SetLeftYDeadband:
       GetRightX:
+      SetRightXDeadband:
       GetRightY:
+      SetRightYDeadband:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:
@@ -115,6 +116,9 @@ classes:
       SetRumble:
       GetTouchpadFingerAvailable:
       GetTouchpadFinger:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
       GetL2:
+      SetL2Deadband:
       GetR2:
+      SetR2Deadband:

@@ -23,7 +23,6 @@
 #include "net/WireEncoder.hpp"
 #include "wpi/net/HttpUtil.hpp"
 #include "wpi/net/HttpWebSocketServerConnection.hpp"
-#include "wpi/net/UrlParser.hpp"
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/net/uv/Work.hpp"
 #include "wpi/net/uv/util.hpp"
@@ -39,9 +38,10 @@ using namespace wpi::nt;
 namespace uv = wpi::net::uv;
 
 // use a larger max message size for websockets
-static constexpr size_t kMaxMessageSize = 2 * 1024 * 1024;
+static constexpr size_t MAX_MESSAGE_SIZE = 2 * 1024 * 1024;
 
-static constexpr size_t kClientProcessMessageCountMax = 16;
+static constexpr size_t CLIENT_PROCESS_MESSAGE_COUNT_MAX = 16;
+static constexpr uv::Timer::Time HANDSHAKE_TIMEOUT{5000};
 
 class NetworkServer::ServerConnection {
  public:
@@ -82,7 +82,8 @@ class NetworkServer::ServerConnection4 final
         HttpWebSocketServerConnection(
             stream,
             {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu",
-             "rtt.networktables.first.wpi.edu"}) {
+             "rtt.networktables.first.wpi.edu"},
+            HANDSHAKE_TIMEOUT) {
     m_info.protocol_version = 0x0400;
   }
 
@@ -125,27 +126,26 @@ void NetworkServer::ServerConnection::ConnectionClosed() {
 
 void NetworkServer::ServerConnection4::ProcessRequest() {
   DEBUG1("HTTP request: '{}'", m_request.GetUrl());
-  wpi::net::UrlParser url{m_request.GetUrl(),
-                          m_request.GetMethod() == wpi::net::HTTP_CONNECT};
-  if (!url.IsValid()) {
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
+  if (!url) {
     // failed to parse URL
     SendError(400);
     return;
   }
 
   std::string_view path;
-  if (url.HasPath()) {
-    path = url.GetPath();
+  if (url->get_pathname_length() > 0) {
+    path = url->get_pathname();
   }
   DEBUG4("path: \"{}\"", path);
 
   std::string_view query;
-  if (url.HasQuery()) {
-    query = url.GetQuery();
+  if (url->has_search()) {
+    query = url->get_search();
   }
   DEBUG4("query: \"{}\"\n", query);
 
-  const bool isGET = m_request.GetMethod() == wpi::net::HTTP_GET;
+  const bool isGET = m_request.GetMethod() == HTTP_GET;
   if (isGET && path == "/") {
     // build HTML root page
     SendResponse(200, "OK", "text/html",
@@ -162,10 +162,10 @@ void NetworkServer::ServerConnection4::ProcessRequest() {
 
 void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
   // get name from URL
-  wpi::net::UrlParser url{m_request.GetUrl(), false};
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
   std::string_view path;
-  if (url.HasPath()) {
-    path = url.GetPath();
+  if (url && url->get_pathname_length() > 0) {
+    path = url->get_pathname();
   }
   DEBUG4("path: '{}'", path);
 
@@ -183,7 +183,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
     return;
   }
 
-  m_websocket->SetMaxMessageSize(kMaxMessageSize);
+  m_websocket->SetMaxMessageSize(MAX_MESSAGE_SIZE);
 
   m_websocket->open.connect([this, name = std::string{name}](
                                 std::string_view protocol) {
@@ -283,6 +283,8 @@ NetworkServer::~NetworkServer() {
   m_loopRunner.ExecAsync([this](uv::Loop&) { m_shutdown = true; });
   m_localStorage.ClearNetwork();
   m_connList.ClearConnections();
+  // shut down loop here to avoid race
+  m_loopRunner.Stop();
 }
 
 void NetworkServer::FlushLocal() {
@@ -306,12 +308,12 @@ void NetworkServer::LoadPersistent() {
   // check if SavePersistent was interrupted and left a backup file;
   // if so, try to restore it
   auto bak = std::format("{}.bck", m_persistentFilename);
-  if (!fs::exists(m_persistentFilename) && fs::exists(bak)) {
+  std::error_code ec;
+  if (!fs::exists(m_persistentFilename, ec) && fs::exists(bak, ec)) {
     INFO(
         "restoring persistent file from backup '{}', since original '{}' is "
         "missing",
         bak, m_persistentFilename);
-    std::error_code ec;
     fs::rename(bak, m_persistentFilename, ec);
     if (ec.value() != 0) {
       INFO("failed to restore backup: {}", ec.message());
@@ -355,7 +357,7 @@ void NetworkServer::SavePersistent(std::string_view filename,
   os << data;
   os.close();
   if (os.has_error()) {
-    fs::remove(tmp);
+    fs::remove(tmp, ec);
     return;
   }
 
@@ -383,7 +385,7 @@ void NetworkServer::Init() {
   m_readLocalTimer = uv::Timer::Create(m_loop);
   if (m_readLocalTimer) {
     m_readLocalTimer->timeout.connect([this] {
-      if (m_serverImpl.ProcessLocalMessages(kClientProcessMessageCountMax)) {
+      if (m_serverImpl.ProcessLocalMessages(CLIENT_PROCESS_MESSAGE_COUNT_MAX)) {
         DEBUG4("Starting idle processing");
         m_idle->Start();  // more to process
       }
@@ -420,7 +422,7 @@ void NetworkServer::Init() {
   m_flushLocal = uv::Async<>::Create(m_loop);
   if (m_flushLocal) {
     m_flushLocal->wakeup.connect([this] {
-      if (m_serverImpl.ProcessLocalMessages(kClientProcessMessageCountMax)) {
+      if (m_serverImpl.ProcessLocalMessages(CLIENT_PROCESS_MESSAGE_COUNT_MAX)) {
         DEBUG4("Starting idle processing");
         m_idle->Start();  // more to process
       }
@@ -431,7 +433,8 @@ void NetworkServer::Init() {
   m_idle = uv::Idle::Create(m_loop);
   if (m_idle) {
     m_idle->idle.connect([this] {
-      if (m_serverImpl.ProcessIncomingMessages(kClientProcessMessageCountMax)) {
+      if (m_serverImpl.ProcessIncomingMessages(
+              CLIENT_PROCESS_MESSAGE_COUNT_MAX)) {
         DEBUG4("Starting idle processing");
         m_idle->Start();  // more to process
       } else {

@@ -8,6 +8,7 @@
 #include <functional>
 #include <limits>
 #include <random>
+#include <utility>
 
 namespace wpi::math {
 
@@ -44,8 +45,8 @@ class SimulatedAnnealing {
                                std::function<State(const State&)> neighbor,
                                std::function<double(const State&)> cost)
       : m_initialTemperature{initialTemperature},
-        m_neighbor{neighbor},
-        m_cost{cost} {}
+        m_neighbor{std::move(neighbor)},
+        m_cost{std::move(cost)} {}
 
   /**
    * Runs the Simulated Annealing algorithm.

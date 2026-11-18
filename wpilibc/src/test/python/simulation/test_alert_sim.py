@@ -16,7 +16,7 @@ def group_name(request):
     AlertSim.reset_data()
 
 
-def get_active_alerts(level: Alert.Level) -> T.List[str]:
+def get_active_alerts(level: Alert.Level) -> list[str]:
     return [a.text for a in AlertSim.get_all() if a.level == level and a.is_active()]
 
 
@@ -31,7 +31,7 @@ def is_alert_active(text: str, level: Alert.Level):
 
 def assert_state(
     level: Alert.Level,
-    expected_state: T.List[str],
+    expected_state: list[str],
 ):
     assert expected_state == get_active_alerts(level)
 

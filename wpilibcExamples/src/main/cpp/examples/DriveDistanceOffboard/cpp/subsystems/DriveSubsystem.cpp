@@ -9,14 +9,11 @@
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : leftLeader{kLeftMotor1Port},
-      leftFollower{kLeftMotor2Port},
-      rightLeader{kRightMotor1Port},
-      rightFollower{kRightMotor2Port},
+    : leftLeader{LEFT_MOTOR1_PORT},
+      leftFollower{LEFT_MOTOR2_PORT},
+      rightLeader{RIGHT_MOTOR1_PORT},
+      rightFollower{RIGHT_MOTOR2_PORT},
       feedforward{ks, kv, ka} {
-  wpi::util::SendableRegistry::AddChild(&drive, &leftLeader);
-  wpi::util::SendableRegistry::AddChild(&drive, &rightLeader);
-
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.
@@ -40,12 +37,12 @@ void DriveSubsystem::SetDriveStates(
     wpi::math::TrapezoidProfile<wpi::units::meters>::State nextRight) {
   // Feedforward is divided by battery voltage to normalize it to [-1, 1]
   leftLeader.SetSetpoint(
-      ExampleSmartMotorController::PIDMode::kPosition,
+      ExampleSmartMotorController::PIDMode::POSITION,
       currentLeft.position.value(),
       feedforward.Calculate(currentLeft.velocity, nextLeft.velocity) /
           wpi::RobotController::GetBatteryVoltage());
   rightLeader.SetSetpoint(
-      ExampleSmartMotorController::PIDMode::kPosition,
+      ExampleSmartMotorController::PIDMode::POSITION,
       currentRight.position.value(),
       feedforward.Calculate(currentRight.velocity, nextRight.velocity) /
           wpi::RobotController::GetBatteryVoltage());
@@ -75,36 +72,36 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
 wpi::cmd::CommandPtr DriveSubsystem::ProfiledDriveDistance(
     wpi::units::meter_t distance) {
   return StartRun(
-             [&] {
+             [this] {
                // Restart timer so profile setpoints start at the beginning
                timer.Restart();
                ResetEncoders();
              },
-             [&] {
+             [this, distance] {
                // Current state never changes, so we need to use a timer to get
                // the setpoints we need to be at
                auto currentTime = timer.Get();
                auto currentSetpoint =
                    profile.Calculate(currentTime, {}, {distance, 0_mps});
                auto nextSetpoint =
-                   profile.Calculate(currentTime + kDt, {}, {distance, 0_mps});
+                   profile.Calculate(currentTime + DT, {}, {distance, 0_mps});
                SetDriveStates(currentSetpoint, currentSetpoint, nextSetpoint,
                               nextSetpoint);
              })
-      .Until([&] { return profile.IsFinished(0_s); });
+      .Until([this] { return profile.IsFinished(0_s); });
 }
 
 wpi::cmd::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
     wpi::units::meter_t distance) {
   return StartRun(
-             [&] {
+             [this] {
                // Restart timer so profile setpoints start at the beginning
                timer.Restart();
                // Store distance so we know the target distance for each encoder
                initialLeftDistance = GetLeftEncoderDistance();
                initialRightDistance = GetRightEncoderDistance();
              },
-             [&] {
+             [this, distance] {
                // Current state never changes for the duration of the command,
                // so we need to use a timer to get the setpoints we need to be
                // at
@@ -118,13 +115,13 @@ wpi::cmd::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
                                      {initialRightDistance + distance, 0_mps});
 
                auto nextLeftSetpoint = profile.Calculate(
-                   currentTime + kDt, {initialLeftDistance, 0_mps},
+                   currentTime + DT, {initialLeftDistance, 0_mps},
                    {initialLeftDistance + distance, 0_mps});
                auto nextRightSetpoint = profile.Calculate(
-                   currentTime + kDt, {initialRightDistance, 0_mps},
+                   currentTime + DT, {initialRightDistance, 0_mps},
                    {initialRightDistance + distance, 0_mps});
                SetDriveStates(currentLeftSetpoint, currentRightSetpoint,
                               nextLeftSetpoint, nextRightSetpoint);
              })
-      .Until([&] { return profile.IsFinished(0_s); });
+      .Until([this] { return profile.IsFinished(0_s); });
 }

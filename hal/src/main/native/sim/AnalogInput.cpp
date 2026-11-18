@@ -20,10 +20,10 @@ extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(
     int32_t channel, const char* allocationLocation, int32_t* status) {
   wpi::hal::init::CheckInit();
-  if (channel < 0 || channel >= kNumAnalogInputs) {
+  if (channel < 0 || channel >= NUM_ANALOG_INPUTS) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for Analog Input", 0,
-                                       kNumAnalogInputs - 1, channel);
+                                       NUM_ANALOG_INPUTS - 1, channel);
     return HAL_INVALID_HANDLE;
   }
 
@@ -60,7 +60,7 @@ HAL_Bool HAL_CheckAnalogModule(int32_t module) {
 }
 
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
-  return channel < kNumAnalogInputs && channel >= 0;
+  return channel < NUM_ANALOG_INPUTS && channel >= 0;
 }
 
 void HAL_SetAnalogInputSimDevice(HAL_AnalogInputHandle handle,

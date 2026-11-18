@@ -6,12 +6,39 @@ WPILib is normally built with Gradle, but [Bazel](https://www.bazel.build/) can 
 ## Prerequisites
 - Install [Bazelisk](https://github.com/bazelbuild/bazelisk/releases) and add it to your path. Bazelisk is a wrapper that will download the correct version of Bazel specified in the repository. Note: You can alias/rename the binary to `bazel` if you want to keep the familiar `bazel build` vs `bazelisk build` syntax.
 
+### Windows
+On Windows, Bazelisk hands off to `tools/bazel.bat` instead of running Bazel directly. That wrapper downloads a private copy of [PortableGit](https://github.com/git-for-windows/git/releases) into `%USERPROFILE%\.cache\bazel\portable_git\<release tag>-<checksum prefix>` (verified against a pinned SHA256), puts it at the front of `PATH`, and points `BAZEL_SH` at its `bash.exe`. The build then gets the same `bash`, `sh`, and `git` on every machine rather than whichever ones happen to be installed.
+
+Keeping the rest of your environment out of the build is Bazel's job rather than the wrapper's. Actions are covered by `--incompatible_strict_action_env`, and repository rules and module extensions by `--experimental_strict_repo_env`, which limits them to `PATH`, `PATHEXT`, and the variables named by the `--repo_env` lines in `.bazelrc`. Your environment is otherwise left alone, so `bazel run` targets still see it.
+
+Consequences worth knowing about:
+- You must invoke Bazel through Bazelisk. Running a `bazel.exe` binary directly skips the wrapper, and the build will fall back to whatever shell it can find.
+- The first invocation on a machine spends a minute or so fetching and unpacking PortableGit. Later invocations reuse the cached copy.
+- Set `BAZEL_VC` (or `BAZEL_VS`) if Visual Studio isn't installed in the default location. `.bazelrc` passes those through to the toolchain configuration; without a `--repo_env` line a variable will not reach it.
+
 ## Building
 To build the entire repository, simply run `bazel build //...`. To run all of the unit tests, run `bazel test //...`
 Other examples:
 - `bazel build //wpimath/...` - Builds every target in the wpimath folder
-- `bazel test //wpiutil:wpiutil-cpp-test` - Runs only the cpp test target in the wpiutil folder
+- `bazel test //wpiutil/src/test/native` - Runs only the cpp test target in the wpiutil folder
 - `bazel coverage //wpiutil/...` - (*Nix only) - Runs a code coverage report for both C++ and Java on all the targets under wpiutil
+
+## Optional ImGui GUI tests
+Bazel can build GUI tests that use [imgui_test_engine](https://github.com/ocornut/imgui_test_engine). This dependency is disabled by default because the `imgui_test_engine/` directory uses the Dear ImGui Test Engine License. Normal `bazel build //...` and `bazel test //...` invocations do not build these tests or download the dependency.
+
+To enable the tests, pass `--config=imgui_tests` or the underlying build setting `--//shared/bazel/rules:with_imgui_tests=true`. The first enabled build needs network access so Bazel can download the pinned upstream source archive.
+
+The ImGui GUI test macro transitions an internal hook flag for the generated C++ test binary so the ImGui test-engine macros apply only to the GUI test dependency graph, not to ordinary GUI executables built under `--config=imgui_tests`.
+
+The ImGui GUI test targets are:
+- `//glass/src/test/native/imgui`
+- `//simulation/halsim_gui/src/test/native/imgui`
+- `//tools/datalogtool/src/test/native/imgui`
+- `//tools/outlineviewer/src/test/native/imgui`
+- `//tools/sysid/src/test/native/imgui`
+- `//tools/wpical/src/test/native/imgui`
+
+These tests run headless by default using SDL's dummy video driver, the software SDL renderer, and `WPIGUI_FORCE_RENDERER=2d`.
 
 ## User settings
 When invoking Bazel, it will check if `user.bazelrc` exists for additional, user specified flags. You can use these settings to do things like always ignore builds in a specific folder, or limiting the CPU/RAM usage during a build.
@@ -25,7 +52,7 @@ Examples:
   ```
 Bazel's RAM usage estimation is simplistic and hardcoded, so limiting the allowed number of CPU cores is the best way to reduce memory usage if it becomes a problem.
 
-The default settings build all the release artifact variants relevant for your platform.  The overall list of options ends up being, essentially, all the variants of (linux, osx, windows) x (debug, release) x (static, shared) x (aarch64, x86).  OSX and Windows are hard to compile for from any other OS, so we by default build for your local OS and the system core, with all the variants.
+The default settings build all the release artifact variants relevant for your platform.  The overall list of options ends up being, essentially, all the variants of (linux, osx, windows) x (debug, release) x (static, shared) x (aarch64, x86), although static and shared can reuse the same object files and only differ in linking.  OSX and Windows are hard to compile for from any other OS, so we by default build for your local OS and the system core, with all the variants.
 
 This can be a bit expensive.  If you would like to build a subset, you can specify the repo environmental variable, `WPI_PUBLISH_CLASSIFIER_FILTER`, and pick what you build for.  The default is, in the .bazelrc file,
 ```

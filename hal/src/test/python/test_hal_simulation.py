@@ -6,7 +6,7 @@ import typing
 
 def test_value_changed_callback():
 
-    recv: typing.Optional[typing.Tuple[bool, str, int]] = None
+    recv: tuple[bool, str, int] | None = None
 
     def created_cb(
         name: str, handle: int, direction: hal.SimValueDirection, value: hal.Value
