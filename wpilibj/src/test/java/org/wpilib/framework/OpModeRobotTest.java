@@ -22,7 +22,6 @@ import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.OpModeOption;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.opmode.OpMode;
-import org.wpilib.opmode.OpModeListener;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.SimHooks;
 import org.wpilib.util.Color;
@@ -518,29 +517,18 @@ class OpModeRobotTest {
     robot.close();
   }
 
-  /** Listener that appends {@code "<tag>:<event>:<opModeName>"} to a shared log. */
-  private static OpModeListener loggingListener(String tag, List<String> log) {
-    return new OpModeListener() {
-      @Override
-      public void onOpModeSelect(String opModeName, OpMode opMode) {
-        log.add(tag + ":select:" + opModeName);
-      }
-
-      @Override
-      public void onOpModeStart(String opModeName, OpMode opMode) {
-        log.add(tag + ":start:" + opModeName);
-      }
-
-      @Override
-      public void onOpModeStop(String opModeName, OpMode opMode) {
-        log.add(tag + ":stop:" + opModeName);
-      }
-
-      @Override
-      public void onOpModeClose(String opModeName, OpMode opMode) {
-        log.add(tag + ":close:" + opModeName);
-      }
-    };
+  /**
+   * Registers handlers for all four events that append {@code "<tag>:<event>:<opModeName>"} to a
+   * shared log.
+   *
+   * @return the IDs of the four registrations
+   */
+  private static List<Integer> addLoggingListeners(MockRobot robot, String tag, List<String> log) {
+    return List.of(
+        robot.addOpModeSelectListener((name, opMode) -> log.add(tag + ":select:" + name)),
+        robot.addOpModeStartListener((name, opMode) -> log.add(tag + ":start:" + name)),
+        robot.addOpModeStopListener((name, opMode) -> log.add(tag + ":stop:" + name)),
+        robot.addOpModeCloseListener((name, opMode) -> log.add(tag + ":close:" + name)));
   }
 
   private static void selectTeleop(String name, boolean enabled) {
@@ -556,7 +544,7 @@ class OpModeRobotTest {
     MockRobot robot = new MockRobot();
     robot.addOpMode(RobotMode.TELEOPERATED, "TestOpMode", MockOpMode::new);
     robot.publishOpModes();
-    robot.registerListener(loggingListener("A", log));
+    addLoggingListeners(robot, "A", log);
 
     DriverStationSim.setDsAttached(true);
     Thread robotThread = new Thread(robot::startCompetition);
@@ -590,8 +578,8 @@ class OpModeRobotTest {
     MockRobot robot = new MockRobot();
     robot.addOpMode(RobotMode.TELEOPERATED, "TestOpMode", MockOpMode::new);
     robot.publishOpModes();
-    robot.registerListener(loggingListener("A", log));
-    robot.registerListener(loggingListener("B", log));
+    addLoggingListeners(robot, "A", log);
+    addLoggingListeners(robot, "B", log);
 
     DriverStationSim.setDsAttached(true);
     Thread robotThread = new Thread(robot::startCompetition);
@@ -629,10 +617,9 @@ class OpModeRobotTest {
     MockRobot robot = new MockRobot();
     robot.addOpMode(RobotMode.TELEOPERATED, "TestOpMode", MockOpMode::new);
     robot.publishOpModes();
-    OpModeListener removed = loggingListener("removed", log);
-    robot.registerListener(removed);
-    robot.registerListener(loggingListener("kept", log));
-    robot.removeListener(removed);
+    List<Integer> removed = addLoggingListeners(robot, "removed", log);
+    addLoggingListeners(robot, "kept", log);
+    removed.forEach(robot::removeListener);
 
     DriverStationSim.setDsAttached(true);
     Thread robotThread = new Thread(robot::startCompetition);

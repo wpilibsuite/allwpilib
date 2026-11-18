@@ -1730,23 +1730,19 @@ def test_robot_periodic(periodic_robot_test_fixture):
     assert robot.periodic_count == 2
 
 
-class LoggingListener(wpilib.OpModeListener):
-    def __init__(self, tag: str, log: list[str]):
-        super().__init__()
-        self.tag = tag
-        self.log = log
+def add_logging_listeners(robot, tag: str, log: list[str]) -> list[int]:
+    """Registers handlers for all four events that append
+    "<tag>:<event>:<opmode_name>" to the log. Returns the registration IDs."""
 
-    def on_opmode_select(self, opmode_name, opmode):
-        self.log.append(f"{self.tag}:select:{opmode_name}")
+    def logger(event: str):
+        return lambda opmode_name, opmode: log.append(f"{tag}:{event}:{opmode_name}")
 
-    def on_opmode_start(self, opmode_name, opmode):
-        self.log.append(f"{self.tag}:start:{opmode_name}")
-
-    def on_opmode_stop(self, opmode_name, opmode):
-        self.log.append(f"{self.tag}:stop:{opmode_name}")
-
-    def on_opmode_close(self, opmode_name, opmode):
-        self.log.append(f"{self.tag}:close:{opmode_name}")
+    return [
+        robot.add_opmode_select_listener(logger("select")),
+        robot.add_opmode_start_listener(logger("start")),
+        robot.add_opmode_stop_listener(logger("stop")),
+        robot.add_opmode_close_listener(logger("close")),
+    ]
 
 
 class ListenerOpMode(OpMode):
@@ -1788,8 +1784,8 @@ def listener_robot():
 def test_listener_lifecycle_and_ordering(listener_robot):
     PERIOD = 0.020  # 20 ms
     log: list[str] = []
-    listener_robot.register_listener(LoggingListener("A", log))
-    listener_robot.register_listener(LoggingListener("B", log))
+    add_logging_listeners(listener_robot, "A", log)
+    add_logging_listeners(listener_robot, "B", log)
 
     # Selected while disabled: only select fires, in registration order
     select_teleop(False)
@@ -1817,10 +1813,10 @@ def test_listener_lifecycle_and_ordering(listener_robot):
 def test_remove_listener(listener_robot):
     PERIOD = 0.020  # 20 ms
     log: list[str] = []
-    removed = LoggingListener("removed", log)
-    listener_robot.register_listener(removed)
-    listener_robot.register_listener(LoggingListener("kept", log))
-    listener_robot.remove_listener(removed)
+    removed = add_logging_listeners(listener_robot, "removed", log)
+    add_logging_listeners(listener_robot, "kept", log)
+    for listener_id in removed:
+        listener_robot.remove_listener(listener_id)
 
     select_teleop(True)
     wsim.step_timing(PERIOD)

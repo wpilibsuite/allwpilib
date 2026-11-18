@@ -139,33 +139,20 @@ class EventLog {
   std::vector<std::string> m_events;
 };
 
-// Listener that appends "<tag>:<event>:<opModeName>" to a shared log.
-class LoggingListener : public wpi::OpModeListener {
- public:
-  LoggingListener(std::string tag, EventLog& log)
-      : m_tag{std::move(tag)}, m_log{log} {}
-
-  void OnOpModeSelect(std::string_view name, wpi::OpMode&) override {
-    Log("select", name);
-  }
-  void OnOpModeStart(std::string_view name, wpi::OpMode&) override {
-    Log("start", name);
-  }
-  void OnOpModeStop(std::string_view name, wpi::OpMode&) override {
-    Log("stop", name);
-  }
-  void OnOpModeClose(std::string_view name, wpi::OpMode&) override {
-    Log("close", name);
-  }
-
- private:
-  void Log(std::string_view event, std::string_view name) {
-    m_log.Add(std::format("{}:{}:{}", m_tag, event, name));
-  }
-
-  std::string m_tag;
-  EventLog& m_log;
-};
+// Registers handlers for all four events that append
+// "<tag>:<event>:<opModeName>" to a shared log. Returns the registration IDs.
+std::vector<int> AddLoggingListeners(wpi::OpModeRobotBase& robot,
+                                     const std::string& tag, EventLog& log) {
+  auto logger = [tag, &log](std::string_view event) {
+    return [tag, event, &log](std::string_view name, wpi::OpMode&) {
+      log.Add(std::format("{}:{}:{}", tag, event, name));
+    };
+  };
+  return {robot.AddOpModeSelectListener(logger("select")),
+          robot.AddOpModeStartListener(logger("start")),
+          robot.AddOpModeStopListener(logger("stop")),
+          robot.AddOpModeCloseListener(logger("close"))};
+}
 
 void SelectTeleop(bool enabled) {
   wpi::sim::DriverStationSim::SetDsAttached(true);
@@ -403,7 +390,7 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest ListenerLifecycleEvents",
   using Events = std::vector<std::string>;
   EventLog log;
   SingleOpModeRobot robot;
-  robot.RegisterListener(std::make_shared<LoggingListener>("A", log));
+  AddLoggingListeners(robot, "A", log);
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
   wpi::sim::WaitForProgramStart();
@@ -436,8 +423,8 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest ListenerOrdering",
   using Events = std::vector<std::string>;
   EventLog log;
   SingleOpModeRobot robot;
-  robot.RegisterListener(std::make_shared<LoggingListener>("A", log));
-  robot.RegisterListener(std::make_shared<LoggingListener>("B", log));
+  AddLoggingListeners(robot, "A", log);
+  AddLoggingListeners(robot, "B", log);
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
   wpi::sim::WaitForProgramStart();
@@ -467,10 +454,11 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest RemoveListener",
   using Events = std::vector<std::string>;
   EventLog log;
   SingleOpModeRobot robot;
-  auto removed = std::make_shared<LoggingListener>("removed", log);
-  robot.RegisterListener(removed);
-  robot.RegisterListener(std::make_shared<LoggingListener>("kept", log));
-  robot.RemoveListener(removed);
+  auto removed = AddLoggingListeners(robot, "removed", log);
+  AddLoggingListeners(robot, "kept", log);
+  for (int id : removed) {
+    robot.RemoveListener(id);
+  }
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
   wpi::sim::WaitForProgramStart();
