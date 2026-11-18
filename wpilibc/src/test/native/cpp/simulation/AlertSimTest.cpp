@@ -178,7 +178,11 @@ TEST_CASE_METHOD(AlertSimTest, "AlertSimTest SetIsIdempotent",
   expected.emplace_back("A");
   expected.emplace_back("B");
   expected.emplace_back("C");
-  CHECK(expected == startState);
+  // GetAll() reports alerts in storage-slot order, and new alerts reuse slots
+  // freed by earlier tests, so only membership is checked here.
+  auto sortedState = startState;
+  std::ranges::sort(sortedState);
+  CHECK(expected == sortedState);
 
   b.Set(true);
   CHECK_STATE(wpi::util::Alert::Level::LOW, startState);

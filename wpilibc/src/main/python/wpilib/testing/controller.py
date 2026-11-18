@@ -1,5 +1,4 @@
 import contextlib
-import time
 import threading
 
 import pytest
@@ -9,7 +8,7 @@ from ..simulation import (
     DriverStationSim,
     step_timing,
     step_timing_async,
-    get_program_started,
+    wait_for_program_start,
 )
 from hal import RobotMode, opmode_get_robot_mode
 
@@ -69,16 +68,17 @@ class RobotTestController:
             # make sure the thread didn't die
             assert self._cond.wait_for(lambda: self._robot_started, timeout=1)
 
-        # This is the same thing that wait_for_program_start does
-        for _ in range(1000):
-            if get_program_started():
-                break
+        # Do not proceed until a notifier alarm has been armed after program start.
+        try:
+            wait_for_program_start(timeout=1.0)
+        except TimeoutError:
             error = self._reraise.exception
             if error is not None:
                 raise error
-            time.sleep(0.001)
-        else:
             assert False, "robot never started"
+        error = self._reraise.exception
+        if error is not None:
+            raise error
 
         try:
             # in this block you should tell the sim to do sim things

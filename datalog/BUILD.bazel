@@ -1,6 +1,3 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
-load("@rules_java//java:defs.bzl", "java_binary")
-load("@rules_python//python:defs.bzl", "py_binary")
 load("//datalog:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library")
@@ -72,43 +69,6 @@ wpilib_cc_shared_library(
     use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":datalogjni"],
-)
-
-py_binary(
-    name = "datalog_example",
-    srcs = ["examples/printlog/datalog.py"],
-    main = "examples/printlog/datalog.py",
-    target_compatible_with = select({
-        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-)
-
-cc_binary(
-    name = "printlog",
-    srcs = ["examples/printlog/printlog.cpp"],
-    deps = [
-        ":datalog",
-        "//wpiutil",
-    ],
-)
-
-cc_binary(
-    name = "writelog",
-    srcs = ["examples/writelog/writelog.cpp"],
-    deps = [
-        ":datalog",
-        "//wpiutil",
-    ],
-)
-
-java_binary(
-    name = "printlog-java",
-    srcs = ["src/printlog/java/printlog/PrintLog.java"],
-    main_class = "printlog.PrintLog",
-    deps = [
-        "//datalog/src/main/java",
-    ],
 )
 
 package_default_jni_project(

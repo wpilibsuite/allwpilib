@@ -21,11 +21,3 @@ void MockPWMMotorController::SetInverted(bool isInverted) {
 bool MockPWMMotorController::GetInverted() const {
   return m_isInverted;
 }
-
-void MockPWMMotorController::Disable() {
-  m_throttle = 0;
-}
-
-void MockPWMMotorController::StopMotor() {
-  Disable();
-}

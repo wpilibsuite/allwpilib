@@ -72,10 +72,10 @@ class RobotDriveBase : public MotorSafety {
    */
   void FeedWatchdog();
 
+ protected:
   void StopMotor() override = 0;
   std::string GetDescription() const override = 0;
 
- protected:
   /// Default input deadband.
   static constexpr double DEFAULT_DEADBAND = 0.02;
 

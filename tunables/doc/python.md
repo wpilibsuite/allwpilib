@@ -136,7 +136,7 @@ is passed, every root-level publication retained for that object is removed.
 
 ## Python Complex Tunables
 
-Python complex tunables subclass `tunables.ComplexTunable` or provide a `publish_tunables(table)` method. `get_tunable_type()` may return a non-empty string, and `update_tunables()` is optional. `publish_tunables()` and `update_tunables()` must not raise; if they do, registry and backend state is not guaranteed to be restored.
+Python complex tunables subclass `tunables.ComplexTunable` or provide a `publish_tunable(table)` method. `get_tunable_type()` may return a non-empty string, and `update_tunable()` is optional. `publish_tunable()` and `update_tunable()` must not raise; if they do, registry and backend state is not guaranteed to be restored.
 
 ```py
 class TunablePID(tunables.ComplexTunable):
@@ -148,7 +148,7 @@ class TunablePID(tunables.ComplexTunable):
     def get_tunable_type(self) -> str:
         return "PIDController"
 
-    def publish_tunables(self, table: tunables.TunableTable) -> None:
+    def publish_tunable(self, table: tunables.TunableTable) -> None:
         table.publish("kP", self.k_p)
         table.publish("kI", self.k_i)
         table.publish("kD", self.k_d)
@@ -156,19 +156,19 @@ class TunablePID(tunables.ComplexTunable):
 tunables.publish("drive/pid", TunablePID())
 ```
 
-The Python adapter retains child `Tunable` and complex objects published from `publish_tunables()` so they stay alive after publication. Removing a complex parent removes retained child values and descendant backend entries.
+The Python adapter retains child `Tunable` and complex objects published from `publish_tunable()` so they stay alive after publication. Removing a complex parent removes retained child values and descendant backend entries.
 
-`update_tunables()` runs during registry updates and can push local changes into child tunables:
+`update_tunable()` runs during registry updates and can push local changes into child tunables:
 
 ```py
 class UpdatingComplex(tunables.ComplexTunable):
     def __init__(self) -> None:
         self.value = tunables.Tunable(0)
 
-    def publish_tunables(self, table: tunables.TunableTable) -> None:
+    def publish_tunable(self, table: tunables.TunableTable) -> None:
         table.publish("value", self.value)
 
-    def update_tunables(self) -> None:
+    def update_tunable(self) -> None:
         self.value.set(self.value.get() + 1)
 ```
 

@@ -59,13 +59,6 @@ int32_t HAL_GetNumDigitalChannels(void);
 int32_t HAL_GetNumPWMChannels(void);
 
 /**
- * Gets the number of digital IO PWM outputs in the current system.
- *
- * @return the number of digital IO PWM outputs
- */
-int32_t HAL_GetNumDigitalPWMOutputs(void);
-
-/**
  * Gets the number of quadrature encoders in the current system.
  *
  * @return the number of quadrature encoders

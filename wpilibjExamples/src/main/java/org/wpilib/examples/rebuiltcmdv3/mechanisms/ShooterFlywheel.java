@@ -45,7 +45,7 @@ public class ShooterFlywheel implements Mechanism {
 
   @Override
   public Command idle() {
-    return runRepeatedly(flywheelMotorPrimary::stopMotor).named("ShooterFlywheel.Idle");
+    return runRepeatedly(() -> flywheelMotorPrimary.setThrottle(0.0)).named("ShooterFlywheel.Idle");
   }
 
   /**

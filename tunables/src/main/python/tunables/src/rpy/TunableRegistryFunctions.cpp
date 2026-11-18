@@ -146,7 +146,7 @@ uint64_t GetTuneRevision(py::handle value) {
   if (auto revision = GetRetainedTuneRevision(value)) {
     return *revision;
   }
-  if (py::hasattr(value, "publish_tunables")) {
+  if (py::hasattr(value, "publish_tunable")) {
     return 0;
   }
   throw py::type_error("value must be a tunables.Tunable or ComplexTunable");

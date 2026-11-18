@@ -38,33 +38,34 @@ def copy_upstream_src(wpilib_root: Path):
     )
     # Change directory to upb to minimize the number of files to walk
     os.chdir(upstream_root / "upb")
+
+    def filter(dp, f):
+        return len(dp.parts) >= 1 and (
+            dp.parts[0] == "base"
+            or dp.parts[0] == "hash"
+            or dp.parts[0] == "mem"
+            or (
+                dp.parts[0] == "message"
+                and "compare" not in f
+                and "promote" not in f
+                and "accessors_split64" not in f
+            )
+            or dp.parts[0] == "mini_descriptor"
+            or (dp.parts[0] == "mini_table" and "compat" not in f)
+            or dp.parts[0] == "port"
+            or dp.parts[0] == "reflection"
+            or (
+                dp.parts[0] == "wire"
+                and "byte_size" not in f
+                and "decode_fast" not in dp.parts
+                and "test_util" not in dp.parts
+            )
+        )
+
     include_files = walk_cwd_and_copy_if(
         lambda dp, f: (
-            (
-                len(dp.parts) >= 1
-                and (
-                    dp.parts[0] == "base"
-                    or dp.parts[0] == "hash"
-                    or dp.parts[0] == "mem"
-                    or (
-                        dp.parts[0] == "message"
-                        and "compare" not in f
-                        and "promote" not in f
-                        and "accessors_split64" not in f
-                    )
-                    or dp.parts[0] == "mini_descriptor"
-                    or (dp.parts[0] == "mini_table" and "compat" not in f)
-                    or dp.parts[0] == "port"
-                    or dp.parts[0] == "reflection"
-                    or (
-                        dp.parts[0] == "wire"
-                        and "byte_size" not in f
-                        and "decode_fast" not in dp.parts
-                        and "test_util" not in dp.parts
-                    )
-                )
-                and "cmake" not in dp.parts
-            )
+            filter(dp, f)
+            and "cmake" not in dp.parts
             and f.endswith((".h", ".inc"))
             or f == "generated_code_support.h"
         ),
@@ -77,30 +78,7 @@ def copy_upstream_src(wpilib_root: Path):
 
     walk_cwd_and_copy_if(
         lambda dp, f: (
-            (
-                len(dp.parts) >= 1
-                and (
-                    dp.parts[0] == "base"
-                    or dp.parts[0] == "hash"
-                    or dp.parts[0] == "mem"
-                    or (
-                        dp.parts[0] == "message"
-                        and "compare" not in f
-                        and "promote" not in f
-                    )
-                    or dp.parts[0] == "mini_descriptor"
-                    or (dp.parts[0] == "mini_table" and "compat" not in f)
-                    or dp.parts[0] == "port"
-                    or dp.parts[0] == "reflection"
-                    or (
-                        dp.parts[0] == "wire"
-                        and "byte_size" not in f
-                        and "decode_fast" not in dp.parts
-                    )
-                )
-            )
-            and f.endswith(".c")
-            and f != "descriptor.upb_minitable.c"
+            filter(dp, f) and f.endswith(".c") and f != "descriptor.upb_minitable.c"
         ),
         wpiutil / "src/main/native/thirdparty/upb/src",
     )

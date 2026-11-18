@@ -15,15 +15,6 @@ class EncoderModel;
 class BooleanSource;
 class DoubleSource;
 
-class DPWMModel : public Model {
- public:
-  virtual const char* GetSimDevice() const = 0;
-
-  virtual DoubleSource* GetValueData() = 0;
-
-  virtual void SetValue(double val) = 0;
-};
-
 class DutyCycleModel : public Model {
  public:
   virtual const char* GetSimDevice() const = 0;
@@ -37,7 +28,6 @@ class DIOModel : public Model {
  public:
   virtual const char* GetSimDevice() const = 0;
 
-  virtual DPWMModel* GetDPWM() = 0;
   virtual DutyCycleModel* GetDutyCycle() = 0;
   virtual EncoderModel* GetEncoder() = 0;
 

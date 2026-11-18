@@ -15,7 +15,7 @@ cc_test(
     ],
 )
 
-alias(
+test_suite(
     name = "native",
-    actual = ":tunables_tests",
+    tests = [":tunables_tests"],
 )
