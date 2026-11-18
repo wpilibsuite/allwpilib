@@ -87,7 +87,7 @@ TEST_CASE("LinearSystemLoopTest StateSpaceEnabled", "[wpimath]") {
 TEST_CASE("LinearSystemLoopTest FlywheelEnabled", "[wpimath]") {
   wpi::math::LinearSystem<1, 1, 1> plant{
       wpi::math::Models::AngularVelocityFromPhysicalConstants(
-          wpi::math::DCMotor::NEO(2), 0.00289_kg_sq_m, 1.0)};
+          wpi::math::DCMotor::Neo(2), 0.00289_kg_sq_m, 1.0)};
 
   wpi::math::KalmanFilter<1, 1, 1> observer{
       plant, {1.0}, {POSITION_STDDEV}, DT};

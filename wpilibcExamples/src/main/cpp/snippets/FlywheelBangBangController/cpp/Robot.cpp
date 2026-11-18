@@ -98,7 +98,7 @@ class Robot : public wpi::TimedRobot {
   static constexpr wpi::units::kilogram_square_meter_t
       FLYWHEEL_MOMENT_OF_INERTIA = 0.5 * 1.5_lb * 4_in * 4_in;
 
-  wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
+  wpi::math::DCMotor gearbox = wpi::math::DCMotor::Neo(1);
   wpi::math::LinearSystem<1, 1, 1> plant{
       wpi::math::Models::AngularVelocityFromPhysicalConstants(
           gearbox, FLYWHEEL_MOMENT_OF_INERTIA, FLYWHEEL_GEARING)};

@@ -21,7 +21,7 @@ class DCMotorSimTest {
   void testVoltageSteadyState() {
     RoboRioSim.resetData();
 
-    DCMotor gearbox = DCMotor.getNEO(1);
+    DCMotor gearbox = DCMotor.getNeo(1);
     LinearSystem<N2, N1, N2> plant =
         Models.angularPositionFromPhysicalConstants(gearbox, 0.0005, 1);
     DCMotorSim sim = new DCMotorSim(plant, gearbox);
@@ -63,7 +63,7 @@ class DCMotorSimTest {
   void testPositionFeedbackControl() {
     RoboRioSim.resetData();
 
-    DCMotor gearbox = DCMotor.getNEO(1);
+    DCMotor gearbox = DCMotor.getNeo(1);
     LinearSystem<N2, N1, N2> plant =
         Models.angularPositionFromPhysicalConstants(gearbox, 0.0005, 1);
     DCMotorSim sim = new DCMotorSim(plant, gearbox);

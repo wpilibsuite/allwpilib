@@ -274,10 +274,10 @@ class DifferentialDrivetrainSim {
         wpi::math::DCMotor::Falcon500(2);
     /// One NEO motor per drive side.
     static constexpr wpi::math::DCMotor SINGLE_NEO_PER_SIDE =
-        wpi::math::DCMotor::NEO(1);
+        wpi::math::DCMotor::Neo(1);
     /// Two NEO motors per drive side.
     static constexpr wpi::math::DCMotor DUAL_NEO_PER_SIDE =
-        wpi::math::DCMotor::NEO(2);
+        wpi::math::DCMotor::Neo(2);
   };
 
   /**

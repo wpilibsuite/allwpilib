@@ -95,7 +95,7 @@ class LinearSystemLoopTest {
   @Test
   void testFlywheelEnabled() {
     LinearSystem<N1, N1, N1> plant =
-        Models.angularVelocityFromPhysicalConstants(DCMotor.getNEO(2), 0.00289, 1.0);
+        Models.angularVelocityFromPhysicalConstants(DCMotor.getNeo(2), 0.00289, 1.0);
     KalmanFilter<N1, N1, N1> observer =
         new KalmanFilter<>(
             Nat.N1(), Nat.N1(), plant, VecBuilder.fill(1.0), VecBuilder.fill(POSITION_STDDEV), DT);

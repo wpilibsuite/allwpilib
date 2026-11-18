@@ -419,9 +419,9 @@ public class DifferentialDrivetrainSim {
     /** Two Falcon 500 motors per drive side. */
     DUAL_FALCON_500_PER_SIDE(DCMotor.getFalcon500(2)),
     /** One NEO motor per drive side. */
-    SINGLE_NEO_PER_SIDE(DCMotor.getNEO(1)),
+    SINGLE_NEO_PER_SIDE(DCMotor.getNeo(1)),
     /** Two NEO motors per drive side. */
-    DUAL_NEO_PER_SIDE(DCMotor.getNEO(2));
+    DUAL_NEO_PER_SIDE(DCMotor.getNeo(2));
 
     /** KitbotMotor value. */
     public final DCMotor value;
