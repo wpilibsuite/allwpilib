@@ -1,4 +1,4 @@
-// Copyright (c) FIRST and other WPILib contributors.
+w// Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
@@ -200,16 +200,16 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
-   * Returns a gearbox of NEO brushless motors.
+   * Returns a gearbox of Neo brushless motors.
    */
-  static constexpr DCMotor NEO(int numMotors = 1) {
+  static constexpr DCMotor Neo(int numMotors = 1) {
     return DCMotor(12_V, 2.6_Nm, 105_A, 1.8_A, 5676_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of NEO 550 brushless motors.
+   * Returns a gearbox of Neo 550 brushless motors.
    */
-  static constexpr DCMotor NEO550(int numMotors = 1) {
+  static constexpr DCMotor Neo550(int numMotors = 1) {
     return DCMotor(12_V, 0.97_Nm, 100_A, 1.4_A, 11000_rpm, numMotors);
   }
 

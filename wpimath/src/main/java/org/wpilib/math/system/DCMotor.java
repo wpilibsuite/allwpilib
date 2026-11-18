@@ -161,12 +161,12 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Return a gearbox of NEO motors.
+   * Return a gearbox of Neo motors.
    *
    * @param numMotors Number of motors in the gearbox.
-   * @return A gearbox of NEO motors.
+   * @return A gearbox of Neo motors.
    */
-  public static DCMotor getNEO(int numMotors) {
+  public static DCMotor getNeo(int numMotors) {
     return new DCMotor(12, 2.6, 105, 1.8, rotationsPerMinuteToRadiansPerSecond(5676), numMotors);
   }
 
@@ -231,10 +231,10 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Return a gearbox of NEO 550 motors.
+   * Return a gearbox of Neo 550 motors.
    *
    * @param numMotors Number of motors in the gearbox.
-   * @return A gearbox of NEO 550 motors.
+   * @return A gearbox of Neo 550 motors.
    */
   public static DCMotor getNeo550(int numMotors) {
     return new DCMotor(
@@ -341,10 +341,10 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Return a gearbox of NEO 2.0 motors.
+   * Return a gearbox of Neo 2.0 motors.
    *
    * @param numMotors Number of motors in the gearbox.
-   * @return A gearbox of NEO 2.0 motors.
+   * @return A gearbox of Neo 2.0 motors.
    */
   public static DCMotor getNeo2(int numMotors) {
     // From https://docs.revrobotics.com/brushless/neo/2.0
