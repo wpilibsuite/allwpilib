@@ -22,6 +22,8 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
 - Changes should have tests.
 - Code should be well documented.
     - This involves writing tutorials and/or usage guides for your submitted feature. These articles are then hosted on the [WPILib](https://docs.wpilib.org/) documentation website. See the [wpilib-docs repository](https://github.com/wpilibsuite/wpilib-docs) for more information.
+- Do not use any profanity (including in abbreviations) in source code. Any such uses may be asked to be removed, or edited out by a maintainer.
+    - Thirdparty code sometimes includes profanity, and upstream is not always responsive to removing it. In that case, an upstream_utils patch removing the profanity is allowed and recommended.
 
 ## What to Contribute
 
