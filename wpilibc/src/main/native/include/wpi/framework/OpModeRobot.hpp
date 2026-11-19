@@ -6,9 +6,11 @@
 
 #include <concepts>
 #include <functional>
+#include <map>
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "wpi/framework/RobotBase.hpp"
@@ -29,6 +31,21 @@ class Color;
 namespace wpi {
 
 using RobotMode = wpi::hal::RobotMode;
+
+/**
+ * Handles a lifecycle event of an opmode run by an OpModeRobot.
+ *
+ * Handlers are registered with OpModeRobotBase::AddOpModeSelectListener(),
+ * AddOpModeStartListener(), AddOpModeStopListener(), and
+ * AddOpModeCloseListener().
+ *
+ * Handlers run synchronously on the robot loop thread, so they should return
+ * quickly.
+ *
+ * The first argument is the name the opmode was registered under, and the
+ * second is the opmode the event applies to.
+ */
+using OpModeEventHandler = std::function<void(std::string_view, OpMode&)>;
 
 namespace detail {
 template <typename T>
@@ -191,6 +208,60 @@ class OpModeRobotBase : public RobotBase {
                    wpi::units::second_t offset = 0_s);
 
   /**
+   * Registers a handler that runs after an opmode has been selected on the
+   * Driver Station and constructed, before it is started. This runs once per
+   * selection, whether or not the robot is enabled.
+   *
+   * Handlers run in registration order.
+   *
+   * @param handler The handler to register.
+   * @return An ID that can be passed to RemoveListener().
+   */
+  int AddOpModeSelectListener(OpModeEventHandler handler);
+
+  /**
+   * Registers a handler that runs after the opmode's Start() has run, when the
+   * robot is enabled with the opmode selected.
+   *
+   * Handlers run in registration order.
+   *
+   * @param handler The handler to register.
+   * @return An ID that can be passed to RemoveListener().
+   */
+  int AddOpModeStartListener(OpModeEventHandler handler);
+
+  /**
+   * Registers a handler that runs before the opmode's End() runs. This is only
+   * called for opmodes that were started.
+   *
+   * Handlers run in reverse registration order.
+   *
+   * @param handler The handler to register.
+   * @return An ID that can be passed to RemoveListener().
+   */
+  int AddOpModeStopListener(OpModeEventHandler handler);
+
+  /**
+   * Registers a handler that runs before the opmode is destroyed. This is
+   * called for every opmode that was constructed, including ones that were
+   * selected but never started.
+   *
+   * Handlers run in reverse registration order.
+   *
+   * @param handler The handler to register.
+   * @return An ID that can be passed to RemoveListener().
+   */
+  int AddOpModeCloseListener(OpModeEventHandler handler);
+
+  /**
+   * Removes a handler registered with one of the Add*Listener methods. Does
+   * nothing if the ID is not registered.
+   *
+   * @param id The ID returned when the handler was registered.
+   */
+  void RemoveListener(int id);
+
+  /**
    * Gets time period between calls to Periodic() functions.
    */
   wpi::units::second_t GetPeriod() const { return m_period; }
@@ -327,6 +398,13 @@ class OpModeRobotBase : public RobotBase {
       m_activeOpModeCallbacks;
   std::optional<wpi::internal::PeriodicPriorityQueue::Callback>
       m_opmodePeriodic;
+  // Keyed by listener ID. IDs only increase, so key order is registration
+  // order.
+  int m_nextListenerId = 1;
+  std::map<int, OpModeEventHandler> m_selectListeners;
+  std::map<int, OpModeEventHandler> m_startListeners;
+  std::map<int, OpModeEventHandler> m_stopListeners;
+  std::map<int, OpModeEventHandler> m_closeListeners;
 };
 
 /**

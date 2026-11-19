@@ -7,8 +7,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <format>
+#include <map>
 #include <memory>
+#include <ranges>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -67,6 +70,53 @@ void OpModeRobotBase::AddPeriodic(std::function<void()> callback,
   m_callbacks.Add(std::move(callback), m_startTime, period, offset);
 }
 
+int OpModeRobotBase::AddOpModeSelectListener(OpModeEventHandler handler) {
+  m_selectListeners.emplace(m_nextListenerId, std::move(handler));
+  return m_nextListenerId++;
+}
+
+int OpModeRobotBase::AddOpModeStartListener(OpModeEventHandler handler) {
+  m_startListeners.emplace(m_nextListenerId, std::move(handler));
+  return m_nextListenerId++;
+}
+
+int OpModeRobotBase::AddOpModeStopListener(OpModeEventHandler handler) {
+  m_stopListeners.emplace(m_nextListenerId, std::move(handler));
+  return m_nextListenerId++;
+}
+
+int OpModeRobotBase::AddOpModeCloseListener(OpModeEventHandler handler) {
+  m_closeListeners.emplace(m_nextListenerId, std::move(handler));
+  return m_nextListenerId++;
+}
+
+void OpModeRobotBase::RemoveListener(int id) {
+  m_selectListeners.erase(id);
+  m_startListeners.erase(id);
+  m_stopListeners.erase(id);
+  m_closeListeners.erase(id);
+}
+
+namespace {
+using ListenerMap = std::map<int, OpModeEventHandler>;
+
+void Notify(const ListenerMap& listeners, std::string_view name,
+            OpMode& opMode) {
+  for (auto handlers = listeners;
+       auto& handler : handlers | std::views::values) {
+    handler(name, opMode);
+  }
+}
+
+void NotifyReverse(const ListenerMap& listeners, std::string_view name,
+                   OpMode& opMode) {
+  for (auto handlers = listeners;
+       auto& handler : std::views::reverse(handlers) | std::views::values) {
+    handler(name, opMode);
+  }
+}
+}  // namespace
+
 void OpModeRobotBase::PrintWatchdogEpochs() {
   m_watchdog.PrintEpochs();
 }
@@ -118,6 +168,8 @@ void OpModeRobotBase::LoopFunc() {
           m_currentOpMode->DisabledPeriodic();
           m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
         }
+
+        Notify(m_selectListeners, m_currentOpModeName, *m_currentOpMode);
       }
     } else {
       WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
@@ -290,6 +342,8 @@ void OpModeRobotBase::StartCurrentOpMode() {
 
   m_currentOpMode->Start();
   m_watchdog.AddEpoch("OpMode::Start()");
+
+  Notify(m_startListeners, m_currentOpModeName, *m_currentOpMode);
 }
 
 void OpModeRobotBase::EndCurrentOpMode() {
@@ -300,6 +354,8 @@ void OpModeRobotBase::EndCurrentOpMode() {
   // If the opmode was started, end it and remove its main periodic callback.
   if (m_opmodePeriodic) {
     std::print("********** Ending OpMode {} **********\n", m_currentOpModeName);
+
+    NotifyReverse(m_stopListeners, m_currentOpModeName, *m_currentOpMode);
 
     m_currentOpMode->End();
     m_watchdog.AddEpoch("OpMode::End()");
@@ -316,6 +372,8 @@ void OpModeRobotBase::EndCurrentOpMode() {
     m_callbacks.Remove(cb);
   }
   m_activeOpModeCallbacks.clear();
+
+  NotifyReverse(m_closeListeners, m_currentOpModeName, *m_currentOpMode);
 
   // Regardless of whether opmode was started, close it and release it
   std::print("********** Closing OpMode {} **********\n", m_currentOpModeName);

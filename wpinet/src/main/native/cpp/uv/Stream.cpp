@@ -107,13 +107,14 @@ static std::string BufsToString(std::span<const Buffer> bufs) {
     }
   }
   goto done;
-extra: {
-  size_t total = 0;
-  for (auto buf : bufs) {
-    total += buf.len;
+extra:
+  {
+    size_t total = 0;
+    for (auto buf : bufs) {
+      total += buf.len;
+    }
+    stros << std::format("... (total {})", total);
   }
-  stros << std::format("... (total {})", total);
-}
 done:
   return str;
 }

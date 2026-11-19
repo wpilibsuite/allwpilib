@@ -32,6 +32,11 @@ classes:
         param_override:
           offset:
             default: 0_s
+      AddOpModeSelectListener:
+      AddOpModeStartListener:
+      AddOpModeStopListener:
+      AddOpModeCloseListener:
+      RemoveListener:
       GetPeriod:
       PrintWatchdogEpochs:
       GetLoopStartTime:
