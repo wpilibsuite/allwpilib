@@ -206,6 +206,7 @@ subprojects {
             // ignore warnings for classes missing explicit constructors
             "-Xlint:-missing-explicit-ctor",
         ]
+        options.incremental = false
     }
     // Enables UTF-8 support in Javadoc, disables 4 MB of fonts being added to every Javadoc JAR, add our styles
     tasks.withType(Javadoc).configureEach {
