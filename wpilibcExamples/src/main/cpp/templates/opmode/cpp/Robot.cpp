@@ -19,6 +19,21 @@ Robot::Robot() {
 void Robot::DriverStationConnected() {}
 
 /**
+ * This function is called periodically every loop, regardless of enabled state
+ * or opmode.
+ */
+void Robot::RobotPeriodic() {}
+
+/** This function is called once when the robot becomes disabled. */
+void Robot::DisabledInit() {}
+
+/** This function is called periodically while the robot is disabled. */
+void Robot::DisabledPeriodic() {}
+
+/** This function is called once when the robot exits the disabled state. */
+void Robot::DisabledExit() {}
+
+/**
  * This function is called periodically anytime when no opmode is selected,
  * including when the Driver Station is disconnected.
  */
