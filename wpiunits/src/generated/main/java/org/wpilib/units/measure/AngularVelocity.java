@@ -95,12 +95,12 @@ public record AngularVelocity(double magnitude, double baseUnitMagnitude, Angula
   }
 
   @Override
-  public Per<AngularVelocityUnit, AngleUnit> div(Angle divisor) {
-    return (Per<AngularVelocityUnit, AngleUnit>) Measure.super.div(divisor);
+  public Frequency div(Angle divisor) {
+    return Hertz.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<AngularVelocityUnit, AngleUnit> per(AngleUnit divisorUnit) {
+  public Frequency per(AngleUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -111,12 +111,12 @@ public record AngularVelocity(double magnitude, double baseUnitMagnitude, Angula
   }
 
   @Override
-  public Per<AngularVelocityUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
-    return (Per<AngularVelocityUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
+  public Time div(AngularAcceleration divisor) {
+    return Seconds.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<AngularVelocityUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+  public Time per(AngularAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -233,12 +233,12 @@ public record AngularVelocity(double magnitude, double baseUnitMagnitude, Angula
   }
 
   @Override
-  public Per<AngularVelocityUnit, FrequencyUnit> div(Frequency divisor) {
-    return (Per<AngularVelocityUnit, FrequencyUnit>) Measure.super.div(divisor);
+  public Angle div(Frequency divisor) {
+    return Radians.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<AngularVelocityUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+  public Angle per(FrequencyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -420,8 +420,8 @@ public record AngularVelocity(double magnitude, double baseUnitMagnitude, Angula
 
 
   @Override
-  public Mult<AngularVelocityUnit, TorqueUnit> times(Torque multiplier) {
-    return (Mult<AngularVelocityUnit, TorqueUnit>) Measure.super.times(multiplier);
+  public Power times(Torque multiplier) {
+    return Watts.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
