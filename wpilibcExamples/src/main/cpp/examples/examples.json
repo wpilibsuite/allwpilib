@@ -288,6 +288,17 @@
     "commandversion": 2
   },
   {
+    "name": "Parametrized OpModes",
+    "description": "Add multiple OpModes of the same class with different constructor parameters",
+    "tags": [
+      "OpMode",
+      "Trajectory"
+    ],
+    "foldername": "ParametrizedOpModes",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
     "name": "DriveDistanceOffboard",
     "description": "Drive a differential drivetrain a set distance using TrapezoidProfile and smart motor controller PID.",
     "tags": [
