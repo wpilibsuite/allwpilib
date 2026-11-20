@@ -23,6 +23,8 @@ namespace wpi::cmd {
  *
  * <p>Wrapped commands may only be used through the wrapper, trying to directly
  * schedule them or add them to a group will throw an exception.
+ *
+ * This class is provided by the Commands v2 VendorDep
  */
 class WrapperCommand : public CommandHelper<Command, WrapperCommand> {
  public:

@@ -14,6 +14,8 @@ namespace wpi::vision {
  * A vision pipeline is responsible for running a group of OpenCV algorithms to
  * extract data from an image.
  *
+ * This class is provided by the CameraServer VendorDep
+ *
  * @see VisionRunner
  */
 class VisionPipeline {

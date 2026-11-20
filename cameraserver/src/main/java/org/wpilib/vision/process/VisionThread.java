@@ -11,6 +11,8 @@ import org.wpilib.vision.camera.VideoSource;
  * does not prevent the program from exiting when all other non-daemon threads have finished
  * running.
  *
+ * <p>This class is provided by the CameraServer VendorDep
+ *
  * @see VisionPipeline
  * @see VisionRunner
  * @see Thread#setDaemon(boolean)

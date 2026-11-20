@@ -21,6 +21,8 @@ import org.wpilib.util.Pair;
 /**
  * A version of {@link GenericHID} with {@link Trigger} factories for command-based.
  *
+ * <p>This class is provided by the Commands v3 VendorDep
+ *
  * @see GenericHID
  */
 public final class CommandGenericHID {

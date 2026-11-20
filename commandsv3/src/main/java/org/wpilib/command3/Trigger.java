@@ -72,6 +72,8 @@ import org.wpilib.units.measure.Time;
  * }).named("Shoot While Aiming");
  * controller.rightBumper().whileTrue(shootWhileAiming);
  * }</pre>
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_condition;

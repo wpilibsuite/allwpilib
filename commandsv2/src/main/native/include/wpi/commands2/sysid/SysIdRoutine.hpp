@@ -19,7 +19,11 @@ namespace wpi::cmd::sysid {
 using ramp_rate_t = wpi::units::unit_t<wpi::units::compound_unit<
     wpi::units::volt, wpi::units::inverse<wpi::units::second>>>;
 
-/** Hardware-independent configuration for a SysId test routine. */
+/**
+ * Hardware-independent configuration for a SysId test routine.
+ *
+ * This class is provided by the Commands v2 VendorDep
+ */
 class Config {
  public:
   /// The voltage ramp rate used for quasistatic test routines.
@@ -65,6 +69,9 @@ class Config {
   }
 };
 
+/**
+ * This class is provided by the Commands v2 VendorDep
+ */
 class Mechanism {
  public:
   /// Sends the SysId-specified drive signal to the mechanism motors during test
@@ -166,6 +173,8 @@ enum Direction {
  * frames within the valid timestamp ranges. If a given test was run multiple
  * times in a single logfile, the user will need to select which of the tests to
  * use for the fit in the analysis tool.
+ *
+ * This class is provided by the Commands v2 VendorDep
  */
 class SysIdRoutine : public wpi::sysid::SysIdRoutineLog {
  public:

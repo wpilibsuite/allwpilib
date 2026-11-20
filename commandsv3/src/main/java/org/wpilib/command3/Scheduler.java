@@ -102,6 +102,8 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
  * SchedulerEvent} for all event types). These events are emitted immediately and can be used to
  * detect lifecycle events for all commands, including one-shots that would be invisible to the
  * protobuf serializer. However, it is up to the user to log those events themselves.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 public final class Scheduler implements ProtobufSerializable {
   /**

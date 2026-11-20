@@ -15,6 +15,8 @@ import org.wpilib.system.RobotController;
  * Interrupted a command being interrupted by another}. Event listeners can be registered with a
  * scheduler via {@link Scheduler#addEventListener(Consumer)}. All events have a timestamp to
  * indicate when the event occurred.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 public sealed interface SchedulerEvent {
   /**

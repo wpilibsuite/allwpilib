@@ -6,7 +6,11 @@ package org.wpilib.command3;
 
 import static java.util.Objects.requireNonNull;
 
-/** Represents the state of a command as it is executed by the scheduler. */
+/**
+ * Represents the state of a command as it is executed by the scheduler.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
+ */
 final class CommandState {
   // Two billion unique IDs should be enough for anybody.
   private static int s_lastId = 0;

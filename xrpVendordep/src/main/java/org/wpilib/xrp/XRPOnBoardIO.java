@@ -10,6 +10,8 @@ import org.wpilib.hardware.discrete.DigitalOutput;
 /**
  * This class represents the onboard IO of the XRP Reference Robot. This includes the USER
  * pushbutton and LED
+ *
+ * <p>This class is provided by the XRP VendorDep
  */
 public class XRPOnBoardIO {
   private final DigitalInput m_button = new DigitalInput(0);

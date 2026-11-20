@@ -54,6 +54,8 @@ import org.wpilib.annotation.PostConstructionInitializer;
  * // no transitions are defined from state2 or state3,
  * // so the state machine will exit when either state completes
  * }</pre>
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 public final class StateMachine implements Command {
   private final String m_name;

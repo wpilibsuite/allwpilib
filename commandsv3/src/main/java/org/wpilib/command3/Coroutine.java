@@ -31,6 +31,8 @@ import org.wpilib.units.measure.Time;
  * commands to yield and compositions to run other commands. Commands are considered <i>bound</i> to
  * a coroutine while they're scheduled; attempting to use a coroutine outside the command bound to
  * it will result in an {@code IllegalStateException} being thrown.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 public final class Coroutine {
   private final Scheduler m_scheduler;

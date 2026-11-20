@@ -12,6 +12,8 @@ import org.wpilib.system.RobotController;
  * first checks the state of its coroutine. Any coroutine in a {@link #shouldMount() mountable}
  * state will be mounted and ticked; any coroutine not in a mountable state will be skipped and no
  * further action will be taken on it in that cycle.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 sealed interface CoroutineState {
   /**
