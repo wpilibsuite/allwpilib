@@ -33,7 +33,7 @@ class DriverStationTest {
 
   @AfterEach
   void tearDown() {
-    DriverStationBackend.clearUserProgramStarted();
+    RobotState.clearUserProgramStarted();
   }
 
   @ParameterizedTest
@@ -54,7 +54,7 @@ class DriverStationTest {
     DriverStationSim.notifyNewData();
     assertEquals(0, RobotState.getOpModeId());
 
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
     // need to manually mask because the upper eight bits include robot mode information
     assertEquals(0x1234, RobotState.getOpModeId() & 0xFFFF);
   }
@@ -65,7 +65,7 @@ class DriverStationTest {
     DriverStationSim.notifyNewData();
     assertEquals("", RobotState.getOpMode());
 
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
     // in Sim, the opmode string is just the stringified version of the opmode i64 "<0000...0000>"
     // we need to parse the string to get the
     // need to manually mask because the upper eight bits include robot mode information
@@ -90,7 +90,7 @@ class DriverStationTest {
     assertFalse(RobotState.isUtility());
     assertFalse(RobotState.isUtilityEnabled());
 
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
 
     assertEquals(RobotMode.AUTONOMOUS, RobotState.getRobotMode());
     assertTrue(RobotState.isAutonomous());
@@ -240,7 +240,7 @@ class DriverStationTest {
     DriverStationBackend.silenceJoystickConnectionAlert(false);
     assertFalse(isJoystickDisconnectedAlertActive(0));
 
-    var field = DriverStationBackend.class.getDeclaredField("m_userProgramStarted");
+    var field = RobotState.class.getDeclaredField("m_userProgramStarted");
     field.setAccessible(true);
     field.set(null, false);
   }

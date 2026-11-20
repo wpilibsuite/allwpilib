@@ -6,7 +6,7 @@
 
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
-#include "wpi/hal/DriverStation.h"
+#include "wpi/hal/DriverStation.hpp"
 #include "wpi/internal/DriverStationModeThread.hpp"
 
 Robot::Robot() {}
@@ -33,10 +33,10 @@ void Robot::StartCompetition() {
       event.GetHandle());
 
   // Tell the DS that the robot is ready to be enabled
-  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
+  wpi::RobotState::ObserveUserProgramStarting();
 
   while (!exit) {
-    modeThread.InControl(wpi::internal::DriverStationBackend::GetControlWord());
+    modeThread.InControl(wpi::hal::GetControlWord());
     if (IsDisabled()) {
       Disabled();
       while (IsDisabled()) {

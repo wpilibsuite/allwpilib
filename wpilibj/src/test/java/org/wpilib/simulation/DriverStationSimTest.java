@@ -38,7 +38,7 @@ class DriverStationSimTest {
     DriverStationSim.resetData();
     DriverStationSim.notifyNewData();
 
-    var field = DriverStationBackend.class.getDeclaredField("m_userProgramStarted");
+    var field = RobotState.class.getDeclaredField("m_userProgramStarted");
     field.setAccessible(true);
     field.set(null, false);
   }
@@ -64,7 +64,7 @@ class DriverStationSimTest {
   void testAutonomous() {
     HAL.initialize();
     DriverStationSim.resetData();
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
 
     assertFalse(RobotState.isAutonomous());
     EnumCallback callback = new EnumCallback();
@@ -83,7 +83,7 @@ class DriverStationSimTest {
   void testTest() {
     HAL.initialize();
     DriverStationSim.resetData();
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
 
     assertFalse(RobotState.isUtility());
     EnumCallback callback = new EnumCallback();
