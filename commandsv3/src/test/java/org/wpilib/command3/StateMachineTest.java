@@ -111,6 +111,71 @@ class StateMachineTest extends CommandTestBase {
   }
 
   @Test
+  void unsafeInitialStateExitsWhenStartingInDisabled() {
+    m_enabled = false;
+
+    var unsafeMech = new DummyMechanism("Mechanism", m_scheduler);
+    var unsafeCommand = unsafeMech.run(Coroutine::park).named("Unsafe Command");
+    var unsafeWrapper =
+        Command.noRequirements(co -> co.await(unsafeCommand)).named("Unsafe Wrapper");
+
+    StateMachine stateMachine = new StateMachine("State Machine");
+    var state = stateMachine.addState(unsafeWrapper);
+    stateMachine.setInitialState(state);
+
+    m_scheduler.addEventListener(System.out::println);
+    m_scheduler.schedule(stateMachine);
+    m_scheduler.run();
+    assertEquals(List.of(), m_scheduler.getRunningCommands());
+  }
+
+  @Test
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  void delayedForkFailureInDisabledCancelsStateMachine() {
+    m_enabled = false;
+
+    var unsafeMech = new DummyMechanism("Mechanism", m_scheduler);
+    var unsafeCommand = unsafeMech.run(Coroutine::park).named("Unsafe Command");
+
+    StateMachine stateMachine = new StateMachine("State Machine");
+    Command delayedWrapper =
+        Command.noRequirements(
+                co -> {
+                  co.yield();
+                  co.await(unsafeCommand);
+                })
+            .named("Delayed Unsafe Wrapper");
+
+    var state = stateMachine.addState(delayedWrapper);
+    stateMachine.setInitialState(state);
+
+    m_scheduler.schedule(stateMachine);
+    m_scheduler.run(); // Cycle 1: starts state machine and child wrapper
+    assertEquals(
+        List.of(stateMachine, delayedWrapper),
+        m_scheduler.getRunningCommands(),
+        "State machine and delayed wrapper should be running after cycle 1");
+
+    m_scheduler.run(); // Cycle 2: child wrapper attempts to await unsafe command and fails
+    assertEquals(
+        List.of(),
+        m_scheduler.getRunningCommands(),
+        "State Machine should not be running after fork failure");
+    assertSchedulerEvent(
+        Canceled.class,
+        e -> e.command() == stateMachine,
+        "State Machine should have been canceled");
+    assertSchedulerEvent(
+        SchedulerEvent.ForkFailure.class,
+        e -> {
+          return e.command() == delayedWrapper
+              && e.failures().size() == 1
+              && e.failures().getFirst().command() == unsafeCommand;
+        },
+        "Delayed wrapper should have failed to fork the unsafe command");
+  }
+
+  @Test
   void transitions() {
     AtomicBoolean signalA = new AtomicBoolean(false);
     AtomicBoolean signalB = new AtomicBoolean(false);

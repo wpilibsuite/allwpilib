@@ -627,13 +627,21 @@ public final class Scheduler implements ProtobufSerializable {
 
     emitScheduledEvent(command);
 
-    if (currentState() != null) {
+    var current = currentState();
+    if (current != null) {
       // Scheduling a child command while running. Start it immediately instead of waiting a full
       // cycle. This prevents issues with deeply nested command groups taking many scheduler cycles
       // to start running the commands that actually _do_ things
       evictConflictingRunningCommands(state);
       m_runningCommands.put(command, state);
       runCommand(state);
+
+      // The command may have had a descendant fail to fork or have been manually canceled by
+      // a descendant. That cancellation will have removed this one from the running set, but
+      // we need to manually halt it to ensure it doesn't continue running.
+      if (!m_runningCommands.containsKey(current.command()) && current.coroutine().isMounted()) {
+        current.coroutine().requestCancellation();
+      }
     } else {
       // Scheduling outside a command, add it to the pending set. If it's not overridden by another
       // conflicting command being scheduled in the same scheduler loop, it'll be promoted and
@@ -1080,10 +1088,8 @@ public final class Scheduler implements ProtobufSerializable {
 
   private void handleCoroutineIRQ(Coroutine.ForkResult failure, Command command) {
     Command root = getRoot(command); // capture the root command before modifying scheduler state
-    m_currentCommandAncestry.clear();
     emitForkFailureEvent(command, failure.getFailedCommands());
     cancel(root);
-    Continuation.mountContinuation(null);
   }
 
   /**
