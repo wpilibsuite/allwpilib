@@ -14,6 +14,7 @@
 #include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/geometry/Quaternion.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/time.hpp"
@@ -432,4 +433,89 @@ TEST_CASE("Rotation3dTest Interpolate", "[wpimath]") {
   CHECK_NEAR(rot2.X().value(), interpolated.X().value(), 1e-9);
   CHECK_NEAR(rot2.Y().value(), interpolated.Y().value(), 1e-9);
   CHECK_NEAR(rot2.Z().value(), interpolated.Z().value(), 1e-9);
+}
+
+TEST_CASE("Rotation3dTest FromExtrinsicMatchesEulerConstructor", "[wpimath]") {
+  constexpr auto roll = wpi::units::radian_t{0.3};
+  constexpr auto pitch = wpi::units::radian_t{-0.7};
+  constexpr auto yaw = wpi::units::radian_t{1.9};
+
+  const Rotation3d extrinsic = Rotation3d::FromExtrinsic(roll, pitch, yaw);
+  CHECK(Rotation3d{roll, pitch, yaw} == extrinsic);
+
+  // Degree quantities convert to the radian parameters.
+  CHECK(Rotation3d{20_deg, -35_deg, 40_deg} ==
+        Rotation3d::FromExtrinsic(20_deg, -35_deg, 40_deg));
+
+  // X/Y/Z report the extrinsic Euler angles, so they round-trip.
+  const auto inDegrees = Rotation3d::FromExtrinsic(20_deg, -35_deg, 40_deg);
+  CHECK_NEAR(20.0, wpi::units::degree_t{inDegrees.X()}.value(), 1e-9);
+  CHECK_NEAR(-35.0, wpi::units::degree_t{inDegrees.Y()}.value(), 1e-9);
+  CHECK_NEAR(40.0, wpi::units::degree_t{inDegrees.Z()}.value(), 1e-9);
+
+  const Eigen::Vector3d xAxis{1.0, 0.0, 0.0};
+  const Eigen::Vector3d yAxis{0.0, 1.0, 0.0};
+  const Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
+  CHECK(Rotation3d{xAxis, roll} ==
+        Rotation3d::FromExtrinsic(roll, 0_rad, 0_rad));
+  CHECK(Rotation3d{yAxis, pitch} ==
+        Rotation3d::FromExtrinsic(0_rad, pitch, 0_rad));
+  CHECK(Rotation3d{zAxis, yaw} == Rotation3d::FromExtrinsic(0_rad, 0_rad, yaw));
+
+  CHECK(Rotation3d{} == Rotation3d::FromExtrinsic(0_rad, 0_rad, 0_rad));
+  CHECK(extrinsic != Rotation3d::FromIntrinsic(roll, pitch, yaw));
+}
+
+TEST_CASE("Rotation3dTest FromIntrinsicMatchesComposition", "[wpimath]") {
+  constexpr auto roll = wpi::units::radian_t{0.3};
+  constexpr auto pitch = wpi::units::radian_t{-0.7};
+  constexpr auto yaw = wpi::units::radian_t{1.9};
+
+  const Rotation3d r{roll, 0_rad, 0_rad};
+  const Rotation3d p{0_rad, pitch, 0_rad};
+  const Rotation3d y{0_rad, 0_rad, yaw};
+  const Rotation3d intrinsic = Rotation3d::FromIntrinsic(roll, pitch, yaw);
+
+  // Intrinsic roll, then pitch, then yaw is extrinsic yaw, then pitch, then
+  // roll.
+  CHECK(y.RotateBy(p).RotateBy(r) == intrinsic);
+
+  // A rotation about a single axis is the same either way.
+  CHECK(Rotation3d::FromExtrinsic(roll, 0_rad, 0_rad) ==
+        Rotation3d::FromIntrinsic(roll, 0_rad, 0_rad));
+  CHECK(Rotation3d::FromExtrinsic(0_rad, pitch, 0_rad) ==
+        Rotation3d::FromIntrinsic(0_rad, pitch, 0_rad));
+  CHECK(Rotation3d::FromExtrinsic(0_rad, 0_rad, yaw) ==
+        Rotation3d::FromIntrinsic(0_rad, 0_rad, yaw));
+  CHECK(Rotation3d{} == Rotation3d::FromIntrinsic(0_rad, 0_rad, 0_rad));
+
+  // intrinsic (90°, 90°, 0°) == extrinsic (90°, 0°, 90°). X/Y/Z report that
+  // extrinsic triple, not the intrinsic inputs.
+  const auto rightAngle = Rotation3d::FromIntrinsic(90_deg, 90_deg, 0_deg);
+  CHECK(Rotation3d::FromExtrinsic(90_deg, 0_deg, 90_deg) == rightAngle);
+  CHECK_NEAR(90.0, wpi::units::degree_t{rightAngle.X()}.value(), 1e-9);
+  CHECK_NEAR(0.0, wpi::units::degree_t{rightAngle.Y()}.value(), 1e-9);
+  CHECK_NEAR(90.0, wpi::units::degree_t{rightAngle.Z()}.value(), 1e-9);
+}
+
+TEST_CASE("Rotation3dTest FromIntrinsicRotatesAboutBodyAxes", "[wpimath]") {
+  // Pitch 90° about body Y (body X now points along world -Z, body Z along
+  // world +X), then yaw 90° about the new body Z (world +X). That swings body
+  // X from world -Z to world +Y. Extrinsically applying the same angles would
+  // leave body X along world -Z instead.
+  const auto rot = Rotation3d::FromIntrinsic(
+      0_rad, wpi::units::radian_t{std::numbers::pi / 2.0},
+      wpi::units::radian_t{std::numbers::pi / 2.0});
+  const auto bodyX = Translation3d{1_m, 0_m, 0_m}.RotateBy(rot);
+  CHECK_NEAR(0.0, bodyX.X().value(), 1e-9);
+  CHECK_NEAR(1.0, bodyX.Y().value(), 1e-9);
+  CHECK_NEAR(0.0, bodyX.Z().value(), 1e-9);
+
+  const auto extrinsic = Rotation3d::FromExtrinsic(
+      0_rad, wpi::units::radian_t{std::numbers::pi / 2.0},
+      wpi::units::radian_t{std::numbers::pi / 2.0});
+  const auto extrinsicBodyX = Translation3d{1_m, 0_m, 0_m}.RotateBy(extrinsic);
+  CHECK_NEAR(0.0, extrinsicBodyX.X().value(), 1e-9);
+  CHECK_NEAR(0.0, extrinsicBodyX.Y().value(), 1e-9);
+  CHECK_NEAR(-1.0, extrinsicBodyX.Z().value(), 1e-9);
 }
