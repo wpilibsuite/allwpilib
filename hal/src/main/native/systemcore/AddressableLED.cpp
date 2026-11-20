@@ -157,7 +157,7 @@ void HAL_SetAddressableLEDData(int32_t start, int32_t length,
                                const struct HAL_AddressableLEDData* data,
                                int32_t* status) {
   if (start < 0 || start >= HAL_ADDRESSABLE_LED_MAX_LEN || length < 0 ||
-      (start + length) >= HAL_ADDRESSABLE_LED_MAX_LEN) {
+      (start + length) > HAL_ADDRESSABLE_LED_MAX_LEN) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
