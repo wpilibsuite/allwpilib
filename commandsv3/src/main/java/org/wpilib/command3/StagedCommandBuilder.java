@@ -170,8 +170,7 @@ public final class StagedCommandBuilder {
           } else {
             // A custom end condition is implemented as a race group, since we cannot modify the
             // command body to inject the end condition.
-            m_builtCommand =
-                new ParallelGroupBuilder().requiring(command).until(m_endCondition).named(m_name);
+            m_builtCommand = command.until(m_endCondition).named(m_name);
           }
 
           return m_builtCommand;

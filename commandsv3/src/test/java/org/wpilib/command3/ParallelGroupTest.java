@@ -187,7 +187,7 @@ class ParallelGroupTest extends CommandTestBase {
     var b = Command.noRequirements(coroutine -> {}).named("B");
     var c = Command.noRequirements(coroutine -> {}).named("C");
 
-    var group = new ParallelGroupBuilder().optional(a, b, c).withAutomaticName();
+    var group = Command.race(a, b, c);
     assertEquals("(A | B | C)", group.name());
   }
 
@@ -197,7 +197,7 @@ class ParallelGroupTest extends CommandTestBase {
     var b = Command.noRequirements(coroutine -> {}).named("B");
     var c = Command.noRequirements(coroutine -> {}).named("C");
 
-    var group = new ParallelGroupBuilder().requiring(a, b, c).withAutomaticName();
+    var group = Command.parallel(a, b, c);
     assertEquals("(A & B & C)", group.name());
   }
 
@@ -207,7 +207,7 @@ class ParallelGroupTest extends CommandTestBase {
     var b = Command.noRequirements(coroutine -> {}).named("B");
     var c = Command.noRequirements(coroutine -> {}).named("C");
 
-    var group = new ParallelGroupBuilder().requiring(a).optional(b, c).withAutomaticName();
+    var group = Command.race(b, c).requiring(a);
     assertEquals("[(A) * (B | C)]", group.name());
   }
 

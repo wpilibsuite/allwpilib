@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -594,7 +593,7 @@ class SchedulerCancellationTests extends CommandTestBase {
     var mechanism = new DummyMechanism("The mechanism", m_scheduler);
     var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
 
-    var group = new SequentialGroup("Seq", Collections.singletonList(cmd));
+    var group = new SequentialGroup(cmd);
     m_scheduler.schedule(group);
     m_scheduler.run();
     m_scheduler.cancel(group);
@@ -686,7 +685,7 @@ class SchedulerCancellationTests extends CommandTestBase {
     var mechanism = new DummyMechanism("The mechanism", m_scheduler);
     var cmd = mechanism.run(Coroutine::yield).whenExited(() -> ran.set(true)).named("cmd");
 
-    var group = new SequentialGroup("Seq", Collections.singletonList(cmd));
+    var group = new SequentialGroup(cmd).named("Sequence");
     m_scheduler.schedule(group);
     m_scheduler.run();
     m_scheduler.cancel(group);
@@ -779,7 +778,7 @@ class SchedulerCancellationTests extends CommandTestBase {
             .whenCanceled(() -> invocations.add("onCancel"))
             .named("cmd");
 
-    var group = new SequentialGroup("Seq", Collections.singletonList(cmd));
+    var group = new SequentialGroup(cmd).named("Sequence");
     m_scheduler.schedule(group);
     m_scheduler.run();
     m_scheduler.cancel(group);

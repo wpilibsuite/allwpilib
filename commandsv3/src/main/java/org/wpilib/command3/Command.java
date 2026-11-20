@@ -8,6 +8,7 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -282,15 +283,12 @@ public interface Command {
    * Starts creating a command that runs a group of multiple commands in parallel. The command will
    * complete when every command in the group has completed naturally.
    *
-   * <p>More configuration options are needed after calling this function before the command can be
-   * created. See {@link ParallelGroupBuilder} for details.
-   *
    * @param commands The commands to run in parallel
-   * @return A command builder
+   * @return A parallel command group
    */
-  static ParallelGroupBuilder parallel(Command... commands) {
-    // parameters will be null checked by the builder
-    return new ParallelGroupBuilder().requiring(commands);
+  static ParallelGroup parallel(Command... commands) {
+    // parameters will be null checked by the command group
+    return new ParallelGroup(null, List.of(commands), List.of());
   }
 
   /**
@@ -298,15 +296,12 @@ public interface Command {
    * complete when any command in the group has completed naturally; all other commands in the group
    * will be canceled.
    *
-   * <p>More configuration options are needed after calling this function before the command can be
-   * created. See {@link ParallelGroupBuilder} for details.
-   *
    * @param commands The commands to run in parallel
-   * @return A command builder
+   * @return A parallel command group
    */
-  static ParallelGroupBuilder race(Command... commands) {
-    // parameters will be null checked by the builder
-    return new ParallelGroupBuilder().optional(commands);
+  static ParallelGroup race(Command... commands) {
+    // parameters will be null checked by the command group
+    return new ParallelGroup(null, List.of(), List.of(commands));
   }
 
   /**
@@ -314,15 +309,12 @@ public interface Command {
    * complete when the last command in the group has completed naturally. Commands in the group will
    * run in the order they're passed to this method.
    *
-   * <p>More configuration options are needed after calling this function before the command can be
-   * created. See {@link SequentialGroupBuilder} for details.
-   *
    * @param commands The commands to run in sequence.
-   * @return A command builder
+   * @return A command sequence
    */
-  static SequentialGroupBuilder sequence(Command... commands) {
+  static SequentialGroup sequence(Command... commands) {
     // parameters will be null checked by the builder
-    return new SequentialGroupBuilder().andThen(commands);
+    return new SequentialGroup(commands);
   }
 
   /**
@@ -359,16 +351,24 @@ public interface Command {
    * has not already exited by then).
    *
    * <p>More configuration options are needed after calling this function before the command can be
-   * created. See {@link ParallelGroupBuilder} for details.
+   * created. See {@link NeedsNameBuilderStage} for details.
    *
    * @param endCondition The end condition to wait for.
    * @return The waiting command
    */
-  default ParallelGroupBuilder until(BooleanSupplier endCondition) {
+  default NeedsNameBuilderStage until(BooleanSupplier endCondition) {
     requireNonNullParam(endCondition, "endCondition", "Command.until");
 
-    return new ParallelGroupBuilder()
-        .optional(this, Command.waitUntil(endCondition).named("Until Condition"));
+    return noRequirements(
+        coroutine -> {
+          var result = coroutine.scheduler().schedule(this);
+          if (result instanceof Scheduler.ScheduleResult.Success res) {
+            coroutine.waitUntil(
+                () ->
+                    endCondition.getAsBoolean()
+                        || coroutine.scheduler().runId(this) != res.runId());
+          }
+        });
   }
 
   /**
@@ -379,50 +379,96 @@ public interface Command {
    * Sequence aThenBThenC =
    *   commandA()
    *     .andThen(commandB())
-   *     .andThen(commandC())
-   *     .withAutomaticName();
+   *     .andThen(commandC());
    * }</pre>
    *
    * @param next The command to run after this one in the sequence
-   * @return A sequence builder
+   * @return A command sequence
    */
-  default SequentialGroupBuilder andThen(Command next) {
+  default SequentialGroup andThen(Command next) {
     // parameter will be null checked by the builder
-    return new SequentialGroupBuilder().andThen(this).andThen(next);
+    return new SequentialGroup(this, next);
   }
 
   /**
    * Creates a parallel command group, running this command alongside one or more other commands.
    * The group will exit once every command has finished.
    *
-   * <p>More configuration options are needed after calling this function before the command can be
-   * created. See {@link ParallelGroupBuilder} for details.
-   *
-   * <pre>{@code
-   * ParallelGroup abc =
-   *   commandA()
-   *     .alongWith(commandB(), commandC())
-   *     .withAutomaticName();
-   * }</pre>
-   *
    * @param parallel The commands to run in parallel with this one
-   * @return A parallel group builder
+   * @return A parallel command group
    */
-  default ParallelGroupBuilder alongWith(Command... parallel) {
-    return new ParallelGroupBuilder().requiring(this).requiring(parallel);
+  default ParallelGroup alongWith(Command... parallel) {
+    var commands = new Command[parallel.length + 1];
+    commands[0] = this;
+    System.arraycopy(parallel, 0, commands, 1, parallel.length);
+    return new ParallelGroup(null, List.of(commands), List.of());
   }
 
   /**
    * Creates a parallel command group, running this command alongside one or more other commands.
    * The group will exit after any command finishes.
    *
-   * <p>More configuration options are needed after calling this function before the command can be
-   * created. See {@link ParallelGroupBuilder} for details.
-   *
    * @param parallel The commands to run in parallel with this one
-   * @return A parallel group builder
+   * @return A parallel command group
    */
-  default ParallelGroupBuilder raceWith(Command... parallel) {
-    return new ParallelGroupBuilder().optional(this).optional(parallel);
+  default ParallelGroup raceWith(Command... parallel) {
+    var commands = new Command[parallel.length + 1];
+    commands[0] = this;
+    System.arraycopy(parallel, 0, commands, 1, parallel.length);
+    return new ParallelGroup(null, List.of(), List.of(commands));
+  }
+
+  /**
+   * Gives an existing command a different name.
+   *
+   * @param newName The name to assign to this command.
+   * @return A command that has the same implementation as this command, but with a different name.
+   */
+  default Command named(String newName) {
+    var originalCommand = this;
+    return new Command() {
+      @Override
+      public void run(Coroutine coroutine) {
+        originalCommand.run(coroutine);
+      }
+
+      @Override
+      public String name() {
+        return newName;
+      }
+
+      @Override
+      public Set<Mechanism> requirements() {
+        return originalCommand.requirements();
+      }
+
+      @Override
+      public int priority() {
+        return originalCommand.priority();
+      }
+
+      @Override
+      public void onCancel() {
+        originalCommand.onCancel();
+      }
+
+      @Override
+      public String toString() {
+        return newName;
+      }
+
+      // By overriding equals() and hashCode(),
+      // the scheduler treats this command as identical to the parent,
+      // which prevents it and the parent from being scheduled simultaneously.
+      @Override
+      public int hashCode() {
+        return originalCommand.hashCode();
+      }
+
+      @Override
+      public boolean equals(Object other) {
+        return other instanceof Command && (other == originalCommand || other == this);
+      }
+    };
   }
 }
