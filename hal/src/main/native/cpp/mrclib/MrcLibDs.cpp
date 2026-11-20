@@ -309,7 +309,7 @@ MrcLibDsImpl::MrcLibDsImpl() {
     std::memset(&joystickOutputs[i], 0, sizeof(joystickOutputs[i]));
   }
 
-  if (!MRC_CHECK_API_VERSION()) {
+  if (MRC_CHECK_API_VERSION() != MRC_STATUS_SUCCESS) {
     wpi::util::print(
         stderr,
         "Error: MRC API version mismatch. Restarting app and retrying...");
