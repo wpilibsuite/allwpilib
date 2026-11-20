@@ -5,14 +5,20 @@
 #include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <memory>
 #include <string>
+#include <string_view>
 #include <thread>
+#include <utility>
 
 #include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 
+#include "wpi/net/HttpUtil.hpp"
+#include "wpi/net/TCPConnector.h"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/util/Logger.hpp"
 
 // Valid persistent JSON containing a single persistent integer topic.
 static constexpr const char* PERSISTENT_JSON = R"([
@@ -28,6 +34,63 @@ static constexpr unsigned int RESTORE_BACKUP_PORT = 10040;
 static constexpr unsigned int NORMAL_LOAD_PORT = 10041;
 static constexpr unsigned int ORIGINAL_OVER_BACKUP_PORT = 10042;
 static constexpr unsigned int NO_FILE_PORT = 10043;
+static constexpr unsigned int WEB_VIEWER_PORT = 10044;
+
+class NetworkServerWebTest {
+ public:
+  NetworkServerWebTest() {
+    m_inst.StartServer("", "127.0.0.1", "", WEB_VIEWER_PORT);
+  }
+
+  ~NetworkServerWebTest() { wpi::nt::NetworkTableInstance::Destroy(m_inst); }
+
+ protected:
+  std::unique_ptr<wpi::net::HttpConnection> Get(std::string_view path) {
+    wpi::util::Logger logger;
+    std::unique_ptr<wpi::net::NetworkStream> stream;
+    auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{3};
+    do {
+      stream = wpi::net::TCPConnector::connect("127.0.0.1", WEB_VIEWER_PORT,
+                                               logger, 1);
+      if (stream) {
+        break;
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds{10});
+    } while (std::chrono::steady_clock::now() < deadline);
+    REQUIRE(stream);
+    auto conn =
+        std::make_unique<wpi::net::HttpConnection>(std::move(stream), 3);
+    wpi::net::HttpRequest request;
+    request.host = "127.0.0.1";
+    request.port = WEB_VIEWER_PORT;
+    request.path = path.substr(1);
+    std::string warning;
+    bool success = conn->Handshake(request, &warning);
+    INFO(warning);
+    REQUIRE(success);
+    return conn;
+  }
+
+  wpi::nt::NetworkTableInstance m_inst =
+      wpi::nt::NetworkTableInstance::Create();
+};
+
+TEST_CASE_METHOD(NetworkServerWebTest, "NetworkServerWebTest OutlineViewer",
+                 "[ntcore][network-server]") {
+  auto conn = Get("/");
+  CHECK(std::string_view{conn->contentType} == "text/html; charset=utf-8");
+  auto length = std::stoul(std::string{conn->contentLength});
+  std::string body(length, '\0');
+  conn->is.read(body.data(), body.size());
+  REQUIRE_FALSE(conn->is.has_error());
+  CHECK(body.starts_with("<!doctype html>"));
+  CHECK(body.find("NetworkTables Outline Viewer") != std::string::npos);
+  CHECK(body.find("v4.1.networktables.first.wpi.edu") != std::string::npos);
+  CHECK(body.find("</html>") != std::string::npos);
+
+  auto persistent = Get("/nt/persistent.json");
+  CHECK(std::string_view{persistent->contentType} == "application/json");
+}
 
 class NetworkServerPersistentTest {
  public:

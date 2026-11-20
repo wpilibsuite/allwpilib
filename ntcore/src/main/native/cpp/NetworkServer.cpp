@@ -18,6 +18,7 @@
 #include "IConnectionList.hpp"
 #include "InstanceImpl.hpp"
 #include "Log.hpp"
+#include "WebServerPage.hpp"
 #include "net/WebSocketConnection.hpp"
 #include "net/WireDecoder.hpp"
 #include "net/WireEncoder.hpp"
@@ -147,11 +148,8 @@ void NetworkServer::ServerConnection4::ProcessRequest() {
 
   const bool isGET = m_request.GetMethod() == HTTP_GET;
   if (isGET && path == "/") {
-    // build HTML root page
-    SendResponse(200, "OK", "text/html",
-                 "<html><head><title>NetworkTables</title></head>"
-                 "<body><p>WebSockets must be used to access NetworkTables."
-                 "</body></html>");
+    SendStaticResponse(200, "OK", "text/html; charset=utf-8", WEB_SERVER_PAGE,
+                       false);
   } else if (isGET && path == "/nt/persistent.json") {
     SendResponse(200, "OK", "application/json",
                  m_server.m_serverImpl.DumpPersistent());
