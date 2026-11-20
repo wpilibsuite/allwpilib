@@ -2,9 +2,11 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 import argparse
+import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from collections.abc import Sequence
 from enum import Flag, auto
 from pathlib import Path
@@ -141,6 +143,57 @@ def generate_quickbuf(
             encoding="utf-8",
             newline="\n",
         )
+
+
+def generate_python_protobuf(
+    protoc: Sequence[str], output_directory: Path, proto_dir: Path
+) -> None:
+    """Generates Python protobuf files (*_pb2.py and *_pb2.pyi) with the official protoc.
+
+    Keyword arguments:
+    protoc -- The command that runs the Protocol Buffers compiler.
+    output_directory -- The package directory to write generated files to.
+    proto_dir -- The base directory with protobuf files.
+    """
+    protos = sorted(proto_dir.glob("**/*.proto"))
+    with tempfile.TemporaryDirectory() as tmp:
+        subprocess.check_call(
+            [
+                *protoc,
+                f"-I{proto_dir.absolute()}",
+                f"--python_out={tmp}",
+                f"--pyi_out={tmp}",
+                *(str(p.absolute()) for p in protos),
+            ]
+        )
+        generated = sorted(Path(tmp).glob("**/*_pb2.py*"))
+
+        names = [g.name for g in generated]
+        if len(names) != len(set(names)):
+            raise ValueError(
+                f"Generated protobuf modules collide when flattened: {names}"
+            )
+
+        # Wipe away all protobuf files (and only protobuf files) first to ensure correctness
+        for file in output_directory.glob("*_pb2.py*"):
+            file.unlink()
+        output_directory.mkdir(parents=True, exist_ok=True)
+
+        modules = "|".join(sorted({g.name.split(".")[0] for g in generated}))
+        # Only rewrite imports of modules generated here, never google.protobuf's.
+        local_import = re.compile(
+            rf"^from (?!google\.)[\w.]+ import ({modules})\b", re.MULTILINE
+        )
+        for file in generated:
+            (output_directory / file.name).write_text(
+                local_import.sub(r"from . import \1", file.read_text(encoding="utf-8")),
+                encoding="utf-8",
+                newline="\n",
+            )
+
+        # Mark the directory as a package. This is written here so that syncing the
+        # whole directory into the source tree doesn't delete it.
+        (output_directory / "__init__.py").touch()
 
 
 def generate_nanopb(

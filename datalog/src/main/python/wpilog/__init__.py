@@ -50,3 +50,7 @@ __all__ = [
     "StructArrayLogEntry",
     "StructLogEntry",
 ]
+
+from .protobuf import ProtobufLogEntry, add_protobuf_schema
+
+__all__ += ["ProtobufLogEntry", "add_protobuf_schema"]
