@@ -24,6 +24,23 @@ def fileCheck = { parsedJson, folder ->
     }
 }
 
+def unitTestsCheck = { entries ->
+    def errors = []
+    entries.each { entry ->
+        def hasTag = entry.tags.contains("UnitTests")
+        def hasTests = entry.hasunittests == true
+        if (hasTag && !hasTests) {
+            errors << "Entry ${entry.foldername}: 'UnitTests' tag requires hasunittests: true"
+        }
+        if (hasTests && !hasTag) {
+            errors << "Entry ${entry.foldername}: hasunittests is true without 'UnitTests' tag"
+        }
+    }
+    if (!errors.empty) {
+        throw new GradleException(errors.join('\n'))
+    }
+}
+
 def tagList = [
         /* --- Categories --- */
         // On-RIO image processing
@@ -75,6 +92,7 @@ tasks.register('checkTemplates') {
     doLast {
         def parsedJson = new groovy.json.JsonSlurper().parseText(templateFile.text)
         fileCheck(parsedJson, templateDirectory)
+        unitTestsCheck(parsedJson)
         parsedJson.each {
             assert it.name != null
             assert it.description != null
@@ -94,6 +112,7 @@ tasks.register('checkExamples') {
     doLast {
         def parsedJson = new groovy.json.JsonSlurper().parseText(exampleFile.text)
         fileCheck(parsedJson, exampleDirectory)
+        unitTestsCheck(parsedJson)
         parsedJson.each {
             assert it.name != null
             assert it.description != null
@@ -113,6 +132,7 @@ tasks.register('checkSnippets') {
     doLast {
         def parsedJson = new groovy.json.JsonSlurper().parseText(snippetsFile.text)
         fileCheck(parsedJson, snippetsDirectory)
+        unitTestsCheck(parsedJson)
         parsedJson.each {
             assert it.name != null
             assert it.description != null
