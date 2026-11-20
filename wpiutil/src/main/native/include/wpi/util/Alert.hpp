@@ -85,6 +85,16 @@ class Alert {
   Alert() = default;
 
   /**
+   * Creates a new alert in the default group - "Alerts". The text is also used
+   * as the alert identifier.
+   *
+   * @param text Text to be displayed when the alert is active. This should be
+   *     unique within the group.
+   * @param level Alert urgency level.
+   */
+  Alert(std::string_view text, Level level);
+
+  /**
    * Creates a new alert in the default group - "Alerts".
    *
    * @param text Text to be displayed when the alert is active.
