@@ -25,6 +25,8 @@ class HALSimWSProviderDriverStation : public HALSimWSHalProvider {
  private:
   int32_t m_enabledCbKey = 0;
   int32_t m_robotModeCbKey = 0;
+  int32_t m_opModeCbKey = 0;
+  int32_t m_opModeOptionsCbKey = 0;
   int32_t m_estopCbKey = 0;
   int32_t m_fmsCbKey = 0;
   int32_t m_dsCbKey = 0;

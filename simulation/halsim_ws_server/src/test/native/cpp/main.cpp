@@ -17,9 +17,11 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/simulation/DIOData.h"
+#include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/halsim/ws_server/HALSimWSServer.hpp"
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/util/print.hpp"
+#include "wpi/util/string.hpp"
 
 namespace uv = wpi::net::uv;
 
@@ -195,6 +197,83 @@ TEST_CASE("WebServerIntegrationTest DriverStation",
   HAL_GetControlWord(&cw);
   bool test_value = HAL_ControlWord_IsEnabled(cw);
   CHECK(EXPECTED_VALUE == test_value);
+}
+
+TEST_CASE("WebServerIntegrationTest DriverStation OpMode",
+          "[simulation][halsim_ws_server]") {
+  WebServerIntegrationTest test;
+
+  using namespace std::chrono_literals;
+  std::this_thread::sleep_for(500ms);
+  REQUIRE(test.IsConnectedClientWS());
+
+  // Register an OpMode
+  const int64_t EXPECTED_ID =
+      HAL_MakeOpModeId(HAL_ROBOT_MODE_TELEOPERATED, 0x00FEDCBA98765432LL);
+  HAL_OpModeOption option{EXPECTED_ID,
+                          wpi::util::make_string("My Teleop"),
+                          wpi::util::make_string("Group"),
+                          wpi::util::make_string("Description"),
+                          -1,
+                          -1};
+  HAL_SetOpModeOptions(&option, 1);
+
+  std::this_thread::sleep_for(500ms);
+
+  // Get values from JSON message
+  std::string test_type;
+  std::string test_id;
+  std::string test_name;
+  std::string test_group;
+  std::string test_description;
+  int test_robot_mode = HAL_ROBOT_MODE_UNKNOWN;
+  try {
+    auto& msg = test.m_webserverClient->GetLastMessage();
+    test_type = msg.at("type").get_string();
+    auto& options = msg.at("data").at("<opModes").get_array();
+    REQUIRE(options.size() == 1u);
+    test_id = options[0].at("id").get_string();
+    test_name = options[0].at("name").get_string();
+    test_group = options[0].at("group").get_string();
+    test_description = options[0].at("description").get_string();
+    test_robot_mode = options[0].at("robotMode").get_int();
+  } catch (std::logic_error& e) {
+    wpi::util::print(stderr, "Error with incoming message: {}\n", e.what());
+  }
+
+  CHECK("DriverStation" == test_type);
+  CHECK(std::to_string(EXPECTED_ID) == test_id);
+  CHECK("My Teleop" == test_name);
+  CHECK("Group" == test_group);
+  CHECK("Description" == test_description);
+  CHECK(HAL_ROBOT_MODE_TELEOPERATED == test_robot_mode);
+
+  // Select the OpMode using the ID received from the server
+  test.m_server.runner.ExecSync([&](auto& loop) {
+    auto data = wpi::util::json::object();
+    data[">robotMode"] = static_cast<int>(HAL_ROBOT_MODE_TELEOPERATED);
+    data[">opMode"] = test_id;
+    data[">new_data"] = true;
+    wpi::util::json msg = wpi::util::json::object();
+    msg["type"] = "DriverStation";
+    msg["device"] = "";
+    msg["data"] = std::move(data);
+    wpi::util::print("***** Input JSON: {}\n", msg.to_string());
+    test.m_webserverClient->SendMessage(msg);
+  });
+
+  std::this_thread::sleep_for(500ms);
+
+  HAL_RefreshDSData();
+
+  // Compare results
+  HAL_ControlWord cw;
+  HAL_GetControlWord(&cw);
+  CHECK(EXPECTED_ID == HAL_ControlWord_GetOpModeId(cw));
+
+  HAL_SetOpModeOptions(nullptr, 0);
+  HALSIM_SetDriverStationOpMode(0);
+  HALSIM_SetDriverStationRobotMode(HAL_ROBOT_MODE_UNKNOWN);
 }
 
 int main(int argc, char* argv[]) {
