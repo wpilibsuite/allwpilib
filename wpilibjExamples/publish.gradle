@@ -18,7 +18,6 @@ def mainFile = file("$projectDir/src/main/java/org/wpilib/Main.java")
 task javaExamplesZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = examplesZipBaseName
-    exclude '**/*.bazel'
 
     from(licenseFile) {
         into '/'
@@ -40,7 +39,6 @@ task javaExamplesZip(type: Zip) {
 task javaTemplatesZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = templatesZipBaseName
-    exclude '**/*.bazel'
 
     from(licenseFile) {
         into '/'
@@ -62,7 +60,6 @@ task javaTemplatesZip(type: Zip) {
 task javaCommandsZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = commandsZipBaseName
-    exclude '**/*.bazel'
 
     from(licenseFile) {
         into '/'
@@ -80,7 +77,6 @@ task javaCommandsZip(type: Zip) {
 task javaSnippetsZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = snippetsZipBaseName
-    exclude '**/*.bazel'
 
     from(licenseFile) {
         into '/'

@@ -27,6 +27,22 @@ _EXAMPLE_DEPS = [
     "@bzlmodrio-opencv//libraries/java/opencv",
 ]
 
+# Example/snippet launchers are tagged manual so wildcard builds (//...)
+# don't build 70+ launchers, their native-libs directories and halsim_gui.
+# `bazel run //wpilibjExamples:<x>-example` still works, and their smoke
+# tests aren't affected.
+_LAUNCHER_TAGS = ["manual"]
+
+# commandsv3 runs commands on JDK continuations, which live in JDK internals.
+# Matches the flags wpilibjExamples/build.gradle passes (there scoped to the
+# wpilib.command3 module; Bazel runs everything on the classpath instead).
+_EXAMPLE_JVM_FLAGS = [
+    "--add-opens",
+    "java.base/jdk.internal.vm=ALL-UNNAMED",
+    "--add-opens",
+    "java.base/java.lang=ALL-UNNAMED",
+]
+
 def first_level_folders(paths, prefix):
     output = {}
     for path in paths:
@@ -86,7 +102,9 @@ def build_examples(folders, halsim_deps):
             runtime_deps = [":examples-java"],
             halsim_deps = halsim_deps,
             args = ["org.wpilib.examples." + folder + ".Robot"],
+            jvm_flags = _EXAMPLE_JVM_FLAGS,
             tags = ["wpi-example"],
+            binary_tags = _LAUNCHER_TAGS,
         )
 
 def build_commands(folders):
@@ -109,7 +127,9 @@ def build_snippets(folders, halsim_deps = []):
             runtime_deps = [":examples-java"],
             halsim_deps = halsim_deps,
             args = ["org.wpilib.snippets." + folder + ".Robot"],
+            jvm_flags = _EXAMPLE_JVM_FLAGS,
             tags = ["wpi-example"],
+            binary_tags = _LAUNCHER_TAGS,
         )
 
 def build_templates(folders):

@@ -3,12 +3,22 @@ load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//shared/bazel/rules:packaging.bzl", "zip_java_srcs")
 load("//shared/bazel/rules:publishing.bzl", "wpilib_maven_export")
-load("//shared/bazel/rules/gen:flatten_native_libs.bzl", "wpilib_flatten_native_libs")
+load("//shared/bazel/rules/gen:flatten_native_libs.bzl", "NATIVE_LIBS_MARKER", "wpilib_flatten_native_libs")
 
-# Applied to every generated "_java_impl"/wrapper target pair (both the
-# wpilib_java_junit5_test and wpilib_java_binary machinery below), so
-# sanitizer builds and //... wildcard expansion treat them uniformly.
-_INNER_TAGS = ["allwpilib-build-java", "no-asan", "no-tsan", "no-ubsan"]
+# Applied to every generated "_java_impl"/wrapper target pair, so sanitizer
+# builds skip them uniformly.
+_SANITIZER_TAGS = ["no-asan", "no-tsan", "no-ubsan"]
+
+# wpilib_java_junit5_test targets additionally join --config=build_java.
+# wpilib_java_binary targets deliberately don't: they're the robot example
+# and snippet launchers, which pull in halsim_gui (GLFW/ImGui) and so can't
+# build on a Java-only machine without GL/X11 headers.
+_INNER_TAGS = ["allwpilib-build-java"] + _SANITIZER_TAGS
+
+# Attributes that only mean something on the test target Bazel actually runs.
+# wpilib_java_junit5_test routes these to its outer sh_test rather than the
+# manual inner java_test, which is only ever executed by the wrapper script.
+_TEST_ONLY_ATTRS = ["env", "env_inherit", "flaky", "local", "shard_count", "timeout"]
 
 def patch_module(module_name, patch_dirs):
     """
@@ -92,6 +102,56 @@ def wpilib_java_library(
         visibility = ["//visibility:public"],
     )
 
+def _rlocation(target_name):
+    # Runfiles paths start with the canonical name of the repository that
+    # owns the file: "_main" when allwpilib is the main repository, something
+    # like "allwpilib+" when it's pulled in as a dependency of another one.
+    return (native.repo_name() or "_main") + "/" + native.package_name() + "/" + target_name
+
+def _native_libs(name, deps, halsim_deps = None, testonly = None):
+    """Declares "<name>.native-libs" and returns its target name.
+
+    Collects every transitively-linked native/JNI shared library into one
+    flat directory, so the JVM/OS loader can resolve them uniformly
+    regardless of which Bazel package they were built in. Native libraries
+    reach it through the deps' runfiles: in-repo JNI modules attach theirs
+    as `data` (see wpilib_java_library above), and prebuilt artifacts like
+    OpenCV's Java bindings carry theirs the same way.
+    """
+    native_libs_name = name + ".native-libs"
+    wpilib_flatten_native_libs(
+        name = native_libs_name,
+        deps = deps,
+        halsim_deps = halsim_deps,
+        testonly = testonly,
+        tags = ["manual"],
+    )
+    return native_libs_name
+
+def _java_wrapper(wrapper_rule, name, java_impl_name, native_libs_name, extra_env = {}, **kwargs):
+    """Declares an sh_binary/sh_test that runs java_executable_wrapper.sh.
+
+    The inner "_java_impl" java_binary/java_test never sets
+    -Djava.library.path itself: the wrapper resolves the native-libs
+    directory from the runfiles at run time and injects it via
+    --wrapper_script_flag (applied after the params-file jvm_flags, so it
+    always wins), and also points the OS loader's search path at it (see
+    the wrapper script's header comment).
+    """
+    env = {
+        "JAVA_EXECUTABLE_RLOCATION": _rlocation(java_impl_name),
+        "NATIVE_LIBS_MARKER_RLOCATION": _rlocation(native_libs_name + "/" + NATIVE_LIBS_MARKER),
+    }
+    env.update(extra_env)
+    wrapper_rule(
+        name = name,
+        srcs = ["//shared/bazel/rules:java_executable_wrapper.sh"],
+        deps = ["@bazel_tools//tools/bash/runfiles"],
+        env = {k: env[k] for k in sorted(env)},
+        data = [":" + java_impl_name, ":" + native_libs_name],
+        **kwargs
+    )
+
 def wpilib_java_junit5_test(
         name,
         deps = [],
@@ -116,28 +176,14 @@ def wpilib_java_junit5_test(
         "@maven//:org_junit_platform_junit_platform_console",
     ]
 
-    # Collects every transitively-linked native/JNI shared library into one
-    # flat directory, so the JVM/OS loader can resolve them uniformly
-    # regardless of which Bazel package they were built in. Native libraries
-    # reach it through the deps' runfiles: in-repo JNI modules attach theirs
-    # as `data` (see wpilib_java_library above), and prebuilt artifacts like
-    # OpenCV's Java bindings carry theirs the same way.
-    native_libs_name = name + ".native-libs"
-    wpilib_flatten_native_libs(
-        name = native_libs_name,
-        deps = deps + runtime_deps,
-        testonly = True,
-        tags = ["manual"],
-    )
+    native_libs_name = _native_libs(name, deps + runtime_deps, testonly = True)
 
-    java_impl_name = name + "_java_impl"
+    kwargs = dict(kwargs)
+    test_kwargs = {attr: kwargs.pop(attr) for attr in _TEST_ONLY_ATTRS if attr in kwargs}
 
-    # The java_test itself never sets -Djava.library.path: the sh_test
-    # wrapper below resolves the native-libs directory from the runfiles
-    # manifest at test run time and injects it via --wrapper_script_flag
-    # (applied after the params-file jvm_flags, so it always wins).
     # Tagged manual so //... wildcard expansion skips it; the sh_test below is
     # the only entry point users interact with.
+    java_impl_name = name + "_java_impl"
     java_test(
         name = java_impl_name,
         deps = deps + junit_deps,
@@ -156,26 +202,18 @@ def wpilib_java_junit5_test(
         **kwargs
     )
 
-    # Primary test target (all platforms). The wrapper reads
-    # RUNFILES_MANIFEST_FILE to obtain the absolute native-libs path and
-    # injects it via --wrapper_script_flag before invoking the java_impl
-    # binary, on every OS.  On Windows the wrapper additionally prepends the
-    # native-libs directory to PATH so the DLL loader can resolve transitive
-    # dependencies.
-    sh_test(
+    _java_wrapper(
+        sh_test,
         name = name,
-        srcs = ["//shared/bazel/rules:java_executable_wrapper.sh"],
+        java_impl_name = java_impl_name,
+        native_libs_name = native_libs_name,
+        extra_env = test_kwargs.pop("env", {}),
         args = args + ["--select-package", package],
-        deps = ["@bazel_tools//tools/bash/runfiles"],
-        env = {
-            "JAVA_EXECUTABLE_RLOCATION": "_main/" + native.package_name() + "/" + java_impl_name,
-            "NATIVE_LIBS_RLOCATION": "_main/" + native.package_name() + "/" + native_libs_name,
-        },
         size = size or "small",
-        data = [":" + java_impl_name, ":" + native_libs_name],
         testonly = True,
         visibility = kwargs.get("visibility"),
         tags = tags + _INNER_TAGS,
+        **test_kwargs
     )
 
 def wpilib_java_binary(
@@ -188,14 +226,13 @@ def wpilib_java_binary(
         tags = [],
         data = [],
         smoke_test_timeout_seconds = 10,
+        binary_tags = [],
         **kwargs):
     """
     Convenience helper to make a runnable java_binary that can find its
     transitive native/JNI shared libraries at runtime (via `bazel run` or by
     executing the built target directly), the same way wpilib_java_junit5_test
-    already does for `bazel test`. See that macro's comments for the full
-    rationale; this mirrors its native-lib flattening + wrapper-script
-    machinery, minus the JUnit-specific bits.
+    does for `bazel test`.
 
     halsim_deps: HAL simulation extension targets (e.g.
         //simulation/halsim_ws_client:shared/halsim_ws_client) to auto-load at
@@ -212,64 +249,50 @@ def wpilib_java_binary(
         runtime-only bug the compiler couldn't catch (e.g. two DigitalInputs
         constructed on the same port). The test is skipped unless
         --config=java_smoke_tests is set.
+
+    binary_tags: extra tags applied only to the runnable "<name>" target, not
+        to its smoke test. Pass ["manual"] to keep wildcard builds like
+        //... from building the launcher (and its native-libs directory)
+        while still letting --config=java_smoke_tests pick up the smoke test.
     """
-    native_libs_name = name + ".native-libs"
-    native_libs_kwargs = {}
-    if "testonly" in kwargs:
-        native_libs_kwargs["testonly"] = kwargs["testonly"]
-    wpilib_flatten_native_libs(
-        name = native_libs_name,
-        deps = deps + runtime_deps,
-        halsim_deps = halsim_deps,
-        tags = ["manual"],
-        **native_libs_kwargs
-    )
+    testonly = kwargs.get("testonly")
+    native_libs_name = _native_libs(name, deps + runtime_deps, halsim_deps, testonly)
 
-    java_impl_name = name + "_java_impl"
-
-    # Core java_binary: never bakes in -Djava.library.path itself. The
-    # sh_binary wrapper below resolves the native-libs directory from the
-    # runfiles manifest at run time and injects it via --wrapper_script_flag.
     # Tagged manual so //... wildcard expansion skips it; the sh_binary below
     # is the only entry point users interact with.
+    java_impl_name = name + "_java_impl"
     java_binary(
         name = java_impl_name,
         deps = deps,
         runtime_deps = runtime_deps,
         data = data + [":" + native_libs_name],
-        jvm_flags = jvm_flags + [
-            "--add-opens",
-            "java.base/jdk.internal.vm=ALL-UNNAMED",
-            "--add-opens",
-            "java.base/java.lang=ALL-UNNAMED",
-        ],
+        jvm_flags = jvm_flags + select({
+            # halsim_gui (GLFW) must create its window on the process's main
+            # thread on macOS; matches what wpilibjExamples/build.gradle does.
+            "@platforms//os:osx": ["-XstartOnFirstThread"],
+            "//conditions:default": [],
+        }),
         args = args,
-        tags = tags + ["manual"] + _INNER_TAGS,
+        tags = tags + ["manual"] + _SANITIZER_TAGS,
         **kwargs
     )
 
-    wrapper_env = {
-        "HALSIM_MANIFEST_RLOCATION": "_main/" + native.package_name() + "/" + native_libs_name + ".halsim-extensions.txt",
-        "JAVA_EXECUTABLE_RLOCATION": "_main/" + native.package_name() + "/" + java_impl_name,
-        "NATIVE_LIBS_RLOCATION": "_main/" + native.package_name() + "/" + native_libs_name,
-    }
-
-    # Primary runnable target. The wrapper reads RUNFILES_MANIFEST_FILE to
-    # obtain the absolute native-libs path and injects it via
-    # --wrapper_script_flag before invoking the java_impl binary, on every
-    # OS. `args` is duplicated here (rather than relying solely on the inner
-    # java_binary's own `args`) because that attribute is only consulted by
-    # Bazel's own `run` invocation of the target actually being run, not
-    # baked into the generated stub itself.
-    sh_binary(
+    # Primary runnable target. `args` is duplicated here (rather than relying
+    # solely on the inner java_binary's own `args`) because that attribute is
+    # only consulted by Bazel's own `run` invocation of the target actually
+    # being run, not baked into the generated stub itself.
+    _java_wrapper(
+        sh_binary,
         name = name,
-        srcs = ["//shared/bazel/rules:java_executable_wrapper.sh"],
+        java_impl_name = java_impl_name,
+        native_libs_name = native_libs_name,
+        extra_env = {
+            "HALSIM_MANIFEST_RLOCATION": _rlocation(native_libs_name + ".halsim-extensions.txt"),
+        },
         args = args,
-        deps = ["@bazel_tools//tools/bash/runfiles"],
-        env = wrapper_env,
-        data = [":" + java_impl_name, ":" + native_libs_name],
+        testonly = testonly,
         visibility = kwargs.get("visibility"),
-        tags = tags + _INNER_TAGS,
+        tags = tags + binary_tags + _SANITIZER_TAGS,
     )
 
     # Runs the same program as the sh_binary above, except the wrapper
@@ -278,26 +301,23 @@ def wpilib_java_binary(
     # is a simulated Robot program - it never exits on its own), an
     # early exit means a runtime-only startup bug.
     #
-    # Deliberately drops HALSIM_MANIFEST_RLOCATION from the shared
-    # wrapper_env: the smoke test only cares whether the program itself
-    # starts up cleanly, and loading halsim_gui would pop open its
-    # simulation GUI window on every test run for no benefit here.
-    smoke_test_env = dict(wrapper_env)
-    smoke_test_env.pop("HALSIM_MANIFEST_RLOCATION", None)
-    smoke_test_env["SMOKE_TEST_TIMEOUT_SECONDS"] = str(smoke_test_timeout_seconds)
-    sh_test(
+    # Deliberately leaves out HALSIM_MANIFEST_RLOCATION: the smoke test only
+    # cares whether the program itself starts up cleanly, and loading
+    # halsim_gui would pop open its simulation GUI window on every test run
+    # for no benefit here.
+    _java_wrapper(
+        sh_test,
         name = name + "-smoke-test",
-        srcs = ["//shared/bazel/rules:java_executable_wrapper.sh"],
+        java_impl_name = java_impl_name,
+        native_libs_name = native_libs_name,
+        extra_env = {"SMOKE_TEST_TIMEOUT_SECONDS": str(smoke_test_timeout_seconds)},
         args = args,
-        deps = ["@bazel_tools//tools/bash/runfiles"],
-        env = smoke_test_env,
         size = "small",
-        data = [":" + java_impl_name, ":" + native_libs_name],
         testonly = True,
         target_compatible_with = select({
             "//shared/bazel/rules:with_java_smoke_tests_enabled": [],
             "//conditions:default": ["@platforms//:incompatible"],
         }) + kwargs.get("target_compatible_with", []),
         visibility = kwargs.get("visibility"),
-        tags = tags + _INNER_TAGS,
+        tags = tags + _SANITIZER_TAGS,
     )

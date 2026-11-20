@@ -37,7 +37,12 @@
 #     dependencies, same rationale as LD_LIBRARY_PATH/DYLD_LIBRARY_PATH).
 #
 # Required environment variables (set by the enclosing target in java_rules.bzl):
-#   NATIVE_LIBS_RLOCATION     rlocation key of the flat native-libs directory
+#   NATIVE_LIBS_MARKER_RLOCATION
+#                             rlocation key of the marker file inside the flat
+#                             native-libs directory. The directory is made of
+#                             per-library symlink outputs, so it has no
+#                             runfiles-manifest entry of its own (which is all
+#                             Windows has); its parent directory is used.
 #   JAVA_EXECUTABLE_RLOCATION rlocation key of the _java_impl executable
 #
 # Optional (wpilib_java_binary only, when it has halsim_deps):
@@ -87,7 +92,7 @@ source "${RUNFILES_DIR:-/dev/null}/$f" 2>/dev/null || \
 runfiles_export_envvars
 
 java_bin_key="${JAVA_EXECUTABLE_RLOCATION:?JAVA_EXECUTABLE_RLOCATION must be set}"
-native_libs_key="${NATIVE_LIBS_RLOCATION:?NATIVE_LIBS_RLOCATION must be set}"
+native_libs_marker_key="${NATIVE_LIBS_MARKER_RLOCATION:?NATIVE_LIBS_MARKER_RLOCATION must be set}"
 
 # Resolve the java executable.
 # On Windows, Bazel appends .exe to binary rlocation keys in the manifest.
@@ -100,11 +105,14 @@ if [[ -z "$java_bin" ]]; then
   exit 1
 fi
 
-# Not every target has native libs (e.g. pure-Java modules with no JNI
-# deps), in which case the flattened directory is empty and may not resolve
-# via rlocation at all. Treat that as "nothing to inject" rather than a
-# fatal error.
-native_libs_dir="$(rlocation "$native_libs_key" 2>/dev/null || true)"
+# The marker always exists, even for pure-Java modules with no JNI deps
+# (whose flattened directory holds nothing else). If it somehow doesn't
+# resolve, treat that as "nothing to inject" rather than a fatal error.
+native_libs_marker="$(rlocation "$native_libs_marker_key" 2>/dev/null || true)"
+native_libs_dir=""
+if [[ -n "$native_libs_marker" ]]; then
+  native_libs_dir="$(dirname "$native_libs_marker")"
+fi
 
 wrapper_flags=()
 if [[ -n "$native_libs_dir" ]]; then
@@ -113,11 +121,14 @@ if [[ -n "$native_libs_dir" ]]; then
   case "$(uname -s)" in
     MINGW*|MSYS*|CYGWIN*)
       # rlocation returns a mixed-style Windows path (C:/...) on Windows.
-      # PATH prepend: use as-is; MSYS2 converts it for the Windows exe child.
-      # This ensures the whole transitive DLL chain is found
-      # (LOAD_WITH_ALTERED_SEARCH_PATH only covers first-level deps, PATH
-      # covers the rest).
-      export PATH="$native_libs_dir:$PATH"
+      # That form is fine for -Djava.library.path above, but MSYS's PATH is
+      # ':'-separated, so the drive letter's colon would split the entry in
+      # two. Convert it to a POSIX path (/c/...) first; MSYS2 converts PATH
+      # back to Windows form for the Windows exe child. This ensures the
+      # whole transitive DLL chain is found (LOAD_WITH_ALTERED_SEARCH_PATH
+      # only covers first-level deps, PATH covers the rest).
+      native_libs_dir_posix="$(cygpath -u "$native_libs_dir")"
+      export PATH="$native_libs_dir_posix:$PATH"
       ;;
     Darwin*)
       export DYLD_FALLBACK_LIBRARY_PATH="$native_libs_dir:${DYLD_FALLBACK_LIBRARY_PATH:-}"
