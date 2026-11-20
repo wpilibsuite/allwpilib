@@ -18,6 +18,7 @@
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/math/trajectory/TrapezoidProfileSample.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/mass.hpp"
@@ -54,18 +55,21 @@ TEST_CASE("LinearSystemLoopTest StateSpaceEnabled", "[wpimath]") {
   wpi::math::Vectord<2> references{2.0, 0.0};
   loop.SetNextR(references);
 
-  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
-      4_mps, 3_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meters> profile{constraints};
+  using Constraints =
+      wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints;
+  using Sample = wpi::math::TrapezoidProfileSample<wpi::units::meters>;
 
-  wpi::math::TrapezoidProfile<wpi::units::meters>::State state{
-      wpi::units::meter_t{loop.Xhat(0)},
-      wpi::units::meters_per_second_t{loop.Xhat(1)}};
+  Constraints constraints{4_mps, 3_mps_sq};
+
+  Sample sample{0_s, wpi::units::meter_t{loop.Xhat(0)},
+                wpi::units::meters_per_second_t{loop.Xhat(1)}, 0_mps_sq};
   for (int i = 0; i < 1000; ++i) {
-    state = profile.Calculate(DT, state,
-                              {wpi::units::meter_t{references(0)},
-                               wpi::units::meters_per_second_t{references(1)}});
-    loop.SetNextR({state.position.value(), state.velocity.value()});
+    auto profile = wpi::math::TrapezoidProfile<wpi::units::meters>::Generate(
+        constraints, {sample.position, sample.velocity},
+        {wpi::units::meter_t{references(0)},
+         wpi::units::meters_per_second_t{references(1)}});
+    sample = profile.SampleAt(DT);
+    loop.SetNextR({sample.position.value(), sample.velocity.value()});
 
     wpi::math::Matrixd<1, 1> y{
         slicedPlant.CalculateY(loop.Xhat(), loop.U()) +

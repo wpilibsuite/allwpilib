@@ -20,6 +20,7 @@ import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.LinearSystemLoop;
 import org.wpilib.math.system.Models;
 import org.wpilib.math.trajectory.TrapezoidProfile;
+import org.wpilib.math.trajectory.TrapezoidProfileSample;
 import org.wpilib.math.util.Nat;
 
 class LinearSystemLoopTest {
@@ -70,14 +71,16 @@ class LinearSystemLoopTest {
     m_loop.setNextR(references);
 
     var constraints = new TrapezoidProfile.Constraints(4, 3);
-    var profile = new TrapezoidProfile(constraints);
 
-    var state = new TrapezoidProfile.State(m_loop.getXHat(0), m_loop.getXHat(1));
+    var sample = new TrapezoidProfileSample(0.0, m_loop.getXHat(0), m_loop.getXHat(1), 0.0);
     for (int i = 0; i < 1000; i++) {
-      state =
-          profile.calculate(
-              DT, state, new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)));
-      m_loop.setNextR(VecBuilder.fill(state.position, state.velocity));
+      sample =
+          TrapezoidProfile.generate(
+                  constraints,
+                  new TrapezoidProfile.State(sample.position, sample.velocity),
+                  new TrapezoidProfile.State(references.get(0, 0), references.get(1, 0)))
+              .sampleAt(DT);
+      m_loop.setNextR(VecBuilder.fill(sample.position, sample.velocity));
 
       updateTwoState(
           (LinearSystem<N2, N1, N1>) m_plant.slice(0),

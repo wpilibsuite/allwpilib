@@ -86,7 +86,8 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax motor{MOTOR_PORT};
   wpi::Gamepad joystick{JOYSTICK_PORT};
 
-  wpi::math::TrapezoidProfile<wpi::units::meters> profile{{3_fps, 6_fps_sq}};
+  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
+      3_fps, 6_fps_sq};
 
   wpi::math::TrapezoidProfile<wpi::units::meters>::State lastProfiledReference;
 
@@ -117,8 +118,10 @@ class Robot : public wpi::TimedRobot {
       // We released the bumper, so let's spin down
       goal = {LOWERED_POSITION, 0_fps};
     }
-    lastProfiledReference =
-        profile.Calculate(20_ms, lastProfiledReference, goal);
+    auto sample = wpi::math::TrapezoidProfile<wpi::units::meters>::Generate(
+                      constraints, lastProfiledReference, goal)
+                      .SampleAt(20_ms);
+    lastProfiledReference = {sample.position, sample.velocity};
 
     loop.SetNextR(
         wpi::math::Vectord<2>{lastProfiledReference.position.value(),
