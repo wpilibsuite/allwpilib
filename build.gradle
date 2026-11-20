@@ -15,13 +15,12 @@ plugins {
 
     alias(libs.plugins.wpilib.versioning)
     alias(libs.plugins.wpilib.repositories)
-    // NativeUtils and GradleVsCode are on the classpath for buildSrc, which doesn't carry version information.
-    // We're forced to use the string-based syntax here instead.
+    alias(libs.plugins.wpilib.gradle.jni)
+    // NativeUtils and GradleVsCode are on the buildSrc classpath (see
+    // buildSrc/build.gradle), which doesn't carry version information, so they
+    // must be applied by id.
     id 'org.wpilib.NativeUtils' apply false
     id 'org.wpilib.GradleVsCode' apply false
-    // alias(libs.plugins.wpilib.native.utils) apply false
-    // alias(libs.plugins.wpilib.gradle.vscode)
-    alias(libs.plugins.wpilib.gradle.jni)
 
     alias(libs.plugins.lint.errorprone) apply false
     alias(libs.plugins.lint.spotbugs) apply false
