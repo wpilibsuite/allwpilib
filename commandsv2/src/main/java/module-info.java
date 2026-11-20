@@ -5,12 +5,12 @@
 /** Defines APIs for event-based programming and concurrent control of mechanisms. */
 open module wpilib.command2 {
   requires transitive wpilib.core;
+  requires transitive wpilib.tunable;
   requires transitive wpilib.units;
   requires wpilib.annotation;
   requires wpilib.hal;
   requires wpilib.ntcore;
   requires wpilib.telemetry;
-  requires wpilib.tunable;
   requires wpilib.util;
 
   exports org.wpilib.command2;
