@@ -75,7 +75,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *
      * @param rampRate The voltage ramp rate used for quasistatic test routines. Defaults to 1 volt
      *     per second if left null.
-     * @param stepVoltage The step voltage output used for dynamic test routines. Defaults to 7
+     * @param stepVoltage The step voltage output used for dynamic test routines. Defaults to 4
      *     volts if left null.
      * @param timeout Safety timeout for the test routine commands. Defaults to 10 seconds if left
      *     null.
@@ -89,7 +89,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
         Time timeout,
         Consumer<State> recordState) {
       this.rampRate = rampRate != null ? rampRate : Volts.of(1).per(Second);
-      this.stepVoltage = stepVoltage != null ? stepVoltage : Volts.of(7);
+      this.stepVoltage = stepVoltage != null ? stepVoltage : Volts.of(4);
       this.timeout = timeout != null ? timeout : Seconds.of(10);
       this.recordState = recordState;
     }
@@ -99,7 +99,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *
      * @param rampRate The voltage ramp rate used for quasistatic test routines. Defaults to 1 volt
      *     per second if left null.
-     * @param stepVoltage The step voltage output used for dynamic test routines. Defaults to 7
+     * @param stepVoltage The step voltage output used for dynamic test routines. Defaults to 4
      *     volts if left null.
      * @param timeout Safety timeout for the test routine commands. Defaults to 10 seconds if left
      *     null.
@@ -113,7 +113,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *
      * <p>rampRate: 1 volt/sec
      *
-     * <p>stepVoltage: 7 volts
+     * <p>stepVoltage: 4 volts
      *
      * <p>timeout: 10 seconds
      */
