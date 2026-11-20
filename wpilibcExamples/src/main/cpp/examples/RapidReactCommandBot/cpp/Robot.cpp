@@ -18,11 +18,11 @@ void Robot::RobotPeriodic() {
   wpi::cmd::CommandScheduler::GetInstance().Run();
 }
 
-void Robot::DisabledInit() {}
+void Robot::DisabledStart() {}
 
 void Robot::DisabledPeriodic() {}
 
-void Robot::AutonomousInit() {
+void Robot::AutonomousStart() {
   autonomousCommand = robot.GetAutonomousCommand();
 
   if (autonomousCommand) {
@@ -33,7 +33,7 @@ void Robot::AutonomousInit() {
 
 void Robot::AutonomousPeriodic() {}
 
-void Robot::AutonomousExit() {
+void Robot::AutonomousEnd() {
   // This makes sure that the autonomous stops running when
   // autonomous mode ends. If you want the autonomous to
   // continue until interrupted by another command, remove
@@ -43,11 +43,11 @@ void Robot::AutonomousExit() {
   }
 }
 
-void Robot::TeleopInit() {}
+void Robot::TeleopStart() {}
 
 void Robot::TeleopPeriodic() {}
 
-void Robot::UtilityInit() {
+void Robot::UtilityStart() {
   // Cancels all running commands at the start of utility mode.
   wpi::cmd::CommandScheduler::GetInstance().CancelAll();
 }

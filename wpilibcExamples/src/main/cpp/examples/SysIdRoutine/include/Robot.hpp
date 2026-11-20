@@ -14,18 +14,18 @@ class Robot : public wpi::TimedRobot {
  public:
   Robot();
   void RobotPeriodic() override;
-  void DisabledInit() override;
+  void DisabledStart() override;
   void DisabledPeriodic() override;
-  void DisabledExit() override;
-  void AutonomousInit() override;
+  void DisabledEnd() override;
+  void AutonomousStart() override;
   void AutonomousPeriodic() override;
-  void AutonomousExit() override;
-  void TeleopInit() override;
+  void AutonomousEnd() override;
+  void TeleopStart() override;
   void TeleopPeriodic() override;
-  void TeleopExit() override;
-  void UtilityInit() override;
+  void TeleopEnd() override;
+  void UtilityStart() override;
   void UtilityPeriodic() override;
-  void UtilityExit() override;
+  void UtilityEnd() override;
 
  private:
   std::optional<wpi::cmd::CommandPtr> autonomousCommand;

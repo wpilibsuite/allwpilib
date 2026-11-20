@@ -18,7 +18,7 @@ public class Robot extends TimedRobot {
   private final Intake intake = new Intake();
   private final Joystick joystick = new Joystick(Constants.JOYSTICK_INDEX);
 
-  /** This function is called periodically during operator control. */
+  /** This function is called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {
     // Activate the intake while the trigger is held

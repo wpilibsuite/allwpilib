@@ -2,10 +2,10 @@ classes:
   wpi::IterativeRobotBase:
     methods:
       DriverStationConnected:
-      DisabledInit:
-      AutonomousInit:
-      TeleopInit:
-      UtilityInit:
+      DisabledStart:
+      AutonomousStart:
+      TeleopStart:
+      UtilityStart:
       RobotPeriodic:
       DisabledPeriodic:
       AutonomousPeriodic:
@@ -19,10 +19,10 @@ classes:
       LoopFunc:
       SimulationInit:
       SimulationPeriodic:
-      DisabledExit:
-      AutonomousExit:
-      TeleopExit:
-      UtilityExit:
+      DisabledEnd:
+      AutonomousEnd:
+      TeleopEnd:
+      UtilityEnd:
       GetPeriod:
       PrintWatchdogEpochs:
     doc: |
@@ -38,13 +38,13 @@ classes:
       DriverStationConnected() -- provide for initialization the first time the DS
       is connected
 
-      Init() functions -- each of the following functions is called once when the
-      appropriate mode is entered:
+      Start() functions -- each of the following functions is called once when the
+      appropriate mode starts:
 
-      - DisabledInit() -- called each and every time disabled is entered from another mode
-      - AutonomousInit() -- called each and every time autonomous is entered from another mode
-      - TeleopInit() -- called each and every time teleop is entered from another mode
-      - UtilityInit() -- called each and every time utility is entered from another mode
+      - DisabledStart() -- called each and every time disabled mode starts
+      - AutonomousStart() -- called each and every time autonomous mode starts
+      - TeleopStart() -- called each and every time teleoperated mode starts
+      - UtilityStart() -- called each and every time utility mode starts
 
       Periodic() functions -- each of these functions is called on an interval:
 
@@ -54,10 +54,10 @@ classes:
       - TeleopPeriodic()
       - UtilityPeriodic()
 
-      Exit() functions -- each of the following functions is called once when the
-      appropriate mode is exited:
+      End() functions -- each of the following functions is called once when the
+      appropriate mode ends:
 
-      - DisabledExit() -- called each and every time disabled is exited
-      - AutonomousExit() -- called each and every time autonomous is exited
-      - TeleopExit() -- called each and every time teleop is exited
-      - UtilityExit() -- called each and every time utility is exited
+      - DisabledEnd() -- called each and every time disabled mode ends
+      - AutonomousEnd() -- called each and every time autonomous mode ends
+      - TeleopEnd() -- called each and every time teleoperated mode ends
+      - UtilityEnd() -- called each and every time utility mode ends

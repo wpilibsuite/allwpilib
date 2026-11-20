@@ -35,8 +35,8 @@ class MyRobot(commands2.TimedCommandRobot):
         wpilib.DataLogManager.start()
 
     @override
-    def disabled_init(self) -> None:
-        """This function is called once each time the robot enters Disabled mode."""
+    def disabled_start(self) -> None:
+        """This function is called each time Disabled mode starts."""
         pass
 
     @override
@@ -44,7 +44,7 @@ class MyRobot(commands2.TimedCommandRobot):
         pass
 
     @override
-    def autonomous_init(self) -> None:
+    def autonomous_start(self) -> None:
         self.autonomous_command = self.robot.get_autonomous_command()
 
         if self.autonomous_command is not None:
@@ -56,7 +56,7 @@ class MyRobot(commands2.TimedCommandRobot):
         pass
 
     @override
-    def teleop_init(self) -> None:
+    def teleop_start(self) -> None:
         # This makes sure that the autonomous stops running when
         # teleop starts running. If you want the autonomous to
         # continue until interrupted by another command, remove
@@ -66,11 +66,11 @@ class MyRobot(commands2.TimedCommandRobot):
 
     @override
     def teleop_periodic(self) -> None:
-        """This function is called periodically during operator control."""
+        """This function is called periodically during teleoperated mode."""
         pass
 
     @override
-    def utility_init(self) -> None:
+    def utility_start(self) -> None:
         # Cancels all running commands at the start of utility mode.
         commands2.CommandScheduler.get_instance().cancel_all()
 

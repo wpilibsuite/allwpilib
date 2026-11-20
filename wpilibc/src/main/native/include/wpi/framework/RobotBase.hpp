@@ -179,7 +179,7 @@ class RobotBase {
   static bool IsAutonomousEnabled();
 
   /**
-   * Determine if the robot is currently in Operator Control mode.
+   * Determine if the robot is currently in teleoperated mode.
    *
    * @return True if the robot is currently operating in Tele-Op mode as
    *         determined by the Driver Station.
@@ -187,7 +187,7 @@ class RobotBase {
   static bool IsTeleop();
 
   /**
-   * Determine if the robot is current in Operator Control mode and enabled.
+   * Determine if the robot is current in teleoperated mode and enabled.
    *
    * @return True if the robot is currently operating in Tele-Op mode while
    * enabled as determined by the Driver Station.
@@ -282,7 +282,7 @@ class RobotBase {
    * Constructor for a generic robot program.
    *
    * User code can be placed in the constructor that runs before the
-   * Autonomous or Operator Control period starts. The constructor will run to
+   * autonomous or teleoperated period starts. The constructor will run to
    * completion before Autonomous is entered.
    *
    * This must be used to ensure that the communications code starts. In the

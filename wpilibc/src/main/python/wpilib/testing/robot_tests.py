@@ -62,7 +62,7 @@ def test_disabled(control: RobotTestController, robot):
 
 @pytest.mark.filterwarnings("ignore")
 def test_operator_control(control: RobotTestController):
-    """Runs operator control mode by itself"""
+    """Runs teleoperated mode by itself"""
 
     with control.run_robot():
         # Run disabled for a short period
