@@ -8,7 +8,7 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 /**
  * The {@link Selectable} class is a useful tool for presenting a selection of options as a tunable.
@@ -30,7 +30,7 @@ public final class Selectable<V> implements ComplexTunable {
 
   private final Tunable<String> m_defaultChoice =
       Tunable.createConfig("", TunableConfig.of(TunableOption.IMMUTABLE));
-  private Consumer<V> m_listener;
+  private BiConsumer<String, V> m_listener;
   private final Tunable<String[]> m_options =
       Tunable.createConfig(new String[0], TunableConfig.of(TunableOption.IMMUTABLE));
   private final Tunable<String> m_selected =
@@ -43,7 +43,7 @@ public final class Selectable<V> implements ComplexTunable {
                     if (m_listener != null) {
                       V selected = getSelected();
                       if (selected != null) {
-                        m_listener.accept(selected);
+                        m_listener.accept(getSelectedName(), selected);
                       }
                     }
                   })));
@@ -113,8 +113,27 @@ public final class Selectable<V> implements ComplexTunable {
   }
 
   /**
+   * Gets the name of the selected option. If there is none selected, it will return the name of the
+   * default option. If there is none or an invalid option selected and no default, then it will
+   * return {@code null}.
+   *
+   * @return the name of the selected option or null.
+   */
+  public String getSelectedName() {
+    String selected = m_selected.get();
+    if (selected != null && !selected.isEmpty() && m_map.containsKey(selected)) {
+      return selected;
+    }
+    String defaultChoice = m_defaultChoice.get();
+    if (defaultChoice != null && !defaultChoice.isEmpty()) {
+      return defaultChoice;
+    }
+    return null;
+  }
+
+  /**
    * Returns the selected option. If there is none selected, it will return the default. If there is
-   * none or invalid option selected and no default, then it will return {@code null}.
+   * none or an invalid option selected and no default, then it will return {@code null}.
    *
    * @return the option selected
    */
@@ -132,7 +151,7 @@ public final class Selectable<V> implements ComplexTunable {
    *
    * @param listener The function to call that accepts the new value
    */
-  public void onChange(Consumer<V> listener) {
+  public void onChange(BiConsumer<String, V> listener) {
     requireNonNullParam(listener, "listener", "onChange");
     m_listener = listener;
   }
