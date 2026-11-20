@@ -410,3 +410,12 @@ pkg_zip(
     ],
     target_compatible_with = robotpy_compatibility_select(),
 )
+
+exports_files(
+    [
+        "MODULE.bazel",
+        "gradle/libs.versions.toml",
+        "maven_install.json",
+    ],
+    visibility = ["//shared/bazel/dependency_versions:__pkg__"],
+)
