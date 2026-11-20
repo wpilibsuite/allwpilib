@@ -48,6 +48,7 @@ package_group(
 )
 
 halsim_deps = [
+    "//simulation/halsim_gui:shared/halsim_gui",
 ]
 
 build_java_sources()
@@ -59,7 +60,10 @@ build_examples(
     halsim_deps = halsim_deps,
 )
 
-build_snippets(folders = snippet_folders)
+build_snippets(
+    folders = snippet_folders,
+    halsim_deps = halsim_deps,
+)
 
 build_templates(folders = template_folders)
 

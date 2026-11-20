@@ -38,6 +38,7 @@ single_version_override(
 )
 
 bazel_dep(name = "rules_pycross", version = "2.0.0")
+bazel_dep(name = "rules_shell", version = "0.8.0")
 bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 single_version_override(
     module_name = "pybind11_bazel",
