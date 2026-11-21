@@ -8,8 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.avaje.jsonb.Jsonb;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
@@ -17,6 +22,27 @@ import org.wpilib.math.geometry.Translation2d;
 
 class Rectangle2dTest {
   private static final double EPSILON = 1E-9;
+
+  @Test
+  void testJson() {
+    var type = Jsonb.instance().type(Rectangle2d.class);
+    var rectangle = new Rectangle2d(new Pose2d(1, 2, Rotation2d.fromDegrees(90)), 3, 4);
+    var output = new ByteArrayOutputStream();
+    type.toJson(rectangle, output);
+    var json = output.toString(StandardCharsets.UTF_8);
+
+    assertTrue(json.contains("\"center\""));
+    assertTrue(json.contains("\"xWidth\""));
+    assertTrue(json.contains("\"yWidth\""));
+    assertEquals(rectangle, type.fromJson(new ByteArrayInputStream(output.toByteArray())));
+    var fixture =
+        "{\"center\":{\"translation\":{\"x\":1.0,\"y\":2.0},"
+            + "\"rotation\":{\"radians\":1.5707963267948966}},"
+            + "\"xWidth\":3.0,\"yWidth\":4.0}";
+    assertEquals(rectangle, type.fromJson(fixture));
+    var invalid = fixture.replace("\"xWidth\":3.0", "\"xWidth\":-1.0");
+    assertThrows(RuntimeException.class, () -> type.fromJson(invalid));
+  }
 
   @Test
   void testNewWithCorners() {

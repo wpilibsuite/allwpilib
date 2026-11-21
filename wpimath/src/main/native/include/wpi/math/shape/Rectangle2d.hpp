@@ -203,7 +203,22 @@ class WPILIB_DLLEXPORT Rectangle2d final {
   wpi::units::meter_t m_yWidth;
 };
 
+WPILIB_DLLEXPORT
+void to_json(wpi::util::json& json, const Rectangle2d& rectangle);
+
 }  // namespace wpi::math
+
+namespace wpi::util {
+
+template <typename T>
+struct json_serializer;
+
+template <>
+struct WPILIB_DLLEXPORT json_serializer<wpi::math::Rectangle2d> {
+  static wpi::math::Rectangle2d from(const json& json);
+};
+
+}  // namespace wpi::util
 
 #include "wpi/math/shape/proto/Rectangle2dProto.hpp"
 #include "wpi/math/shape/struct/Rectangle2dStruct.hpp"

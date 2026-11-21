@@ -9,8 +9,22 @@
 
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/util/json.hpp"
 
 using namespace wpi::math;
+
+void wpi::math::to_json(wpi::util::json& json, const Ellipse2d& ellipse) {
+  json.set_object();
+  json["center"] = ellipse.Center();
+  json["xSemiAxis"] = ellipse.XSemiAxis().value();
+  json["ySemiAxis"] = ellipse.YSemiAxis().value();
+}
+
+Ellipse2d wpi::util::json_serializer<Ellipse2d>::from(const json& json) {
+  return Ellipse2d{json.at("center").get<Pose2d>(),
+                   wpi::units::meter_t{json.at("xSemiAxis").get_number()},
+                   wpi::units::meter_t{json.at("ySemiAxis").get_number()}};
+}
 
 Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
   // Check if already in ellipse

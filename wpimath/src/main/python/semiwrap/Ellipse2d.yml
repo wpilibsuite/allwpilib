@@ -2,6 +2,10 @@ extra_includes:
 - geometryToString.h
 - wpystruct.h
 
+functions:
+  to_json:
+    ignore: true
+
 classes:
   wpi::math::Ellipse2d:
     force_type_casters:
