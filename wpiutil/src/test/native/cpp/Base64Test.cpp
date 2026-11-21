@@ -11,8 +11,6 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
 
-#include "wpi/util/SmallString.hpp"
-
 namespace wpi::util {
 
 struct Base64TestParam {
@@ -55,21 +53,7 @@ static Base64TestParam testParams[] = {
 
 TEST_CASE("Base64Test EncodeStdString", "[wpiutil][base64]") {
   const auto& param = GENERATE_REF(Catch::Generators::from_range(testParams));
-  std::string s;
-  Base64Encode(GetPlain(param), &s);
-  REQUIRE(param.encoded == s);
-
-  // text already in s
-  Base64Encode(GetPlain(param), &s);
-  REQUIRE(param.encoded == s);
-}
-
-TEST_CASE("Base64Test EncodeSmallString", "[wpiutil][base64]") {
-  const auto& param = GENERATE_REF(Catch::Generators::from_range(testParams));
-  SmallString<128> buf;
-  REQUIRE(param.encoded == Base64Encode(GetPlain(param), buf));
-  // reuse buf
-  REQUIRE(param.encoded == Base64Encode(GetPlain(param), buf));
+  REQUIRE(param.encoded == Base64Encode(GetPlain(param)));
 }
 
 TEST_CASE("Base64Test DecodeStdString", "[wpiutil][base64]") {
@@ -82,20 +66,6 @@ TEST_CASE("Base64Test DecodeStdString", "[wpiutil][base64]") {
   // text already in s
   Base64Decode(encoded, &s);
   REQUIRE(GetPlain(param) == s);
-}
-
-TEST_CASE("Base64Test DecodeSmallString", "[wpiutil][base64]") {
-  const auto& param = GENERATE_REF(Catch::Generators::from_range(testParams));
-  SmallString<128> buf;
-  std::string_view encoded = param.encoded;
-  size_t len;
-  std::string_view plain = Base64Decode(encoded, &len, buf);
-  CHECK(encoded.size() == len);
-  REQUIRE(GetPlain(param) == plain);
-
-  // reuse buf
-  plain = Base64Decode(encoded, &len, buf);
-  REQUIRE(GetPlain(param) == plain);
 }
 
 }  // namespace wpi::util

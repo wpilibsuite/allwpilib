@@ -26,7 +26,7 @@ class AddressableLEDModel : public wpi::glass::LEDDisplayModel {
     return HALSIM_GetAddressableLEDInitialized(m_channel);
   }
 
-  std::span<const Data> GetData(wpi::util::SmallVectorImpl<Data>&) override {
+  std::span<const Data> GetData() override {
     size_t length = HALSIM_GetAddressableLEDData(
         HALSIM_GetAddressableLEDStart(m_channel),
         HALSIM_GetAddressableLEDLength(m_channel), m_data);

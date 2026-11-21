@@ -11,7 +11,6 @@
 #include <utility>
 
 #include "AvahiClient.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -93,7 +92,7 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
                                   value.size() - splitIndex - 1);
         data.txt.emplace_back(std::pair<std::string, std::string>{key, value});
       }
-      wpi::util::SmallString<256> outputHostName;
+      std::string outputHostName;
       char label[256];
       do {
         impl->table.unescape_label(&host_name, label, sizeof(label));
@@ -107,7 +106,7 @@ static void ResolveCallback(AvahiServiceResolver* r, AvahiIfIndex interface,
       data.ipv4Address = ntohl(address->data.ipv4.address);
       data.port = ntohs(port);
       data.serviceName = name;
-      data.hostName = std::string{outputHostName};
+      data.hostName = std::move(outputHostName);
 
       impl->onFound(std::move(data));
     }

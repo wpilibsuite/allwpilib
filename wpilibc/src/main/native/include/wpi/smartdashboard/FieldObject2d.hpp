@@ -16,7 +16,6 @@
 #include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/tunables/Tunable.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi::math {
@@ -103,15 +102,6 @@ class FieldObject2d {
    * @return vector of 2D poses
    */
   std::vector<wpi::math::Pose2d> GetPoses() const;
-
-  /**
-   * Get multiple poses.
-   *
-   * @param out output wpi::util::SmallVector to hold 2D poses
-   * @return span referring to output wpi::util::SmallVector
-   */
-  std::span<const wpi::math::Pose2d> GetPoses(
-      wpi::util::SmallVectorImpl<wpi::math::Pose2d>& out) const;
 
  private:
   class PosesTunable

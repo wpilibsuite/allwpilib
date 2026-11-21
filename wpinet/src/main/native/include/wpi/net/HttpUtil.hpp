@@ -45,20 +45,16 @@ inline ada::result<ada::url_aggregator> ParseUrl(std::string_view urlStr) {
 }
 
 // Unescape a %xx-encoded URI.
-// @param buf Buffer for output
+// @param str %xx-encoded string
 // @param error Set to true if an error occurred
 // @return Escaped string
-std::string_view UnescapeURI(std::string_view str,
-                             wpi::util::SmallVectorImpl<char>& buf,
-                             bool* error);
+std::string UnescapeURI(std::string_view str, bool* error);
 
 // Escape a string with %xx-encoding.
-// @param buf Buffer for output
+// @param str String to escape
 // @param spacePlus If true, encodes spaces to '+' rather than "%20"
 // @return Escaped string
-std::string_view EscapeURI(std::string_view str,
-                           wpi::util::SmallVectorImpl<char>& buf,
-                           bool spacePlus = true);
+std::string EscapeURI(std::string_view str, bool spacePlus = true);
 
 // Escape a string for HTML output.
 // @param buf Buffer for output
@@ -354,10 +350,9 @@ class HttpRequest {
       } else {
         pathOs << '&';
       }
-      wpi::util::SmallString<64> escapeBuf;
-      pathOs << EscapeURI(GetFirst(param), escapeBuf, false);
+      pathOs << EscapeURI(GetFirst(param), false);
       if (!GetSecond(param).empty()) {
-        pathOs << '=' << EscapeURI(GetSecond(param), escapeBuf, false);
+        pathOs << '=' << EscapeURI(GetSecond(param), false);
       }
     }
   }

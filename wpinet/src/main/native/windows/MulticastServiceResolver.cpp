@@ -45,10 +45,8 @@ MulticastServiceResolver::MulticastServiceResolver(
   if (wpi::util::ends_with_lower(serviceType, ".local")) {
     wpi::util::sys::windows::UTF8ToUTF16(serviceType, wideStorage);
   } else {
-    wpi::util::SmallString<128> storage;
-    storage.append(serviceType);
-    storage.append(".local");
-    wpi::util::sys::windows::UTF8ToUTF16(storage.str(), wideStorage);
+    wpi::util::sys::windows::UTF8ToUTF16(std::string{serviceType} + ".local",
+                                         wideStorage);
   }
   pImpl->serviceType = std::wstring{wideStorage.data(), wideStorage.size()};
 }

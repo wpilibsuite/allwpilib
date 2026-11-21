@@ -624,7 +624,7 @@ Java_org_wpilib_datalog_DataLogJNI_appendIntegerArray
         entry, {reinterpret_cast<const int64_t*>(jarr.data()), jarr.size()},
         timestamp);
   } else {
-    wpi::util::SmallVector<int64_t, 16> arr;
+    std::vector<int64_t> arr;
     arr.reserve(jarr.size());
     for (auto v : jarr) {
       arr.push_back(v);

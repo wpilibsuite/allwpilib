@@ -8,6 +8,7 @@
 #include <concepts>
 #include <cstddef>
 #include <stdexcept>
+#include <vector>
 
 #include <Eigen/Core>
 #include <gcem.hpp>
@@ -16,7 +17,6 @@
 #include "wpi/math/system/Discretization.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Algorithm.hpp"
-#include "wpi/util/SmallVector.hpp"
 
 namespace wpi::math {
 
@@ -217,7 +217,7 @@ class LinearSystem {
         outputIndices...);
 
     // Sort and deduplicate output indices
-    wpi::util::SmallVector<int> outputIndicesArray{outputIndices...};
+    std::vector<int> outputIndicesArray{outputIndices...};
     std::sort(outputIndicesArray.begin(), outputIndicesArray.end());
     auto last =
         std::unique(outputIndicesArray.begin(), outputIndicesArray.end());
