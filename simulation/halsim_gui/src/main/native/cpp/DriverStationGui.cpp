@@ -1271,16 +1271,15 @@ static void DriverStationExecute() {
   static bool prevDisableDS = false;
 
   bool disableDS = IsDSDisabled();
-  if (disableDS && !prevDisableDS) {
-    if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
+  if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
+    if (disableDS && !prevDisableDS) {
       win->SetVisibility(wpi::glass::Window::DISABLED);
-    }
-  } else if (!disableDS && prevDisableDS) {
-    if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
+    } else if (!disableDS && (prevDisableDS || !win->IsEnabled())) {
       win->SetVisibility(wpi::glass::Window::SHOW);
     }
   }
   prevDisableDS = disableDS;
+
   if (disableDS) {
     gDSModel->Update();
     return;
