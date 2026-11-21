@@ -14,9 +14,8 @@
 
 #include "wpi/units/base.hpp"
 
-namespace wpi::units {
+namespace wpi::units::detail {
 
-namespace detail {
 template <class Units>
 wpi::tunables::TunableConfig MakeUnitTunableConfig() {
   wpi::tunables::TunableConfig config;
@@ -103,7 +102,6 @@ class TunableMemberValue
   mutable double m_value;
   wpi::tunables::detail::TunableMemberPointer<ValueType> m_ptr;
 };
-}  // namespace detail
 
 template <class Units, typename T, template <typename> class NonLinearScale>
 inline detail::TunableUnit<Units, T, NonLinearScale> GetCustomTunable(
@@ -120,4 +118,4 @@ MakeTunableMember(unit_t<Units, T, NonLinearScale> Class::* member,
       member, std::forward<Args>(args)...);
 }
 
-}  // namespace wpi::units
+}  // namespace wpi::units::detail
