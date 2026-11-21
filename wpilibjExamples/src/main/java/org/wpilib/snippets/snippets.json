@@ -216,7 +216,8 @@
     "description": "Communicates with external devices (such as an Arduino) using the roboRIO's DIO.",
     "tags": [
       "Hardware",
-      "Digital Output"
+      "Digital Output",
+      "UnitTests"
     ],
     "foldername": "digitalcommunication",
     "gradlebase": "java",
@@ -277,7 +278,8 @@
     "description": "Communicate with external devices (such as an Arduino) using the roboRIO's I2C port.",
     "tags": [
       "Hardware",
-      "I2C"
+      "I2C",
+      "UnitTests"
     ],
     "foldername": "i2ccommunication",
     "gradlebase": "java",
