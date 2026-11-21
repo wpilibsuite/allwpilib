@@ -11,6 +11,7 @@ def _generate_fields_impl(ctx):
     args.add("--resources_root", "fields/src/main/native/resources")
     args.add("--template_root", "fields/src/generate")
     args.add("--proto_directory", "fields/src/main/proto")
+    args.add_all("--proto_path", ["wpimath/src/main/proto"])
     args.add("--protoc", protoc.executable)
     args.add("--quickbuf_plugin", ctx.executable._quickbuf)
     args.add("--nanopb", ctx.executable._nanopb)
@@ -19,8 +20,7 @@ def _generate_fields_impl(ctx):
         inputs = depset(transitive = [
             ctx.attr._field_jsons.files,
             ctx.attr._templates.files,
-            ctx.attr.proto_files.files,
-        ]),
+        ] + [target.files for target in ctx.attr.proto_files]),
         outputs = [output_dir],
         executable = ctx.executable._tool,
         arguments = [args],
@@ -32,9 +32,9 @@ def _generate_fields_impl(ctx):
 generate_fields = rule(
     implementation = _generate_fields_impl,
     attrs = {
-        "proto_files": attr.label(
+        "proto_files": attr.label_list(
             allow_files = True,
-            default = Label("//fields:proto_files"),
+            default = [Label("//fields:proto_files"), Label("//wpimath:proto_files")],
         ),
         "_field_jsons": attr.label(
             default = Label("//fields:field-jsons"),

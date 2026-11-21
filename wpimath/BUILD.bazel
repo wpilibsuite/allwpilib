@@ -34,7 +34,10 @@ filegroup(
 filegroup(
     name = "proto_files",
     srcs = glob(["src/main/proto/**/*.proto"]),
-    visibility = ["//wpimath:__subpackages__"],
+    visibility = [
+        "//fields:__pkg__",
+        "//wpimath:__subpackages__",
+    ],
 )
 
 py_binary(
