@@ -3,6 +3,11 @@ project(wpigui)
 include(CompileWarnings)
 
 file(GLOB wpigui_src src/main/native/cpp/*.cpp)
+if(APPLE)
+    file(GLOB wpigui_macos_src src/main/native/macOS/*.mm)
+    list(APPEND wpigui_src ${wpigui_macos_src})
+    set_source_files_properties(${wpigui_macos_src} PROPERTIES COMPILE_FLAGS "-fobjc-arc")
+endif()
 
 add_library(wpigui STATIC ${wpigui_src})
 set_target_properties(wpigui PROPERTIES DEBUG_POSTFIX "d")
@@ -11,6 +16,9 @@ set_property(TARGET wpigui PROPERTY FOLDER "libraries")
 
 wpilib_target_warnings(wpigui)
 target_link_libraries(wpigui PUBLIC imgui)
+if(APPLE)
+    target_link_libraries(wpigui PUBLIC "-framework AppKit" "-framework QuartzCore")
+endif()
 
 target_include_directories(
     wpigui
@@ -31,6 +39,9 @@ if(WPILIB_WITH_IMGUI_TESTS)
     set_property(TARGET wpigui_for_tests PROPERTY FOLDER "tests")
     wpilib_target_warnings(wpigui_for_tests)
     target_link_libraries(wpigui_for_tests PUBLIC imgui_test_engine)
+    if(APPLE)
+        target_link_libraries(wpigui_for_tests PUBLIC "-framework AppKit" "-framework QuartzCore")
+    endif()
     target_include_directories(
         wpigui_for_tests
         PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
