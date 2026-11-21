@@ -9,6 +9,7 @@ import static org.wpilib.units.Units.Volts;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.wpilib.hardware.hal.util.AllocationException;
+import org.wpilib.hardware.motor.MotorController;
 import org.wpilib.networktables.BooleanPublisher;
 import org.wpilib.networktables.DoublePublisher;
 import org.wpilib.networktables.DoubleSubscriber;
@@ -20,7 +21,7 @@ import org.wpilib.units.measure.Current;
 import org.wpilib.units.measure.Voltage;
 
 /** This class controls a specific motor and encoder hooked up to an ExpansionHub. */
-public class ExpansionHubMotor implements AutoCloseable {
+public class ExpansionHubMotor implements MotorController, AutoCloseable {
   /** The direction to follow a leader motor in when using the follow method. */
   public enum FollowDirection {
     /** Follow the leader motor in the same direction. */
@@ -45,6 +46,8 @@ public class ExpansionHubMotor implements AutoCloseable {
 
   private ExpansionHub m_hub;
   private final int m_channel;
+  private double m_throttle;
+  private boolean m_isInverted;
 
   private final DoubleSubscriber m_encoderSubscriber;
   private final DoubleSubscriber m_encoderVelocitySubscriber;
@@ -171,10 +174,36 @@ public class ExpansionHubMotor implements AutoCloseable {
    *
    * @param throttle The throttle where -1 represents full reverse and 1 represents full forward.
    */
+  @Override
   public void setThrottle(double throttle) {
+    m_throttle = throttle;
     setEnabled(true);
     m_modePublisher.set(PERCENTAGE_MODE);
     m_setpointPublisher.set(throttle);
+  }
+
+  /**
+   * Gets the last commanded throttle, before inversion. Initially zero and reset to zero by {@link
+   * #unfollow()}. Commands in other control modes do not update this value.
+   *
+   * @return The commanded throttle where -1 represents full reverse and 1 represents full forward.
+   */
+  @Override
+  public double getThrottle() {
+    return m_throttle;
+  }
+
+  /**
+   * Sets the voltage to run the motor at. This value will be continuously scaled to match the input
+   * voltage.
+   *
+   * @param voltage The voltage to drive the motor at, in volts
+   */
+  @Override
+  public void setVoltage(double voltage) {
+    setEnabled(true);
+    m_modePublisher.set(VOLTAGE_MODE);
+    m_setpointPublisher.set(voltage);
   }
 
   /**
@@ -183,10 +212,9 @@ public class ExpansionHubMotor implements AutoCloseable {
    *
    * @param voltage The voltage to drive the motor at
    */
+  @Override
   public void setVoltage(Voltage voltage) {
-    setEnabled(true);
-    m_modePublisher.set(VOLTAGE_MODE);
-    m_setpointPublisher.set(voltage.in(Volts));
+    setVoltage(voltage.in(Volts));
   }
 
   /**
@@ -280,10 +308,31 @@ public class ExpansionHubMotor implements AutoCloseable {
   /**
    * Sets if the motor and encoder should be reversed.
    *
-   * @param reversed True to reverse encoder, false otherwise
+   * @param reversed True to reverse the motor and encoder, false otherwise
    */
   public void setReversed(boolean reversed) {
-    m_reversedPublisher.set(reversed);
+    setInverted(reversed);
+  }
+
+  /**
+   * Sets the inversion state of the motor and encoder.
+   *
+   * @param isInverted True to reverse the motor and encoder, false otherwise
+   */
+  @Override
+  public void setInverted(boolean isInverted) {
+    m_isInverted = isInverted;
+    m_reversedPublisher.set(isInverted);
+  }
+
+  /**
+   * Gets the inversion state of the motor and encoder.
+   *
+   * @return True if the motor and encoder are reversed, false otherwise
+   */
+  @Override
+  public boolean getInverted() {
+    return m_isInverted;
   }
 
   /** Reset the encoder count to 0. */
@@ -339,6 +388,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   /** Stops following the currently set leader motor. */
   public void unfollow() {
     m_hub.removeFollower(this.m_channel);
+    m_throttle = 0;
     setEnabled(false);
     m_modePublisher.set(PERCENTAGE_MODE);
     m_setpointPublisher.set(0);
