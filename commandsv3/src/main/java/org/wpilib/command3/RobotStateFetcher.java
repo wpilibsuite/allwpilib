@@ -12,6 +12,8 @@ import org.wpilib.hardware.hal.RobotMode;
 /**
  * Helper class for fetching information about the state of the robot. This is a package-private
  * class so tests for this library don't need to hook into driverstation simulation and the HAL.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 abstract class RobotStateFetcher {
   private static volatile RobotStateFetcher s_fetcher;

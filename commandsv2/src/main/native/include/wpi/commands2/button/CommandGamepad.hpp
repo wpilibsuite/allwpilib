@@ -16,6 +16,8 @@ namespace wpi::cmd {
  * A version of {@link wpi::Gamepad} with {@link Trigger} factories for
  * command-based.
  *
+ * This class is provided by the Commands v2 VendorDep
+ *
  * @see wpi::Gamepad
  */
 class CommandGamepad {

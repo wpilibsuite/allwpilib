@@ -9,6 +9,8 @@ import org.wpilib.hardware.hal.RobotMode;
 /**
  * A scope for when a binding is live. Bindings tied to a scope must be deleted when the scope
  * becomes inactive.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 @SuppressWarnings("PMD.ImplicitFunctionalInterface")
 interface BindingScope {

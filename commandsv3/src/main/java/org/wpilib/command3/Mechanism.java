@@ -17,6 +17,8 @@ import org.wpilib.units.measure.Time;
  * <p>Even though this interface is named "Mechanism", it may be used to represent other physical
  * hardware on a robot that should be controlled with commands - for example, an LED strip or a
  * vision processor that can switch between different pipelines could be represented as mechanisms.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 public interface Mechanism {
   /**

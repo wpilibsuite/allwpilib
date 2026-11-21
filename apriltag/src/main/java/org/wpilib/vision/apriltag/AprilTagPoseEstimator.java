@@ -7,7 +7,11 @@ package org.wpilib.vision.apriltag;
 import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.vision.apriltag.jni.AprilTagJNI;
 
-/** Pose estimators for AprilTag tags. */
+/**
+ * Pose estimators for AprilTag tags.
+ *
+ * <p>This class is provided by the AprilTag VendorDep
+ */
 public class AprilTagPoseEstimator {
   /** Configuration for the pose estimator. */
   public static class Config {

@@ -16,6 +16,8 @@ namespace wpi::cmd {
  * Represents requirements for a command, which is a set of (pointers to)
  * subsystems. This class is implicitly convertible from std::initializer_list
  * and std::span.
+ *
+ * This class is provided by the Commands v2 VendorDep
  */
 class Requirements {
  public:

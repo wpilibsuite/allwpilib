@@ -37,6 +37,8 @@ import org.wpilib.units.measure.Voltage;
  * then extracts the motor frames within the valid timestamp ranges. If a given test was run
  * multiple times in a single logfile, the user will need to select which of the tests to use for
  * the fit in the analysis tool.
+ *
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class SysIdRoutine extends SysIdRoutineLog {
   private final Config m_config;

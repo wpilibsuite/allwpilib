@@ -16,6 +16,8 @@ import org.wpilib.hardware.motor.MotorController;
  * XRPMotor.
  *
  * <p>A SimDevice based motor controller representing the motors on an XRP robot
+ *
+ * <p>This class is provided by the XRP VendorDep
  */
 @SuppressWarnings("removal")
 public class XRPMotor implements MotorController {

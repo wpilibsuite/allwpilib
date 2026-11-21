@@ -16,6 +16,8 @@ namespace wpi::vision {
 
 /**
  * Non-template base class for VisionRunner.
+ *
+ * This class is provided by the CameraServer VendorDep
  */
 class VisionRunnerBase {
  public:
@@ -75,6 +77,8 @@ class VisionRunnerBase {
  * A vision runner is a convenient wrapper object to make it easy to run vision
  * pipelines from robot code. The easiest way to use this is to run it in a
  * std::thread and use the listener to take snapshots of the pipeline's outputs.
+ *
+ * This class is provided by the CameraServer VendorDep
  *
  * @see VisionPipeline
  */

@@ -11,6 +11,8 @@ import org.wpilib.vision.apriltag.jni.AprilTagJNI;
  * An AprilTag detector engine. This is expensive to set up and tear down, so most use cases should
  * only create one of these, add a family to it, set up any other configuration, and repeatedly call
  * Detect().
+ *
+ * <p>This class is provided by the AprilTag VendorDep
  */
 public class AprilTagDetector implements AutoCloseable {
   /** Detector configuration. */

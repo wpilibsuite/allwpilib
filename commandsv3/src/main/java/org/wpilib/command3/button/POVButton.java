@@ -11,7 +11,11 @@ import org.wpilib.driverstation.GenericHID;
 import org.wpilib.driverstation.HIDDevice;
 import org.wpilib.driverstation.POVDirection;
 
-/** A {@link Trigger} that gets its state from a POV on a {@link GenericHID}. */
+/**
+ * A {@link Trigger} that gets its state from a POV on a {@link GenericHID}.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
+ */
 public class POVButton extends Trigger {
   /**
    * Creates a POV button for triggering commands.
