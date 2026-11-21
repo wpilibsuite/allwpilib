@@ -79,7 +79,7 @@ struct wpi::util::Struct<ThingB> {
   static ThingB Unpack(std::span<const uint8_t> data) {
     return ThingB{data[0]};
   }
-  static void Pack(std::span<uint8_t> data, const ThingB& value) {
+  static void Pack(std::span<uint8_t> data, const ThingB value) {
     data[0] = std::to_underlying(value);
   }
 };
