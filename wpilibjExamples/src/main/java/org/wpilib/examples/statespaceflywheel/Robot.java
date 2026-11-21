@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
   // Outputs (what we can measure): [velocity], in radians per second.
   private final LinearSystem<N1, N1, N1> flywheelPlant =
       Models.angularVelocityFromPhysicalConstants(
-          DCMotor.getNEO(2), FLYWHEEL_MOMENT_OF_INERTIA, FLYWHEEL_GEARING);
+          DCMotor.getNeo(2), FLYWHEEL_MOMENT_OF_INERTIA, FLYWHEEL_GEARING);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   private final KalmanFilter<N1, N1, N1> observer =
