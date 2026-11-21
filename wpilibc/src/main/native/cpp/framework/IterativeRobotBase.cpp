@@ -61,6 +61,8 @@ void IterativeRobotBase::DisabledPeriodic() {
   }
 }
 
+void IterativeRobotBase::EnabledPeriodic() {}
+
 void IterativeRobotBase::AutonomousPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
@@ -144,6 +146,11 @@ void IterativeRobotBase::LoopFunc() {
 
   // Call the appropriate function depending upon the current robot mode
   HAL_ObserveUserProgram(word.GetValue());
+  if (enabled) {
+    EnabledPeriodic();
+    m_watchdog.AddEpoch("EnabledPeriodic()");
+  }
+
   if (mode == RobotMode::UNKNOWN) {
     DisabledPeriodic();
     m_watchdog.AddEpoch("DisabledPeriodic()");

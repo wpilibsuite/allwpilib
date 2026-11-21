@@ -36,6 +36,7 @@ namespace wpi {
  *
  * \li RobotPeriodic()
  * \li DisabledPeriodic()
+ * \li EnabledPeriodic()
  * \li AutonomousPeriodic()
  * \li TeleopPeriodic()
  * \li UtilityPeriodic()
@@ -45,10 +46,11 @@ namespace wpi {
  * 1. DriverStationConnected(), once, the first time the DS is connected
  * 2. The end function of the previous mode and the start function of the new
  *    mode, only on a mode change
- * 3. The periodic function for the current mode (DisabledPeriodic(),
+ * 3. EnabledPeriodic(), only while enabled
+ * 4. The periodic function for the current mode (DisabledPeriodic(),
  *    AutonomousPeriodic(), TeleopPeriodic(), or UtilityPeriodic())
- * 4. RobotPeriodic()
- * 5. SimulationPeriodic(), only in simulation
+ * 5. RobotPeriodic()
+ * 6. SimulationPeriodic(), only in simulation
  *
  * The mode-specific periodic function runs before RobotPeriodic(). Exactly one
  * mode-specific periodic function runs per iteration.
@@ -119,9 +121,9 @@ class IterativeRobotBase : public RobotBase {
    * This function is called each time a new packet is received from the driver
    * station.
    *
-   * Runs after the current mode's periodic function (DisabledPeriodic(),
-   * AutonomousPeriodic(), TeleopPeriodic(), or UtilityPeriodic()) and before
-   * SimulationPeriodic().
+   * Runs after EnabledPeriodic() and the current mode's periodic function
+   * (DisabledPeriodic(), AutonomousPeriodic(), TeleopPeriodic(), or
+   * UtilityPeriodic()), and before SimulationPeriodic().
    */
   virtual void RobotPeriodic();
 
@@ -147,13 +149,23 @@ class IterativeRobotBase : public RobotBase {
   virtual void DisabledPeriodic();
 
   /**
+   * Periodic code for all enabled modes should go here.
+   *
+   * Called once per loop while the robot is enabled, after any mode transition
+   * callbacks and before the current mode's periodic function, RobotPeriodic(),
+   * and SimulationPeriodic(). Never runs while disabled.
+   */
+  virtual void EnabledPeriodic();
+
+  /**
    * Periodic code for autonomous mode should go here.
    *
    * Users should override this method for code which will be called each time a
    * new packet is received from the driver station and the robot is in
    * autonomous mode.
    *
-   * Runs before RobotPeriodic() and SimulationPeriodic().
+   * Runs after EnabledPeriodic() and before RobotPeriodic() and
+   * SimulationPeriodic().
    */
   virtual void AutonomousPeriodic();
 
@@ -164,7 +176,8 @@ class IterativeRobotBase : public RobotBase {
    * new packet is received from the driver station and the robot is in teleop
    * mode.
    *
-   * Runs before RobotPeriodic() and SimulationPeriodic().
+   * Runs after EnabledPeriodic() and before RobotPeriodic() and
+   * SimulationPeriodic().
    */
   virtual void TeleopPeriodic();
 
@@ -175,7 +188,8 @@ class IterativeRobotBase : public RobotBase {
    * new packet is received from the driver station and the robot is in utility
    * mode.
    *
-   * Runs before RobotPeriodic() and SimulationPeriodic().
+   * Runs after EnabledPeriodic() and before RobotPeriodic() and
+   * SimulationPeriodic().
    */
   virtual void UtilityPeriodic();
 
