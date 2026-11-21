@@ -10,4 +10,4 @@ functions:
   GetField:
 
 inline_code: |
-  SetupWPyStruct<wpi::fields::FieldId>(enum1.value);
+  SetupWPyStruct<wpi::fields::FieldId>(enum_FieldId);
