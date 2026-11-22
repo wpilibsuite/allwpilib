@@ -75,27 +75,21 @@ pip.parse(
 )
 use_repo(pip, "allwpilib_pip_deps")
 
-bazel_dep(name = "rules_jvm_external", version = "6.10")
+bazel_dep(name = "rules_jvm_external", version = "7.2")
 
 register_toolchains("//:java_toolchain_definition")
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.from_toml(
+    name = "maven",
+    libs_versions_toml = "//:gradle/libs.versions.toml",
+)
 maven.install(
     name = "maven",
+    # Everything else comes from gradle/libs.versions.toml above. These are
+    # only used by Bazel, so they aren't in the Gradle version catalog.
     artifacts = [
-        "org.ejml:ejml-java9module:0.46.0",
-        "io.avaje:avaje-jsonb:3.14",
-        "io.avaje:avaje-jsonb-generator:3.14",
-        "us.hebi.quickbuf:quickbuf-runtime:1.4",
-        "com.google.code.gson:gson:2.13.1",
-        "org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-4",
-        "org.openjdk.jmh:jmh-generator-annprocess:1.37",
-        "org.openjdk.jmh:jmh-core:1.37",
-        "org.junit.jupiter:junit-jupiter:5.13.4",
         "org.junit.platform:junit-platform-console:1.13.4",
-        "org.junit.platform:junit-platform-launcher:1.13.4",
-        "org.mockito:mockito-core:4.1.0",
-        "com.google.testing.compile:compile-testing:0.23.0",
         "com.google.errorprone:error_prone_annotations:2.41.0",
     ],
     excluded_artifacts = [
