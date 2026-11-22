@@ -6,12 +6,10 @@
 
 #include <stdexcept>
 
-#include <fmt/format.h>
-
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
+#include "wpi/math/protobuf/kinematics.npb.h"
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/kinematics.npb.h"
 
 template <size_t NumModules>
 struct wpi::util::Protobuf<wpi::math::SwerveDriveKinematics<NumModules>> {

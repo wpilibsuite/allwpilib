@@ -24,12 +24,14 @@ namespace wpi::xrp {
  *
  * <p>DIO 0 - USER Button (input only)
  * DIO 1 - LED (output only)
+ *
+ * This class is provided by the XRP VendorDep
  */
 class XRPOnBoardIO {
  public:
   XRPOnBoardIO() {}  // No need to do anything. No configurable IO
 
-  static constexpr auto kMessageInterval = 1_s;
+  static constexpr auto MESSAGE_INTERVAL = 1_s;
   wpi::units::second_t m_nextMessageTime = 0_s;
 
   /**

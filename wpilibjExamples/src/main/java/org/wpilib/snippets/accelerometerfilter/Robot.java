@@ -8,10 +8,10 @@ import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
 import org.wpilib.math.filter.LinearFilter;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /**
- * Accelerometer filtering snippets for frc-docs.
+ * Accelerometer filtering snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 public class Robot extends TimedRobot {
@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
     // Get the filtered X acceleration
     double filteredXAccel = xAccelFilter.calculate(xAccel);
 
-    SmartDashboard.putNumber("X Acceleration", xAccel);
-    SmartDashboard.putNumber("Filtered X Acceleration", filteredXAccel);
+    Telemetry.log("X Acceleration", xAccel);
+    Telemetry.log("Filtered X Acceleration", filteredXAccel);
   }
 }

@@ -10,7 +10,7 @@
 extern "C" int HALSIM_InitExtension(void);
 
 int main() {
-  HAL_Initialize(500, 0);
+  HAL_Initialize();
   HALSIM_InitExtension();
 
   HAL_ObserveUserProgramStarting();

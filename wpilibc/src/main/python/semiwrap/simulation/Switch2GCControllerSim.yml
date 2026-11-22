@@ -1,0 +1,35 @@
+extra_includes:
+- wpi/driverstation/Switch2GCController.hpp
+
+classes:
+  wpi::sim::Switch2GCControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::Switch2GCController
+    methods:
+      Switch2GCControllerSim:
+        overloads:
+          const Switch2GCController&:
+          int:
+      SetLeftX:
+      SetLeftY:
+      SetCStickX:
+      SetCStickY:
+      SetLTrigger:
+      SetRTrigger:
+      SetAButton:
+      SetXButton:
+      SetBButton:
+      SetYButton:
+      SetHomeButton:
+      SetStartButton:
+      SetZLButton:
+      SetZButton:
+      SetDpadUpButton:
+      SetDpadDownButton:
+      SetDpadLeftButton:
+      SetDpadRightButton:
+      SetCaptureButton:
+      SetCButton:
+      SetLButton:
+      SetRButton:

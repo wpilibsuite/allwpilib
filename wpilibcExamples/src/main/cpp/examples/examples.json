@@ -10,7 +10,7 @@
       "Arm",
       "Analog",
       "Joystick",
-      "SmartDashboard",
+      "Telemetry",
       "Mechanism2d"
     ],
     "commandversion": 2
@@ -21,7 +21,7 @@
     "tags": [
       "Hardware",
       "Encoder",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "Encoder",
     "gradlebase": "cpp",
@@ -124,10 +124,12 @@
       "Commandv2",
       "Differential Drive",
       "Encoder",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
       "Pneumatics",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "HatchbotTraditional",
     "gradlebase": "cpp",
@@ -141,10 +143,12 @@
       "Commandv2",
       "Differential Drive",
       "Encoder",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
       "Pneumatics",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "HatchbotInlined",
     "gradlebase": "cpp",
@@ -165,7 +169,8 @@
       "PID",
       "Gyro",
       "Profiled PID",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "RapidReactCommandBot",
     "gradlebase": "cpp",
@@ -244,9 +249,44 @@
       "Hardware",
       "Duty Cycle",
       "Encoder",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "DutyCycleEncoder",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Driver Station Display Lines",
+    "description": "Display lines on the Driver Station display and update them every robot loop.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station"
+    ],
+    "foldername": "DriverStationDisplayLines",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "Driver Station Display ANSI",
+    "description": "Stream ANSI text to the Driver Station display and update a value in place once per second.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station"
+    ],
+    "foldername": "DriverStationDisplayAnsi",
+    "gradlebase": "cpp",
+    "commandversion": 2
+  },
+  {
+    "name": "DS Gamepad Chooser",
+    "description": "Use a gamepad-controlled Driver Station display selector to configure separate autonomous opmodes.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station",
+      "Gamepad",
+      "OpMode"
+    ],
+    "foldername": "DSGamepadChooser",
     "gradlebase": "cpp",
     "commandversion": 2
   },
@@ -383,7 +423,8 @@
       "State-Space",
       "Simulation",
       "Mechanism2d",
-      "Profiled PID"
+      "Profiled PID",
+      "UnitTests"
     ],
     "foldername": "ElevatorSimulation",
     "gradlebase": "cpp",
@@ -444,7 +485,8 @@
       "State-Space",
       "Simulation",
       "Mechanism2d",
-      "Preferences"
+      "Preferences",
+      "UnitTests"
     ],
     "foldername": "ArmSimulation",
     "gradlebase": "cpp",
@@ -456,7 +498,8 @@
     "description": "Test a robot project with basic unit tests in simulation.",
     "tags": [
       "Intake",
-      "Pneumatics"
+      "Pneumatics",
+      "UnitTests"
     ],
     "foldername": "UnitTest",
     "gradlebase": "cpp",

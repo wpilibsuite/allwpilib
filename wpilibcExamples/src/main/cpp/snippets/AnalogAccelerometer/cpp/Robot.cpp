@@ -7,7 +7,7 @@
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 
 /**
- * AnalogAccelerometer snippets for frc-docs.
+ * AnalogAccelerometer snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 class Robot : public wpi::TimedRobot {

@@ -37,6 +37,8 @@ import org.wpilib.units.measure.Voltage;
  * then extracts the motor frames within the valid timestamp ranges. If a given test was run
  * multiple times in a single logfile, the user will need to select which of the tests to use for
  * the fit in the analysis tool.
+ *
+ * <p>This class is provided by the Commands v2 VendorDep
  */
 public class SysIdRoutine extends SysIdRoutineLog {
   private final Config m_config;
@@ -190,9 +192,9 @@ public class SysIdRoutine extends SysIdRoutineLog {
   /** Motor direction for a SysId test. */
   public enum Direction {
     /** Forward. */
-    kForward,
+    FORWARD,
     /** Reverse. */
-    kReverse
+    REVERSE
   }
 
   /**
@@ -207,13 +209,13 @@ public class SysIdRoutine extends SysIdRoutineLog {
    */
   public Command quasistatic(Direction direction) {
     State state;
-    if (direction == Direction.kForward) {
+    if (direction == Direction.FORWARD) {
       state = State.QUASISTATIC_FORWARD;
-    } else { // if (direction == Direction.kReverse) {
+    } else { // if (direction == Direction.REVERSE) {
       state = State.QUASISTATIC_REVERSE;
     }
 
-    double outputSign = direction == Direction.kForward ? 1.0 : -1.0;
+    double outputSign = direction == Direction.FORWARD ? 1.0 : -1.0;
 
     Timer timer = new Timer();
     return m_mechanism
@@ -248,11 +250,11 @@ public class SysIdRoutine extends SysIdRoutineLog {
    * @return A command to run the test.
    */
   public Command dynamic(Direction direction) {
-    double outputSign = direction == Direction.kForward ? 1.0 : -1.0;
+    double outputSign = direction == Direction.FORWARD ? 1.0 : -1.0;
     State state =
         Map.ofEntries(
-                entry(Direction.kForward, State.DYNAMIC_FORWARD),
-                entry(Direction.kReverse, State.DYNAMIC_REVERSE))
+                entry(Direction.FORWARD, State.DYNAMIC_FORWARD),
+                entry(Direction.REVERSE, State.DYNAMIC_REVERSE))
             .get(direction);
     Voltage[] output = {Volts.zero()};
 

@@ -1,0 +1,13 @@
+classes:
+  wpi::sim::OnboardIMUSim:
+    methods:
+      SetAngleX:
+      SetAngleY:
+      SetAngleZ:
+      SetGyroRateX:
+      SetGyroRateY:
+      SetGyroRateZ:
+      SetAccelX:
+      SetAccelY:
+      SetAccelZ:
+      SetYaw:

@@ -4,11 +4,11 @@
 
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 #include "wpi/units/acceleration.hpp"
 
 /**
- * Collision detection snippets for frc-docs.
+ * Collision detection snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 class Robot : public wpi::TimedRobot {
@@ -23,8 +23,8 @@ class Robot : public wpi::TimedRobot {
     prevXAccel = xAccel;
     prevYAccel = yAccel;
 
-    wpi::SmartDashboard::PutNumber("X Jerk", xJerk.value());
-    wpi::SmartDashboard::PutNumber("Y Jerk", yJerk.value());
+    wpi::telemetry::Log("X Jerk", xJerk);
+    wpi::telemetry::Log("Y Jerk", yJerk);
   }
 
  private:

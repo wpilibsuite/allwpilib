@@ -31,7 +31,7 @@ constexpr bool IsSpecial(std::string_view name) {
 }
 
 struct LocalTopic {
-  static constexpr auto kType = Handle::TOPIC;
+  static constexpr auto TYPE = Handle::TOPIC;
 
   LocalTopic(NT_Topic handle, std::string_view name)
       : handle{handle}, name{name}, special{IsSpecial(name)} {}
@@ -99,6 +99,8 @@ struct LocalTopic {
   VectorSet<LocalMultiSubscriber*> multiSubscribers;
   VectorSet<LocalEntry*> entries;
   VectorSet<NT_Listener> listeners;
+
+  void* userData{nullptr};
 
  private:
   // update flags from properties

@@ -37,7 +37,7 @@ classes:
         cpp_code: |
           [](wpi::sim::AddressableLEDSim &self, std::span<wpi::AddressableLED::LEDData> &data) {
             if (static_cast<int>(data.size()) != self.GetLength()) {
-               std::string msg = fmt::format("data must have length {} (got {})", self.GetLength(), data.size());
+               std::string msg = std::format("data must have length {} (got {})", self.GetLength(), data.size());
                throw py::value_error(msg);
             }
             self.SetData(data.data());

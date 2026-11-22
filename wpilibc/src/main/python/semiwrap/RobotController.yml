@@ -10,7 +10,6 @@ classes:
     nodelete: true
     methods:
       GetSerialNumber:
-      GetComments:
       GetTeamNumber:
       SetTimeSource:
       GetTime:
@@ -26,8 +25,7 @@ classes:
       GetEnabled3V3:
       GetFaultCount3V3:
       GetBatteryVoltage:
-      GetBrownoutVoltage:
-      SetBrownoutVoltage:
+      SetBrownoutVoltages:
       GetCPUTemp:
       GetCANStatus:
       GetCommsDisableCount:

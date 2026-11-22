@@ -4,6 +4,23 @@
 
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 
+#include <Eigen/Core>
+
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/geometry/Twist2d.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelVelocities.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/angular_acceleration.hpp"
+#include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/velocity.hpp"
+
 using namespace wpi::math;
 
 MecanumDriveWheelVelocities MecanumDriveKinematics::ToWheelVelocities(

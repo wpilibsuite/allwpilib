@@ -15,7 +15,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.epilogue.logging.ClassSpecificLogger;
-import org.wpilib.epilogue.logging.EpilogueBackend;
 
 /**
  * Handles logging of fields or methods. An element that passes the {@link #isLoggable(Element)}
@@ -47,13 +46,11 @@ public abstract class ElementHandler {
    * @return the logged datatype
    */
   protected TypeMirror dataType(Element element) {
-    if (element instanceof VariableElement field) {
-      return field.asType();
-    } else if (element instanceof ExecutableElement method) {
-      return method.getReturnType();
-    } else {
-      throw new IllegalStateException("Unexpected" + element.getClass().getName());
-    }
+    return switch (element) {
+      case VariableElement field -> field.asType();
+      case ExecutableElement method -> method.getReturnType();
+      default -> throw new IllegalStateException("Unexpected" + element.getClass().getName());
+    };
   }
 
   /**
@@ -118,13 +115,11 @@ public abstract class ElementHandler {
    * @return the generated access snippet
    */
   public String elementAccess(Element element, TypeElement loggedClass) {
-    if (element instanceof VariableElement field) {
-      return fieldAccess(field, loggedClass);
-    } else if (element instanceof ExecutableElement method) {
-      return methodAccess(method);
-    } else {
-      throw new IllegalStateException("Unexpected" + element.getClass().getName());
-    }
+    return switch (element) {
+      case VariableElement field -> fieldAccess(field, loggedClass);
+      case ExecutableElement method -> methodAccess(method);
+      default -> throw new IllegalStateException("Unexpected" + element.getClass().getName());
+    };
   }
 
   private static String fieldAccess(VariableElement field, TypeElement loggedClass) {
@@ -177,8 +172,8 @@ public abstract class ElementHandler {
   /**
    * Generates a code snippet to place in a generated logger file to log the value of a field or
    * method. Log invocations are placed in a generated implementation of {@link
-   * ClassSpecificLogger#update(EpilogueBackend, Object)}, with access to the backend and logged
-   * object passed to the method call.
+   * ClassSpecificLogger#update(TelemetryTable, Object)}, with access to the table and logged object
+   * passed to the method call.
    *
    * @param element the field or method element to generate the logger call for
    * @return the generated log invocation

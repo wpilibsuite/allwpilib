@@ -114,33 +114,15 @@ public class EncoderSim {
   }
 
   /**
-   * Register a callback on the period of the encoder.
+   * Register a callback on the rate of the encoder.
    *
-   * @param callback the callback that will be called whenever the period is changed
+   * @param callback the callback that will be called whenever the rate is changed
    * @param initialNotify if true, the callback will be run on the initial value
    * @return the {@link CallbackStore} object associated with this callback.
    */
-  public CallbackStore registerPeriodCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = EncoderDataJNI.registerPeriodCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, EncoderDataJNI::cancelPeriodCallback);
-  }
-
-  /**
-   * Read the period of the encoder.
-   *
-   * @return the encoder period
-   */
-  public double getPeriod() {
-    return EncoderDataJNI.getPeriod(m_index);
-  }
-
-  /**
-   * Change the encoder period.
-   *
-   * @param period the new period
-   */
-  public void setPeriod(double period) {
-    EncoderDataJNI.setPeriod(m_index, period);
+  public CallbackStore registerRateCallback(NotifyCallback callback, boolean initialNotify) {
+    int uid = EncoderDataJNI.registerRateCallback(m_index, callback, initialNotify);
+    return new CallbackStore(m_index, uid, EncoderDataJNI::cancelRateCallback);
   }
 
   /**
@@ -171,36 +153,6 @@ public class EncoderSim {
    */
   public void setReset(boolean reset) {
     EncoderDataJNI.setReset(m_index, reset);
-  }
-
-  /**
-   * Register a callback to be run whenever the max period of the encoder is changed.
-   *
-   * @param callback the callback
-   * @param initialNotify whether to run the callback on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public CallbackStore registerMaxPeriodCallback(NotifyCallback callback, boolean initialNotify) {
-    int uid = EncoderDataJNI.registerMaxPeriodCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, EncoderDataJNI::cancelMaxPeriodCallback);
-  }
-
-  /**
-   * Get the max period of the encoder.
-   *
-   * @return the max period of the encoder
-   */
-  public double getMaxPeriod() {
-    return EncoderDataJNI.getMaxPeriod(m_index);
-  }
-
-  /**
-   * Change the max period of the encoder.
-   *
-   * @param maxPeriod the new value
-   */
-  public void setMaxPeriod(double maxPeriod) {
-    EncoderDataJNI.setMaxPeriod(m_index, maxPeriod);
   }
 
   /**
@@ -262,37 +214,6 @@ public class EncoderSim {
    */
   public void setReverseDirection(boolean reverseDirection) {
     EncoderDataJNI.setReverseDirection(m_index, reverseDirection);
-  }
-
-  /**
-   * Register a callback on the samples-to-average value of this encoder.
-   *
-   * @param callback the callback that will be called whenever the samples-to-average is changed
-   * @param initialNotify if true, the callback will be run on the initial value
-   * @return the {@link CallbackStore} object associated with this callback.
-   */
-  public CallbackStore registerSamplesToAverageCallback(
-      NotifyCallback callback, boolean initialNotify) {
-    int uid = EncoderDataJNI.registerSamplesToAverageCallback(m_index, callback, initialNotify);
-    return new CallbackStore(m_index, uid, EncoderDataJNI::cancelSamplesToAverageCallback);
-  }
-
-  /**
-   * Get the samples-to-average value.
-   *
-   * @return the samples-to-average value
-   */
-  public int getSamplesToAverage() {
-    return EncoderDataJNI.getSamplesToAverage(m_index);
-  }
-
-  /**
-   * Set the samples-to-average value.
-   *
-   * @param samplesToAverage the new value
-   */
-  public void setSamplesToAverage(int samplesToAverage) {
-    EncoderDataJNI.setSamplesToAverage(m_index, samplesToAverage);
   }
 
   /**

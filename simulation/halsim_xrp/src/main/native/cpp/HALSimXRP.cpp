@@ -9,8 +9,6 @@
 
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/util.hpp"
-#include "wpi/util/Endian.hpp"
-#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/print.hpp"
 
@@ -65,6 +63,9 @@ bool HALSimXRP::Initialize() {
   };
 
   m_xrp.SetWPILibUpdateFunc(func);
+
+  wpi::util::println("Your XRP's IP Address: {}", m_host);
+  wpi::util::println("Your XRP's Port: {}", m_port);
 
   return true;
 }

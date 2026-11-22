@@ -1,0 +1,14 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+cc_binary(
+    name = "usbviewer",
+    srcs = glob(["*.cpp"]),
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        "//cscore",
+        "//wpigui",
+        "@bzlmodrio-opencv//libraries/cpp/opencv",
+    ],
+)

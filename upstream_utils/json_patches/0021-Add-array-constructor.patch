@@ -8,14 +8,15 @@ Subject: [PATCH 21/25] Add array constructor
  1 file changed, 21 insertions(+)
 
 diff --git a/json.h b/json.h
-index 6a52615ab3e1799ebcf51a3b5ca445b1e2e64b97..ef3ea13b7cb147f0b383ff1ead496d495cfece32 100644
+index 08796527ea948c1cd602c0ba7a7b24dd75e57046..2dbf2cd9f8cc150c8f1dcfa7ef7ecd523b14d6ca 100644
 --- a/json.h
 +++ b/json.h
-@@ -17,6 +17,8 @@
+@@ -17,7 +17,9 @@
  
  #pragma once
  
 +#include <concepts>
+ #include <expected>
 +#include <ranges>
  #include <string>
  #include <string_view>

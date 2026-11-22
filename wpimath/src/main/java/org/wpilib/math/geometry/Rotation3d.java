@@ -4,6 +4,7 @@
 
 package org.wpilib.math.geometry;
 
+import static org.wpilib.math.util.UnitConversions.rotationsToRadians;
 import static org.wpilib.units.Units.Radians;
 
 import io.avaje.jsonb.Json;
@@ -73,7 +74,7 @@ public final class Rotation3d
    *
    * <p>This exists to avoid allocations for common rotations.
    */
-  public static final Rotation3d kZero = new Rotation3d();
+  public static final Rotation3d ZERO = new Rotation3d();
 
   @Json.Property("quaternion")
   private final Quaternion m_q;
@@ -98,6 +99,19 @@ public final class Rotation3d
    *
    * <p>Extrinsic rotations occur in that order around the axes in the fixed global frame rather
    * than the body frame.
+   *
+   * <p>Intrinsic rotations applied in the order yaw, then pitch, then roll are equivalent to these
+   * extrinsic rotations, so they can be passed to this constructor unchanged as (roll, pitch, yaw).
+   *
+   * <p>Intrinsic rotations applied in the order roll, then pitch, then yaw cannot be passed
+   * directly. Instead, construct the rotation by composing single-axis rotations:
+   *
+   * <pre>{@code
+   * var r = new Rotation3d(roll, 0, 0);
+   * var p = new Rotation3d(0, pitch, 0);
+   * var y = new Rotation3d(0, 0, yaw);
+   * var rotation = y.rotateBy(p).rotateBy(r);
+   * }</pre>
    *
    * <p>Angles are measured counterclockwise with the rotation axis pointing "out of the page". If
    * you point your right thumb along the positive axis direction, your fingers curl in the
@@ -131,6 +145,19 @@ public final class Rotation3d
    *
    * <p>Extrinsic rotations occur in that order around the axes in the fixed global frame rather
    * than the body frame.
+   *
+   * <p>Intrinsic rotations applied in the order yaw, then pitch, then roll are equivalent to these
+   * extrinsic rotations, so they can be passed to this constructor unchanged as (roll, pitch, yaw).
+   *
+   * <p>Intrinsic rotations applied in the order roll, then pitch, then yaw cannot be passed
+   * directly. Instead, construct the rotation by composing single-axis rotations:
+   *
+   * <pre>{@code
+   * var r = new Rotation3d(roll, Radians.zero(), Radians.zero());
+   * var p = new Rotation3d(Radians.zero(), pitch, Radians.zero());
+   * var y = new Rotation3d(Radians.zero(), Radians.zero(), yaw);
+   * var rotation = y.rotateBy(p).rotateBy(r);
+   * }</pre>
    *
    * <p>Angles are measured counterclockwise with the rotation axis pointing "out of the page". If
    * you point your right thumb along the positive axis direction, your fingers curl in the
@@ -324,6 +351,46 @@ public final class Rotation3d
   }
 
   /**
+   * Constructs and returns a Rotation3d with the given number of radians for the roll, pitch, and
+   * yaw.
+   *
+   * @param roll The counterclockwise rotation angle around the X axis (roll) in radians.
+   * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in radians.
+   * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in radians.
+   * @return The rotation object with the desired angle values.
+   */
+  public static Rotation3d fromRadians(double roll, double pitch, double yaw) {
+    return new Rotation3d(roll, pitch, yaw);
+  }
+
+  /**
+   * Constructs and returns a Rotation3d with the given number of degrees for the roll, pitch, and
+   * yaw.
+   *
+   * @param roll The counterclockwise rotation angle around the X axis (roll) in degrees.
+   * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in degrees.
+   * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in degrees.
+   * @return The rotation object with the desired angle values.
+   */
+  public static Rotation3d fromDegrees(double roll, double pitch, double yaw) {
+    return new Rotation3d(Math.toRadians(roll), Math.toRadians(pitch), Math.toRadians(yaw));
+  }
+
+  /**
+   * Constructs and returns a Rotation3d with the given number of rotations for the roll, pitch, and
+   * yaw.
+   *
+   * @param roll The counterclockwise rotation angle around the X axis (roll) in rotations.
+   * @param pitch The counterclockwise rotation angle around the Y axis (pitch) in rotations.
+   * @param yaw The counterclockwise rotation angle around the Z axis (yaw) in rotations.
+   * @return The rotation object with the desired angle values.
+   */
+  public static Rotation3d fromRotations(double roll, double pitch, double yaw) {
+    return new Rotation3d(
+        rotationsToRadians(roll), rotationsToRadians(pitch), rotationsToRadians(yaw));
+  }
+
+  /**
    * Takes the inverse of the current rotation.
    *
    * @return The inverse of the current rotation.
@@ -339,7 +406,7 @@ public final class Rotation3d
    * @return The new scaled Rotation3d.
    */
   public Rotation3d times(double scalar) {
-    return Rotation3d.kZero.interpolate(this, scalar);
+    return Rotation3d.ZERO.interpolate(this, scalar);
   }
 
   /**
@@ -355,10 +422,9 @@ public final class Rotation3d
   /**
    * Adds the new rotation to the current rotation. The other rotation is applied extrinsically,
    * which means that it rotates around the global axes. For example, {@code new
-   * Rotation3d(Units.degreesToRadians(90), 0, 0).rotateBy(new Rotation3d(0,
-   * Units.degreesToRadians(45), 0))} rotates by 90 degrees around the +X axis and then by 45
-   * degrees around the global +Y axis. (This is equivalent to {@code new
-   * Rotation3d(Units.degreesToRadians(90), Units.degreesToRadians(45), 0)})
+   * Rotation3d(degreesToRadians(90), 0, 0).rotateBy(new Rotation3d(0, degreesToRadians(45), 0))}
+   * rotates by 90 degrees around the +X axis and then by 45 degrees around the global +Y axis.
+   * (This is equivalent to {@code new Rotation3d(degreesToRadians(90), degreesToRadians(45), 0)})
    *
    * @param other The extrinsic rotation to rotate by.
    * @return The new rotated Rotation3d.
@@ -386,6 +452,23 @@ public final class Rotation3d
   }
 
   /**
+   * Projects the rotation forward by integrating the given body rates over time.
+   *
+   * @param rollRate The body roll rate in radians per second.
+   * @param pitchRate The body pitch rate in radians per second.
+   * @param yawRate The body yaw rate in radians per second.
+   * @param dt The time over which to integrate in seconds.
+   * @return The rotation in the world frame projected forward.
+   */
+  public Rotation3d integrate(double rollRate, double pitchRate, double yawRate, double dt) {
+    // qₖ₊₁ = qₖ exp(1/2 W dt) where W = 0 + ω_x î + ω_y ĵ + ω_z k̂
+    //
+    // https://math.stackexchange.com/a/2099673
+    var W = new Quaternion(0.0, rollRate, pitchRate, yawRate);
+    return new Rotation3d(m_q.times(W.times(dt / 2.0).exp()));
+  }
+
+  /**
    * Returns the quaternion representation of the Rotation3d.
    *
    * @return The quaternion representation of the Rotation3d.
@@ -405,7 +488,7 @@ public final class Rotation3d
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // wpimath/algorithms.md
+    // wpimath/docs/Quaternion.md
     final var cxcy = 1.0 - 2.0 * (x * x + y * y);
     final var sxcy = 2.0 * (w * x + y * z);
     final var cy_sq = cxcy * cxcy + sxcy * sxcy;
@@ -447,7 +530,7 @@ public final class Rotation3d
     final var y = m_q.getY();
     final var z = m_q.getZ();
 
-    // wpimath/algorithms.md
+    // wpimath/docs/Quaternion.md
     final var cycz = 1.0 - 2.0 * (y * y + z * z);
     final var cysz = 2.0 * (w * z + x * y);
     final var cy_sq = cycz * cycz + cysz * cysz;

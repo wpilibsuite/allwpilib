@@ -4,7 +4,7 @@
 
 #include "wpi/math/linalg/proto/MatrixProto.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "../ProtoTestBase.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
@@ -14,11 +14,11 @@ using namespace wpi::math;
 struct MatrixProtoTestData {
   using Type = Matrixd<2, 3>;
 
-  inline static const Type kTestData{{1.1, 1.2, 1.3}, {1.4, 1.5, 1.6}};
+  inline static const Type TEST_DATA{{1.1, 1.2, 1.3}, {1.4, 1.5, 1.6}};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData, data);
+    CHECK(testData == data);
   }
 };
 
-INSTANTIATE_TYPED_TEST_SUITE_P(Matrix, ProtoTest, MatrixProtoTestData);
+INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(Matrix, ProtoTest, MatrixProtoTestData);

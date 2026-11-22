@@ -11,7 +11,11 @@ import org.wpilib.command3.proto.ProtobufCommands.ProtobufCommand;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors;
 
-/** Protobuf serde for running commands. */
+/**
+ * Protobuf serde for running commands.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
+ */
 public class CommandProto implements Protobuf<Command, ProtobufCommand> {
   private final Scheduler m_scheduler;
 
@@ -41,6 +45,7 @@ public class CommandProto implements Protobuf<Command, ProtobufCommand> {
   }
 
   @Override
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public void pack(ProtobufCommand msg, Command command) {
     msg.clear();
 
@@ -60,6 +65,15 @@ public class CommandProto implements Protobuf<Command, ProtobufCommand> {
     if (m_scheduler.isRunning(command)) {
       msg.setLastTimeMs(m_scheduler.lastCommandRuntimeMs(command));
       msg.setTotalTimeMs(m_scheduler.totalRuntimeMs(command));
+    }
+
+    if (command.requirements().size() == 1) {
+      var requirement = command.requirements().iterator().next();
+      // Note: this will still flag a command as the default even if it was scheduled manually
+      //       or from a trigger
+      if (m_scheduler.getDefaultCommandFor(requirement) == command) {
+        msg.setIsDefaultCommand(true);
+      }
     }
   }
 }

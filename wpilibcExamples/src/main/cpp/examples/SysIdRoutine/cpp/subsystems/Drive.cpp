@@ -13,9 +13,9 @@ Drive::Drive() {
   rightLeader.SetInverted(true);
 
   leftEncoder.SetDistancePerPulse(
-      constants::drive::kEncoderDistancePerPulse.value());
+      constants::drive::ENCODER_DISTANCE_PER_PULSE.value());
   rightEncoder.SetDistancePerPulse(
-      constants::drive::kEncoderDistancePerPulse.value());
+      constants::drive::ENCODER_DISTANCE_PER_PULSE.value());
 
   drive.SetSafetyEnabled(false);
 }

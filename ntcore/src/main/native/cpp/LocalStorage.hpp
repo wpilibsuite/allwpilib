@@ -106,6 +106,22 @@ class LocalStorage final : public net::ILocalStorage {
     }
   }
 
+  void* GetTopicUserData(NT_Topic topicHandle) {
+    std::scoped_lock lock{m_mutex};
+    if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {
+      return topic->userData;
+    } else {
+      return nullptr;
+    }
+  }
+
+  void SetTopicUserData(NT_Topic topicHandle, void* userData) {
+    std::scoped_lock lock{m_mutex};
+    if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {
+      topic->userData = userData;
+    }
+  }
+
   NT_Type GetTopicType(NT_Topic topicHandle) {
     std::scoped_lock lock{m_mutex};
     if (auto topic = m_impl.GetTopicByHandle(topicHandle)) {

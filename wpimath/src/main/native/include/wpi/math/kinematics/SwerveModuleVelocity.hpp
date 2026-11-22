@@ -46,7 +46,8 @@ struct WPILIB_DLLEXPORT SwerveModuleVelocity {
    * @return The optimized SwerveModuleVelocity.
    */
   [[nodiscard]]
-  constexpr SwerveModuleVelocity Optimize(const Rotation2d& currentAngle) {
+  constexpr SwerveModuleVelocity Optimize(
+      const Rotation2d& currentAngle) const {
     auto delta = angle - currentAngle;
     if (wpi::units::math::abs(delta.Degrees()) > 90_deg) {
       return {-velocity, angle + Rotation2d{180_deg}};
@@ -64,7 +65,8 @@ struct WPILIB_DLLEXPORT SwerveModuleVelocity {
    * @return The scaled SwerveModuleVelocity.
    */
   [[nodiscard]]
-  constexpr SwerveModuleVelocity CosineScale(const Rotation2d& currentAngle) {
+  constexpr SwerveModuleVelocity CosineScale(
+      const Rotation2d& currentAngle) const {
     return {velocity * (angle - currentAngle).Cos(), angle};
   }
 };

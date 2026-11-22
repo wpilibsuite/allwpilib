@@ -7,7 +7,11 @@
 #include <array>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 // constexpr
 static constexpr std::array<int, 10> cesarr_values = {
@@ -25,7 +29,7 @@ static std::array<int, 10> sarr_values = {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 static int arr_values[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 static std::vector<int> vec_values{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-TEST(RotatedSpanTest, Constexpr) {
+TEST_CASE("RotatedSpanTest Constexpr", "[wpiutil]") {
   {
     constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values};
     static_assert(sp[5] == cesarr_values[5]);
@@ -36,63 +40,63 @@ TEST(RotatedSpanTest, Constexpr) {
   }
 }
 
-TEST(RotatedSpanTest, ConstructConst) {
+TEST_CASE("RotatedSpanTest ConstructConst", "[wpiutil]") {
   {
     wpi::util::rotated_span<const int, 10> sp{csarr_values};
-    EXPECT_EQ(sp[5], sarr_values[5]);
+    CHECK(sp[5] == sarr_values[5]);
   }
   {
     wpi::util::rotated_span<const int> sp{csarr_values};
-    EXPECT_EQ(sp[5], sarr_values[5]);
+    CHECK(sp[5] == sarr_values[5]);
   }
   {
     wpi::util::rotated_span<const int, 10> sp{carr_values};
-    EXPECT_EQ(sp[5], arr_values[5]);
+    CHECK(sp[5] == arr_values[5]);
   }
   {
     wpi::util::rotated_span<const int> sp{carr_values};
-    EXPECT_EQ(sp[5], arr_values[5]);
+    CHECK(sp[5] == arr_values[5]);
   }
   {
     wpi::util::rotated_span<const int> sp{cvec_values.begin(),
                                           cvec_values.end()};
-    EXPECT_EQ(sp[5], vec_values[5]);
+    CHECK(sp[5] == vec_values[5]);
   }
   {
     wpi::util::rotated_span<const int> sp{cvec_values.data(),
                                           cvec_values.size()};
-    EXPECT_EQ(sp[5], vec_values[5]);
+    CHECK(sp[5] == vec_values[5]);
   }
 }
 
-TEST(RotatedSpanTest, ConstructNonConst) {
+TEST_CASE("RotatedSpanTest ConstructNonConst", "[wpiutil]") {
   {
     wpi::util::rotated_span<int, 10> sp{sarr_values};
-    EXPECT_EQ(sp[5], sarr_values[5]);
+    CHECK(sp[5] == sarr_values[5]);
   }
   {
     wpi::util::rotated_span<int> sp{sarr_values};
-    EXPECT_EQ(sp[5], sarr_values[5]);
+    CHECK(sp[5] == sarr_values[5]);
   }
   {
     wpi::util::rotated_span<int, 10> sp{arr_values};
-    EXPECT_EQ(sp[5], arr_values[5]);
+    CHECK(sp[5] == arr_values[5]);
   }
   {
     wpi::util::rotated_span<int> sp{arr_values};
-    EXPECT_EQ(sp[5], arr_values[5]);
+    CHECK(sp[5] == arr_values[5]);
   }
   {
     wpi::util::rotated_span<int> sp{vec_values.begin(), vec_values.end()};
-    EXPECT_EQ(sp[5], vec_values[5]);
+    CHECK(sp[5] == vec_values[5]);
   }
   {
     wpi::util::rotated_span<int> sp{vec_values.data(), vec_values.size()};
-    EXPECT_EQ(sp[5], vec_values[5]);
+    CHECK(sp[5] == vec_values[5]);
   }
 }
 
-TEST(RotatedSpanTest, ConstructRotated) {
+TEST_CASE("RotatedSpanTest ConstructRotated", "[wpiutil]") {
   {
     constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values, 1};
     static_assert(sp[5] == cesarr_values[6]);
@@ -128,7 +132,7 @@ TEST(RotatedSpanTest, ConstructRotated) {
   }
 }
 
-TEST(RotatedSpanTest, Rotate) {
+TEST_CASE("RotatedSpanTest Rotate", "[wpiutil]") {
   constexpr wpi::util::rotated_span<const int, 10> sp{cesarr_values, 1};
   static_assert(sp[5] == cesarr_values[6]);
   static_assert(sp.rotate(2)[5] == cesarr_values[8]);
@@ -147,7 +151,7 @@ void const_unsized_func(wpi::util::rotated_span<const int>) {}
 void sized_func(wpi::util::rotated_span<int, 10>) {}
 void const_sized_func(wpi::util::rotated_span<const int, 10>) {}
 
-TEST(RotatedSpanTest, Implicit) {
+TEST_CASE("RotatedSpanTest Implicit", "[wpiutil]") {
   // unsized_func(csarr_values);  // error
   const_unsized_func(csarr_values);
   // sized_func(csarr_values);  // error
@@ -169,38 +173,38 @@ TEST(RotatedSpanTest, Implicit) {
   const_sized_func(arr_values);
 }
 
-TEST(RotatedSpanTest, IteratorConst) {
+TEST_CASE("RotatedSpanTest IteratorConst", "[wpiutil]") {
   wpi::util::rotated_span<const int> sp_sarr{csarr_values};
 
   // iterator
   int i = 0;
   for (auto& elem : sp_sarr) {
-    EXPECT_EQ(sarr_values[i], elem);
+    CHECK(sarr_values[i] == elem);
     ++i;
   }
 
   // const_iterator
   i = 0;
   for (const auto& elem : sp_sarr) {
-    EXPECT_EQ(sarr_values[i], elem);
+    CHECK(sarr_values[i] == elem);
     ++i;
   }
 }
 
-TEST(RotatedSpanTest, IteratorNonConst) {
+TEST_CASE("RotatedSpanTest IteratorNonConst", "[wpiutil]") {
   wpi::util::rotated_span<int> sp_sarr{sarr_values};
 
   // iterator
   int i = 0;
   for (auto& elem : sp_sarr) {
-    EXPECT_EQ(sarr_values[i], elem);
+    CHECK(sarr_values[i] == elem);
     ++i;
   }
 
   // const_iterator
   i = 0;
   for (const auto& elem : sp_sarr) {
-    EXPECT_EQ(sarr_values[i], elem);
+    CHECK(sarr_values[i] == elem);
     ++i;
   }
 }

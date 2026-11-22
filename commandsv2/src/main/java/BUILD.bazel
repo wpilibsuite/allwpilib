@@ -1,0 +1,37 @@
+load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_library")
+
+wpilib_java_library(
+    name = "commandsv2-java",
+    srcs = glob(["**/*.java"]) + ["//commandsv2:generated_java"],
+    exported_plugins = ["//javacPlugin:plugin"],
+    generated_java_srcs = ["//commandsv2:generated_java"],
+    javacopts = patch_module(
+        "wpilib.command2",
+        ["commandsv2/src/generated/main/java"],
+    ) + [
+        # Silence compiler warnings about trailing digits in module names
+        "-Xlint:-module",
+    ],
+    maven_artifact_name = "commandsv2-java",
+    maven_group_id = "org.wpilib.commandsv2",
+    plugins = ["//javacPlugin:plugin"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//hal/src/main/java",
+        "//ntcore/src/main/java",
+        "//telemetry/src/main/java",
+        "//tunables/src/main/java",
+        "//wpiannotations/src/main/java",
+        "//wpilibj/src/main/java",
+        "//wpimath/src/main/java",
+        "//wpinet/src/main/java",
+        "//wpiunits/src/main/java",
+        "//wpiutil/src/main/java",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":commandsv2-java",
+    visibility = ["//visibility:public"],
+)

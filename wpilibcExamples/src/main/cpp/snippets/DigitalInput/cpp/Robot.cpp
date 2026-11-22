@@ -6,7 +6,7 @@
 #include "wpi/hardware/discrete/DigitalInput.hpp"
 
 /**
- * Digital Input snippets for frc-docs.
+ * Digital Input snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/digital-input-software.html
  */
 class Robot : public wpi::TimedRobot {

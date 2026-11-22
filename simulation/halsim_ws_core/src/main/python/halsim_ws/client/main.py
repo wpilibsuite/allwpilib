@@ -5,7 +5,7 @@ from os.path import abspath, dirname, join
 logger = logging.getLogger("halsim_ws.client")
 
 
-def loadExtension():
+def load_extension():
     try:
         import hal
     except ImportError as e:
@@ -18,6 +18,6 @@ def loadExtension():
 
     root = join(abspath(dirname(__file__)), "lib")
     ext = join(root, os.listdir(root)[0])
-    retval = hal.loadOneExtension(ext)
+    retval = hal.load_one_extension(ext)
     if retval != 0:
         logger.warn("loading extension may have failed (error=%d)", retval)

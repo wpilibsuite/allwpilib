@@ -6,8 +6,6 @@
 
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "wpi/util/json.hpp"
 
 using namespace wpi::cs;

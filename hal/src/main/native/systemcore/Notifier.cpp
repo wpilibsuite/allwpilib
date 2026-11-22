@@ -7,6 +7,7 @@
 #include <atomic>
 #include <chrono>
 #include <functional>
+#include <limits>
 #include <memory>
 #include <string>
 #include <utility>
@@ -25,10 +26,12 @@
 #include "wpi/util/string.hpp"
 
 namespace {
+static constexpr int64_t NO_ALARM = std::numeric_limits<int64_t>::max();
+
 struct Notifier {
   std::string name;
-  std::atomic<uint64_t> alarmTime = UINT64_MAX;
-  uint64_t intervalTime = 0;
+  std::atomic<int64_t> alarmTime = NO_ALARM;
+  int64_t intervalTime = 0;
   std::atomic<int32_t> userOverrunCount = 0;
   int32_t overrunCount = 0;
   std::atomic_flag handlerSignaled{};
@@ -89,10 +92,10 @@ void NotifierThread::Main() {
 
     // Wait until next alarm
     const Alarm& alarm = m_alarmQueue.top();
-    uint64_t curTime = HAL_GetMonotonicTime();
+    int64_t curTime = HAL_GetMonotonicTime();
     if (alarm.notifier->alarmTime > curTime) {
       m_cond.wait_for(
-          lock, std::chrono::microseconds{alarm.notifier->alarmTime - curTime});
+          lock, std::chrono::nanoseconds{alarm.notifier->alarmTime - curTime});
     }
     if (!m_active) {
       break;
@@ -103,7 +106,7 @@ void NotifierThread::Main() {
 }
 
 void NotifierThread::ProcessAlarms() {
-  uint64_t curTime = HAL_GetMonotonicTime();
+  int64_t curTime = HAL_GetMonotonicTime();
 
   while (!m_alarmQueue.empty() &&
          m_alarmQueue.top().notifier->alarmTime <= curTime) {
@@ -127,7 +130,7 @@ void NotifierThread::ProcessAlarms() {
       m_alarmQueue.push(std::move(alarm));
     } else {
       // Disable one-shot alarm
-      notifier.alarmTime = UINT64_MAX;
+      notifier.alarmTime = NO_ALARM;
     }
 
     // If the last call was acknowledged, signal the handler
@@ -172,9 +175,9 @@ void HAL_DestroyNotifier(HAL_NotifierHandle notifierHandle) {
   thr->m_alarmQueue.remove({notifierHandle, notifier});
 }
 
-void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, uint64_t alarmTime,
-                          uint64_t intervalTime, HAL_Bool absolute,
-                          HAL_Bool ack, int32_t* status) {
+void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, int64_t alarmTime,
+                          int64_t intervalTime, HAL_Bool absolute, HAL_Bool ack,
+                          int32_t* status) {
   auto thr = notifierInstance->owner.GetThread();
   auto notifier = thr->m_handles.Get(notifierHandle);
   if (!notifier) {
@@ -190,7 +193,7 @@ void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, uint64_t alarmTime,
     alarmTime += HAL_GetMonotonicTime();
   }
 
-  uint64_t prevWakeup = UINT64_MAX;
+  int64_t prevWakeup = NO_ALARM;
   if (!thr->m_alarmQueue.empty()) {
     prevWakeup = thr->m_alarmQueue.top().notifier->alarmTime;
     thr->m_alarmQueue.remove({notifierHandle, notifier});
@@ -220,7 +223,7 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle, HAL_Bool ack,
   }
 
   thr->m_alarmQueue.remove({notifierHandle, notifier});
-  notifier->alarmTime = UINT64_MAX;
+  notifier->alarmTime = NO_ALARM;
 }
 
 void HAL_AcknowledgeNotifierAlarm(HAL_NotifierHandle notifierHandle,

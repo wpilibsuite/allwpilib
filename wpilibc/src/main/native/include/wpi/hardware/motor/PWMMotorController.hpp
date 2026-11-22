@@ -6,30 +6,27 @@
 
 #include <memory>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include "wpi/hal/SimDevice.hpp"
 #include "wpi/hardware/discrete/PWM.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/hardware/motor/MotorSafety.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/voltage.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
 /**
  * Common base class for all PWM Motor Controllers.
  */
-class PWMMotorController
-    : public MotorController,
-      public MotorSafety,
-      public wpi::util::Sendable,
-      public wpi::util::SendableHelper<PWMMotorController> {
+class PWMMotorController : public MotorController,
+                           public MotorSafety,
+                           public wpi::telemetry::TelemetryLoggable {
  public:
-  PWMMotorController(PWMMotorController&&) = default;
-  PWMMotorController& operator=(PWMMotorController&&) = default;
+  ~PWMMotorController();
+  PWMMotorController(PWMMotorController&& rhs);
+  PWMMotorController& operator=(PWMMotorController&& rhs);
 
   void SetThrottle(double throttle) override;
 
@@ -47,12 +44,6 @@ class PWMMotorController
   void SetInverted(bool isInverted) override;
 
   bool GetInverted() const override;
-
-  void Disable() override;
-
-  // MotorSafety interface
-  void StopMotor() override;
-  std::string GetDescription() const override;
 
   int GetChannel() const;
 
@@ -72,19 +63,31 @@ class PWMMotorController
    * @param leader The motor controller to follow.
    */
   void Follow(PWMMotorController& leader) & {
-    leader.m_nonowningFollowers.push_back(this);
+    leader.m_followers.push_back(this);
+    m_leaderFollowers = &leader.m_followers;
   }
 
+  void Unfollow() {
+    if (m_leaderFollowers) {
+      std::erase(*m_leaderFollowers, this);
+    }
+  }
+
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
+
  protected:
+  // MotorSafety interface
+  void StopMotor() override;
+  std::string GetDescription() const override;
+
   /**
    * Constructor for a PWM Motor Controller connected via PWM.
    *
-   * @param name Name to use for SendableRegistry
    * @param channel The SmartIO channel that the controller is attached to.
    */
-  PWMMotorController(std::string_view name, int channel);
-
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  explicit PWMMotorController(int channel);
 
   /// PWM instances for motor controller.
   PWM m_pwm;
@@ -99,9 +102,9 @@ class PWMMotorController
                  wpi::units::microsecond_t minPwm);
 
  private:
+  std::vector<PWMMotorController*>* m_leaderFollowers{nullptr};
   bool m_isInverted = false;
-  std::vector<PWMMotorController*> m_nonowningFollowers;
-  std::vector<std::unique_ptr<PWMMotorController>> m_owningFollowers;
+  std::vector<PWMMotorController*> m_followers;
 
   wpi::hal::SimDevice m_simDevice;
   wpi::hal::SimDouble m_simThrottle;

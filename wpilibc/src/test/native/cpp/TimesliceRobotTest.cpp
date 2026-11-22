@@ -9,7 +9,8 @@
 #include <atomic>
 #include <thread>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
@@ -17,14 +18,14 @@
 using namespace wpi;
 
 namespace {
-class TimesliceRobotTest : public ::testing::Test {
- protected:
-  void SetUp() override {
+class TimesliceRobotTest {
+ public:
+  TimesliceRobotTest() {
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
   }
 
-  void TearDown() override {
+  ~TimesliceRobotTest() {
     wpi::sim::ResumeTiming();
     wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
   }
@@ -40,7 +41,8 @@ class MockRobot : public TimesliceRobot {
 };
 }  // namespace
 
-TEST_F(TimesliceRobotTest, Schedule) {
+TEST_CASE_METHOD(TimesliceRobotTest, "TimesliceRobotTest Schedule",
+                 "[wpilibc]") {
   MockRobot robot;
 
   std::atomic<uint32_t> callbackCount1{0};
@@ -67,33 +69,34 @@ TEST_F(TimesliceRobotTest, Schedule) {
   // robotPeriodic()).
   wpi::sim::StepTiming(5_ms);
 
-  EXPECT_EQ(0u, robot.m_robotPeriodicCount);
-  EXPECT_EQ(0u, callbackCount1);
-  EXPECT_EQ(0u, callbackCount2);
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(0u == callbackCount1);
+  CHECK(0u == callbackCount2);
 
   // Step to 1.5 ms
   wpi::sim::StepTiming(1.5_ms);
-  EXPECT_EQ(0u, robot.m_robotPeriodicCount);
-  EXPECT_EQ(0u, callbackCount1);
-  EXPECT_EQ(0u, callbackCount2);
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(0u == callbackCount1);
+  CHECK(0u == callbackCount2);
 
   // Step to 2.25 ms
   wpi::sim::StepTiming(0.75_ms);
-  EXPECT_EQ(0u, robot.m_robotPeriodicCount);
-  EXPECT_EQ(1u, callbackCount1);
-  EXPECT_EQ(0u, callbackCount2);
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(1u == callbackCount1);
+  CHECK(0u == callbackCount2);
 
   // Step to 2.75 ms
   wpi::sim::StepTiming(0.5_ms);
-  EXPECT_EQ(0u, robot.m_robotPeriodicCount);
-  EXPECT_EQ(1u, callbackCount1);
-  EXPECT_EQ(1u, callbackCount2);
+  CHECK(0u == robot.m_robotPeriodicCount);
+  CHECK(1u == callbackCount1);
+  CHECK(1u == callbackCount2);
 
   robot.EndCompetition();
   robotThread.join();
 }
 
-TEST_F(TimesliceRobotTest, ScheduleOverrun) {
+TEST_CASE_METHOD(TimesliceRobotTest, "TimesliceRobotTest ScheduleOverrun",
+                 "[wpilibc]") {
   MockRobot robot;
 
   robot.Schedule([] {}, 0.5_ms);
@@ -101,7 +104,7 @@ TEST_F(TimesliceRobotTest, ScheduleOverrun) {
 
   // offset = 2 ms + 0.5 ms + 1 ms = 3.5 ms
   // 3.5 ms + 3 ms allocation = 6.5 ms > max of 5 ms
-  EXPECT_THROW(robot.Schedule([] {}, 3_ms), std::runtime_error);
+  CHECK_THROWS_AS(robot.Schedule([] {}, 3_ms), std::runtime_error);
 
   robot.EndCompetition();
 }

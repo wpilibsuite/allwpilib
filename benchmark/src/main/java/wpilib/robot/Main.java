@@ -4,6 +4,7 @@
 
 package wpilib.robot;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -15,17 +16,27 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Twist3d;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N5;
+import org.wpilib.math.numbers.N7;
 
 public class Main {
   /**
    * Main function.
    *
-   * @param args The (unused) arguments to the program.
+   * @param args optional JMH command-line arguments
    */
-  public static void main(String... args) throws RunnerException {
+  public static void main(String... args) throws IOException, RunnerException {
+    if (args.length > 0) {
+      org.openjdk.jmh.Main.main(args);
+      return;
+    }
+
     var opt =
         new OptionsBuilder()
-            .include(Main.class.getSimpleName())
+            .include("wpilib\\.robot\\..*")
             .addProfiler(GCProfiler.class)
             .forks(1)
             .warmupIterations(2)
@@ -39,9 +50,65 @@ public class Main {
 
   @Benchmark
   @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public void justNewThrowable() {
+    StackTraceGatheringBenchmark.run(false);
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public void newThrowableGetStackTrace() {
+    StackTraceGatheringBenchmark.run(true);
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
   public void cartPole() {
     CartPoleBenchmark.cartPole();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public Transform3d twist3dExp() {
+    return Geometry3dBenchmark.twist3dExp();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public Twist3d transform3dLog() {
+    return Geometry3dBenchmark.transform3dLog();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public Matrix<N5, N5> choleskyRankUpdate() {
+    return CholeskyRankUpdateBenchmark.update();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public Matrix<N5, N5> choleskyRankDowndate() {
+    return CholeskyRankUpdateBenchmark.downdate();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.MICROSECONDS)
+  public Matrix<N5, N5> dare() {
+    return DAREBenchmark.dare();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.MICROSECONDS)
+  public Matrix<N7, N7> matrixExp() {
+    return MatrixExpBenchmark.matrixExp();
   }
 
   @Benchmark

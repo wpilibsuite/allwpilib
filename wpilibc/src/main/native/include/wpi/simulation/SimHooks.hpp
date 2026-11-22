@@ -21,8 +21,10 @@ void SetRuntimeType(HAL_RuntimeType type);
 
 /**
  * Waits until the user program has started.
+ *
+ * @param waitForFirstNotifier wait for the first notifier alarm to be armed
  */
-void WaitForProgramStart();
+void WaitForProgramStart(bool waitForFirstNotifier = true);
 
 /**
  * Sets flag that indicates if the user program has started.

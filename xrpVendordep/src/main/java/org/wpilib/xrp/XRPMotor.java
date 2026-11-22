@@ -16,6 +16,8 @@ import org.wpilib.hardware.motor.MotorController;
  * XRPMotor.
  *
  * <p>A SimDevice based motor controller representing the motors on an XRP robot
+ *
+ * <p>This class is provided by the XRP VendorDep
  */
 @SuppressWarnings("removal")
 public class XRPMotor implements MotorController {
@@ -97,10 +99,5 @@ public class XRPMotor implements MotorController {
   @Override
   public boolean getInverted() {
     return m_simInverted != null && m_simInverted.get();
-  }
-
-  @Override
-  public void disable() {
-    setThrottle(0.0);
   }
 }

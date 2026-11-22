@@ -16,14 +16,14 @@ import org.wpilib.framework.TimedRobot;
  */
 public class Robot extends TimedRobot {
   private final Intake intake = new Intake();
-  private final Joystick joystick = new Joystick(Constants.kJoystickIndex);
+  private final Joystick joystick = new Joystick(Constants.JOYSTICK_INDEX);
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
     // Activate the intake while the trigger is held
     if (joystick.getTrigger()) {
-      intake.activate(IntakeConstants.kIntakeVelocity);
+      intake.activate(IntakeConstants.INTAKE_VELOCITY);
     } else {
       intake.activate(0);
     }

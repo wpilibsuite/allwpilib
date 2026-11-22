@@ -21,6 +21,8 @@ namespace wpi::xrp {
  *
  * This class is for the XRP onboard gyro, and will only work in
  * simulation/XRP mode. Only one instance of a XRPGyro is supported.
+ *
+ * This class is provided by the XRP VendorDep
  */
 class XRPGyro {
  public:

@@ -18,7 +18,9 @@ import org.wpilib.internal.PeriodicPriorityQueue;
  * <ul>
  *   <li>constructed when opmode selected on driver station
  *   <li>disabledPeriodic() called periodically as long as DS is disabled. Note this is not called
- *       on a set time interval (it does not use the same time interval as periodic())
+ *       on a set time interval (it does not use the same time interval as periodic()). If the
+ *       opmode is selected while the DS is already enabled, disabledPeriodic() is called exactly
+ *       once, immediately after construction and before start()
  *   <li>when DS transitions from disabled to enabled, start() is called once
  *   <li>while DS is enabled, periodic() is called periodically at {@link OpModeRobot#getPeriod},
  *       and additional periodic callbacks added via addPeriodic() are called periodically on their
@@ -43,6 +45,9 @@ public interface OpMode extends AutoCloseable {
   /**
    * This function is called periodically while the opmode is selected and the robot is disabled.
    * Code that should only run once when the opmode is selected should go in the opmode constructor.
+   *
+   * <p>If the opmode is selected while the robot is already enabled, this is called exactly once,
+   * right after construction and before {@link #start()}.
    */
   default void disabledPeriodic() {}
 
@@ -74,6 +79,11 @@ public interface OpMode extends AutoCloseable {
    * <p>This method allows opmodes to register arbitrary periodic callbacks with custom execution
    * intervals. The callbacks are executed by the robot framework at their scheduled times, in
    * addition to the primary {@link #periodic()} callback.
+   *
+   * <p><b>Registration timing</b>: The callbacks returned by this method are registered with the
+   * framework immediately when the OpMode is constructed and begin executing as soon as they are
+   * registered. To restrict execution to only when the robot is enabled, callbacks should include
+   * an if (RobotState.isEnabled()) check at the beginning.
    *
    * @return A set of custom callbacks to execute, or an empty set if no custom callbacks are
    *     needed. The default implementation returns an empty set.

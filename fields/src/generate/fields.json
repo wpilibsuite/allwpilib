@@ -1,0 +1,77 @@
+{
+  "defaultField": "FRC_2026_REBUILT_WELDED",
+  "fields": [
+    {
+      "resource": "frc/2018-powerup.json",
+      "enum": "FRC_2018_POWER_UP"
+    },
+    {
+      "resource": "frc/2019-deepspace.json",
+      "enum": "FRC_2019_DEEP_SPACE"
+    },
+    {
+      "resource": "frc/2020-infiniterecharge.json",
+      "enum": "FRC_2020_INFINITE_RECHARGE"
+    },
+    {
+      "resource": "frc/2021-infiniterecharge.json",
+      "enum": "FRC_2021_INFINITE_RECHARGE"
+    },
+    {
+      "resource": "frc/2021-barrelracingpath.json",
+      "enum": "FRC_2021_BARREL"
+    },
+    {
+      "resource": "frc/2021-bouncepath.json",
+      "enum": "FRC_2021_BOUNCE"
+    },
+    {
+      "resource": "frc/2021-galacticsearcha.json",
+      "enum": "FRC_2021_GALACTIC_SEARCH_A"
+    },
+    {
+      "resource": "frc/2021-galacticsearchb.json",
+      "enum": "FRC_2021_GALACTIC_SEARCH_B"
+    },
+    {
+      "resource": "frc/2021-slalompath.json",
+      "enum": "FRC_2021_SLALOM"
+    },
+    {
+      "resource": "frc/2022-rapidreact.json",
+      "enum": "FRC_2022_RAPID_REACT"
+    },
+    {
+      "resource": "frc/2023-chargedup.json",
+      "enum": "FRC_2023_CHARGED_UP"
+    },
+    {
+      "resource": "frc/2024-crescendo.json",
+      "enum": "FRC_2024_CRESCENDO"
+    },
+    {
+      "resource": "ftc/2024-2025-intothedeep.json",
+      "enum": "FTC_2024_2025_INTO_THE_DEEP"
+    },
+    {
+      "resource": "frc/2025-reefscape-welded.json",
+      "enum": "FRC_2025_REEFSCAPE_WELDED"
+    },
+    {
+      "resource": "frc/2025-reefscape-andymark.json",
+      "enum": "FRC_2025_REEFSCAPE_ANDY_MARK"
+    },
+    {
+      "resource": "ftc/2025-2026-decode.json",
+      "enum": "FTC_2025_2026_DECODE"
+    },
+    {
+      "resource": "frc/2026-rebuilt-welded.json",
+      "enum": "FRC_2026_REBUILT_WELDED"
+    },
+    {
+      "resource": "frc/2026-rebuilt-andymark.json",
+      "enum": "FRC_2026_REBUILT_ANDY_MARK"
+    }
+  ]
+}

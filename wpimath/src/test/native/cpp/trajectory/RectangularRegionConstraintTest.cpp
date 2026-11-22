@@ -4,9 +4,11 @@
 
 #include "wpi/math/trajectory/constraint/RectangularRegionConstraint.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/shape/Rectangle2d.hpp"
+#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
@@ -15,24 +17,24 @@
 
 using namespace wpi::math;
 
-TEST(RectangularRegionConstraintTest, Constraint) {
+TEST_CASE("RectangularRegionConstraintTest Constraint", "[wpimath]") {
   constexpr auto maxVelocity = 2_fps;
   constexpr wpi::math::Rectangle2d rectangle{{1_ft, 1_ft}, {5_ft, 27_ft}};
 
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   config.AddConstraint(RectangularRegionConstraint{
       rectangle, MaxVelocityConstraint{maxVelocity}});
-  auto trajectory = TestTrajectory::GetTrajectory(config);
+  auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   bool exceededConstraintOutsideRegion = false;
-  for (auto& point : trajectory.States()) {
+  for (auto& point : trajectory.Samples()) {
     if (rectangle.Contains(point.pose.Translation())) {
-      EXPECT_TRUE(wpi::units::math::abs(point.velocity) <
-                  maxVelocity + 0.05_mps);
-    } else if (wpi::units::math::abs(point.velocity) >=
+      CHECK(wpi::units::math::abs(point.ForwardVelocity()) <
+            maxVelocity + 0.05_mps);
+    } else if (wpi::units::math::abs(point.ForwardVelocity()) >=
                maxVelocity + 0.05_mps) {
       exceededConstraintOutsideRegion = true;
     }
   }
-  EXPECT_TRUE(exceededConstraintOutsideRegion);
+  CHECK(exceededConstraintOutsideRegion);
 }

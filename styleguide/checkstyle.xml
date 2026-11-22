@@ -176,7 +176,7 @@ module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
     </module>
     <module name="LambdaParameterName">
       <property name="format"
-        value="^(_?[a-zA-Z]|_?[a-z][a-zA-Z0-9]+)$" />
+        value="^(_|_?[a-zA-Z]|_?[a-z][a-zA-Z0-9]+)$" />
       <message key="name.invalidPattern"
         value="Lambda parameter name ''{0}'' must match pattern ''{1}''." />
     </module>

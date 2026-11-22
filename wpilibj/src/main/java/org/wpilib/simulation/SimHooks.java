@@ -20,9 +20,18 @@ public final class SimHooks {
     SimulatorJNI.setRuntimeType(type);
   }
 
-  /** Waits until the user program has started. */
+  /** Waits until the user program has started and the first notifier alarm has been armed. */
   public static void waitForProgramStart() {
-    SimulatorJNI.waitForProgramStart();
+    waitForProgramStart(true);
+  }
+
+  /**
+   * Waits until the user program has started.
+   *
+   * @param waitForFirstNotifier wait for the first notifier alarm to be armed
+   */
+  public static void waitForProgramStart(boolean waitForFirstNotifier) {
+    SimulatorJNI.waitForProgramStart(waitForFirstNotifier);
   }
 
   /**
@@ -91,7 +100,7 @@ public final class SimHooks {
    * @param delta the amount to advance in seconds
    */
   public static void stepTiming(double delta) {
-    SimulatorJNI.stepTiming((long) (delta * 1e6));
+    SimulatorJNI.stepTiming((long) (delta * 1e9));
   }
 
   /**
@@ -100,6 +109,6 @@ public final class SimHooks {
    * @param delta the amount to advance in seconds
    */
   public static void stepTimingAsync(double delta) {
-    SimulatorJNI.stepTimingAsync((long) (delta * 1e6));
+    SimulatorJNI.stepTimingAsync((long) (delta * 1e9));
   }
 }

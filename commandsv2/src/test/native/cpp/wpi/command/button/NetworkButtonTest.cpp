@@ -4,11 +4,10 @@
 
 #include "wpi/commands2/button/NetworkButton.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "../CommandTestBase.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/commands2/RunCommand.hpp"
 #include "wpi/commands2/WaitUntilCommand.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 
@@ -28,7 +27,8 @@ class NetworkButtonTest : public CommandTestBase {
   wpi::nt::NetworkTableInstance inst;
 };
 
-TEST_F(NetworkButtonTest, SetNetworkButton) {
+TEST_CASE_METHOD(NetworkButtonTest, "NetworkButtonTest SetNetworkButton",
+                 "[commandsv2][command]") {
   auto& scheduler = CommandScheduler::GetInstance();
   auto pub = inst.GetTable("TestTable")->GetBooleanTopic("Test").Publish();
   bool finished = false;
@@ -37,11 +37,11 @@ TEST_F(NetworkButtonTest, SetNetworkButton) {
 
   NetworkButton(inst, "TestTable", "Test").OnTrue(&command);
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  CHECK_FALSE(scheduler.IsScheduled(&command));
   pub.Set(true);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&command));
+  CHECK(scheduler.IsScheduled(&command));
   finished = true;
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  CHECK_FALSE(scheduler.IsScheduled(&command));
 }

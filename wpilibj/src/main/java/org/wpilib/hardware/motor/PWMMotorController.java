@@ -10,14 +10,12 @@ import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
 import org.wpilib.system.RobotController;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /** Common base class for all PWM Motor Controllers. */
-@SuppressWarnings("removal")
 public abstract class PWMMotorController extends MotorSafety
-    implements MotorController, Sendable, AutoCloseable {
+    implements MotorController, TelemetryLoggable, AutoCloseable {
   private boolean m_isInverted;
   private final ArrayList<PWMMotorController> m_followers = new ArrayList<>();
 
@@ -37,13 +35,10 @@ public abstract class PWMMotorController extends MotorSafety
   /**
    * Constructor.
    *
-   * @param name Name to use for SendableRegistry
    * @param channel The SmartIO channel that the controller is attached to.
    */
-  @SuppressWarnings("this-escape")
-  protected PWMMotorController(final String name, final int channel) {
-    m_pwm = new PWM(channel, false);
-    SendableRegistry.add(this, name, channel);
+  protected PWMMotorController(final int channel) {
+    m_pwm = new PWM(channel);
 
     m_simDevice = SimDevice.create("PWMMotorController", channel);
     if (m_simDevice != null) {
@@ -55,7 +50,6 @@ public abstract class PWMMotorController extends MotorSafety
   /** Free the resource associated with the PWM channel and set the value to 0. */
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     m_pwm.close();
 
     if (m_simDevice != null) {
@@ -199,7 +193,7 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   @Override
-  public void disable() {
+  protected void stopMotor() {
     m_pwm.setDisabled();
 
     if (m_simThrottle != null) {
@@ -207,17 +201,12 @@ public abstract class PWMMotorController extends MotorSafety
     }
 
     for (var follower : m_followers) {
-      follower.disable();
+      follower.stopMotor();
     }
   }
 
   @Override
-  public void stopMotor() {
-    disable();
-  }
-
-  @Override
-  public String getDescription() {
+  protected String getDescription() {
     return "PWM " + getChannel();
   }
 
@@ -260,9 +249,12 @@ public abstract class PWMMotorController extends MotorSafety
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Motor Controller");
-    builder.setActuator(true);
-    builder.addDoubleProperty("Value", this::getThrottle, this::setThrottle);
+  public void logTo(TelemetryTable table) {
+    table.log("Value", getThrottle());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Motor Controller";
   }
 }

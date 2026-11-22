@@ -2,11 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <format>
 #include <memory>
 #include <span>
 #include <string>
-
-#include <fmt/format.h>
 
 #define WPI_RAWFRAME_JNI
 #include "org_wpilib_vision_camera_CameraServerJNI.h"
@@ -208,7 +207,7 @@ static void ReportError(JNIEnv* env, CS_Status status) {
       msg = "telemetry not enabled";
       break;
     default: {
-      msgBuf = fmt::format("unknown error code={}", status);
+      msgBuf = std::format("unknown error code={}", status);
       msg = msgBuf;
       break;
     }

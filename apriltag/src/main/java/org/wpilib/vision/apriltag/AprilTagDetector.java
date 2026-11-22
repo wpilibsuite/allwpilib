@@ -11,6 +11,8 @@ import org.wpilib.vision.apriltag.jni.AprilTagJNI;
  * An AprilTag detector engine. This is expensive to set up and tear down, so most use cases should
  * only create one of these, add a family to it, set up any other configuration, and repeatedly call
  * Detect().
+ *
+ * <p>This class is provided by the AprilTag VendorDep
  */
 public class AprilTagDetector implements AutoCloseable {
   /** Detector configuration. */
@@ -52,7 +54,7 @@ public class AprilTagDetector implements AutoCloseable {
     /**
      * Debug mode. When true, the decoder writes a variety of debugging images to the current
      * working directory at various stages through the detection process. This is slow and should
-     * *not* be used on space-limited systems such as the RoboRIO. Default is disabled (false).
+     * *not* be used on space-limited systems such as the Systemcore. Default is disabled (false).
      */
     public boolean debug;
 

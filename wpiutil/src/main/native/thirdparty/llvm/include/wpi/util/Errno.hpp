@@ -13,6 +13,7 @@
 #ifndef WPIUTIL_WPI_ERRNO_H
 #define WPIUTIL_WPI_ERRNO_H
 
+#include "wpi/util/Compiler.hpp"
 #include <cerrno>
 #include <string>
 

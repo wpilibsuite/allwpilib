@@ -15,10 +15,8 @@
 
 #include "wpi/util/Compiler.hpp"
 #include <type_traits>
-#include <utility>
 
 namespace wpi::util {
-
 
 /// Metafunction that determines whether the given type is either an
 /// integral type or an enumeration type, including enum classes.
@@ -40,47 +38,28 @@ public:
 };
 
 /// If T is a pointer, just return it. If it is not, return T&.
-template<typename T, typename Enable = void>
-struct add_lvalue_reference_if_not_pointer { using type = T &; };
-
-template <typename T>
-struct add_lvalue_reference_if_not_pointer<
-    T, std::enable_if_t<std::is_pointer_v<T>>> {
-  using type = T;
+template <typename T> struct add_lvalue_reference_if_not_pointer {
+  using type = std::conditional_t<std::is_pointer_v<T>, T, T &>;
 };
 
 /// If T is a pointer to X, return a pointer to const X. If it is not,
 /// return const T.
-template<typename T, typename Enable = void>
-struct add_const_past_pointer { using type = const T; };
-
-template <typename T>
-struct add_const_past_pointer<T, std::enable_if_t<std::is_pointer_v<T>>> {
-  using type = const std::remove_pointer_t<T> *;
+template <typename T> struct add_const_past_pointer {
+  using type = std::conditional_t<std::is_pointer_v<T>,
+                                  const std::remove_pointer_t<T> *, const T>;
 };
 
-template <typename T, typename Enable = void>
-struct const_pointer_or_const_ref {
-  using type = const T &;
+template <typename T> struct const_pointer_or_const_ref {
+  using type =
+      std::conditional_t<std::is_pointer_v<T>,
+                         typename add_const_past_pointer<T>::type, const T &>;
 };
-template <typename T>
-struct const_pointer_or_const_ref<T, std::enable_if_t<std::is_pointer_v<T>>> {
-  using type = typename add_const_past_pointer<T>::type;
-};
-
-namespace detail {
-template<class T>
-union trivial_helper {
-    T t;
-};
-
-} // end namespace detail
 
 // https://stackoverflow.com/questions/55288555/c-check-if-statement-can-be-evaluated-constexpr
 template<class Lambda, int=(Lambda{}(), 0)>
 constexpr bool is_constexpr(Lambda) { return true; }
 constexpr bool is_constexpr(...) { return false; }
 
-} // end namespace wpi::util
+} // namespace wpi::util
 
 #endif // WPIUTIL_WPI_TYPE_TRAITS_H

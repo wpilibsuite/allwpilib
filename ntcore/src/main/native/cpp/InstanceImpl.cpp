@@ -11,7 +11,7 @@
 using namespace wpi::nt;
 
 std::atomic<int> InstanceImpl::s_default{-1};
-std::atomic<InstanceImpl*> InstanceImpl::s_instances[kNumInstances];
+std::atomic<InstanceImpl*> InstanceImpl::s_instances[NUM_INSTANCES];
 wpi::util::mutex InstanceImpl::s_mutex;
 InstanceImpl::Cleanup InstanceImpl::s_cleanup;
 
@@ -33,7 +33,7 @@ InstanceImpl* InstanceImpl::GetDefault() {
 }
 
 InstanceImpl* InstanceImpl::Get(int inst) {
-  if (inst < 0 || inst >= kNumInstances) {
+  if (inst < 0 || inst >= NUM_INSTANCES) {
     return nullptr;
   }
   return s_instances[inst];
@@ -67,7 +67,7 @@ int InstanceImpl::Alloc() {
 
 int InstanceImpl::AllocImpl() {
   int inst = 0;
-  for (; inst < kNumInstances; ++inst) {
+  for (; inst < NUM_INSTANCES; ++inst) {
     if (!s_instances[inst]) {
       s_instances[inst] = new InstanceImpl(inst);
       return inst;
@@ -77,12 +77,13 @@ int InstanceImpl::AllocImpl() {
 }
 
 void InstanceImpl::Destroy(int inst) {
-  std::scoped_lock lock(s_mutex);
-  if (inst < 0 || inst >= kNumInstances) {
-    return;
-  }
+  if (auto impl = Get(inst)) {
+    // If a callback is currently running, wait for it to complete.
+    impl->listenerStorage.Reset();
 
-  delete s_instances[inst].exchange(nullptr);
+    std::scoped_lock lock{s_mutex};
+    delete s_instances[inst].exchange(nullptr);
+  }
 }
 
 void InstanceImpl::StartLocal() {
@@ -158,7 +159,9 @@ void InstanceImpl::StartClient(std::string_view identity) {
           m_rtt2 = 0;
         }
       });
-  if (!m_servers.empty()) {
+  if (m_serverResolver) {
+    m_networkClient->SetServers(m_servers, *m_serverResolver);
+  } else if (!m_servers.empty()) {
     m_networkClient->SetServers(m_servers);
   }
   networkMode = NT_NET_MODE_CLIENT;
@@ -187,8 +190,20 @@ void InstanceImpl::SetServers(
     std::span<const std::pair<std::string, unsigned int>> servers) {
   std::scoped_lock lock{m_mutex};
   m_servers = {servers.begin(), servers.end()};
+  m_serverResolver.reset();
   if (m_networkClient) {
     m_networkClient->SetServers(servers);
+  }
+}
+
+void InstanceImpl::SetServers(
+    std::span<const std::pair<std::string, unsigned int>> servers,
+    const INetworkClient::ServerResolver& resolver) {
+  std::scoped_lock lock{m_mutex};
+  m_servers = {servers.begin(), servers.end()};
+  m_serverResolver = resolver;
+  if (m_networkClient) {
+    m_networkClient->SetServers(servers, resolver);
   }
 }
 
@@ -222,15 +237,20 @@ void InstanceImpl::AddTimeSyncListener(NT_Listener listener,
 }
 
 void InstanceImpl::Reset() {
+  // Listeners sometimes call NetworkTables APIs, so reset listenerStorage
+  // first. Note that if a listener callback is running, this will wait until
+  // that callback completes.
+  listenerStorage.Reset();
+
   std::scoped_lock lock{m_mutex};
   m_networkServer.reset();
   m_networkClient.reset();
   m_servers.clear();
+  m_serverResolver.reset();
   networkMode = NT_NET_MODE_NONE;
   m_serverTimeOffset.reset();
   m_rtt2 = 0;
 
-  listenerStorage.Reset();
   // connectionList should have been cleared by destroying networkClient/server
   localStorage.Reset();
 }

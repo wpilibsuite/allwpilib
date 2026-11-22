@@ -5,6 +5,7 @@
 #pragma once
 #include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/HIDDevice.hpp"
 
 namespace wpi::cmd {
 /**
@@ -27,5 +28,14 @@ class JoystickButton : public Trigger {
       : Trigger([joystick, buttonNumber] {
           return joystick->GetRawButton(buttonNumber);
         }) {}
+
+  /**
+   * Creates a JoystickButton that commands can be bound to.
+   *
+   * @param joystick The HID device on which the button is located.
+   * @param buttonNumber The number of the button on the HID device.
+   */
+  explicit JoystickButton(wpi::HIDDevice* joystick, int buttonNumber)
+      : JoystickButton(&joystick->GetHID(), buttonNumber) {}
 };
 }  // namespace wpi::cmd

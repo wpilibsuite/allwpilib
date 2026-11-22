@@ -1,5 +1,14 @@
 classes:
   wpi::math::ExponentialProfile:
+    doc_code_blocks:
+    - |
+      constraints = ExponentialProfile.Constraints.from_characteristics(MAX_V, kV, kA)
+      previous_profiled_reference = ExponentialProfile.State(initial_reference, 0.0)
+      profile = ExponentialProfile(constraints)
+    - |
+      previous_profiled_reference = profile.calculate(
+          time_since_previous_update, previous_profiled_reference, unprofiled_reference
+      )
     force_type_casters:
     - wpi::units::meters_per_second_t
     template_params:
@@ -29,12 +38,12 @@ classes:
             ignore: true
       MaxVelocity:
     inline_code: |
-      .def_static("fromStateSpace", [](Input_t maxInput, A_t a, B_t b) {
+      .def_static("from_state_space", [](Input_t maxInput, A_t a, B_t b) {
           return typename wpi::math::ExponentialProfile<Distance, Input>::Constraints(maxInput, a, b);
-        }, py::arg("maxInput"), py::arg("a"), py::arg("b"))
-      .def_static("fromCharacteristics", [](Input_t maxInput, kV_t kv, kA_t ka) {
+        }, py::arg("max_input"), py::arg("a"), py::arg("b"))
+      .def_static("from_characteristics", [](Input_t maxInput, kV_t kv, kA_t ka) {
           return typename wpi::math::ExponentialProfile<Distance, Input>::Constraints(maxInput, kv, ka);
-        }, py::arg("maxInput"), py::arg("kV"), py::arg("kA"))
+        }, py::arg("max_input"), py::arg("k_v"), py::arg("k_a"))
 
   wpi::math::ExponentialProfile::State:
     force_no_default_constructor: true
@@ -53,7 +62,7 @@ classes:
       IsFinished:
 
 templates:
-  ExponentialProfileMeterVolts:
+  ExponentialProfile:
     qualname: wpi::math::ExponentialProfile
     params:
     - wpi::units::meter

@@ -7,9 +7,9 @@
 #include <algorithm>
 
 #include "wpi/hal/AddressableLED.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/util/StackTrace.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -19,7 +19,7 @@ AddressableLED::AddressableLED(int channel) : m_channel{channel} {
   m_handle = HAL_InitializeAddressableLED(channel, stack.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_ReportUsage("IO", channel, "AddressableLED");
+  wpi::util::ReportUsage("IO", channel, "AddressableLED");
 }
 
 void AddressableLED::SetColorOrder(AddressableLED::ColorOrder order) {

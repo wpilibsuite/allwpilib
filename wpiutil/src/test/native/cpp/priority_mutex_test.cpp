@@ -8,7 +8,11 @@
 #include <condition_variable>
 #include <thread>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 namespace wpi::util {
 
@@ -49,16 +53,16 @@ void SetProcessorAffinity(int32_t core_id) {
   CPU_SET(core_id, &cpuset);
 
   pthread_t current_thread = pthread_self();
-  ASSERT_EQ(pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset),
-            0);
+  REQUIRE(pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset) ==
+          0);
 }
 
 void SetThreadRealtimePriorityOrDie(int32_t priority) {
   struct sched_param param;
   // Set real-time priority for this thread
   param.sched_priority = priority + sched_get_priority_min(SCHED_RR);
-  ASSERT_EQ(pthread_setschedparam(pthread_self(), SCHED_RR, &param), 0)
-      << ": Failed to set scheduler priority.";
+  UNSCOPED_INFO(": Failed to set scheduler priority.");
+  REQUIRE(pthread_setschedparam(pthread_self(), SCHED_RR, &param) == 0);
 }
 
 // This thread holds the mutex and spins until signaled to release it and stop.
@@ -222,45 +226,45 @@ class InversionTestRunner {
 // TODO: Fix roborio permissions to run as root.
 
 // Priority inversion test.
-TEST(MutexTest, DISABLED_PriorityInversion) {
+TEST_CASE("MutexTest DISABLED_PriorityInversion", "[wpiutil][.]") {
   InversionTestRunner<priority_mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
-  EXPECT_TRUE(runner.success());
+  CHECK(runner.success());
 }
 
 // Verify that the non-priority inversion mutex doesn't pass the test.
-TEST(MutexTest, DISABLED_StdMutexPriorityInversion) {
+TEST_CASE("MutexTest DISABLED_StdMutexPriorityInversion", "[wpiutil][.]") {
   InversionTestRunner<std::mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
-  EXPECT_FALSE(runner.success());
+  CHECK_FALSE(runner.success());
 }
 
 // Smoke test to make sure that mutexes lock and unlock.
-TEST(MutexTest, TryLock) {
+TEST_CASE("MutexTest TryLock", "[wpiutil]") {
   priority_mutex m;
   m.lock();
-  EXPECT_FALSE(m.try_lock());
+  CHECK_FALSE(m.try_lock());
   m.unlock();
-  EXPECT_TRUE(m.try_lock());
+  CHECK(m.try_lock());
 }
 
 // Priority inversion test.
-TEST(MutexTest, DISABLED_ReentrantPriorityInversion) {
+TEST_CASE("MutexTest DISABLED_ReentrantPriorityInversion", "[wpiutil][.]") {
   InversionTestRunner<priority_recursive_mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
-  EXPECT_TRUE(runner.success());
+  CHECK(runner.success());
 }
 
 // Smoke test to make sure that mutexes lock and unlock.
-TEST(MutexTest, ReentrantTryLock) {
+TEST_CASE("MutexTest ReentrantTryLock", "[wpiutil]") {
   priority_recursive_mutex m;
   m.lock();
-  EXPECT_TRUE(m.try_lock());
+  CHECK(m.try_lock());
   m.unlock();
-  EXPECT_TRUE(m.try_lock());
+  CHECK(m.try_lock());
 }
 
 #endif  // WPI_HAVE_PRIORITY_MUTEX

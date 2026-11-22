@@ -64,7 +64,7 @@ namespace Catch {
     class IStream;
     struct PathFilter;
 
-    class IConfig : public Detail::NonCopyable {
+    class IConfig : Detail::NonCopyable {
     public:
         virtual ~IConfig();
 

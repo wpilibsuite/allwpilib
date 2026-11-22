@@ -16,7 +16,7 @@
 namespace wpi::glass {
 class NTCommandSelectorModel : public CommandSelectorModel {
  public:
-  static constexpr const char* kType = "Command";
+  static constexpr const char* TYPE = "Command";
 
   explicit NTCommandSelectorModel(std::string_view path);
   NTCommandSelectorModel(wpi::nt::NetworkTableInstance inst,
@@ -28,7 +28,7 @@ class NTCommandSelectorModel : public CommandSelectorModel {
 
   void Update() override;
   bool Exists() override;
-  bool IsReadOnly() override { return false; }
+  bool IsReadOnly() override;
 
  private:
   wpi::nt::NetworkTableInstance m_inst;

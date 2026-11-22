@@ -22,6 +22,8 @@ namespace wpi::apriltag {
  * An AprilTag detector engine. This is expensive to set up and tear down, so
  * most use cases should only create one of these, add a family to it, set up
  * any other configuration, and repeatedly call Detect().
+ *
+ * This class is provided by the AprilTag VendorDep
  */
 class WPILIB_DLLEXPORT AprilTagDetector {
  public:
@@ -72,7 +74,7 @@ class WPILIB_DLLEXPORT AprilTagDetector {
      * Debug mode. When true, the decoder writes a variety of debugging images
      * to the current working directory at various stages through the detection
      * process. This is slow and should *not* be used on space-limited systems
-     * such as the RoboRIO. Default is disabled (false).
+     * such as the Systemcore. Default is disabled (false).
      */
     bool debug = false;
   };

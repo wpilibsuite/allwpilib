@@ -10,7 +10,7 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class for swerve drive odometry. Odometry allows you to track the robot's position on the field
@@ -32,7 +32,8 @@ public class SwerveDriveOdometry3d extends Odometry3d<SwerveModulePosition[]> {
    * Constructs a SwerveDriveOdometry3d object.
    *
    * @param kinematics The swerve drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param modulePositions The wheel positions reported by each module.
    * @param initialPose The starting position of the robot on the field.
    */
@@ -45,21 +46,22 @@ public class SwerveDriveOdometry3d extends Odometry3d<SwerveModulePosition[]> {
 
     m_numModules = modulePositions.length;
 
-    MathSharedStore.reportUsage("SwerveDriveOdometry3d", "");
+    UsageReporting.reportUsage("SwerveDriveOdometry3d", "");
   }
 
   /**
    * Constructs a SwerveDriveOdometry3d object with the default pose at the origin.
    *
    * @param kinematics The swerve drive kinematics for your drivetrain.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param modulePositions The wheel positions reported by each module.
    */
   public SwerveDriveOdometry3d(
       SwerveDriveKinematics kinematics,
       Rotation3d gyroAngle,
       SwerveModulePosition[] modulePositions) {
-    this(kinematics, gyroAngle, modulePositions, Pose3d.kZero);
+    this(kinematics, gyroAngle, modulePositions, Pose3d.ZERO);
   }
 
   @Override

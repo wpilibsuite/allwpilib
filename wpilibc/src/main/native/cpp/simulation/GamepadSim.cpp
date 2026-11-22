@@ -9,7 +9,8 @@
 using namespace wpi;
 using namespace wpi::sim;
 
-GamepadSim::GamepadSim(const wpi::Gamepad& joystick) : GenericHIDSim{joystick} {
+GamepadSim::GamepadSim(const wpi::Gamepad& joystick)
+    : GenericHIDSim{joystick.GetHID()} {
   SetAxesMaximumIndex(6);
   SetButtonsMaximumIndex(26);
   SetPOVsMaximumIndex(1);
@@ -53,20 +54,20 @@ void GamepadSim::SetRightTriggerAxis(double value) {
   SetAxis(Gamepad::Axis::RIGHT_TRIGGER, value);
 }
 
-void GamepadSim::SetSouthFaceButton(bool value) {
-  SetButton(Gamepad::Button::SOUTH_FACE, value);
+void GamepadSim::SetFaceDownButton(bool value) {
+  SetButton(Gamepad::Button::FACE_DOWN, value);
 }
 
-void GamepadSim::SetEastFaceButton(bool value) {
-  SetButton(Gamepad::Button::EAST_FACE, value);
+void GamepadSim::SetFaceRightButton(bool value) {
+  SetButton(Gamepad::Button::FACE_RIGHT, value);
 }
 
-void GamepadSim::SetWestFaceButton(bool value) {
-  SetButton(Gamepad::Button::WEST_FACE, value);
+void GamepadSim::SetFaceLeftButton(bool value) {
+  SetButton(Gamepad::Button::FACE_LEFT, value);
 }
 
-void GamepadSim::SetNorthFaceButton(bool value) {
-  SetButton(Gamepad::Button::NORTH_FACE, value);
+void GamepadSim::SetFaceUpButton(bool value) {
+  SetButton(Gamepad::Button::FACE_UP, value);
 }
 
 void GamepadSim::SetBackButton(bool value) {

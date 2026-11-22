@@ -1,0 +1,9 @@
+extra_includes:
+- pybind11/stl.h
+
+enums:
+  FieldId:
+functions:
+  GetFields:
+  GetFieldName:
+  GetField:

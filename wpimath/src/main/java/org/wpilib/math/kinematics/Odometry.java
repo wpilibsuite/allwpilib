@@ -23,10 +23,7 @@ public class Odometry<T> {
   private final Kinematics<T, ?, ?> m_kinematics;
   private Pose2d m_pose;
 
-  private Rotation2d m_gyroOffset;
-
-  // Always equal to m_poseMeters.getRotation()
-  private Rotation2d m_previousAngle;
+  private Rotation2d m_previousGyroAngle;
 
   private final T m_previousWheelPositions;
 
@@ -34,7 +31,8 @@ public class Odometry<T> {
    * Constructs an Odometry object.
    *
    * @param kinematics The kinematics of the drivebase.
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @param initialPose The starting position of the robot on the field.
    */
@@ -42,25 +40,23 @@ public class Odometry<T> {
       Kinematics<T, ?, ?> kinematics, Rotation2d gyroAngle, T wheelPositions, Pose2d initialPose) {
     m_kinematics = kinematics;
     m_pose = initialPose;
-    m_gyroOffset = gyroAngle.unaryMinus().rotateBy(m_pose.getRotation());
-    m_previousAngle = m_pose.getRotation();
+    m_previousGyroAngle = gyroAngle;
     m_previousWheelPositions = m_kinematics.copy(wheelPositions);
   }
 
   /**
    * Resets the robot's position on the field.
    *
-   * <p>The gyroscope angle does not need to be reset here on the user's robot code. The library
-   * automatically takes care of offsetting the gyro angle.
+   * <p>The gyroscope angle does not need to be reset here in the user's robot code.
    *
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @param pose The position on the field that your robot is at.
    */
   public void resetPosition(Rotation2d gyroAngle, T wheelPositions, Pose2d pose) {
     m_pose = pose;
-    m_gyroOffset = gyroAngle.unaryMinus().rotateBy(m_pose.getRotation());
-    m_previousAngle = m_pose.getRotation();
+    m_previousGyroAngle = gyroAngle;
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
   }
 
@@ -70,10 +66,7 @@ public class Odometry<T> {
    * @param pose The pose to reset to.
    */
   public void resetPose(Pose2d pose) {
-    m_gyroOffset =
-        m_gyroOffset.rotateBy(m_pose.getRotation().unaryMinus()).rotateBy(pose.getRotation());
     m_pose = pose;
-    m_previousAngle = m_pose.getRotation();
   }
 
   /**
@@ -91,9 +84,7 @@ public class Odometry<T> {
    * @param rotation The rotation to reset to.
    */
   public void resetRotation(Rotation2d rotation) {
-    m_gyroOffset = m_gyroOffset.rotateBy(m_pose.getRotation().unaryMinus()).rotateBy(rotation);
     m_pose = new Pose2d(m_pose.getTranslation(), rotation);
-    m_previousAngle = m_pose.getRotation();
   }
 
   /**
@@ -111,21 +102,19 @@ public class Odometry<T> {
    * that is calculated from forward kinematics, in addition to the current distance measurement at
    * each wheel.
    *
-   * @param gyroAngle The angle reported by the gyroscope.
+   * @param gyroAngle The angle reported by the gyroscope. This does not need to be offset to match
+   *     the robot's orientation on the field.
    * @param wheelPositions The current encoder readings.
    * @return The new pose of the robot.
    */
   public Pose2d update(Rotation2d gyroAngle, T wheelPositions) {
-    var angle = gyroAngle.rotateBy(m_gyroOffset);
-
     var twist = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
-    twist.dtheta = angle.minus(m_previousAngle).getRadians();
+    twist.dtheta = gyroAngle.minus(m_previousGyroAngle).getRadians();
 
-    var newPose = m_pose.plus(twist.exp());
+    m_pose = m_pose.plus(twist.exp());
 
     m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
-    m_previousAngle = angle;
-    m_pose = new Pose2d(newPose.getTranslation(), angle);
+    m_previousGyroAngle = gyroAngle;
 
     return m_pose;
   }

@@ -1,0 +1,13 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+cc_binary(
+    name = "enum_usb",
+    srcs = glob(["*.cpp"]),
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        "//cscore",
+        "//wpiutil",
+    ],
+)

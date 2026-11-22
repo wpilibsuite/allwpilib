@@ -15,7 +15,7 @@ public class GamepadSim extends GenericHIDSim {
    */
   @SuppressWarnings("this-escape")
   public GamepadSim(Gamepad joystick) {
-    super(joystick);
+    super(joystick.getHID());
     setAxesMaximumIndex(6);
     setButtonsMaximumIndex(26);
     setPOVsMaximumIndex(1);
@@ -109,39 +109,39 @@ public class GamepadSim extends GenericHIDSim {
   }
 
   /**
-   * Change the value of the South Face button on the controller.
+   * Change the value of the Face Down button on the controller.
    *
    * @param value the new value
    */
-  public void setSouthFaceButton(boolean value) {
-    setButton(Gamepad.Button.SOUTH_FACE, value);
+  public void setFaceDownButton(boolean value) {
+    setButton(Gamepad.Button.FACE_DOWN, value);
   }
 
   /**
-   * Change the value of the East Face button on the controller.
+   * Change the value of the Face Right button on the controller.
    *
    * @param value the new value
    */
-  public void setEastFaceButton(boolean value) {
-    setButton(Gamepad.Button.EAST_FACE, value);
+  public void setFaceRightButton(boolean value) {
+    setButton(Gamepad.Button.FACE_RIGHT, value);
   }
 
   /**
-   * Change the value of the West Face button on the controller.
+   * Change the value of the Face Left button on the controller.
    *
    * @param value the new value
    */
-  public void setWestFaceButton(boolean value) {
-    setButton(Gamepad.Button.WEST_FACE, value);
+  public void setFaceLeftButton(boolean value) {
+    setButton(Gamepad.Button.FACE_LEFT, value);
   }
 
   /**
-   * Change the value of the North Face button on the controller.
+   * Change the value of the Face Up button on the controller.
    *
    * @param value the new value
    */
-  public void setNorthFaceButton(boolean value) {
-    setButton(Gamepad.Button.NORTH_FACE, value);
+  public void setFaceUpButton(boolean value) {
+    setButton(Gamepad.Button.FACE_UP, value);
   }
 
   /**

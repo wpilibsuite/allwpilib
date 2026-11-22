@@ -4,6 +4,7 @@
 
 #include "wpi/math/geometry/Rotation3d.hpp"
 
+#include "wpi/math/geometry/Quaternion.hpp"
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json, const Rotation3d& rotation) {

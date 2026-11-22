@@ -1,0 +1,56 @@
+classes:
+  wpi::telemetry::TelemetryEntry:
+    methods:
+      TelemetryEntry:
+      IsDiscard:
+      KeepDuplicates:
+      SetProperty:
+      LogBoolean:
+      LogInt8:
+      LogInt16:
+      LogInt32:
+      LogInt64:
+      LogFloat:
+      LogDouble:
+      LogString:
+      LogBooleanArray:
+        overloads:
+          std::span<const bool>, int64_t:
+          std::span<const int>, int64_t:
+            ignore: true
+      LogInt16Array:
+      LogInt32Array:
+      LogInt64Array:
+      LogFloatArray:
+      LogDoubleArray:
+      LogStringArray:
+        overloads:
+          std::span<const std::string>, int64_t:
+          std::span<const std::string_view>, int64_t:
+            ignore: true
+      LogRaw:
+    trampoline_inline_code: |
+      void LogBooleanArray(std::span<const int> value,
+                           int64_t timestamp) override {
+        using LookupBase = typename PyTrampolineCfg::Base;
+        SEMIWRAP_OVERRIDE_PURE_NAME(TelemetryEntry, PYBIND11_TYPE(void),
+          LookupBase, "log_boolean_array", LogBooleanArray, value, timestamp);
+      }
+
+      void LogStringArray(std::span<const std::string_view> value,
+                          int64_t timestamp) override {
+        using LookupBase = typename PyTrampolineCfg::Base;
+        SEMIWRAP_OVERRIDE_PURE_NAME(TelemetryEntry, PYBIND11_TYPE(void),
+          LookupBase, "log_string_array", LogStringArray, value, timestamp);
+      }
+    inline_code: |
+      .def("log_boolean_array", static_cast<void (wpi::telemetry::TelemetryEntry::*)(
+             std::span<const int>, int64_t)>(
+             &wpi::telemetry::TelemetryEntry::LogBooleanArray),
+           py::arg("value"), py::arg("timestamp"), release_gil(),
+           py::doc("Logs a boolean array."))
+      .def("log_string_array", static_cast<void (wpi::telemetry::TelemetryEntry::*)(
+             std::span<const std::string_view>, int64_t)>(
+             &wpi::telemetry::TelemetryEntry::LogStringArray),
+           py::arg("value"), py::arg("timestamp"), release_gil(),
+           py::doc("Logs a String array."))

@@ -42,12 +42,12 @@ std::unique_ptr<CallbackStore> DriverStationSim::RegisterRobotModeCallback(
   return store;
 }
 
-HAL_RobotMode DriverStationSim::GetRobotMode() {
-  return HALSIM_GetDriverStationRobotMode();
+hal::RobotMode DriverStationSim::GetRobotMode() {
+  return static_cast<hal::RobotMode>(HALSIM_GetDriverStationRobotMode());
 }
 
-void DriverStationSim::SetRobotMode(HAL_RobotMode robotMode) {
-  HALSIM_SetDriverStationRobotMode(robotMode);
+void DriverStationSim::SetRobotMode(hal::RobotMode robotMode) {
+  HALSIM_SetDriverStationRobotMode(static_cast<HAL_RobotMode>(robotMode));
 }
 
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterEStopCallback(
@@ -111,13 +111,15 @@ DriverStationSim::RegisterAllianceStationIdCallback(NotifyCallback callback,
   return store;
 }
 
-HAL_AllianceStationID DriverStationSim::GetAllianceStationId() {
-  return HALSIM_GetDriverStationAllianceStationId();
+wpi::hal::AllianceStationID DriverStationSim::GetAllianceStationId() {
+  return static_cast<wpi::hal::AllianceStationID>(
+      HALSIM_GetDriverStationAllianceStationId());
 }
 
 void DriverStationSim::SetAllianceStationId(
-    HAL_AllianceStationID allianceStationId) {
-  HALSIM_SetDriverStationAllianceStationId(allianceStationId);
+    wpi::hal::AllianceStationID allianceStationId) {
+  HALSIM_SetDriverStationAllianceStationId(
+      static_cast<HAL_AllianceStationID>(allianceStationId));
 }
 
 std::unique_ptr<CallbackStore> DriverStationSim::RegisterMatchTimeCallback(
@@ -183,8 +185,9 @@ void DriverStationSim::SetSendError(bool shouldSend) {
     HALSIM_SetSendError(nullptr);
   } else {
     HALSIM_SetSendError([](HAL_Bool isError, int32_t errorCode,
-                           HAL_Bool isLVCode, const char* details,
-                           const char* location, const char* callStack,
+                           const struct WPI_String* details,
+                           const struct WPI_String* location,
+                           const struct WPI_String* callStack,
                            HAL_Bool printMsg) { return 0; });
   }
 }
@@ -193,7 +196,7 @@ void DriverStationSim::SetSendConsoleLine(bool shouldSend) {
   if (shouldSend) {
     HALSIM_SetSendConsoleLine(nullptr);
   } else {
-    HALSIM_SetSendConsoleLine([](const char* line) { return 0; });
+    HALSIM_SetSendConsoleLine([](const struct WPI_String* line) { return 0; });
   }
 }
 

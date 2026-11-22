@@ -17,6 +17,8 @@ namespace wpi::apriltag {
 
 /**
  * A detection of an AprilTag tag.
+ *
+ * This class is provided by the AprilTag VendorDep
  */
 class WPILIB_DLLEXPORT AprilTagDetection final {
  public:

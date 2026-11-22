@@ -93,6 +93,8 @@ import org.wpilib.units.measure.Time;
  *   }
  * }
  * }</pre>
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 @NoDiscard("Commands must be used! Did you mean to fork it or bind it to a trigger?")
 public interface Command {
@@ -130,6 +132,16 @@ public interface Command {
    * cleanup (for example, setting a motor to zero volts) and not do any complex looping logic here.
    */
   default void onCancel() {
+    // NOP by default
+  }
+
+  /**
+   * An optional lifecycle hook that can be implemented to execute some code whenever this command
+   * exits, regardless of exit condition (natural completion, cancellation, or interruption).
+   * Commands should be careful to do a single-shot cleanup (for example, setting a motor to zero
+   * volts) and not do any complex looping logic here.
+   */
+  default void onExit() {
     // NOP by default
   }
 

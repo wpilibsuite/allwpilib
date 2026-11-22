@@ -51,7 +51,7 @@ public final class NetworkTableValue {
   /**
    * Get the creation time of the value in local time.
    *
-   * @return The time, in the units returned by NetworkTablesJNI.now().
+   * @return The time, in nanoseconds.
    */
   public long getTime() {
     return m_time;
@@ -60,7 +60,7 @@ public final class NetworkTableValue {
   /**
    * Get the creation time of the value in server time.
    *
-   * @return The server time.
+   * @return The server time, in nanoseconds.
    */
   public long getServerTime() {
     return m_serverTime;
@@ -343,7 +343,7 @@ public final class NetworkTableValue {
    * Creates a boolean value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeBoolean(boolean value, long time) {
@@ -364,7 +364,7 @@ public final class NetworkTableValue {
    * Creates a long value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeInteger(long value, long time) {
@@ -385,7 +385,7 @@ public final class NetworkTableValue {
    * Creates a float value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeFloat(float value, long time) {
@@ -406,7 +406,7 @@ public final class NetworkTableValue {
    * Creates a double value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeDouble(double value, long time) {
@@ -427,7 +427,7 @@ public final class NetworkTableValue {
    * Creates a String value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeString(String value, long time) {
@@ -448,7 +448,7 @@ public final class NetworkTableValue {
    * Creates a byte[] value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeRaw(byte[] value, long time) {
@@ -469,7 +469,7 @@ public final class NetworkTableValue {
    * Creates a boolean[] value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeBooleanArray(boolean[] value, long time) {
@@ -490,7 +490,7 @@ public final class NetworkTableValue {
    * Creates a boolean[] value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeBooleanArray(Boolean[] value, long time) {
@@ -511,7 +511,7 @@ public final class NetworkTableValue {
    * Creates a long[] value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeIntegerArray(long[] value, long time) {
@@ -532,7 +532,7 @@ public final class NetworkTableValue {
    * Creates a long[] value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeIntegerArray(Long[] value, long time) {
@@ -553,7 +553,7 @@ public final class NetworkTableValue {
    * Creates a float[] value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeFloatArray(float[] value, long time) {
@@ -574,7 +574,7 @@ public final class NetworkTableValue {
    * Creates a float[] value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeFloatArray(Float[] value, long time) {
@@ -595,7 +595,7 @@ public final class NetworkTableValue {
    * Creates a double[] value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeDoubleArray(double[] value, long time) {
@@ -616,7 +616,7 @@ public final class NetworkTableValue {
    * Creates a double[] value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeDoubleArray(Double[] value, long time) {
@@ -637,7 +637,7 @@ public final class NetworkTableValue {
    * Creates a String[] value.
    *
    * @param value the value
-   * @param time the creation time to use (instead of the current time)
+   * @param time the creation time to use, in nanoseconds (instead of the current time)
    * @return The entry value
    */
   public static NetworkTableValue makeStringArray(String[] value, long time) {

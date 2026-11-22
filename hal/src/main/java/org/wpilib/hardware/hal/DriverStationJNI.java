@@ -246,10 +246,8 @@ public class DriverStationJNI extends JNIWrapper {
    * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
    * dispute ref calls or guarantee that a function will trigger before the match ends).
    *
-   * <p>When connected to the real field, this number only changes in full integer increments, and
-   * always counts down.
-   *
-   * <p>When the DS is in practice mode, this number is a floating point number, and counts down.
+   * <p>This number only changes in full integer increments and always counts down, both when
+   * connected to the real field and when the DS is in match mode.
    *
    * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
    *
@@ -283,7 +281,6 @@ public class DriverStationJNI extends JNIWrapper {
    *
    * @param isError true for error, false for warning
    * @param errorCode the error code
-   * @param isLVCode true for a LV error code, false for a standard error code
    * @param details the details of the error
    * @param location the file location of the error
    * @param callStack the callstack of the error
@@ -294,7 +291,6 @@ public class DriverStationJNI extends JNIWrapper {
   public static native int sendError(
       boolean isError,
       int errorCode,
-      boolean isLVCode,
       String details,
       String location,
       String callStack,
@@ -307,6 +303,17 @@ public class DriverStationJNI extends JNIWrapper {
    * @return the error code, or 0 for success
    */
   public static native int sendConsoleLine(String line);
+
+  /**
+   * Sends a program crash to the driver station.
+   *
+   * @param details the details of the crash
+   * @param location the file location of the crash
+   * @param callStack the callstack of the crash
+   * @return the error code, or 0 for success
+   * @see "HAL_SendProgramCrash"
+   */
+  public static native int sendProgramCrash(String details, String location, String callStack);
 
   /**
    * Refresh the DS control word.
@@ -336,6 +343,14 @@ public class DriverStationJNI extends JNIWrapper {
    * @return true if outputs are enabled
    */
   public static native boolean getOutputsActive();
+
+  /**
+   * Writes ANSI text to the display.
+   *
+   * @param data the ANSI text to write
+   * @see "HAL_WriteDisplayAnsi"
+   */
+  public static native void writeDisplayAnsi(String data);
 
   /** Utility class. */
   private DriverStationJNI() {}

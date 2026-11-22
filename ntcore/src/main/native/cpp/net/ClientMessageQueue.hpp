@@ -33,7 +33,7 @@ template <size_t MaxValueSize, bool IsMutexed>
 class ClientMessageQueueImpl final : public ClientMessageHandler,
                                      public ClientMessageQueue {
  public:
-  static constexpr size_t kBlockSize = 64;
+  static constexpr size_t BLOCK_SIZE = 64;
 
   explicit ClientMessageQueueImpl(wpi::util::Logger& logger)
       : m_logger{logger} {}
@@ -106,20 +106,21 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
   void ClientSetValue(int pubuid, const Value& value) final {
     std::scoped_lock lock{m_mutex};
     if constexpr (MaxValueSize != 0) {
-      m_valueSize.size += sizeof(ClientMessage) + value.size();
-      if (m_valueSize.size > MaxValueSize) {
+      size_t addedSize = sizeof(ClientMessage) + value.size();
+      if (m_valueSize.size + addedSize > MaxValueSize) {
         if (!m_valueSize.errored) {
           WPI_ERROR(m_logger, "NT: dropping value set due to memory limits");
           m_valueSize.errored = true;
         }
         return;  // avoid potential out of memory
       }
+      m_valueSize.size += addedSize;
     }
     m_queue.enqueue(ClientMessage{ClientValueMsg{pubuid, value}});
   }
 
  private:
-  wpi::util::FastQueue<ClientMessage, kBlockSize> m_queue{kBlockSize - 1};
+  wpi::util::FastQueue<ClientMessage, BLOCK_SIZE> m_queue{BLOCK_SIZE - 1};
   wpi::util::Logger& m_logger;
 
   class NoMutex {

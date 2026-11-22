@@ -365,7 +365,7 @@
     },
     "jni": {
       "jtype": "jobjectArray",
-      "jtypestr": "[Ljava/lang/Object;",
+      "jtypestr": "[Ljava/lang/String;",
       "JavaObject": true,
       "FromJavaBegin": "FromJavaStringArray(env, ",
       "FromJavaEnd": ")",

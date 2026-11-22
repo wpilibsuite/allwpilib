@@ -11,12 +11,11 @@
 #include "wpi/glass/hardware/Gyro.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/nt/StringTopic.hpp"
 
 namespace wpi::glass {
 class NTGyroModel : public GyroModel {
  public:
-  static constexpr const char* kType = "Gyro";
+  static constexpr const char* TYPE = "Gyro";
 
   explicit NTGyroModel(std::string_view path);
   NTGyroModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
@@ -34,7 +33,6 @@ class NTGyroModel : public GyroModel {
  private:
   wpi::nt::NetworkTableInstance m_inst;
   wpi::nt::DoubleSubscriber m_angle;
-  wpi::nt::StringSubscriber m_name;
 
   DoubleSource m_angleData;
   std::string m_nameValue;

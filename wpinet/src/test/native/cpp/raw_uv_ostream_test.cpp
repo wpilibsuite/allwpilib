@@ -4,64 +4,64 @@
 
 #include "wpi/net/raw_uv_ostream.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 namespace wpi::net {
 
-TEST(RawUvOstreamTest, BasicWrite) {
+TEST_CASE("RawUvOstreamTest BasicWrite", "[uv][ostream]") {
   wpi::util::SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os(bufs, 1024);
   os << "12";
   os << "34";
-  ASSERT_EQ(bufs.size(), 1u);
-  ASSERT_EQ(bufs[0].len, 4u);
-  ASSERT_EQ(bufs[0].base[0], '1');
-  ASSERT_EQ(bufs[0].base[1], '2');
-  ASSERT_EQ(bufs[0].base[2], '3');
-  ASSERT_EQ(bufs[0].base[3], '4');
+  REQUIRE(bufs.size() == 1u);
+  REQUIRE(bufs[0].len == 4u);
+  REQUIRE(bufs[0].base[0] == '1');
+  REQUIRE(bufs[0].base[1] == '2');
+  REQUIRE(bufs[0].base[2] == '3');
+  REQUIRE(bufs[0].base[3] == '4');
 
   for (auto& buf : bufs) {
     buf.Deallocate();
   }
 }
 
-TEST(RawUvOstreamTest, BoundaryWrite) {
+TEST_CASE("RawUvOstreamTest BoundaryWrite", "[uv][ostream]") {
   wpi::util::SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os(bufs, 4);
-  ASSERT_EQ(bufs.size(), 0u);
+  REQUIRE(bufs.size() == 0u);
   os << "12";
-  ASSERT_EQ(bufs.size(), 1u);
+  REQUIRE(bufs.size() == 1u);
   os << "34";
-  ASSERT_EQ(bufs.size(), 1u);
+  REQUIRE(bufs.size() == 1u);
   os << "56";
-  ASSERT_EQ(bufs.size(), 2u);
+  REQUIRE(bufs.size() == 2u);
 
   for (auto& buf : bufs) {
     buf.Deallocate();
   }
 }
 
-TEST(RawUvOstreamTest, LargeWrite) {
+TEST_CASE("RawUvOstreamTest LargeWrite", "[uv][ostream]") {
   wpi::util::SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os(bufs, 4);
   os << "123456";
-  ASSERT_EQ(bufs.size(), 2u);
-  ASSERT_EQ(bufs[1].len, 2u);
-  ASSERT_EQ(bufs[1].base[0], '5');
+  REQUIRE(bufs.size() == 2u);
+  REQUIRE(bufs[1].len == 2u);
+  REQUIRE(bufs[1].base[0] == '5');
 
   for (auto& buf : bufs) {
     buf.Deallocate();
   }
 }
 
-TEST(RawUvOstreamTest, PrevDataWrite) {
+TEST_CASE("RawUvOstreamTest PrevDataWrite", "[uv][ostream]") {
   wpi::util::SmallVector<uv::Buffer, 4> bufs;
   bufs.emplace_back(uv::Buffer::Allocate(1024));
   raw_uv_ostream os(bufs, 1024);
   os << "1234";
-  ASSERT_EQ(bufs.size(), 2u);
-  ASSERT_EQ(bufs[0].len, 1024u);
-  ASSERT_EQ(bufs[1].len, 4u);
+  REQUIRE(bufs.size() == 2u);
+  REQUIRE(bufs[0].len == 1024u);
+  REQUIRE(bufs[1].len == 4u);
 
   for (auto& buf : bufs) {
     buf.Deallocate();

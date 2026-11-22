@@ -193,7 +193,7 @@ int main(int argc, char* argv[]) {
   } else {
     wpi::util::print("Setting up NetworkTables client for team {}\n", team);
     ntinst.StartClient("multicameraserver");
-    ntinst.SetServerTeam(team);
+    ntinst.SetServerTeam(std::to_string(team));
   }
 
   // start cameras

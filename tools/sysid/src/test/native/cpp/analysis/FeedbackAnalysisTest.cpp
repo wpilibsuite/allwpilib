@@ -4,169 +4,170 @@
 
 #include "wpi/sysid/analysis/FeedbackAnalysis.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
 
-TEST(FeedbackAnalysisTest, VelocitySystem1) {
+TEST_CASE("FeedbackAnalysisTest VelocitySystem1", "[sysid]") {
   auto Kv = 3.060;
   auto Ka = 0.327;
 
   sysid::LQRParameters params{1, 1.5, 7};
 
-  auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(
-      sysid::presets::kDefault, params, Kv, Ka);
+  auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(sysid::presets::DEFAULT,
+                                                        params, Kv, Ka);
 
-  EXPECT_NEAR(Kp, 2.11, 0.05);
-  EXPECT_NEAR(Kd, 0.00, 0.05);
+  CHECK(Kp == Catch::Approx(2.11).margin(0.05));
+  CHECK(Kd == Catch::Approx(0.00).margin(0.05));
 }
 
-TEST(FeedbackAnalysisTest, VelocitySystem2) {
+TEST_CASE("FeedbackAnalysisTest VelocitySystem2", "[sysid]") {
   auto Kv = 0.0693;
   auto Ka = 0.1170;
 
   sysid::LQRParameters params{1, 1.5, 7};
 
-  auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(
-      sysid::presets::kDefault, params, Kv, Ka);
+  auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(sysid::presets::DEFAULT,
+                                                        params, Kv, Ka);
 
-  EXPECT_NEAR(Kp, 3.11, 0.05);
-  EXPECT_NEAR(Kd, 0.00, 0.05);
+  CHECK(Kp == Catch::Approx(3.11).margin(0.05));
+  CHECK(Kd == Catch::Approx(0.00).margin(0.05));
 }
 
-TEST(FeedbackAnalysisTest, VelocitySystemWithSmallKa) {
+TEST_CASE("FeedbackAnalysisTest VelocitySystemWithSmallKa", "[sysid]") {
   auto Kv = 3.060;
   auto Ka = 0.0;
 
   sysid::LQRParameters params{1, 1.5, 7};
 
-  auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(
-      sysid::presets::kDefault, params, Kv, Ka);
+  auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(sysid::presets::DEFAULT,
+                                                        params, Kv, Ka);
 
-  EXPECT_NEAR(Kp, 0.00, 0.05);
-  EXPECT_NEAR(Kd, 0.00, 0.05);
+  CHECK(Kp == Catch::Approx(0.00).margin(0.05));
+  CHECK(Kd == Catch::Approx(0.00).margin(0.05));
 }
 
-TEST(FeedbackAnalysisTest, VelocityConversion) {
+TEST_CASE("FeedbackAnalysisTest VelocityConversion", "[sysid]") {
   auto Kv = 0.0693;
   auto Ka = 0.1170;
 
   sysid::LQRParameters params{1, 1.5, 7};
 
   auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(
-      sysid::presets::kDefault, params, Kv, Ka, 3.0 * 1023);
+      sysid::presets::DEFAULT, params, Kv, Ka, 3.0 * 1023);
 
   // This should have the same Kp as the test above, but scaled by a factor of 3
   // * 1023.
-  EXPECT_NEAR(Kp, 3.11 / (3 * 1023), 0.005);
-  EXPECT_NEAR(Kd, 0.00, 0.05);
+  CHECK(Kp == Catch::Approx(3.11 / (3 * 1023)).margin(0.005));
+  CHECK(Kd == Catch::Approx(0.00).margin(0.05));
 }
 
-TEST(FeedbackAnalysisTest, VelocityCTRE) {
+TEST_CASE("FeedbackAnalysisTest VelocityCTRE", "[sysid]") {
   auto Kv = 1.97;
   auto Ka = 0.179;
 
   sysid::LQRParameters params{1, 1.5, 7};
 
-  auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(sysid::presets::kCTREv5,
+  auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(sysid::presets::CTRE_V5,
                                                         params, Kv, Ka);
 
-  EXPECT_NEAR(Kp, 259.21276731541178, 0.00005);
-  EXPECT_NEAR(Kd, 0.00, 0.05);
+  CHECK(Kp == Catch::Approx(259.21276731541178).margin(0.00005));
+  CHECK(Kd == Catch::Approx(0.00).margin(0.05));
 }
 
-TEST(FeedbackAnalysisTest, VelocityCTREConversion) {
+TEST_CASE("FeedbackAnalysisTest VelocityCTREConversion", "[sysid]") {
   auto Kv = 1.97;
   auto Ka = 0.179;
 
   sysid::LQRParameters params{1, 1.5, 7};
 
-  auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(sysid::presets::kCTREv5,
+  auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(sysid::presets::CTRE_V5,
                                                         params, Kv, Ka, 3.0);
 
   // This should have the same Kp as the test above, but scaled by a factor
   // of 3.
-  EXPECT_NEAR(Kp, 259.21276731541178 / 3, 0.00005);
-  EXPECT_NEAR(Kd, 0.00, 0.05);
+  CHECK(Kp == Catch::Approx(259.21276731541178 / 3).margin(0.00005));
+  CHECK(Kd == Catch::Approx(0.00).margin(0.05));
 }
 
-TEST(FeedbackAnalysisTest, VelocityREV) {
+TEST_CASE("FeedbackAnalysisTest VelocityREV", "[sysid]") {
   auto Kv = 1.97;
   auto Ka = 0.179;
 
   sysid::LQRParameters params{1, 1.5, 7};
 
   auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(
-      sysid::presets::kREVNEOBuiltIn, params, Kv, Ka);
+      sysid::presets::REV_NEO_BUILT_IN, params, Kv, Ka);
 
-  EXPECT_NEAR(Kp, 0.00241, 0.005);
-  EXPECT_NEAR(Kd, 0.00, 0.05);
+  CHECK(Kp == Catch::Approx(0.00241).margin(0.005));
+  CHECK(Kd == Catch::Approx(0.00).margin(0.05));
 }
 
-TEST(FeedbackAnalysisTest, VelocityREVConversion) {
+TEST_CASE("FeedbackAnalysisTest VelocityREVConversion", "[sysid]") {
   auto Kv = 1.97;
   auto Ka = 0.179;
 
   sysid::LQRParameters params{1, 1.5, 7};
 
   auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(
-      sysid::presets::kREVNEOBuiltIn, params, Kv, Ka, 3.0);
+      sysid::presets::REV_NEO_BUILT_IN, params, Kv, Ka, 3.0);
 
   // This should have the same Kp as the test above, but scaled by a factor
   // of 3.
-  EXPECT_NEAR(Kp, 0.00241 / 3, 0.005);
-  EXPECT_NEAR(Kd, 0.00, 0.05);
+  CHECK(Kp == Catch::Approx(0.00241 / 3).margin(0.005));
+  CHECK(Kd == Catch::Approx(0.00).margin(0.05));
 }
 
-TEST(FeedbackAnalysisTest, Position) {
+TEST_CASE("FeedbackAnalysisTest Position", "[sysid]") {
   auto Kv = 3.060;
   auto Ka = 0.327;
 
   sysid::LQRParameters params{1, 1.5, 7};
 
-  auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(
-      sysid::presets::kDefault, params, Kv, Ka);
+  auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(sysid::presets::DEFAULT,
+                                                        params, Kv, Ka);
 
-  EXPECT_NEAR(Kp, 6.41, 0.05);
-  EXPECT_NEAR(Kd, 2.48, 0.05);
+  CHECK(Kp == Catch::Approx(6.41).margin(0.05));
+  CHECK(Kd == Catch::Approx(2.48).margin(0.05));
 }
 
-TEST(FeedbackAnalysisTest, PositionWithSmallKa) {
+TEST_CASE("FeedbackAnalysisTest PositionWithSmallKa", "[sysid]") {
   auto Kv = 3.060;
   auto Ka = 1e-10;
 
   sysid::LQRParameters params{1, 1.5, 7};
 
-  auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(
-      sysid::presets::kDefault, params, Kv, Ka);
+  auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(sysid::presets::DEFAULT,
+                                                        params, Kv, Ka);
 
-  EXPECT_NEAR(Kp, 19.97, 0.05);
-  EXPECT_NEAR(Kd, 0.00, 0.05);
+  CHECK(Kp == Catch::Approx(19.97).margin(0.05));
+  CHECK(Kd == Catch::Approx(0.00).margin(0.05));
 }
 
-TEST(FeedbackAnalysisTest, PositionWithLatencyCompensation) {
+TEST_CASE("FeedbackAnalysisTest PositionWithLatencyCompensation", "[sysid]") {
   auto Kv = 3.060;
   auto Ka = 0.327;
 
   sysid::LQRParameters params{1, 1.5, 7};
-  sysid::FeedbackControllerPreset preset{sysid::presets::kDefault};
+  sysid::FeedbackControllerPreset preset{sysid::presets::DEFAULT};
 
   preset.measurementDelay = 10_ms;
   auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(preset, params, Kv, Ka);
 
-  EXPECT_NEAR(Kp, 5.92, 0.05);
-  EXPECT_NEAR(Kd, 2.12, 0.05);
+  CHECK(Kp == Catch::Approx(5.92).margin(0.05));
+  CHECK(Kd == Catch::Approx(2.12).margin(0.05));
 }
 
-TEST(FeedbackAnalysisTest, PositionREV) {
+TEST_CASE("FeedbackAnalysisTest PositionREV", "[sysid]") {
   auto Kv = 3.060;
   auto Ka = 0.327;
 
   sysid::LQRParameters params{1, 1.5, 7};
 
   auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(
-      sysid::presets::kREVNEOBuiltIn, params, Kv, Ka);
+      sysid::presets::REV_NEO_BUILT_IN, params, Kv, Ka);
 
-  EXPECT_NEAR(Kp, 0.30202, 0.05);
-  EXPECT_NEAR(Kd, 48.518, 0.05);
+  CHECK(Kp == Catch::Approx(0.30202).margin(0.05));
+  CHECK(Kd == Catch::Approx(48.518).margin(0.05));
 }

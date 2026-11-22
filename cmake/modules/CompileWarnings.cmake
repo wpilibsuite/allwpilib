@@ -8,7 +8,7 @@ macro(wpilib_target_warnings target)
             -Wformat=2
             ${WPILIB_TARGET_WARNINGS}
         )
-        if(NOT NO_WERROR)
+        if(NOT WPILIB_NO_WERROR)
             set(WARNING_FLAGS ${WARNING_FLAGS} -Werror)
         endif()
 
@@ -20,41 +20,21 @@ macro(wpilib_target_warnings target)
             /wd4251
             /wd4267
             /wd4324
+            /wd4996
             /D_CRT_SECURE_NO_WARNINGS
+            /D_CRT_SECURE_NO_DEPRECATE
             ${WPILIB_TARGET_WARNINGS}
         )
-        if(NOT NO_WERROR)
+        if(NOT WPILIB_NO_WERROR)
             set(WARNING_FLAGS ${WARNING_FLAGS} /WX)
         endif()
 
         target_compile_options(${target} PRIVATE ${WARNING_FLAGS})
     endif()
 
-    # Suppress C++-specific OpenCV warning; C compiler rejects it with an error
-    # https://github.com/opencv/opencv/issues/20269
-    if(UNIX AND NOT APPLE)
-        target_compile_options(
-            ${target}
-            PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-enum-enum-conversion>
-        )
-    elseif(UNIX AND APPLE)
-        target_compile_options(
-            ${target}
-            PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-anon-enum-enum-conversion>
-        )
-    endif()
-
-    # Suppress warning "enumeration types with a fixed underlying type are a
-    # Clang extension"
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT EMSCRIPTEN)
-        if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 20.0)
-            target_compile_options(
-                ${target}
-                PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-fixed-enum-extension>
-            )
-        else()
-            target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-c23-extensions>)
-        endif()
+    # Suppress -Warray-bounds
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-array-bounds>)
     endif()
 
     # Compress debug info with GCC

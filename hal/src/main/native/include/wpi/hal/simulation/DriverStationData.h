@@ -11,6 +11,10 @@
 #include "wpi/hal/simulation/NotifyListener.h"
 #include "wpi/util/string.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void (*HAL_OpModeOptionsCallback)(const char* name, void* param,
                                           const HAL_OpModeOption* opmodes,
                                           int32_t count);
@@ -38,10 +42,6 @@ typedef void (*HAL_MatchInfoCallback)(const char* name, void* param,
                                       const HAL_MatchInfo* info);
 typedef void (*HAL_GameDataCallback)(const char* name, void* param,
                                      const HAL_GameData* gameData);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 void HALSIM_ResetDriverStationData(void);
 

@@ -42,8 +42,6 @@ from ._ntcore import (
     IntegerTopic,
     LogMessage,
     MultiSubscriber,
-    NTSendable,
-    NTSendableBuilder,
     NetworkTable,
     NetworkTableEntry,
     NetworkTableInstance,
@@ -134,8 +132,6 @@ __all__ = [
     "IntegerTopic",
     "LogMessage",
     "MultiSubscriber",
-    "NTSendable",
-    "NTSendableBuilder",
     "NetworkTable",
     "NetworkTableEntry",
     "NetworkTableInstance",
@@ -185,9 +181,9 @@ __all__ = [
     "ValueEventData",
 ]
 
-from ._ntcore import _now, _setNow
+from ._ntcore import _now, _set_now
 
-__all__ += ["_now", "_setNow"]
+__all__ += ["_now", "_set_now"]
 
 try:
     from .version import version as __version__

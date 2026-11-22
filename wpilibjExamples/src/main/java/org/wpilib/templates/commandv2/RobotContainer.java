@@ -23,7 +23,7 @@ public class RobotContainer {
   private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 
   private final CommandGamepad driverController =
-      new CommandGamepad(OperatorConstants.kDriverControllerPort);
+      new CommandGamepad(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -42,9 +42,9 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     new Trigger(exampleSubsystem::exampleCondition).onTrue(new ExampleCommand(exampleSubsystem));
 
-    // Schedule `exampleMethodCommand` when the Gamepad's east face button is pressed,
+    // Schedule `exampleMethodCommand` when the Gamepad's right face button is pressed,
     // cancelling on release.
-    driverController.eastFace().whileTrue(exampleSubsystem.exampleMethodCommand());
+    driverController.faceRight().whileTrue(exampleSubsystem.exampleMethodCommand());
   }
 
   /**

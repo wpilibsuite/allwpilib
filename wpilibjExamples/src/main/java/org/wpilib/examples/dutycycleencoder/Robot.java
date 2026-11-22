@@ -7,7 +7,7 @@ package org.wpilib.examples.dutycycleencoder;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.rotation.DutyCycleEncoder;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /** This example shows how to use a duty cycle encoder for devices such as an arm or elevator. */
 public class Robot extends TimedRobot {
@@ -64,9 +64,9 @@ public class Robot extends TimedRobot {
     double shiftedOutput =
         MathUtil.inputModulus(output, 0 - percentOfRange, fullRange - percentOfRange);
 
-    SmartDashboard.putBoolean("Connected", connected);
-    SmartDashboard.putNumber("Frequency", frequency);
-    SmartDashboard.putNumber("Output", output);
-    SmartDashboard.putNumber("ShiftedOutput", shiftedOutput);
+    Telemetry.log("Connected", connected);
+    Telemetry.log("Frequency", frequency);
+    Telemetry.log("Output", output);
+    Telemetry.log("ShiftedOutput", shiftedOutput);
   }
 }

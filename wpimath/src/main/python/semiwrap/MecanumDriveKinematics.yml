@@ -17,8 +17,8 @@ classes:
           However, if you wish to change the center of rotation for evasive
           maneuvers, vision alignment, or for any other use case, you can do so.
 
-          :param chassisVelocities:    The desired chassis velocity.
-          :param centerOfRotation: The center of rotation. For example, if you set the
+          :param chassis_velocities: The desired chassis velocity.
+          :param center_of_rotation: The center of rotation. For example, if you set the
                                    center of rotation at one corner of the robot and
                                    provide a chassis velocity that only has a dtheta
                                    component, the robot will rotate around that
@@ -31,7 +31,7 @@ classes:
                     this issue. In addition, you can use Python unpacking syntax
                     to directly assign the wheel velocities to variables::
 
-                      fl, fr, bl, br = kinematics.toWheelVelocities(chassisVelocities)
+                      fl, fr, bl, br = kinematics.to_wheel_velocities(chassis_velocities)
         overloads:
           const ChassisVelocities&, const Translation2d& [const]:
           const ChassisVelocities& [const]:

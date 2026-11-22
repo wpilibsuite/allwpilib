@@ -4,6 +4,7 @@
 
 #include "wpi/net/uv/Stream.hpp"
 
+#include <format>
 #include <functional>
 #include <memory>
 #include <string>
@@ -99,20 +100,21 @@ static std::string BufsToString(std::span<const Buffer> bufs) {
   size_t count = 0;
   for (auto buf : bufs) {
     for (auto ch : buf.bytes()) {
-      stros << fmt::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
+      stros << std::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
       if (count++ > 30) {
         goto extra;
       }
     }
   }
   goto done;
-extra: {
-  size_t total = 0;
-  for (auto buf : bufs) {
-    total += buf.len;
+extra:
+  {
+    size_t total = 0;
+    for (auto buf : bufs) {
+      total += buf.len;
+    }
+    stros << std::format("... (total {})", total);
   }
-  stros << fmt::format("... (total {})", total);
-}
 done:
   return str;
 }

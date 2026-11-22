@@ -1,0 +1,22 @@
+classes:
+  wpi::math::DCMotorBiasEstimator:
+    template_params:
+    - Distance
+    typealias:
+    - typename wpi::math::DCMotorBiasEstimator<Distance>::Velocity
+    - typename wpi::math::DCMotorBiasEstimator<Distance>::Velocity_t
+    - typename wpi::math::DCMotorBiasEstimator<Distance>::kV_t
+    - typename wpi::math::DCMotorBiasEstimator<Distance>::kA_t
+    methods:
+      Calculate:
+      DCMotorBiasEstimator:
+        overloads:
+          wpi::units::volt_t, wpi::units::volt_t, kV_t, kA_t, wpi::units::second_t, wpi::units::second_t:
+          wpi::units::volt_t, kV_t, kA_t, wpi::units::second_t, wpi::units::second_t:
+      Reset:
+
+templates:
+  DCMotorBiasEstimator:
+    qualname: wpi::math::DCMotorBiasEstimator
+    params:
+    - wpi::units::dimensionless::scalar

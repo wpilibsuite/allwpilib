@@ -8,7 +8,7 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
-#include "wpi/math/trajectory/Trajectory.hpp"
+#include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/math.hpp"
@@ -23,9 +23,6 @@ namespace wpi::math {
  * The linear time-varying unicycle controller has a similar form to the LQR,
  * but the model used to compute the controller gain is the nonlinear unicycle
  * model linearized around the drivetrain's current state.
- *
- * See section 8.9 in Controls Engineering in FRC for a derivation of the
- * control law we used shown in theorem 8.9.1.
  */
 class WPILIB_DLLEXPORT LTVUnicycleController {
  public:
@@ -120,9 +117,13 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    *                     from a trajectory.
    */
   ChassisVelocities Calculate(const Pose2d& currentPose,
-                              const Trajectory::State& desiredState) {
-    return Calculate(currentPose, desiredState.pose, desiredState.velocity,
-                     desiredState.velocity * desiredState.curvature);
+                              const HolonomicSample& desiredState) {
+    // The sample velocity is field-relative; the controller needs the
+    // robot-relative forward (linear) velocity.
+    auto linearVelocity =
+        desiredState.velocity.ToRobotRelative(desiredState.pose.Rotation()).vx;
+    return Calculate(currentPose, desiredState.pose, linearVelocity,
+                     desiredState.velocity.omega);
   }
 
   /**

@@ -10,8 +10,8 @@
 #include <string_view>
 #include <vector>
 
-#include "wpi/hal/SimDevice.h"
-#include "wpi/hal/simulation/SimDeviceData.h"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/Value.h"
 #include "wpi/halsim/ws_core/WSBaseProvider.hpp"
 #include "wpi/halsim/ws_core/WSProviderContainer.hpp"
 #include "wpi/net/uv/AsyncFunction.hpp"

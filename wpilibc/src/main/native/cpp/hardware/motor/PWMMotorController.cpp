@@ -4,26 +4,68 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
-
 #include "wpi/system/RobotController.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
+
+PWMMotorController::~PWMMotorController() {
+  Unfollow();
+  for (auto follower : m_followers) {
+    follower->m_leaderFollowers = nullptr;
+  }
+}
+
+PWMMotorController::PWMMotorController(PWMMotorController&& rhs)
+    : MotorSafety{std::move(rhs)},
+      m_isInverted{rhs.m_isInverted},
+      m_eliminateDeadband{rhs.m_eliminateDeadband},
+      m_minPwm{rhs.m_minPwm},
+      m_deadbandMinPwm{rhs.m_deadbandMinPwm},
+      m_centerPwm{rhs.m_centerPwm},
+      m_deadbandMaxPwm{rhs.m_deadbandMaxPwm},
+      m_maxPwm{rhs.m_maxPwm},
+{
+  std::swap(m_followers, rhs.m_followers);
+  std::swap(m_simDevice, rhs.m_simDevice);
+  std::swap(m_simThrottle, rhs.m_simThrottle);
+  rhs.Unfollow();
+  std::swap(m_leaderFollowers, rhs.m_leaderFollowers);
+  if (m_leaderFollowers) {
+    m_leaderFollowers->push_back(this);
+  }
+}
+
+PWMMotorController& PWMMotorController::operator=(PWMMotorController&& rhs) {
+  MotorSafety::operator=(std::move(rhs));
+  rhs.Unfollow();
+  std::swap(m_leaderFollowers, rhs.m_leaderFollowers);
+  if (m_leaderFollowers) {
+    m_leaderFollowers->push_back(this);
+  }
+
+  m_isInverted = rhs.m_isInverted;
+  std::swap(m_followers, rhs.m_followers);
+  std::swap(m_simDevice, rhs.m_simDevice);
+  std::swap(m_simThrottle, rhs.m_simThrottle);
+
+  m_eliminateDeadband = rhs.m_eliminateDeadband;
+  m_minPwm = rhs.m_minPwm;
+  m_deadbandMinPwm = rhs.m_deadbandMinPwm;
+  m_centerPwm = rhs.m_centerPwm;
+  m_deadbandMaxPwm = rhs.m_deadbandMaxPwm;
+  m_maxPwm = rhs.m_maxPwm;
+}
 
 void PWMMotorController::SetThrottle(double throttle) {
   if (m_isInverted) {
     throttle = -throttle;
   }
   SetDutyCycleInternal(throttle);
-
-  for (auto& follower : m_nonowningFollowers) {
-    follower->SetThrottle(throttle);
-  }
-  for (auto& follower : m_owningFollowers) {
+  for (auto& follower : m_followers) {
     follower->SetThrottle(throttle);
   }
 
@@ -46,27 +88,20 @@ bool PWMMotorController::GetInverted() const {
   return m_isInverted;
 }
 
-void PWMMotorController::Disable() {
+void PWMMotorController::StopMotor() {
   m_pwm.SetDisabled();
 
   if (m_simThrottle) {
     m_simThrottle.Set(0.0);
   }
 
-  for (auto& follower : m_nonowningFollowers) {
-    follower->Disable();
+  for (auto& follower : m_followers) {
+    follower->StopMotor();
   }
-  for (auto& follower : m_owningFollowers) {
-    follower->Disable();
-  }
-}
-
-void PWMMotorController::StopMotor() {
-  Disable();
 }
 
 std::string PWMMotorController::GetDescription() const {
-  return fmt::format("PWM {}", GetChannel());
+  return std::format("PWM {}", GetChannel());
 }
 
 int PWMMotorController::GetChannel() const {
@@ -77,10 +112,7 @@ void PWMMotorController::EnableDeadbandElimination(bool eliminateDeadband) {
   m_eliminateDeadband = eliminateDeadband;
 }
 
-PWMMotorController::PWMMotorController(std::string_view name, int channel)
-    : m_pwm(channel, false) {
-  wpi::util::SendableRegistry::Add(this, name, channel);
-
+PWMMotorController::PWMMotorController(int channel) : m_pwm{channel} {
   m_simDevice = wpi::hal::SimDevice{"PWMMotorController", channel};
   if (m_simDevice) {
     m_simThrottle = m_simDevice.CreateDouble(
@@ -89,12 +121,12 @@ PWMMotorController::PWMMotorController(std::string_view name, int channel)
   }
 }
 
-void PWMMotorController::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Motor Controller");
-  builder.SetActuator(true);
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return GetThrottle(); },
-      [=, this](double value) { SetThrottle(value); });
+void PWMMotorController::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("Value", GetThrottle());
+}
+
+std::string_view PWMMotorController::GetTelemetryType() const {
+  return "Motor Controller";
 }
 
 wpi::units::microsecond_t PWMMotorController::GetMinPositivePwm() const {

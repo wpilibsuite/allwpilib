@@ -91,7 +91,7 @@ class SourceImpl : public PropertyContainer {
   }
 
   // Gets the current frame time (without waiting for a new one).
-  uint64_t GetCurFrameTime();
+  int64_t GetCurFrameTime();
 
   // Gets the current frame (without waiting for a new one).
   Frame GetCurFrame();

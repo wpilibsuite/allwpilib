@@ -14,6 +14,8 @@ import org.wpilib.hardware.hal.SimDouble;
  * XRPServo.
  *
  * <p>A SimDevice based servo
+ *
+ * <p>This class is provided by the XRP VendorDep
  */
 public class XRPServo {
   private static HashMap<Integer, String> s_simDeviceNameMap = new HashMap<>();

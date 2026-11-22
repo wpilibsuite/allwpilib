@@ -7,8 +7,8 @@ package org.wpilib.command3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.wpilib.units.Units.Microseconds;
 import static org.wpilib.units.Units.Milliseconds;
+import static org.wpilib.units.Units.Nanoseconds;
 import static org.wpilib.units.Units.Seconds;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -166,7 +166,7 @@ class SchedulerTimingTests extends CommandTestBase {
     m_scheduler.run();
 
     // wait 1 full second (much longer than the wait period)
-    time.set((long) Seconds.of(1).in(Microseconds));
+    time.set((long) Seconds.of(1).in(Nanoseconds));
     m_scheduler.run();
     assertTrue(
         completedWait.get(),
@@ -190,12 +190,12 @@ class SchedulerTimingTests extends CommandTestBase {
     m_scheduler.run();
 
     // move forward by half the wait period
-    time.set((long) Milliseconds.of(0.5).in(Microseconds));
+    time.set((long) Milliseconds.of(0.5).in(Nanoseconds));
     m_scheduler.run();
     assertFalse(completedWait.get(), "Command should still be waiting for 1 ms to elapse");
 
     // move forward by the rest of the wait period
-    time.set((long) Milliseconds.of(1).in(Microseconds));
+    time.set((long) Milliseconds.of(1).in(Nanoseconds));
     m_scheduler.run();
     assertTrue(
         completedWait.get(),

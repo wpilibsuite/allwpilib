@@ -20,7 +20,7 @@ class CommandDecoratorTest extends CommandTestBase {
   @Test
   @ResourceLock("timing")
   void withTimeoutTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SimHooks.pauseTiming();
     try (CommandScheduler scheduler = new CommandScheduler()) {
       Command timeout = Commands.idle().withTimeout(0.1);

@@ -9,11 +9,12 @@
 #ifndef WPIUTIL_WPI_WINDOWSERROR_H
 #define WPIUTIL_WPI_WINDOWSERROR_H
 
+#include "wpi/util/Compiler.hpp"
 #include <system_error>
 
 namespace wpi::util {
-std::error_code mapLastWindowsError();
-std::error_code mapWindowsError(unsigned EV);
+LLVM_ABI std::error_code mapLastWindowsError();
+LLVM_ABI std::error_code mapWindowsError(unsigned EV);
 }
 
 #endif

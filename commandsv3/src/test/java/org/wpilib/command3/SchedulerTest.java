@@ -44,7 +44,7 @@ class SchedulerTest extends CommandTestBase {
   @SuppressWarnings("PMD.ImmutableField") // PMD bugs
   void atomicity() {
     var mechanism =
-        new Mechanism("X", m_scheduler) {
+        new DummyMechanism("X", m_scheduler) {
           int m_x = 0;
         };
 
@@ -80,7 +80,7 @@ class SchedulerTest extends CommandTestBase {
   @SuppressWarnings("PMD.ImmutableField") // PMD bugs
   void runMechanism() {
     var example =
-        new Mechanism("Counting", m_scheduler) {
+        new DummyMechanism("Counting", m_scheduler) {
           int m_x = 0;
         };
 
@@ -107,8 +107,8 @@ class SchedulerTest extends CommandTestBase {
 
   @Test
   void compositionsDoNotNeedRequirements() {
-    var m1 = new Mechanism("M1", m_scheduler);
-    var m2 = new Mechanism("m2", m_scheduler);
+    var m1 = new DummyMechanism("M1", m_scheduler);
+    var m2 = new DummyMechanism("m2", m_scheduler);
 
     // the group has no requirements, but can schedule child commands that do
     var group =
@@ -128,9 +128,15 @@ class SchedulerTest extends CommandTestBase {
   @Test
   void nestedMechanisms() {
     var superstructure =
-        new Mechanism("Superstructure", m_scheduler) {
-          private final Mechanism m_elevator = new Mechanism("Elevator", m_scheduler);
-          private final Mechanism m_arm = new Mechanism("Arm", m_scheduler);
+        new DummyMechanism("Superstructure", m_scheduler) {
+          private final Mechanism m_elevator = new DummyMechanism("Elevator", m_scheduler);
+          private final Mechanism m_arm = new DummyMechanism("Arm", m_scheduler);
+
+          {
+            m_arm.setDefaultCommand(m_arm.idle());
+            m_elevator.setDefaultCommand(m_elevator.idle());
+            setDefaultCommand(this.idle());
+          }
 
           public Command superCommand() {
             return run(co -> {

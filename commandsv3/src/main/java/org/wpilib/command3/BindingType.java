@@ -4,7 +4,11 @@
 
 package org.wpilib.command3;
 
-/** Describes when a command bound to a trigger should run. */
+/**
+ * Describes when a command bound to a trigger should run.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
+ */
 enum BindingType {
   /**
    * An immediate or manual binding created when calling {@link Scheduler#schedule(Command)}
@@ -21,6 +25,11 @@ enum BindingType {
    * or is interrupted by another command requiring the same mechanisms.
    */
   SCHEDULE_ON_FALLING_EDGE,
+  /**
+   * Attempts to schedule (fork) a command on every poll where the signal is high. The command will
+   * run until it completes or is interrupted by another command requiring the same mechanisms.
+   */
+  SCHEDULE_WHILE_HIGH,
   /**
    * Schedules (forks) a command on a rising edge signal. If the command is still running on the
    * next rising edge, it will be canceled then; otherwise, it will be scheduled again.

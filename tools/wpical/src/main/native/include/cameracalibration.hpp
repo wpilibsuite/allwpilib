@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <optional>
 #include <string>
@@ -19,7 +20,6 @@
 #include <opencv2/videoio.hpp>
 
 #include "wpi/util/json.hpp"
-#include "wpi/util/mutex.hpp"
 
 namespace wpical {
 struct CameraModel {
@@ -89,9 +89,9 @@ class CameraCalibrator {
   // Ensures that shared state lives until everything else is destroyed
   std::shared_ptr<Data> m_state;
 
-  std::atomic_bool m_isFinished{false};
   std::atomic_int m_totalFrames;
   std::vector<std::shared_ptr<Worker>> m_workers;
+  std::thread m_processingThread;
 };
 
 void to_json(wpi::util::json& json, const CameraModel& cameraModel);

@@ -1,0 +1,11 @@
+load("//robotpyExamples:project.bzl", "robotpy_project")
+
+robotpy_project(
+    name = "EventLoop",
+    srcs = glob(["**/*.py"]),
+    main = "robot.py",
+    deps = [
+        "//drivers/src/main/python",
+        "//wpimath/src/main/python",
+    ],
+)

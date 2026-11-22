@@ -96,7 +96,7 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
 
  private:
   wpi::math::TrapezoidProfile<wpi::units::meters> profile{
-      {DriveConstants::kMaxVelocity, DriveConstants::kMaxAcceleration}};
+      {DriveConstants::MAX_VELOCITY, DriveConstants::MAX_ACCELERATION}};
   wpi::Timer timer;
   wpi::units::meter_t initialLeftDistance;
   wpi::units::meter_t initialRightDistance;

@@ -2,15 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/commands2/RunCommand.hpp"
-
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/Commands.hpp"
 
 using namespace wpi::cmd;
 class RunCommandTest : public CommandTestBase {};
 
-TEST_F(RunCommandTest, RunCommandSchedule) {
+TEST_CASE_METHOD(RunCommandTest, "RunCommandTest RunCommandSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
@@ -22,5 +21,5 @@ TEST_F(RunCommandTest, RunCommandSchedule) {
   scheduler.Run();
   scheduler.Run();
 
-  EXPECT_EQ(3, counter);
+  CHECK(3 == counter);
 }

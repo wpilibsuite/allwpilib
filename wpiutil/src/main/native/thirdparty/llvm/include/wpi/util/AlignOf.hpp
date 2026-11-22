@@ -14,15 +14,16 @@
 #define WPIUTIL_WPI_ALIGNOF_H
 
 #include <algorithm>
-#include <cstddef>
 
 namespace wpi::util {
 
 /// A suitably aligned and sized character array member which can hold elements
 /// of any type.
-template <typename... Ts> struct AlignedCharArrayUnion {
-  alignas((std::max)({alignof(Ts)...}))
-      std::byte buffer[(std::max)({static_cast<size_t>(1), sizeof(Ts)...})];
+template <typename T, typename... Ts> struct AlignedCharArrayUnion {
+  // Work around "internal compiler error: Segmentation fault" with GCC 7.5,
+  // apparently caused by alignas(Ts...).
+  static constexpr std::size_t Align = (std::max)({alignof(T), alignof(Ts)...});
+  alignas(Align) char buffer[(std::max)({sizeof(T), sizeof(Ts)...})];
 };
 
 } // end namespace wpi::util

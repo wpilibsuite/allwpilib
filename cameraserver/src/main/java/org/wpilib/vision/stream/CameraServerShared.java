@@ -4,7 +4,11 @@
 
 package org.wpilib.vision.stream;
 
-/** CameraServer shared functions. */
+/**
+ * CameraServer shared functions.
+ *
+ * <p>This class is provided by the CameraServer VendorDep
+ */
 public interface CameraServerShared {
   /**
    * get the main thread id func.
@@ -21,19 +25,11 @@ public interface CameraServerShared {
   void reportDriverStationError(String error);
 
   /**
-   * Report usage.
+   * Get if running on a Systemcore.
    *
-   * @param resource the resource name
-   * @param data arbitrary string data
+   * @return true if on Systemcore
    */
-  void reportUsage(String resource, String data);
-
-  /**
-   * Get if running on a roboRIO.
-   *
-   * @return true if on roboRIO
-   */
-  default boolean isRoboRIO() {
+  default boolean isSystemcore() {
     return false;
   }
 }

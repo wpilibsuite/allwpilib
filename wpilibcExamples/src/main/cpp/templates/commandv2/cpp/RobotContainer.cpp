@@ -23,9 +23,9 @@ void RobotContainer::ConfigureBindings() {
     return subsystem.ExampleCondition();
   }).OnTrue(ExampleCommand(&subsystem).ToPtr());
 
-  // Schedule `ExampleMethodCommand` when the Gamepad's East Face button is
+  // Schedule `ExampleMethodCommand` when the Gamepad's Face Right button is
   // pressed, cancelling on release.
-  driverController.EastFace().WhileTrue(subsystem.ExampleMethodCommand());
+  driverController.FaceRight().WhileTrue(subsystem.ExampleMethodCommand());
 }
 
 wpi::cmd::CommandPtr RobotContainer::GetAutonomousCommand() {

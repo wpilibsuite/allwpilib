@@ -5,11 +5,10 @@
 #pragma once
 
 #include "wpi/hal/DutyCycle.h"
-#include "wpi/hal/Types.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 /**
@@ -18,8 +17,7 @@ namespace wpi {
  * <p>PWM input signals are specified with a frequency and a ratio of high to
  * low in that frequency. These can be attached to any SmartIO.
  */
-class DutyCycle : public wpi::util::Sendable,
-                  public wpi::util::SendableHelper<DutyCycle> {
+class DutyCycle : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Constructs a DutyCycle input from a smartio channel.
@@ -66,12 +64,13 @@ class DutyCycle : public wpi::util::Sendable,
    */
   int GetSourceChannel() const;
 
- protected:
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   void InitDutyCycle();
   int m_channel;
-  wpi::hal::Handle<HAL_DutyCycleHandle, HAL_FreeDutyCycle> m_handle;
+  wpi::util::Handle<HAL_DutyCycleHandle, HAL_FreeDutyCycle> m_handle;
 };
 }  // namespace wpi

@@ -1,0 +1,40 @@
+defaults:
+  default_args_as_kw_only: true
+
+functions:
+  GetTable:
+    default_args_as_kw_only: false
+  Publish:
+    no_release_gil: true
+  Add:
+    no_release_gil: true
+    param_override:
+      isMutable:
+        name: mutable
+  AddBoolean:
+    no_release_gil: true
+    param_override:
+      isMutable:
+        name: mutable
+  AddInt:
+    no_release_gil: true
+    param_override:
+      isMutable:
+        name: mutable
+  AddLong:
+    no_release_gil: true
+    param_override:
+      isMutable:
+        name: mutable
+  AddFloat:
+    no_release_gil: true
+    param_override:
+      isMutable:
+        name: mutable
+  AddDouble:
+    no_release_gil: true
+    param_override:
+      isMutable:
+        name: mutable
+  Remove:
+    no_release_gil: true

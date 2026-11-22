@@ -1,3 +1,3 @@
-from .main import loadExtension
+from .main import load_extension
 
-__all__ = ["loadExtension"]
+__all__ = ["load_extension"]

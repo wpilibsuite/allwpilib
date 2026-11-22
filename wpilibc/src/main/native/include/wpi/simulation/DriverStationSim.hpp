@@ -9,7 +9,7 @@
 #include <memory>
 
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
-#include "wpi/hal/DriverStationTypes.h"
+#include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/simulation/CallbackStore.hpp"
 
@@ -91,14 +91,14 @@ class DriverStationSim {
    *
    * @return robot mode
    */
-  static HAL_RobotMode GetRobotMode();
+  static hal::RobotMode GetRobotMode();
 
   /**
    * Change the robot mode set by the DS.
    *
    * @param robotMode the new value
    */
-  static void SetRobotMode(HAL_RobotMode robotMode);
+  static void SetRobotMode(hal::RobotMode robotMode);
 
   /**
    * Register a callback on the eStop state.
@@ -195,14 +195,15 @@ class DriverStationSim {
    *
    * @return the alliance station color and number
    */
-  static HAL_AllianceStationID GetAllianceStationId();
+  static wpi::hal::AllianceStationID GetAllianceStationId();
 
   /**
    * Change the alliance station.
    *
    * @param allianceStationId the new alliance station
    */
-  static void SetAllianceStationId(HAL_AllianceStationID allianceStationId);
+  static void SetAllianceStationId(
+      wpi::hal::AllianceStationID allianceStationId);
 
   /**
    * Register a callback on match time.

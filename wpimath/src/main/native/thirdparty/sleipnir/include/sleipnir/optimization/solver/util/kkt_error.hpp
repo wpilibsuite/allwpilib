@@ -7,6 +7,8 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
+#include "sleipnir/optimization/solver/util/problem_scaling.hpp"
+
 // See docs/algorithms.md#Works_cited for citation definitions
 
 namespace slp {
@@ -22,8 +24,8 @@ enum class KKTErrorType {
 /// Returns the KKT error for Newton's method.
 ///
 /// @tparam Scalar Scalar type.
-/// @tparam T The type of KKT error to compute.
-/// @param g Gradient of the cost function ∇f.
+/// @tparam T Type of KKT error to compute.
+/// @param g Cost function gradient ∇f.
 template <typename Scalar, KKTErrorType T>
 Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g) {
   // The KKT conditions from docs/algorithms.md:
@@ -40,12 +42,10 @@ Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g) {
 /// Returns the KKT error for Sequential Quadratic Programming.
 ///
 /// @tparam Scalar Scalar type.
-/// @tparam T The type of KKT error to compute.
-/// @param g Gradient of the cost function ∇f.
-/// @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
-///     current iterate.
-/// @param c_e The problem's equality constraints cₑ(x) evaluated at the current
-///     iterate.
+/// @tparam T Type of KKT error to compute.
+/// @param g Cost function gradient ∇f.
+/// @param A_e Equality constraint Jacobian Aₑ(x).
+/// @param c_e Equality constraints cₑ(x).
 /// @param y Equality constraint dual variables.
 template <typename Scalar, KKTErrorType T>
 Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
@@ -79,16 +79,12 @@ Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
 /// Returns the KKT error for the interior-point method.
 ///
 /// @tparam Scalar Scalar type.
-/// @tparam T The type of KKT error to compute.
-/// @param g Gradient of the cost function ∇f.
-/// @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
-///     current iterate.
-/// @param c_e The problem's equality constraints cₑ(x) evaluated at the current
-///     iterate.
-/// @param A_i The problem's inequality constraint Jacobian Aᵢ(x) evaluated at
-///     the current iterate.
-/// @param c_i The problem's inequality constraints cᵢ(x) evaluated at the
-///     current iterate.
+/// @tparam T Type of KKT error to compute.
+/// @param g Cost function gradient ∇f.
+/// @param A_e Equality constraint Jacobian Aₑ(x).
+/// @param c_e Equality constraints cₑ(x).
+/// @param A_i Inequality constraint Jacobian Aᵢ(x).
+/// @param c_i Inequality constraints cᵢ(x).
 /// @param s Inequality constraint slack variables.
 /// @param y Equality constraint dual variables.
 /// @param z Inequality constraint dual variables.
@@ -147,6 +143,111 @@ Scalar kkt_error(const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
            (S * z - μe).template lpNorm<1>() + c_e.template lpNorm<1>() +
            (c_i - s).template lpNorm<1>();
   }
+}
+
+/// Returns the unscaled KKT error for Newton's method.
+///
+/// @tparam Scalar Scalar type.
+/// @tparam T Type of KKT error to compute.
+/// @param scaling Problem scaling.
+/// @param g Scaled cost function gradient d_f·∇f.
+template <typename Scalar, KKTErrorType T>
+Scalar unscaled_kkt_error(const ProblemScaling<Scalar>& scaling,
+                          const Eigen::Vector<Scalar, Eigen::Dynamic>& g) {
+  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
+
+  if (scaling.is_identity()) {
+    return kkt_error<Scalar, T>(g);
+  }
+
+  const DenseVector g_unscaled = (Scalar(1) / scaling.f) * g;
+
+  return kkt_error<Scalar, T>(g_unscaled);
+}
+
+/// Returns the unscaled KKT error for Sequential Quadratic Programming.
+///
+/// @tparam Scalar Scalar type.
+/// @tparam T Type of KKT error to compute.
+/// @param scaling Problem scaling.
+/// @param g Scaled cost function gradient d_f·∇f.
+/// @param A_e Scaled equality constraint Jacobian D_cₑ·Aₑ(x).
+/// @param c_e Scaled equality constraints D_cₑ·cₑ(x).
+/// @param y Scaled equality constraint dual variables.
+template <typename Scalar, KKTErrorType T>
+Scalar unscaled_kkt_error(const ProblemScaling<Scalar>& scaling,
+                          const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
+                          const Eigen::SparseMatrix<Scalar>& A_e,
+                          const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e,
+                          const Eigen::Vector<Scalar, Eigen::Dynamic>& y) {
+  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
+  using SparseMatrix = Eigen::SparseMatrix<Scalar>;
+
+  if (scaling.is_identity()) {
+    return kkt_error<Scalar, T>(g, A_e, c_e, y);
+  }
+
+  const Scalar inv_d_f = Scalar(1) / scaling.f;
+  const DenseVector inv_d_c_e = scaling.c_e.cwiseInverse();
+
+  const DenseVector g_unscaled = inv_d_f * g;
+  const SparseMatrix A_e_unscaled = inv_d_c_e.asDiagonal() * A_e;
+  const DenseVector c_e_unscaled = inv_d_c_e.cwiseProduct(c_e);
+  const DenseVector y_unscaled = scaling.c_e.cwiseProduct(y) * inv_d_f;
+
+  return kkt_error<Scalar, T>(g_unscaled, A_e_unscaled, c_e_unscaled,
+                              y_unscaled);
+}
+
+/// Returns the unscaled KKT error for the interior-point method.
+///
+/// @tparam Scalar Scalar type.
+/// @tparam T Type of KKT error to compute.
+/// @param scaling Problem scaling.
+/// @param g Scaled cost function gradient d_f·∇f.
+/// @param A_e Scaled equality constraint Jacobian D_cₑ·Aₑ(x).
+/// @param c_e Scaled equality constraints D_cₑ·cₑ(x).
+/// @param A_i Scaled inequality constraint Jacobian D_cᵢ·Aᵢ(x).
+/// @param c_i Scaled inequality constraints D_cᵢ·cᵢ(x).
+/// @param s Scaled inequality constraint slack variables.
+/// @param y Scaled equality constraint dual variables.
+/// @param z Scaled inequality constraint dual variables.
+/// @param μ Scaled barrier parameter.
+template <typename Scalar, KKTErrorType T>
+Scalar unscaled_kkt_error(const ProblemScaling<Scalar>& scaling,
+                          const Eigen::Vector<Scalar, Eigen::Dynamic>& g,
+                          const Eigen::SparseMatrix<Scalar>& A_e,
+                          const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e,
+                          const Eigen::SparseMatrix<Scalar>& A_i,
+                          const Eigen::Vector<Scalar, Eigen::Dynamic>& c_i,
+                          const Eigen::Vector<Scalar, Eigen::Dynamic>& s,
+                          const Eigen::Vector<Scalar, Eigen::Dynamic>& y,
+                          const Eigen::Vector<Scalar, Eigen::Dynamic>& z,
+                          Scalar μ) {
+  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
+  using SparseMatrix = Eigen::SparseMatrix<Scalar>;
+
+  if (scaling.is_identity()) {
+    return kkt_error<Scalar, T>(g, A_e, c_e, A_i, c_i, s, y, z, μ);
+  }
+
+  const Scalar inv_d_f = Scalar(1) / scaling.f;
+  const DenseVector inv_d_c_e = scaling.c_e.cwiseInverse();
+  const DenseVector inv_d_c_i = scaling.c_i.cwiseInverse();
+
+  const DenseVector g_unscaled = inv_d_f * g;
+  const SparseMatrix A_e_unscaled = inv_d_c_e.asDiagonal() * A_e;
+  const DenseVector c_e_unscaled = inv_d_c_e.cwiseProduct(c_e);
+  const SparseMatrix A_i_unscaled = inv_d_c_i.asDiagonal() * A_i;
+  const DenseVector c_i_unscaled = inv_d_c_i.cwiseProduct(c_i);
+  const DenseVector s_unscaled = inv_d_c_i.cwiseProduct(s);
+  const DenseVector y_unscaled = scaling.c_e.cwiseProduct(y) * inv_d_f;
+  const DenseVector z_unscaled = scaling.c_i.cwiseProduct(z) * inv_d_f;
+  const Scalar μ_unscaled = inv_d_f * μ;
+
+  return kkt_error<Scalar, T>(g_unscaled, A_e_unscaled, c_e_unscaled,
+                              A_i_unscaled, c_i_unscaled, s_unscaled,
+                              y_unscaled, z_unscaled, μ_unscaled);
 }
 
 }  // namespace slp

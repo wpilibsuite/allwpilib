@@ -62,7 +62,6 @@ _jni_headers = rule(
         ),
     },
     fragments = ["cpp"],
-    incompatible_use_toolchain_transition = True,
     provides = [CcInfo],
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
 )
@@ -84,7 +83,7 @@ def wpilib_jni_java_library(
         **java_library_args
     )
 
-    jni = "@rules_bzlmodrio_toolchains//jni"
+    jni = "@wpilib_toolchains//jni"
     _jni_headers(
         name = headers_name,
         jni = jni,
@@ -99,6 +98,7 @@ def wpilib_jni_java_library(
         src = headers_name,
         excludes = ["MANIFEST.MF"],
         outdir_name = "jni/",
+        visibility = visibility,
     )
 
 def wpilib_jni_cc_library(
@@ -106,10 +106,10 @@ def wpilib_jni_cc_library(
         deps = [],
         java_dep = None,
         **kwargs):
-    jni = "@rules_bzlmodrio_toolchains//jni"
+    jni = "@wpilib_toolchains//jni"
 
-    if java_dep[0] != ":":
-        fail("java_dep", java_dep, "should start with a :")
+    if not (java_dep.startswith(":") or java_dep.startswith("//")):
+        fail("java_dep", java_dep, "should be a label (starting with ':' or '//')")
 
     cc_library(
         name = name,

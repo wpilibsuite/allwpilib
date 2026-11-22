@@ -7,9 +7,8 @@
 #include <stdint.h>
 
 #include "wpi/hal/AnalogInput.h"
-#include "wpi/hal/Types.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 
@@ -25,8 +24,7 @@ namespace wpi {
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public wpi::util::Sendable,
-                    public wpi::util::SendableHelper<AnalogInput> {
+class AnalogInput : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Construct an analog input.
@@ -48,6 +46,7 @@ class AnalogInput : public wpi::util::Sendable,
    * GetVoltage() to get the analog value in calibrated units.
    *
    * @return A sample straight from this channel.
+   * @Common This is one of the commonly used methods for this class
    */
   int GetValue() const;
 
@@ -74,11 +73,13 @@ class AnalogInput : public wpi::util::Sendable,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   int m_channel;
-  wpi::hal::Handle<HAL_AnalogInputHandle, HAL_FreeAnalogInputPort> m_port;
+  wpi::util::Handle<HAL_AnalogInputHandle, HAL_FreeAnalogInputPort> m_port;
 };
 
 }  // namespace wpi

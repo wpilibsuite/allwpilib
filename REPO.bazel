@@ -1,0 +1,15 @@
+ignore_directories([
+    "**/__pycache__",
+    "**/.venv",
+    "**/.idea",
+
+    # Gradle outputs
+    "*/build",
+    "simulation/*/build",
+    "tools/*/build",
+
+    # LSP outputs - Eclipse JDT will indiscriminately copy BUILD files
+    "*/bin",
+    "simulation/*/bin",
+    "tools/*/bin",
+])

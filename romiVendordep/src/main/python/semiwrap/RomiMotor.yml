@@ -2,3 +2,9 @@ classes:
   wpi::romi::RomiMotor:
     methods:
       RomiMotor:
+      SetThrottle:
+      GetThrottle:
+      SetInverted:
+      GetInverted:
+      StopMotor:
+      GetDescription:

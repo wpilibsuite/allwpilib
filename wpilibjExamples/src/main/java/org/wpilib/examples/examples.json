@@ -11,12 +11,29 @@
     "commandversion": 2
   },
   {
+    "name": "Commands v3 - REBUILT Robot",
+    "description": "A robot with a drivetrain, intake, and shooter subsystems controlled by the commands v3 framework",
+    "tags": [
+      "Complete Robot",
+      "Commandv3",
+      "DataLog",
+      "Joystick",
+      "Swerve Drive",
+      "OpMode",
+      "FRC"
+    ],
+    "foldername": "rebuiltcmdv3",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 3
+  },
+  {
     "name": "Encoder",
     "description": "View values from a quadrature encoder.",
     "tags": [
       "Hardware",
       "Encoder",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "encoder",
     "gradlebase": "java",
@@ -30,8 +47,7 @@
       "Hardware",
       "ExpansionHub",
       "FTC",
-      "OpModes",
-      "SmartDashboard"
+      "OpMode"
     ],
     "foldername": "expansionhubsample",
     "gradlebase": "java",
@@ -120,7 +136,7 @@
       "Arm",
       "Analog",
       "Joystick",
-      "SmartDashboard",
+      "Telemetry",
       "Mechanism2d"
     ],
     "foldername": "mechanism2d",
@@ -137,9 +153,11 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "hatchbottraditional",
     "gradlebase": "java",
@@ -155,9 +173,11 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "hatchbotinlined",
     "gradlebase": "java",
@@ -173,9 +193,11 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "hatchbotcmdv3",
     "gradlebase": "java",
@@ -197,7 +219,8 @@
       "PID",
       "Gyro",
       "Profiled PID",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "rapidreactcommandbot",
     "gradlebase": "java",
@@ -282,9 +305,47 @@
       "Hardware",
       "Duty Cycle",
       "Encoder",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "dutycycleencoder",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "DS Gamepad Chooser",
+    "description": "Use a gamepad-controlled Driver Station display selector to configure separate autonomous opmodes.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station",
+      "Gamepad",
+      "OpMode"
+    ],
+    "foldername": "dsgamepadchooser",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Driver Station Display Lines",
+    "description": "Display lines on the Driver Station display and update them every robot loop.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station"
+    ],
+    "foldername": "driverstationdisplaylines",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Driver Station Display ANSI",
+    "description": "Stream ANSI text to the Driver Station display and update a value in place once per second.",
+    "tags": [
+      "Basic Robot",
+      "Driver Station"
+    ],
+    "foldername": "driverstationdisplayansi",
     "gradlebase": "java",
     "robotclass": "Robot",
     "commandversion": 2
@@ -396,7 +457,8 @@
       "State-Space",
       "Simulation",
       "Mechanism2d",
-      "Profiled PID"
+      "Profiled PID",
+      "UnitTests"
     ],
     "foldername": "elevatorsimulation",
     "gradlebase": "java",
@@ -430,7 +492,8 @@
       "State-Space",
       "Simulation",
       "Mechanism2d",
-      "Preferences"
+      "Preferences",
+      "UnitTests"
     ],
     "foldername": "armsimulation",
     "gradlebase": "java",
@@ -443,7 +506,8 @@
     "description": "Test a robot project with basic unit tests in simulation.",
     "tags": [
       "Intake",
-      "Pneumatics"
+      "Pneumatics",
+      "UnitTests"
     ],
     "foldername": "unittest",
     "gradlebase": "java",

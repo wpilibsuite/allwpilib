@@ -10,6 +10,8 @@ import org.opencv.core.Mat;
  * A vision pipeline is responsible for running a group of OpenCV algorithms to extract data from an
  * image.
  *
+ * <p>This class is provided by the CameraServer VendorDep
+ *
  * @see VisionRunner
  * @see VisionThread
  */

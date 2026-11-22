@@ -11,9 +11,9 @@ package org.wpilib.examples.elevatorexponentialprofile;
  */
 public class ExampleSmartMotorController {
   public enum PIDMode {
-    kPosition,
-    kVelocity,
-    kMovementWitchcraft
+    POSITION,
+    VELOCITY,
+    MOVEMENT_WITCHCRAFT
   }
 
   /**
@@ -80,8 +80,4 @@ public class ExampleSmartMotorController {
   public boolean getInverted() {
     return false;
   }
-
-  public void disable() {}
-
-  public void stopMotor() {}
 }

@@ -31,6 +31,7 @@ py_binary(
     deps = [
         ":generation_utils",
         ":hack_pkgcfgs",
+        "//shared/bazel/rules/robotpy/hatchlib_native_port:generate_native_lib_files",
         requirement("semiwrap"),
         requirement("jinja2"),
     ],

@@ -12,7 +12,7 @@ wpi::cmd::CommandPtr Intake::IntakeCommand() {
 
 wpi::cmd::CommandPtr Intake::RetractCommand() {
   return RunOnce([this] {
-           motor.Disable();
+           motor.SetThrottle(0.0);
            piston.Set(wpi::DoubleSolenoid::REVERSE);
          })
       .WithName("Retract");

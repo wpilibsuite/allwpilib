@@ -4,8 +4,10 @@
 
 #include <climits>
 #include <cstdio>
+#include <cstdlib>
 
-#include "gmock/gmock.h"
+#include <catch2/catch_session.hpp>
+
 #include "wpi/nt/ntcore.h"
 #include "wpi/util/timestamp.h"
 
@@ -17,18 +19,19 @@ int main(int argc, char** argv) {
                          std::fputc('\n', stderr);
                        }
                      });
-  ::testing::InitGoogleMock(&argc, argv);
-  int ret = RUN_ALL_TESTS();
+  int ret = Catch::Session().run(argc, argv);
   wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
   return ret;
 }
 
 extern "C" {
 void __ubsan_on_report(void) {
-  FAIL() << "Encountered an undefined behavior sanitizer error";
+  std::puts("Encountered an undefined behavior sanitizer error");
+  std::_Exit(EXIT_FAILURE);
 }
 void __asan_on_error(void) {
-  FAIL() << "Encountered an address sanitizer error";
+  std::puts("Encountered an address sanitizer error");
+  std::_Exit(EXIT_FAILURE);
 }
 void __tsan_on_report(void) {
   std::puts("Encountered a thread sanitizer error");

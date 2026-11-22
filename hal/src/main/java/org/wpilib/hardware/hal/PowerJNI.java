@@ -11,7 +11,7 @@ package org.wpilib.hardware.hal;
  */
 public class PowerJNI extends JNIWrapper {
   /**
-   * Gets the roboRIO input voltage.
+   * Gets the Systemcore input voltage.
    *
    * @return the input voltage (volts)
    * @see "HAL_GetVinVoltage"
@@ -61,22 +61,13 @@ public class PowerJNI extends JNIWrapper {
   public static native void resetUserCurrentFaults();
 
   /**
-   * Set the voltage the roboRIO will brownout and disable all outputs.
+   * Set the voltages where the Systemcore will enter and recover from brownout.
    *
-   * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
-   *
-   * @param voltage The brownout voltage
-   * @see "HAL_SetBrownoutVoltage"
+   * @param brownoutVoltage the voltage where the Systemcore will enter brownout
+   * @param recoveryVoltage the voltage where the Systemcore will recover from brownout
+   * @see "HAL_SetBrownoutVoltages"
    */
-  public static native void setBrownoutVoltage(double voltage);
-
-  /**
-   * Get the current brownout voltage setting.
-   *
-   * @return The brownout voltage
-   * @see "HAL_GetBrownoutVoltage"
-   */
-  public static native double getBrownoutVoltage();
+  public static native void setBrownoutVoltages(double brownoutVoltage, double recoveryVoltage);
 
   /**
    * Get the current CPU temperature in degrees Celsius.

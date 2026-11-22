@@ -1,7 +1,8 @@
 # validated: 2024-01-20 DS aaea85ff1656 WaitUntilCommand.java
 from __future__ import annotations
 
-from typing import Callable, overload
+from collections.abc import Callable
+from typing import overload
 
 from wpilib import Timer
 from wpimath import units
@@ -36,6 +37,12 @@ class WaitUntilCommand(Command):
         guarantee that the time at which the action is performed will be judged to be legal by the
         referees. When in doubt, add a safety factor or time the action manually.
 
+        The match time counts down when connected to FMS or the DS is in practice mode for the
+        current mode. When the DS is not connected to FMS or in practice mode, the command will not
+        wait.
+
+        see :func:`wpilib.DriverStation.get_match_time`
+
         :param time: the match time at which to end, in seconds
         """
         ...
@@ -48,7 +55,7 @@ class WaitUntilCommand(Command):
             self._condition = condition
 
         def init_time(time: float) -> None:
-            self._condition = lambda: Timer.getMatchTime() - time > 0
+            self._condition = lambda: Timer.get_match_time() < time
 
         num_args = len(args) + len(kwargs)
 
@@ -71,8 +78,8 @@ TypeError: WaitUntilCommand(): incompatible function arguments. The following ar
 Invoked with: {format_args_kwargs(self, *args, **kwargs)}
 """)
 
-    def isFinished(self) -> bool:
+    def is_finished(self) -> bool:
         return self._condition()
 
-    def runsWhenDisabled(self) -> bool:
+    def runs_when_disabled(self) -> bool:
         return True

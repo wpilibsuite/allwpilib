@@ -4,10 +4,13 @@
 
 #pragma once
 
+#include <stdint.h>
+
 namespace wpi::hal {
 void PauseNotifiers();
 void ResumeNotifiers();
 void WakeupNotifiers();
 void WaitNotifiers();
 void WakeupWaitNotifiers();
+uint64_t GetNotifierAlarmSetCount();
 }  // namespace wpi::hal

@@ -92,6 +92,7 @@ class MotorSafety {
    */
   static void CheckMotors();
 
+ protected:
   /**
    * Called to stop the motor when the timeout expires.
    */

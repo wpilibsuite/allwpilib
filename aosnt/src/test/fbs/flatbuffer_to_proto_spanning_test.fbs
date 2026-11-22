@@ -1,0 +1,16 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+// A schema whose objects span two namespaces, which a .fbs including one from
+// another namespace produces.
+
+include "aosnt/src/test/fbs/flatbuffer_to_proto_test.fbs";
+
+namespace wpi.aosnt.testing.spanning;
+
+table Spanning {
+  control_data:wpi.aosnt.testing.ControlData (id: 0);
+}
+
+root_type Spanning;

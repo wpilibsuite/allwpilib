@@ -7,7 +7,7 @@
 #include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
 
 /**
- * AnalogPotentiometer snippets for frc-docs.
+ * AnalogPotentiometer snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/analog-potentiometers-software.html
  */
 class Robot : public wpi::TimedRobot {

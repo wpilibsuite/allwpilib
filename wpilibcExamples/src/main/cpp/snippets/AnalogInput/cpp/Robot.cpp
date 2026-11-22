@@ -6,7 +6,7 @@
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 
 /**
- * AnalogInput snippets for frc-docs.
+ * AnalogInput snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/analog-input-software.html
  */
 class Robot : public wpi::TimedRobot {

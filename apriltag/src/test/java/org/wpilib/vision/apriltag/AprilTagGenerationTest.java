@@ -12,7 +12,7 @@ import org.wpilib.util.PixelFormat;
 class AprilTagGenerationTest {
   @Test
   void test36h11() {
-    var frame = AprilTag.generate36h11AprilTagImage(1);
+    var frame = AprilTagImageGenerator.generate36h11AprilTagImage(1);
     assertEquals(PixelFormat.GRAY, frame.getPixelFormat());
     assertEquals(10, frame.getWidth());
     assertEquals(10, frame.getHeight());

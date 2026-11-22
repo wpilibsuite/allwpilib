@@ -15,7 +15,11 @@ namespace wpi::apriltag {
 
 class AprilTagDetection;
 
-/** Pose estimators for AprilTag tags. */
+/**
+ * Pose estimators for AprilTag tags.
+ *
+ * This class is provided by the AprilTag VendorDep
+ */
 class WPILIB_DLLEXPORT AprilTagPoseEstimator {
  public:
   /** Configuration for the pose estimator. */

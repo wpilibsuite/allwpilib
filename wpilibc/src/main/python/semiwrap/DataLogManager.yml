@@ -1,6 +1,16 @@
 extra_includes:
 - wpi/datalog/DataLog.hpp
 
+functions:
+  DeleteOldDataLogs:
+    ignore: true
+  TryTransferDataLogToUsb:
+    ignore: true
+  UpdateDataLogFreeSpaceAlert:
+    ignore: true
+  IsDataLogMatchLog:
+    ignore: true
+
 classes:
   wpi::DataLogManager:
     methods:

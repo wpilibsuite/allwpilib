@@ -4,10 +4,9 @@
 
 #include "wpi/glass/networktables/NTMotorController.hpp"
 
-#include <utility>
+#include <format>
 
-#include <fmt/format.h>
-
+#include "wpi/glass/networktables/NTTunableTopic.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::glass;
@@ -19,11 +18,8 @@ NTMotorControllerModel::NTMotorControllerModel(std::string_view path)
 NTMotorControllerModel::NTMotorControllerModel(
     wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
-      m_value{inst.GetDoubleTopic(fmt::format("{}/Value", path)).GetEntry(0)},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
-                         .Subscribe(false)},
-      m_valueData{fmt::format("NT_SpdCtrl:{}", path)},
+      m_value{inst.GetDoubleTopic(std::format("{}/Value", path)).GetEntry(0)},
+      m_valueData{std::format("NT_SpdCtrl:{}", path)},
       m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTMotorControllerModel::SetPercent(double value) {
@@ -34,14 +30,12 @@ void NTMotorControllerModel::Update() {
   for (auto&& v : m_value.ReadQueue()) {
     m_valueData.SetValue(v.value, v.time);
   }
-  for (auto&& v : m_name.ReadQueue()) {
-    m_nameValue = std::move(v.value);
-  }
-  for (auto&& v : m_controllable.ReadQueue()) {
-    m_controllableValue = v.value;
-  }
 }
 
 bool NTMotorControllerModel::Exists() {
   return m_value.Exists();
+}
+
+bool NTMotorControllerModel::IsReadOnly() {
+  return !IsTunableTopicMutable(m_value.GetTopic());
 }

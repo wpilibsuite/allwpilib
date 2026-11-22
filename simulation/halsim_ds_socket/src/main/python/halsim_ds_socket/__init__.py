@@ -1,1 +1,1 @@
-from .main import loadExtension
+from .main import load_extension

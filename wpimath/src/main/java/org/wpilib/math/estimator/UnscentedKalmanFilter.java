@@ -12,11 +12,11 @@ import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.system.NumericalJacobian;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
-import org.wpilib.math.util.Pair;
 import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.util.Pair;
+import org.wpilib.util.UsageReporting;
 
 /**
  * A Kalman filter combines predictions from a model and measurements to give an estimate of the
@@ -174,7 +174,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
     m_pts = pts;
 
     reset();
-    MathSharedStore.getMathShared().reportUsage("UnscentedKalmanFilter", "");
+    UsageReporting.reportUsage("UnscentedKalmanFilter", "");
   }
 
   static <C extends Num> Pair<Matrix<C, N1>, Matrix<C, C>> squareRootUnscentedTransform(
@@ -564,19 +564,14 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num, Outpu
       Pxy = Pxy.plus(dx.times(dy).times(m_pts.getWc(i)));
     }
 
-    // Compute the Kalman gain. We use Eigen's QR decomposition to solve. This
-    // is equivalent to MATLAB's \ operator, so we need to rearrange to use
-    // that.
+    // Compute the Kalman gain (see wpimath/docs/LinalgIdentities.md)
     //
     //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
-    //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
+    //   K = (S_{y} \ P_{xy}ᵀ)ᵀ / S_{y}
     //   K = (S_{y}ᵀ \ (S_{y} \ P_{xy}ᵀ))ᵀ
     //
     // equation (27)
-    Matrix<States, R> K =
-        Sy.transpose()
-            .solveFullPivHouseholderQr(Sy.solveFullPivHouseholderQr(Pxy.transpose()))
-            .transpose();
+    Matrix<States, R> K = Sy.transpose().solve(Sy.solve(Pxy.transpose())).transpose();
 
     // Compute the posterior state mean
     //

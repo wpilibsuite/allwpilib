@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "wpi/halsim/ws_core/WSHalProviders.hpp"
 
 namespace wpilibws {
@@ -27,7 +25,6 @@ class HALSimWSProviderDIO : public HALSimWSHalChanProvider {
  private:
   int32_t m_initCbKey = 0;
   int32_t m_valueCbKey = 0;
-  int32_t m_pulseLengthCbKey = 0;
   int32_t m_inputCbKey = 0;
 };
 

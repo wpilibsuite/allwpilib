@@ -18,8 +18,6 @@
 #include <string>
 #include <thread>
 
-#include <fmt/format.h>
-
 #include "wpi/hal/Errors.h"
 
 namespace wpi::hal::init {

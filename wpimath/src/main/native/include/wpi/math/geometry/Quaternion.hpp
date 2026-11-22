@@ -163,7 +163,7 @@ class WPILIB_DLLEXPORT Quaternion final {
   /**
    * Matrix exponential of a quaternion.
    *
-   * source: wpimath/algorithms.md
+   * source: wpimath/docs/Quaternion.md
    *
    *  If this quaternion is in 𝖘𝖔(3) and you are looking for an element of
    * SO(3), use FromRotationVector
@@ -193,18 +193,23 @@ class WPILIB_DLLEXPORT Quaternion final {
   /**
    * Log operator of a quaternion.
    *
-   * source:  wpimath/algorithms.md
+   * source:  wpimath/docs/Quaternion.md
    *
    * If this quaternion is in SO(3) and you are looking for an element of 𝖘𝖔(3),
    * use ToRotationVector
    */
   constexpr Quaternion Log() const {
     double norm = Norm();
+    if (norm == 0.0) {
+      return Quaternion{0.0, 0.0, 0.0, 0.0};
+    }
+
     double scalar = gcem::log(norm);
 
     double v_norm = gcem::hypot(m_x, m_y, m_z);
 
-    double s_norm = W() / norm;
+    double w = W();
+    double s_norm = w / norm;
 
     if (gcem::abs(s_norm + 1) < 1e-9) {
       return Quaternion{scalar, -std::numbers::pi, 0, 0};
@@ -212,13 +217,15 @@ class WPILIB_DLLEXPORT Quaternion final {
 
     double v_scalar;
 
-    if (v_norm < 1e-9) {
+    if (v_norm < 1e-9 && w != 0.0) {
       // Taylor series expansion of atan2(y/x)/y at y = 0:
       //
       //   1/x - 1/3 y²/x³ + O(y⁴)
-      v_scalar = 1.0 / W() - 1.0 / 3.0 * v_norm * v_norm / (W() * W() * W());
+      v_scalar = 1.0 / w - 1.0 / 3.0 * v_norm * v_norm / (w * w * w);
+    } else if (v_norm == 0.0) {
+      v_scalar = 0.0;
     } else {
-      v_scalar = gcem::atan2(v_norm, W()) / v_norm;
+      v_scalar = gcem::atan2(v_norm, w) / v_norm;
     }
 
     return Quaternion{scalar, v_scalar * m_x, v_scalar * m_y, v_scalar * m_z};
@@ -276,7 +283,7 @@ class WPILIB_DLLEXPORT Quaternion final {
    *
    * This is also the exp operator of 𝖘𝖔(3).
    *
-   * source: wpimath/algorithms.md
+   * source: wpimath/docs/Quaternion.md
    */
   constexpr static Quaternion FromRotationVector(const Eigen::Vector3d& rvec) {
     // 𝑣⃗ = θ * v̂

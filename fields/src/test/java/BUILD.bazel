@@ -1,0 +1,13 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+
+wpilib_java_junit5_test(
+    name = "java",
+    srcs = glob(["**/*.java"]),
+    resources = ["//fields:test-resources"],
+    deps = [
+        "//fields/src/main/java",
+        "//wpimath/src/main/java",
+        "//wpiutil/src/main/java",
+        "@maven//:io_avaje_avaje_jsonb",
+    ],
+)

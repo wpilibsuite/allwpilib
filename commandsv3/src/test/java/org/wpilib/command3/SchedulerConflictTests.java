@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 class SchedulerConflictTests extends CommandTestBase {
   @Test
   void compositionsCannotAwaitConflictingCommands() {
-    var mech = new Mechanism("The Mechanism", m_scheduler);
+    var mech = new DummyMechanism("The Mechanism", m_scheduler);
 
     var group =
         Command.noRequirements(
@@ -40,7 +40,7 @@ class SchedulerConflictTests extends CommandTestBase {
 
   @Test
   void innerCommandMayInterruptOtherInnerCommand() {
-    var mechanism = new Mechanism("The mechanism", m_scheduler);
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
     var firstRan = new AtomicBoolean(false);
     var secondRan = new AtomicBoolean(false);
 
@@ -118,7 +118,7 @@ class SchedulerConflictTests extends CommandTestBase {
 
   @Test
   void childConflictsWithHigherPriorityTopLevel() {
-    var mechanism = new Mechanism("mechanism", m_scheduler);
+    var mechanism = new DummyMechanism("mechanism", m_scheduler);
     var top = mechanism.run(Coroutine::park).withPriority(10).named("Top");
 
     // Child conflicts with and is lower priority than the Top command
@@ -137,7 +137,7 @@ class SchedulerConflictTests extends CommandTestBase {
 
   @Test
   void childConflictsWithLowerPriorityTopLevel() {
-    var mechanism = new Mechanism("mechanism", m_scheduler);
+    var mechanism = new DummyMechanism("mechanism", m_scheduler);
     var top = mechanism.run(Coroutine::park).withPriority(-10).named("Top");
 
     // Child conflicts with and is higher priority than the Top command

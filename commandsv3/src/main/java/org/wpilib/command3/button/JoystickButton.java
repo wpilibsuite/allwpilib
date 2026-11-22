@@ -8,8 +8,13 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.HIDDevice;
 
-/** A {@link Trigger} that gets its state from a {@link GenericHID}. */
+/**
+ * A {@link Trigger} that gets its state from a {@link GenericHID}.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
+ */
 public class JoystickButton extends Trigger {
   /**
    * Creates a joystick button for triggering commands.
@@ -20,5 +25,15 @@ public class JoystickButton extends Trigger {
   public JoystickButton(GenericHID joystick, int buttonNumber) {
     super(() -> joystick.getRawButton(buttonNumber));
     requireNonNullParam(joystick, "joystick", "JoystickButton");
+  }
+
+  /**
+   * Creates a joystick button for triggering commands.
+   *
+   * @param joystick The HIDDevice object that has the button
+   * @param buttonNumber The button number (see {@link GenericHID#getRawButton(int) }
+   */
+  public JoystickButton(HIDDevice joystick, int buttonNumber) {
+    this(requireNonNullParam(joystick, "joystick", "JoystickButton").getHID(), buttonNumber);
   }
 }

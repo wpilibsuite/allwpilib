@@ -6,6 +6,7 @@
 
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/driverstation/POVDirection.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
@@ -16,9 +17,11 @@ namespace wpi::cmd {
  * A version of {@link wpi::GenericHID} with {@link Trigger} factories for
  * command-based.
  *
+ * This class is provided by the Commands v2 VendorDep
+ *
  * @see GenericHID
  */
-class CommandGenericHID {
+class CommandGenericHID final {
  public:
   /**
    * Construct an instance of a device.
@@ -27,6 +30,24 @@ class CommandGenericHID {
    * into.
    */
   explicit CommandGenericHID(int port);
+
+  /**
+   * Construct an instance of a device with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this command HID.
+   */
+  explicit CommandGenericHID(wpi::GenericHID& hid);
+
+  /**
+   * Gets the CommandGenericHID object for the given port. CommandGenericHID
+   * objects are cached, so this will always return the same object for the same
+   * port.
+   *
+   * @param port The port index on the Driver Station that the device is
+   * plugged into.
+   * @return The CommandGenericHID object for the given port.
+   */
+  static CommandGenericHID& GetCommandGenericHID(int port);
 
   /**
    * Get the underlying GenericHID object.
@@ -259,6 +280,6 @@ class CommandGenericHID {
   bool IsConnected() const;
 
  private:
-  wpi::GenericHID m_hid;
+  wpi::GenericHID* m_hid;
 };
 }  // namespace wpi::cmd
