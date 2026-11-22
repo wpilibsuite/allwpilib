@@ -26,16 +26,6 @@ import org.wpilib.simulation.SimHooks;
 import org.wpilib.util.Alert;
 
 class DriverStationTest {
-  @BeforeEach
-  void setUp() {
-    DriverStationBackend.clearUserProgramStarted();
-  }
-
-  @AfterEach
-  void tearDown() {
-    DriverStationBackend.clearUserProgramStarted();
-  }
-
   @ParameterizedTest
   @MethodSource("isConnectedProvider")
   void testIsConnected(int axisCount, int buttonCount, int povCount, boolean expected) {
@@ -229,9 +219,10 @@ class DriverStationTest {
     DriverStationSim.setJoystickPOVsAvailable(stick, 0);
   }
 
+  @BeforeEach
   @AfterEach
-  @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
-  void resetUserProgramFlag() throws ReflectiveOperationException {
+  void resetDriverStation() {
+    DriverStationSim.resetData();
     disconnectJoystick(0);
     DriverStationSim.setFmsAttached(false);
     DriverStationSim.notifyNewData();
@@ -239,9 +230,6 @@ class DriverStationTest {
     AlertSim.resetData();
     DriverStationBackend.silenceJoystickConnectionAlert(false);
     assertFalse(isJoystickDisconnectedAlertActive(0));
-
-    var field = DriverStationBackend.class.getDeclaredField("m_userProgramStarted");
-    field.setAccessible(true);
-    field.set(null, false);
+    DriverStationBackend.clearUserProgramStarted();
   }
 }
