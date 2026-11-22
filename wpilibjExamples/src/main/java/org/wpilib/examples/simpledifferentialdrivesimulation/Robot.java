@@ -82,4 +82,10 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {
     drive.simulationPeriodic();
   }
+
+  @Override
+  public void disabledInit() {
+    // This just makes sure that our simulation code knows that the motor's off.
+    drive.stop();
+  }
 }

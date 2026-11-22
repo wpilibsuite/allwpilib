@@ -110,6 +110,12 @@ public class Drivetrain {
     setVelocities(kinematics.toWheelVelocities(new ChassisVelocities(xVelocity, 0, rot)));
   }
 
+  /** Stop the drivetrain motors. */
+  public void stop() {
+    leftLeader.setThrottle(0.0);
+    rightLeader.setThrottle(0.0);
+  }
+
   /** Update robot odometry. */
   public void updateOdometry() {
     odometry.update(imu.getRotation2d(), leftEncoder.getDistance(), rightEncoder.getDistance());

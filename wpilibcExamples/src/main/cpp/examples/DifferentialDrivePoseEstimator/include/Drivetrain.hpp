@@ -58,6 +58,8 @@ class Drivetrain {
   void Drive(wpi::units::meters_per_second_t xVelocity,
              wpi::units::radians_per_second_t rot);
 
+  void Stop();
+
   /**
    * Updates the field-relative position.
    */
