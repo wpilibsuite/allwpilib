@@ -451,6 +451,7 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
         continue;
       }
       m_state = ACTIVE;
+      blocked = false;
       written = 0;
     }
 
@@ -506,15 +507,29 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
             blocked = true;
             break;
           }
-          WriteToFile(state.f, buf.GetData(), state.filename, m_msglog);
+          if (!WriteToFile(state.f, buf.GetData(), state.filename, m_msglog)) {
+            [[unlikely]] blocked = true;
+            break;
+          }
         }
 
         // sync to storage
 #if defined(__linux__)
-        ::fdatasync(state.f);
+        if (!blocked && ::fdatasync(state.f) != 0) {
+          [[unlikely]] WPI_ERROR(m_msglog, "Error syncing log file '{}': {}",
+                                 state.filename, std::strerror(errno));
+          blocked = true;
+        }
 #elif defined(__APPLE__)
-        ::fsync(state.f);
+        if (!blocked && ::fsync(state.f) != 0) {
+          [[unlikely]] WPI_ERROR(m_msglog, "Error syncing log file '{}': {}",
+                                 state.filename, std::strerror(errno));
+          blocked = true;
+        }
 #endif
+        if (blocked) {
+          [[unlikely]] DataLog::SetBlocked(true);
+        }
         lock.lock();
         if (blocked) {
           [[unlikely]] m_state = PAUSED;
@@ -529,6 +544,9 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
     if (!newDir.empty() && m_state != STOPPED) {
       lock.unlock();
       bool transferred = TransferLogFile(state, newDir, maxTransferSize);
+      if (transferred) {
+        DataLog::SetBlocked(false);
+      }
       lock.lock();
       if (transferred) {
         m_dir = std::move(newDir);

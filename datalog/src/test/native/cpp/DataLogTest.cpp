@@ -207,10 +207,17 @@ TEST_CASE("DataLogTest FlushDoesNotResumeManualPause", "[datalog][data-log]") {
   wpi::log::DataLogWriter writer{
       std::make_unique<wpi::util::raw_uvector_ostream>(output)};
   int entry = writer.Start("integer", "int64", {}, 1);
+  CHECK(writer.GetBufferFreeSpace() > 0);
   writer.Pause();
+  CHECK(writer.GetBufferFreeSpace() == 0);
   writer.Flush();
+  CHECK(writer.GetBufferFreeSpace() == 0);
   writer.AppendInteger(entry, 42, 2);
   writer.Flush();
+  writer.Resume();
+  CHECK(writer.GetBufferFreeSpace() > 0);
+  writer.Stop();
+  CHECK(writer.GetBufferFreeSpace() == 0);
 
   wpi::log::DataLogReader reader{
       wpi::util::MemoryBuffer::GetMemBufferCopy(output, "manual-pause")};
@@ -229,13 +236,20 @@ TEST_CASE("DataLogTest BufferFullReportedOnceUntilDrain",
   payload.back() = 0xa5;
 
   for (int i = 1; i <= 2; ++i) {
+    CHECK(log.GetBufferFreeSpace() > 0);
     log.AppendRaw(entry, payload, i * 1000);
     CHECK(log.bufferFullCount == i);
+    CHECK(log.GetBufferFreeSpace() == 0);
+
+    // Resume() must not clear a buffer-full pause before Flush()
+    log.Resume();
+    CHECK(log.GetBufferFreeSpace() == 0);
 
     // Pause applies to subsequent records, preserving the oversized record.
     log.AppendRaw(entry, std::span<const uint8_t>{payload}.first(1), 3000);
     CHECK(log.bufferFullCount == i);
     log.Flush();
+    CHECK(log.GetBufferFreeSpace() > 0);
   }
 
   wpi::log::DataLogReader reader{
