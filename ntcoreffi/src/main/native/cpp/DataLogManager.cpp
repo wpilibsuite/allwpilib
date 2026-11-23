@@ -175,7 +175,8 @@ inline void RemoveRefreshedDataEventHandle(WPI_EventHandle event) {}
 }  // namespace DriverStation
 
 struct Thread final : public ::wpi::util::SafeThread {
-  Thread(std::string_view dir, bool internalStorage, std::string_view filename,
+  Thread(std::string_view dir, bool internalStorage,
+         std::string_view pendingDir, std::string_view filename,
          double period);
   ~Thread() override;
 
@@ -189,6 +190,7 @@ struct Thread final : public ::wpi::util::SafeThread {
   void CheckUsbStorage();
 
   bool m_internalStorage;
+  std::string m_pendingDir;
   bool m_filenameOverride;
   ::wpi::log::DataLogBackgroundWriter m_log;
   bool m_ntLoggerEnabled = false;
@@ -232,6 +234,23 @@ static std::string FindUsbLogDir(std::string_view usbRoot) {
     return {};
   }
   return logDir.string();
+}
+
+bool ::wpi::internal::TryTransferDataLogToDir(
+    ::wpi::log::DataLogBackgroundWriter& log, std::string_view dir) {
+  if (log.GetDir() == dir) {
+    return true;
+  }
+  // Only transfer once the directory actually exists. In particular, do not
+  // create it: the parent may be an unmounted USB mount point, and creating
+  // the directory there would shadow the mount.
+  std::error_code ec;
+  auto s = fs::status(dir, ec);
+  if (ec || !fs::is_directory(s)) {
+    return false;
+  }
+  log.SetDir(dir, MAX_TRANSFER_SIZE);
+  return false;
 }
 
 bool ::wpi::internal::TryTransferDataLogToUsb(
@@ -280,24 +299,42 @@ static bool IsMatchLog(std::string_view filename) {
   return true;
 }
 
-static std::pair<std::string, bool> MakeLogDir(std::string_view dir) {
+struct LogDirResult {
+  std::string dir;
+  bool internalStorage = false;
+  std::string pendingDir;
+};
+
+static LogDirResult MakeLogDir(std::string_view dir) {
+  std::string pendingDir;
   if (!dir.empty()) {
-    return {std::string{dir}, false};
+    std::error_code ec;
+    auto s = fs::status(dir, ec);
+    if (!ec && fs::is_directory(s)) {
+      return {std::string{dir}, false, {}};
+    }
+    // The requested directory is not accessible yet (e.g. it is on a USB
+    // drive that has not mounted). Fall through to the default location and
+    // transfer the log there once the directory becomes available, so early
+    // log data is buffered instead of being dropped.
+    pendingDir = std::string{dir};
   }
 #ifdef __FIRST_SYSTEMCORE__
-  // prefer a mounted USB drive if one is accessible
-  auto usbDir = FindUsbLogDir("/u");
-  if (!usbDir.empty()) {
-    return {usbDir, false};
+  if (pendingDir.empty()) {
+    // prefer a mounted USB drive if one is accessible
+    auto usbDir = FindUsbLogDir("/u");
+    if (!usbDir.empty()) {
+      return {usbDir, false, {}};
+    }
   }
   std::error_code ec;
   fs::create_directory("/home/systemcore/logs", ec);
-  return {"/home/systemcore/logs", true};
+  return {"/home/systemcore/logs", true, pendingDir};
 #else
   std::string logDir = filesystem::GetOperatingDirectory() + "/logs";
   std::error_code ec;
   fs::create_directory(logDir, ec);
-  return {logDir, false};
+  return {logDir, false, pendingDir};
 #endif
 }
 
@@ -318,8 +355,10 @@ static std::string MakeLogFilename(std::string_view filenameOverride) {
 }
 
 Thread::Thread(std::string_view dir, bool internalStorage,
-               std::string_view filename, double period)
+               std::string_view pendingDir, std::string_view filename,
+               double period)
     : m_internalStorage{internalStorage},
+      m_pendingDir{pendingDir},
       m_filenameOverride{!filename.empty()},
       m_log{dir, MakeLogFilename(filename), period},
       m_messageLog{m_log, "messages"} {
@@ -539,6 +578,16 @@ void Thread::CheckFreeSpace() {
 }
 
 void Thread::CheckUsbStorage() {
+  if (!m_pendingDir.empty()) {
+    if (::wpi::internal::TryTransferDataLogToDir(m_log, m_pendingDir)) {
+      m_pendingDir.clear();
+      if (m_internalStorage) {
+        m_internalStorage = false;
+        m_internalStorageAlert.Set(false);
+      }
+    }
+    return;
+  }
   if (m_internalStorage &&
       ::wpi::internal::TryTransferDataLogToUsb(m_log, "/u")) {
     m_internalStorage = false;
@@ -583,7 +632,7 @@ Instance::Instance(std::string_view dir, std::string_view filename,
   // Delete all previously existing WPILIB_TBD_*.wpilog files. These only exist
   // when the robot never connects to the DS, so they are very unlikely to
   // have useful data and just clutter the filesystem.
-  auto [logDir, internalStorage] = MakeLogDir(dir);
+  auto [logDir, internalStorage, pendingDir] = MakeLogDir(dir);
   std::error_code ec;
   for (fs::directory_iterator it{logDir, ec}, end; !ec && it != end;
        it.increment(ec)) {
@@ -597,7 +646,7 @@ Instance::Instance(std::string_view dir, std::string_view filename,
     }
   }
 
-  owner.Start(logDir, internalStorage, filename, period);
+  owner.Start(logDir, internalStorage, pendingDir, filename, period);
 }
 
 static Instance& GetInstance(std::string_view dir = "",
@@ -605,8 +654,9 @@ static Instance& GetInstance(std::string_view dir = "",
                              double period = 0.25) {
   static Instance instance(dir, filename, period);
   if (!instance.owner) {
-    auto [logDir, internalStorage] = MakeLogDir(dir);
-    instance.owner.Start(logDir, internalStorage, filename, period);
+    auto [logDir, internalStorage, pendingDir] = MakeLogDir(dir);
+    instance.owner.Start(logDir, internalStorage, pendingDir, filename,
+                         period);
   }
   return instance;
 }
