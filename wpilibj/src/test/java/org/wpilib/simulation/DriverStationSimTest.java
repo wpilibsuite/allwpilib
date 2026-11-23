@@ -36,7 +36,7 @@ class DriverStationSimTest {
   void resetDriverStation() {
     DriverStationSim.resetData();
     DriverStationSim.notifyNewData();
-    DriverStationBackend.clearUserProgramStarted();
+    RobotState.clearUserProgramStarted();
   }
 
   @Test
@@ -60,7 +60,7 @@ class DriverStationSimTest {
   void testAutonomous() {
     HAL.initialize();
     DriverStationSim.resetData();
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
 
     assertFalse(RobotState.isAutonomous());
     EnumCallback callback = new EnumCallback();
@@ -79,7 +79,7 @@ class DriverStationSimTest {
   void testTest() {
     HAL.initialize();
     DriverStationSim.resetData();
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
 
     assertFalse(RobotState.isUtility());
     EnumCallback callback = new EnumCallback();
