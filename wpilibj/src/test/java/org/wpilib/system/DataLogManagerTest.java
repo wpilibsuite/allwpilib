@@ -47,6 +47,28 @@ class DataLogManagerTest {
     }
   }
 
+  @Test
+  @Timeout(5)
+  void lateCustomDir(@TempDir Path root) throws IOException, InterruptedException {
+    Path source = Files.createDirectory(root.resolve("internal"));
+    Path custom = root.resolve("custom");
+    try (var log = new DataLogBackgroundWriter(source.toString(), "test.wpilog")) {
+      int entry = log.start("integer", "int64", "", 1);
+      log.appendInteger(entry, 42, 2);
+      // The custom directory does not exist yet: no transfer is requested.
+      assertFalse(DataLogManager.tryTransferToDir(log, custom));
+      assertEquals(source.toString(), log.getDir());
+
+      Files.createDirectory(custom);
+      while (!DataLogManager.tryTransferToDir(log, custom)) {
+        Thread.sleep(10);
+      }
+      assertEquals(custom.toString(), log.getDir());
+      assertTrue(Files.exists(custom.resolve("test.wpilog")));
+      assertFalse(Files.exists(source.resolve("test.wpilog")));
+    }
+  }
+
   private List<AlertSim.AlertInfo> getStorageAlerts() {
     return Arrays.stream(AlertSim.getAll())
         .filter(alert -> "DataLogManager".equals(alert.group))
