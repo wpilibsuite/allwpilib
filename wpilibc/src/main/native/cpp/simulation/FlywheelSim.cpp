@@ -59,9 +59,11 @@ wpi::units::ampere_t FlywheelSim::GetCurrentDraw() const {
   // I = V / R - omega / (Kv * R)
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
+  // Use 1, not sgn(V), at zero applied voltage: sgn(0) is 0, which would hide
+  // the back-EMF braking current through the motor at 0 V.
   return m_gearbox.Current(wpi::units::radians_per_second_t{m_x(0)} * m_gearing,
                            wpi::units::volt_t{m_u(0)}) *
-         wpi::util::sgn(m_u(0));
+         (m_u(0) < 0.0 ? -1.0 : 1.0);
 }
 
 wpi::units::volt_t FlywheelSim::GetInputVoltage() const {
