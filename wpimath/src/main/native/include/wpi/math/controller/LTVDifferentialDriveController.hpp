@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cmath>
+#include <limits>
 
 #include <Eigen/Core>
 
@@ -89,6 +90,9 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * Sets the pose error which is considered tolerable for use with
    * AtReference().
    *
+   * The default tolerance is (x = 0.05 m, y = 0.05 m, heading = 0.05 rad,
+   * left velocity = ∞, right velocity = ∞).
+   *
    * @param poseTolerance Pose error which is tolerable.
    * @param leftVelocityTolerance Left velocity error which is tolerable.
    * @param rightVelocityTolerance Right velocity error which is tolerable.
@@ -155,8 +159,10 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
 
   wpi::units::second_t m_dt;
 
-  Eigen::Vector<double, 5> m_error;
-  Eigen::Vector<double, 5> m_tolerance;
+  Eigen::Vector<double, 5> m_error = Eigen::Vector<double, 5>::Zero();
+  Eigen::Vector<double, 5> m_tolerance{0.05, 0.05, 0.05,
+                                       std::numeric_limits<double>::infinity(),
+                                       std::numeric_limits<double>::infinity()};
 };
 
 }  // namespace wpi::math

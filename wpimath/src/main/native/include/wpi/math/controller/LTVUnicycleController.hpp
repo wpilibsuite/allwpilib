@@ -10,7 +10,9 @@
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
@@ -84,6 +86,8 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    * Sets the pose error which is considered tolerable for use with
    * AtReference().
    *
+   * The default tolerance is (x = 0.05 m, y = 0.05 m, heading = 0.05 rad).
+   *
    * @param poseTolerance Pose error which is tolerable.
    */
   void SetTolerance(const Pose2d& poseTolerance) {
@@ -141,7 +145,7 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
   wpi::units::second_t m_dt;
 
   Pose2d m_poseError;
-  Pose2d m_poseTolerance;
+  Pose2d m_poseTolerance{0.05_m, 0.05_m, 0.05_rad};
   bool m_enabled = true;
 };
 
