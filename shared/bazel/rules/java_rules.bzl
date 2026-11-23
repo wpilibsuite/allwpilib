@@ -59,7 +59,7 @@ def wpilib_java_junit5_test(
         runtime_deps = [],
         args = [],
         tags = [],
-        package = "edu",
+        package = "org.wpilib",
         **kwargs):
     """
     Convenience helper to make a junit5 test
