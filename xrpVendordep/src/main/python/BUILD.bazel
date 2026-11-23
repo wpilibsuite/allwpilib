@@ -29,7 +29,7 @@ generate_robotpy_pybind_build_info(
     additional_srcs = ["//xrpVendordep:robotpy-native-xrp.copy_headers"],
     package_root_file = "xrp/__init__.py",
     pkgcfgs = PKG_CONFIG_DEPS,
-    yaml_files = glob(["semiwrap/**/*.yml"]),
+    yaml_files = glob(["semiwrap/*.yml"]),
 )
 
 xrp_extension(

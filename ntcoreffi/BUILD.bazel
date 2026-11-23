@@ -28,11 +28,11 @@ cc_library(
 
 wpilib_cc_library(
     name = "ntcoreffi",
-    srcs = glob([
-        "src/main/native/c/**",
-        "src/main/native/cpp/**",
-    ]),
-    hdrs = glob(["src/main/native/include/**"]),
+    srcs = [
+        "src/main/native/c/ntcoreffi.c",
+        "src/main/native/cpp/DataLogManager.cpp",
+    ],
+    hdrs = ["src/main/native/include/DataLogManager.h"],
     extra_hdr_pkg_files = [
         "//wpiutil:llvm-hdrs-pkg",
         "//wpiutil:wpiutil-hdrs-pkg",

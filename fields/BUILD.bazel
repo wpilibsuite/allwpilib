@@ -21,20 +21,23 @@ FIELD_IMAGES = glob(
 
 filegroup(
     name = "test-resources",
-    srcs = glob(["src/test/resources/**"]),
+    srcs = glob([
+        "src/test/resources/**/*.png",
+        "src/test/resources/**/*.json",
+    ]),
     visibility = ["//fields/src/test/java:__pkg__"],
 )
 
 filegroup(
     name = "generated-native-include-files",
-    srcs = glob(["src/generated/main/native/include/**/*"]),
+    srcs = glob(["src/generated/main/native/include/**/*.hpp"]),
     visibility = ["//fields:__subpackages__"],
 )
 
 filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/main/native/include/**/*",
+        "src/main/native/include/**/*.hpp",
     ]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
@@ -151,7 +154,7 @@ wpilib_cc_library(
         "src/main/native/cpp/FieldImage.cpp",
         "src/main/native/cpp/FieldTag.cpp",
     ],
-    hdrs = glob(["src/main/native/include/**/*"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]),
     extra_src_pkg_files = [
         ":field-handwritten-srcs-pkg",
         ":field-resource-srcs-pkg",
@@ -189,7 +192,7 @@ wpilib_cc_library(
     srcs = [":generate-image-resources"] + [
         "src/generated/main/native/cpp/fieldimages/field_images.cpp",
     ],
-    hdrs = glob(["src/main/native/include/**/*"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]),
     extra_src_pkg_files = [
         ":field-image-resource-srcs-pkg",
     ],

@@ -25,8 +25,8 @@ py_binary(
 filegroup(
     name = "templates",
     srcs = glob([
-        "src/generate/main/**",
-        "src/main/proto/**",
+        "src/generate/main/java/*.jinja",
+        "src/main/proto/*.proto",
     ]) + [
         "//wpilibj:hid_schema",
     ],
@@ -55,6 +55,6 @@ filegroup(
 
 filegroup(
     name = "proto_files",
-    srcs = glob(["src/main/proto/**"]),
+    srcs = ["src/main/proto/protobuf_commands.proto"],
     visibility = ["//commandsv3/src/main/java:__pkg__"],
 )
