@@ -5,6 +5,7 @@
 package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.rotation.Encoder;
@@ -89,5 +90,30 @@ class DCMotorSimTest {
       assertEquals(750, encoder.getDistance(), 1.0);
       assertEquals(0, encoder.getRate(), 0.1);
     }
+  }
+
+  @Test
+  void testCurrentDrawAtZeroVoltage() {
+    RoboRioSim.resetData();
+    RoboRioSim.setVInVoltage(12);
+
+    DCMotor gearbox = DCMotor.getNeo(1);
+    LinearSystem<N2, N1, N2> plant =
+        Models.angularPositionFromPhysicalConstants(gearbox, 0.0005, 1);
+    DCMotorSim sim = new DCMotorSim(plant, gearbox);
+
+    // Spin up at full voltage so the motor has back-EMF to report
+    sim.setInputVoltage(12);
+    for (int i = 0; i < 100; i++) {
+      sim.update(0.020);
+    }
+    assertTrue(sim.getAngularVelocity() > 0.0);
+
+    // Cutting the voltage must not zero the current: the spinning motor still
+    // drives a braking current through its windings
+    sim.setInputVoltage(0);
+    assertTrue(sim.getCurrentDraw() < 0.0);
+    assertEquals(
+        gearbox.getCurrent(sim.getAngularVelocity(), 0), sim.getCurrentDraw(), 1.0);
   }
 }
