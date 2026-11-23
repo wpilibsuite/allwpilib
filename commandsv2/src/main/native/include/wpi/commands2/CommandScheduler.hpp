@@ -201,6 +201,13 @@ class CommandScheduler final : public wpi::telemetry::TelemetryLoggable,
   void UnregisterAllSubsystems();
 
   /**
+   * Gets all registered subsystems.
+   *
+   * @return a copy of the registered subsystems
+   */
+  std::vector<Subsystem*> GetAllRegisteredSubsystems() const;
+
+  /**
    * Sets the default command for a subsystem.  Registers that subsystem if it
    * is not already registered.  Default commands will run whenever there is no
    * other command currently scheduled that requires the subsystem.  Default
