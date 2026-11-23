@@ -8,8 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.avaje.jsonb.Jsonb;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.autodiff.Variable;
 import org.wpilib.math.geometry.Pose2d;
@@ -18,6 +23,27 @@ import org.wpilib.math.geometry.Translation2d;
 
 class Ellipse2dTest {
   private static final double EPSILON = 1E-9;
+
+  @Test
+  void testJson() {
+    var type = Jsonb.instance().type(Ellipse2d.class);
+    var ellipse = new Ellipse2d(new Pose2d(1, 2, Rotation2d.fromDegrees(90)), 3, 4);
+    var output = new ByteArrayOutputStream();
+    type.toJson(ellipse, output);
+    var json = output.toString(StandardCharsets.UTF_8);
+
+    assertTrue(json.contains("\"center\""));
+    assertTrue(json.contains("\"xSemiAxis\""));
+    assertTrue(json.contains("\"ySemiAxis\""));
+    assertEquals(ellipse, type.fromJson(new ByteArrayInputStream(output.toByteArray())));
+    var fixture =
+        "{\"center\":{\"translation\":{\"x\":1.0,\"y\":2.0},"
+            + "\"rotation\":{\"radians\":1.5707963267948966}},"
+            + "\"xSemiAxis\":3.0,\"ySemiAxis\":4.0}";
+    assertEquals(ellipse, type.fromJson(fixture));
+    var invalid = fixture.replace("\"xSemiAxis\":3.0", "\"xSemiAxis\":0.0");
+    assertThrows(RuntimeException.class, () -> type.fromJson(invalid));
+  }
 
   @Test
   void testGetFocalPoints() {

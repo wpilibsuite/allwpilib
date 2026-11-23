@@ -3,7 +3,7 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_test(
     name = "glass_tests",
     size = "small",
-    srcs = glob(["cpp/**"]),
+    srcs = glob(["cpp/*.cpp"]),
     tags = [
         "wpi-cpp-gui",
     ],

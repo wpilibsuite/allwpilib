@@ -99,7 +99,9 @@ jobs:
 
     name: "${{ matrix.name }} ${{ matrix.action }} (${{ matrix.compilation_mode }})"
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
+    container:
+      image: ${{ matrix.container }}
+      options: --privileged
     steps:
       - name: Check disk free space pre-cleanup
         run: df -h
@@ -166,7 +168,7 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          archive: false
+          name: ${{ matrix.name }} ${{ matrix.compilation_mode }} Bazel profiles
           include-hidden-files: true
           path: ${{ case(runner.os == 'Windows', 'D:/_bazel/command-*.profile.gz', runner.os == 'Linux', '/github/home/.bazel/command-*.profile.gz', '/Users/runner/.bazel/command-*.profile.gz') }}
         if: always()

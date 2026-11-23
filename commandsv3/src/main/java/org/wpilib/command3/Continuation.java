@@ -25,6 +25,8 @@ import java.lang.invoke.WrongMethodTypeException;
  *
  * <p>Teams don't need to use continuations directly with the commands framework; all mounting and
  * unmounting is handled by the command scheduler and a coroutine wrapper.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 @SuppressWarnings("PMD.AvoidCatchingGenericException")
 final class Continuation {

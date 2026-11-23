@@ -9,7 +9,7 @@ load("//thirdparty/imgui_suite/imgui_test_engine:imgui_test.bzl", "IMGUI_TEST_EN
 cc_library(
     name = "fonts",
     srcs = glob(["generated/fonts/src/**"]),
-    hdrs = glob(["generated/fonts/include/**"]),
+    hdrs = glob(["generated/fonts/include/*.h"]),
     includes = ["generated/fonts/include"],
     deps = [
         ":imgui",
@@ -65,13 +65,44 @@ cc_library(
 
 cc_library(
     name = "implot",
-    srcs = glob(["implot/cpp/**"]),
-    hdrs = glob(["implot/include/**"]),
+    srcs = glob(["implot/cpp/*.cpp"]),
+    hdrs = glob(["implot/include/*.h"]),
     includes = ["implot/include"],
     linkstatic = True,
     strip_include_prefix = "implot/include",
     deps = [
         ":imgui",
+    ],
+)
+
+#----------------------------------------
+# IMNODEFLOW
+#----------------------------------------
+
+cc_library(
+    name = "imnodeflow_detail",
+    hdrs = glob([
+        "imnodeflow/src/**/*.h",
+        "imnodeflow/src/**/*.inl",
+    ]),
+    includes = ["imnodeflow/src"],
+    linkstatic = True,
+    strip_include_prefix = "imnodeflow/src",
+    deps = [
+        ":imgui",
+    ],
+)
+
+cc_library(
+    name = "imnodeflow",
+    srcs = glob(["imnodeflow/src/**/*.cpp"]),
+    hdrs = glob(["imnodeflow/include/**/*.h"]),
+    includes = ["imnodeflow/include"],
+    linkstatic = True,
+    strip_include_prefix = "imnodeflow/include",
+    deps = [
+        ":imgui",
+        ":imnodeflow_detail",
     ],
 )
 
@@ -81,8 +112,8 @@ cc_library(
 
 cc_library(
     name = "stb",
-    srcs = glob(["stb/cpp/**"]),
-    hdrs = glob(["stb/include/**"]),
+    srcs = ["stb/cpp/stb_image.cpp"],
+    hdrs = ["stb/include/stb_image.h"],
     linkstatic = True,
     strip_include_prefix = "stb/include",
 )
@@ -99,6 +130,7 @@ wpilib_cc_library(
     deps = [
         ":fonts",
         ":imgui",
+        ":imnodeflow",
         ":implot",
         ":stb",
     ],
@@ -114,25 +146,40 @@ wpilib_cc_static_library(
 
 pkg_files(
     name = "imgui-hdrs-pkg",
-    srcs = glob(["imgui/include/**"]),
+    srcs = glob(["imgui/include/**/*.h"]),
     strip_prefix = "imgui/include",
 )
 
 pkg_files(
     name = "implot-hdrs-pkg",
-    srcs = glob(["implot/include/**"]),
+    srcs = glob(["implot/include/**/*.h"]),
     strip_prefix = "implot/include",
 )
 
 pkg_files(
+    name = "imnodeflow-hdrs-pkg",
+    srcs = glob(["imnodeflow/include/**"]),
+    strip_prefix = "imnodeflow/include",
+)
+
+pkg_files(
+    name = "imnodeflow-detail-hdrs-pkg",
+    srcs = glob([
+        "imnodeflow/src/**/*.h",
+        "imnodeflow/src/**/*.inl",
+    ]),
+    strip_prefix = "imnodeflow/src",
+)
+
+pkg_files(
     name = "stb-hdrs-pkg",
-    srcs = glob(["stb/include/**"]),
+    srcs = ["stb/include/stb_image.h"],
     strip_prefix = "stb/include",
 )
 
 pkg_files(
     name = "generated-fonts-hdrs-pkg",
-    srcs = glob(["generated/fonts/include/**"]),
+    srcs = glob(["generated/fonts/include/*.h"]),
     strip_prefix = "generated/fonts/include/",
 )
 
@@ -141,6 +188,8 @@ pkg_zip(
     srcs = [
         "generated-fonts-hdrs-pkg",
         "imgui-hdrs-pkg",
+        "imnodeflow-detail-hdrs-pkg",
+        "imnodeflow-hdrs-pkg",
         "implot-hdrs-pkg",
         "stb-hdrs-pkg",
         "//:license_pkg_files",
@@ -152,19 +201,28 @@ pkg_zip(
 
 pkg_files(
     name = "imgui-srcs-pkg",
-    srcs = glob(["imgui/cpp/**"]),
+    srcs = glob([
+        "imgui/cpp/**/*.cpp",
+        "imgui/cpp/**/*.h",
+    ]),
     strip_prefix = "imgui/cpp",
 )
 
 pkg_files(
     name = "implot-srcs-pkg",
-    srcs = glob(["implot/cpp/**"]),
+    srcs = glob(["implot/cpp/*.cpp"]),
     strip_prefix = "implot/cpp",
 )
 
 pkg_files(
+    name = "imnodeflow-srcs-pkg",
+    srcs = glob(["imnodeflow/src/**"]),
+    strip_prefix = "imnodeflow/src",
+)
+
+pkg_files(
     name = "stb-srcs-pkg",
-    srcs = glob(["stb/cpp/**"]),
+    srcs = ["stb/cpp/stb_image.cpp"],
     strip_prefix = "stb/cpp",
 )
 
@@ -179,6 +237,7 @@ pkg_zip(
     srcs = [
         "generated-fonts-srcs-pkg",
         "imgui-srcs-pkg",
+        "imnodeflow-srcs-pkg",
         "implot-srcs-pkg",
         "stb-srcs-pkg",
         "//:license_pkg_files",

@@ -18,6 +18,8 @@ import org.wpilib.annotation.NoDiscard;
  * StagedCommandBuilder}, the final command is created by calling the terminal {@link
  * #named(String)} method, or with an automatically generated name using {@link
  * #withAutomaticName()}.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 @NoDiscard
 public class SequentialGroupBuilder {

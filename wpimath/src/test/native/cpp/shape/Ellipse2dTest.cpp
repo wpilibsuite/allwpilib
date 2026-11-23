@@ -11,6 +11,20 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/util/json.hpp"
+
+TEST_CASE("Ellipse2dTest JSON", "[wpimath]") {
+  const wpi::math::Ellipse2d ellipse{{1_m, 2_m, 90_deg}, 3_m, 4_m};
+  wpi::util::json json = ellipse;
+
+  CHECK(json.at("center").get<wpi::math::Pose2d>() == ellipse.Center());
+  CHECK(json.at("xSemiAxis").get_number() == 3.0);
+  CHECK(json.at("ySemiAxis").get_number() == 4.0);
+  CHECK(json.get<wpi::math::Ellipse2d>() == ellipse);
+
+  json["xSemiAxis"] = 0.0;
+  CHECK_THROWS(json.get<wpi::math::Ellipse2d>());
+}
 
 TEST_CASE("Ellipse2dTest FocalPoints", "[wpimath]") {
   constexpr wpi::math::Pose2d center{1_m, 2_m, 0_deg};

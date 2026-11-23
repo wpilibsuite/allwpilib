@@ -4,7 +4,11 @@
 
 package org.wpilib.command3;
 
-/** Describes when a command bound to a trigger should run. */
+/**
+ * Describes when a command bound to a trigger should run.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
+ */
 enum BindingType {
   /**
    * An immediate or manual binding created when calling {@link Scheduler#schedule(Command)}

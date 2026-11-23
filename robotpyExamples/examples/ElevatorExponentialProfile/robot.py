@@ -25,8 +25,8 @@ class MyRobot(wpilib.TimedRobot):
 
         # Create a motion profile with the given maximum voltage and characteristics kV, kA
         # These gains should match your feedforward kV, kA for best results.
-        self.profile = wpimath.ExponentialProfile(
-            wpimath.ExponentialProfile.Constraints.from_characteristics(10, 1, 1)
+        self.constraints = wpimath.ExponentialProfile.Constraints.from_characteristics(
+            10, 1, 1
         )
         self.goal = wpimath.ExponentialProfile.State(0, 0)
         self.setpoint = wpimath.ExponentialProfile.State(0, 0)
@@ -43,7 +43,10 @@ class MyRobot(wpilib.TimedRobot):
 
         # Retrieve the profiled setpoint for the next timestep. This setpoint moves
         # toward the goal while obeying the constraints.
-        next_state = self.profile.calculate(self.DT, self.setpoint, self.goal)
+        sample = wpimath.ExponentialProfile.generate(
+            self.constraints, self.setpoint, self.goal
+        ).sample_at(self.DT)
+        next_state = wpimath.ExponentialProfile.State(sample.position, sample.velocity)
 
         # Send setpoint to offboard controller PID
         self.motor.set_setpoint(

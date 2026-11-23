@@ -59,7 +59,7 @@ platform(
     name = "linux_x86_64",
     exec_properties = {
         "OSFamily": "Linux",
-        "container-image": "docker://wpilib/debian-base:trixie@sha256:4c20e850c88d9766a3aeaaf12901c9ca5e511b6ce59930046c187ce576fa1eeb",
+        "container-image": "docker://wpilib/debian-base:trixie@sha256:d35e5380a706f04c4401c082ad7ef10d17d79e3673721707358684a4b17b563d",
         "dockerAddCapabilities": "SYS_PTRACE",
         "dockerReuse": "True",
     },

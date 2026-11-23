@@ -14,7 +14,11 @@ namespace wpi::xrp {
  * @{
  */
 
-/** This class represents the ultrasonic rangefinder on an XRP robot. */
+/**
+ * This class represents the ultrasonic rangefinder on an XRP robot.
+ *
+ * This class is provided by the XRP VendorDep
+ */
 class XRPRangefinder {
  public:
   /**

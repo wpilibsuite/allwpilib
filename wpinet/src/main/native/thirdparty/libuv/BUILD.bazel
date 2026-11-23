@@ -92,12 +92,15 @@ cc_library(
 # rules there cannot glob across the package boundary this BUILD file creates.
 filegroup(
     name = "include_files",
-    srcs = glob(["include/**"]),
+    srcs = glob(["include/**/*.h"]),
     visibility = ["//visibility:public"],
 )
 
 filegroup(
     name = "src_files",
-    srcs = glob(["src/**"]),
+    srcs = glob([
+        "src/**/*.cpp",
+        "src/**/*.h",
+    ]),
     visibility = ["//visibility:public"],
 )

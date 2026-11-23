@@ -89,14 +89,7 @@ std::string FormatString(const char* msg, va_list args) {
 
   std::size_t size = 256;
   char local_buff[256];
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-#endif  // __GNUC__
   auto ret = vsnprintf(local_buff, size, msg, args_cp);
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif  // __GNUC__
 
   va_end(args_cp);
 
@@ -112,14 +105,10 @@ std::string FormatString(const char* msg, va_list args) {
   // we did not provide a long enough buffer on our first attempt.
   size = static_cast<size_t>(ret) + 1;  // + 1 for the null byte
   std::unique_ptr<char[]> buff(new char[size]);
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-#endif  // __GNUC__
-  ret = vsnprintf(buff.get(), size, msg, args);
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif  // __GNUC__
+  va_list args_cp2;
+  va_copy(args_cp2, args);
+  ret = vsnprintf(buff.get(), size, msg, args_cp2);
+  va_end(args_cp2);
   BM_CHECK(ret > 0 && (static_cast<size_t>(ret)) < size);
   return buff.get();
 }

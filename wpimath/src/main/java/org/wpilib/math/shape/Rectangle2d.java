@@ -6,6 +6,7 @@ package org.wpilib.math.shape;
 
 import static org.wpilib.units.Units.Meters;
 
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
@@ -20,9 +21,15 @@ import org.wpilib.util.struct.StructSerializable;
 /**
  * Represents a 2d rectangular space containing translational, rotational, and scaling components.
  */
+@Json
 public final class Rectangle2d implements ProtobufSerializable, StructSerializable {
+  @Json.Property("center")
   private final Pose2d m_center;
+
+  @Json.Property("xWidth")
   private final double m_xWidth;
+
+  @Json.Property("yWidth")
   private final double m_yWidth;
 
   /**
@@ -32,6 +39,7 @@ public final class Rectangle2d implements ProtobufSerializable, StructSerializab
    * @param xWidth The x size component of the rectangle, in unrotated coordinate frame.
    * @param yWidth The y size component of the rectangle, in unrotated coordinate frame.
    */
+  @Json.Creator
   public Rectangle2d(Pose2d center, double xWidth, double yWidth) {
     if (xWidth < 0 || yWidth < 0) {
       throw new IllegalArgumentException("Rectangle2d dimensions cannot be less than 0!");

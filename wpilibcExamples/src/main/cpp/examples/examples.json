@@ -128,7 +128,8 @@
       "Tunable",
       "DataLog",
       "Pneumatics",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "HatchbotTraditional",
     "gradlebase": "cpp",
@@ -146,7 +147,8 @@
       "Tunable",
       "DataLog",
       "Pneumatics",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "HatchbotInlined",
     "gradlebase": "cpp",
@@ -167,7 +169,8 @@
       "PID",
       "Gyro",
       "Profiled PID",
-      "Gamepad"
+      "Gamepad",
+      "FRC"
     ],
     "foldername": "RapidReactCommandBot",
     "gradlebase": "cpp",
@@ -420,7 +423,8 @@
       "State-Space",
       "Simulation",
       "Mechanism2d",
-      "Profiled PID"
+      "Profiled PID",
+      "UnitTests"
     ],
     "foldername": "ElevatorSimulation",
     "gradlebase": "cpp",
@@ -481,7 +485,8 @@
       "State-Space",
       "Simulation",
       "Mechanism2d",
-      "Preferences"
+      "Preferences",
+      "UnitTests"
     ],
     "foldername": "ArmSimulation",
     "gradlebase": "cpp",
@@ -493,7 +498,8 @@
     "description": "Test a robot project with basic unit tests in simulation.",
     "tags": [
       "Intake",
-      "Pneumatics"
+      "Pneumatics",
+      "UnitTests"
     ],
     "foldername": "UnitTest",
     "gradlebase": "cpp",

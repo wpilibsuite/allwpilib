@@ -15,6 +15,8 @@ import org.wpilib.system.Timer;
  *
  * <p>DIO 0 - Button A (input only) DIO 1 - Button B (input) or Green LED (output) DIO 2 - Button C
  * (input) or Red LED (output) DIO 3 - Yellow LED (output only)
+ *
+ * <p>This class is provided by the Romi VendorDep
  */
 public class OnBoardIO {
   private final DigitalInput m_buttonA = new DigitalInput(0);

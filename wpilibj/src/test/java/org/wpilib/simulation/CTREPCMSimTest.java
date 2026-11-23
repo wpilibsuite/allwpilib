@@ -98,6 +98,7 @@ class CTREPCMSimTest {
     HAL.initialize();
 
     CTREPCMSim sim = new CTREPCMSim(0);
+    sim.resetData();
     BooleanCallback callback = new BooleanCallback();
 
     try (PneumaticsControlModule pcm = new PneumaticsControlModule(BUS);
@@ -117,6 +118,7 @@ class CTREPCMSimTest {
     HAL.initialize();
 
     CTREPCMSim sim = new CTREPCMSim(0);
+    sim.resetData();
     BooleanCallback callback = new BooleanCallback();
 
     try (PneumaticsControlModule pcm = new PneumaticsControlModule(BUS);
@@ -137,6 +139,7 @@ class CTREPCMSimTest {
     HAL.initialize();
 
     CTREPCMSim sim = new CTREPCMSim(0);
+    sim.resetData();
     BooleanCallback callback = new BooleanCallback();
 
     try (PneumaticsControlModule pcm = new PneumaticsControlModule(BUS);
@@ -156,6 +159,7 @@ class CTREPCMSimTest {
     HAL.initialize();
 
     CTREPCMSim sim = new CTREPCMSim(0);
+    sim.resetData();
     DoubleCallback callback = new DoubleCallback();
 
     try (PneumaticsControlModule pcm = new PneumaticsControlModule(BUS);

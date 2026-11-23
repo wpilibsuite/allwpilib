@@ -5,8 +5,9 @@ wpilib_imgui_cc_test(
     name = "wpical_imgui_tests",
     size = "small",
     srcs = [
+        "WPIcalGuiTest.cpp",
         "//tools/wpical:wpical-main-cpp",
-    ] + glob(["*.cpp"]),
+    ],
     copts = COPTS,
     cxxopts = CXXOPTS,
     defines = [

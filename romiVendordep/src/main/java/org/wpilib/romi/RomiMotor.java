@@ -13,6 +13,8 @@ import org.wpilib.hardware.motor.MotorController;
  * RomiMotor.
  *
  * <p>A SimDevice based motor controller representing the motors on a Romi robot
+ *
+ * <p>This class is provided by the Romi VendorDep
  */
 public class RomiMotor implements MotorController {
   private final SimDouble m_simSpeed;

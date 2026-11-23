@@ -14,6 +14,8 @@ import org.wpilib.math.geometry.Rotation2d;
  *
  * <p>This class is for the XRP onboard gyro, and will only work in simulation/XRP mode. Only one
  * instance of a XRPGyro is supported.
+ *
+ * <p>This class is provided by the XRP VendorDep
  */
 public class XRPGyro {
   private final SimDevice m_simDevice;

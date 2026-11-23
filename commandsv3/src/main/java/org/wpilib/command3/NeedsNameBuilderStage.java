@@ -12,6 +12,8 @@ import org.wpilib.annotation.NoDiscard;
  * A stage in a command builder where requirements and main command execution logic have been set.
  * No more changes to requirements or command implementation may happen after this point. This is
  * the final step in command creation
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 @NoDiscard
 public interface NeedsNameBuilderStage {

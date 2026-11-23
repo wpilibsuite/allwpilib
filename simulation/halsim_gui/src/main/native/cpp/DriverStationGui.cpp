@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <format>
@@ -1270,16 +1271,15 @@ static void DriverStationExecute() {
   static bool prevDisableDS = false;
 
   bool disableDS = IsDSDisabled();
-  if (disableDS && !prevDisableDS) {
-    if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
+  if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
+    if (disableDS && !prevDisableDS) {
       win->SetVisibility(wpi::glass::Window::DISABLED);
-    }
-  } else if (!disableDS && prevDisableDS) {
-    if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
+    } else if (!disableDS && (prevDisableDS || !win->IsEnabled())) {
       win->SetVisibility(wpi::glass::Window::SHOW);
     }
   }
   prevDisableDS = disableDS;
+
   if (disableDS) {
     gDSModel->Update();
     return;
@@ -1530,10 +1530,9 @@ void DSSimModel::Update() {
     if (m_startMatchTime == -1.0) {
       m_startMatchTime = matchTime + curTime;
     }
-    matchTime = m_startMatchTime - curTime;
-    if (matchTime < 0) {
-      matchTime = -1.0;
-    }
+    // Match the Driver Station, which reports whole seconds rounded up.
+    double remaining = m_startMatchTime - curTime;
+    matchTime = remaining < 0 ? -1.0 : std::ceil(remaining);
     HALSIM_SetDriverStationMatchTime(matchTime);
   } else {
     if (m_startMatchTime != -1.0) {

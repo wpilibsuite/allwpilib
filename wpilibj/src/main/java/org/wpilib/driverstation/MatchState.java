@@ -4,12 +4,26 @@
 
 package org.wpilib.driverstation;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
-import org.wpilib.driverstation.internal.DriverStationBackend;
+import java.util.concurrent.locks.ReentrantLock;
+import org.wpilib.hardware.hal.AllianceStationID;
+import org.wpilib.hardware.hal.DriverStationJNI;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.MatchInfoData;
 
 /** Provides access to match state information from the Driver Station. */
 public final class MatchState {
+  static {
+    HAL.initialize();
+  }
+
+  private static MatchInfoData m_matchInfo = new MatchInfoData();
+  private static MatchInfoData m_matchInfoCache = new MatchInfoData();
+  private static String m_gameData = "";
+  private static final ReentrantLock m_dataMutex = new ReentrantLock();
+
   private MatchState() {}
 
   /**
@@ -18,10 +32,8 @@ public final class MatchState {
    * current period (auto or teleop). Warning: This is not an official time (so it cannot be used to
    * dispute ref calls or guarantee that a function will trigger before the match ends).
    *
-   * <p>When connected to the real field, this number only changes in full integer increments, and
-   * always counts down.
-   *
-   * <p>When the DS is in practice mode, this number is a floating point number, and counts down.
+   * <p>This number only changes in full integer increments and always counts down, both when
+   * connected to the real field and when the DS is in match mode.
    *
    * <p>When the DS is in teleop or autonomous mode, this number returns -1.0.
    *
@@ -30,8 +42,28 @@ public final class MatchState {
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
   public static double getMatchTime() {
-    return DriverStationBackend.getMatchTime();
+    return DriverStationJNI.getMatchTime();
   }
+
+  private static Map<AllianceStationID, Optional<Alliance>> m_allianceMap =
+      Map.of(
+          AllianceStationID.UNKNOWN, Optional.empty(),
+          AllianceStationID.RED_1, Optional.of(Alliance.RED),
+          AllianceStationID.RED_2, Optional.of(Alliance.RED),
+          AllianceStationID.RED_3, Optional.of(Alliance.RED),
+          AllianceStationID.BLUE_1, Optional.of(Alliance.BLUE),
+          AllianceStationID.BLUE_2, Optional.of(Alliance.BLUE),
+          AllianceStationID.BLUE_3, Optional.of(Alliance.BLUE));
+
+  private static Map<AllianceStationID, OptionalInt> m_stationMap =
+      Map.of(
+          AllianceStationID.UNKNOWN, OptionalInt.empty(),
+          AllianceStationID.RED_1, OptionalInt.of(1),
+          AllianceStationID.RED_2, OptionalInt.of(2),
+          AllianceStationID.RED_3, OptionalInt.of(3),
+          AllianceStationID.BLUE_1, OptionalInt.of(1),
+          AllianceStationID.BLUE_2, OptionalInt.of(2),
+          AllianceStationID.BLUE_3, OptionalInt.of(3));
 
   /**
    * Get the current alliance from the FMS.
@@ -41,7 +73,12 @@ public final class MatchState {
    * @return The alliance (red or blue) or an empty optional if the alliance is invalid
    */
   public static Optional<Alliance> getAlliance() {
-    return DriverStationBackend.getAlliance();
+    AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
+    if (allianceStationID == null) {
+      allianceStationID = AllianceStationID.UNKNOWN;
+    }
+
+    return m_allianceMap.get(allianceStationID);
   }
 
   /**
@@ -52,7 +89,12 @@ public final class MatchState {
    * @return the location of the team's driver station controls: 1, 2, or 3
    */
   public static OptionalInt getLocation() {
-    return DriverStationBackend.getLocation();
+    AllianceStationID allianceStationID = DriverStationJNI.getAllianceStation();
+    if (allianceStationID == null) {
+      allianceStationID = AllianceStationID.UNKNOWN;
+    }
+
+    return m_stationMap.get(allianceStationID);
   }
 
   /**
@@ -61,7 +103,12 @@ public final class MatchState {
    * @return the replay number
    */
   public static int getReplayNumber() {
-    return DriverStationBackend.getReplayNumber();
+    m_dataMutex.lock();
+    try {
+      return m_matchInfo.replayNumber;
+    } finally {
+      m_dataMutex.unlock();
+    }
   }
 
   /**
@@ -70,7 +117,12 @@ public final class MatchState {
    * @return the match number
    */
   public static int getMatchNumber() {
-    return DriverStationBackend.getMatchNumber();
+    m_dataMutex.lock();
+    try {
+      return m_matchInfo.matchNumber;
+    } finally {
+      m_dataMutex.unlock();
+    }
   }
 
   /**
@@ -79,7 +131,19 @@ public final class MatchState {
    * @return the match type
    */
   public static MatchType getMatchType() {
-    return DriverStationBackend.getMatchType();
+    int matchType;
+    m_dataMutex.lock();
+    try {
+      matchType = m_matchInfo.matchType;
+    } finally {
+      m_dataMutex.unlock();
+    }
+    return switch (matchType) {
+      case 1 -> MatchType.PRACTICE;
+      case 2 -> MatchType.QUALIFICATION;
+      case 3 -> MatchType.ELIMINATION;
+      default -> MatchType.NONE;
+    };
   }
 
   /**
@@ -88,7 +152,12 @@ public final class MatchState {
    * @return the event name
    */
   public static String getEventName() {
-    return DriverStationBackend.getEventName();
+    m_dataMutex.lock();
+    try {
+      return m_matchInfo.eventName;
+    } finally {
+      m_dataMutex.unlock();
+    }
   }
 
   /**
@@ -99,6 +168,33 @@ public final class MatchState {
    * @return the game specific message
    */
   public static Optional<String> getGameData() {
-    return DriverStationBackend.getGameData();
+    m_dataMutex.lock();
+    try {
+      if (m_gameData == null || m_gameData.isEmpty()) {
+        return Optional.empty();
+      }
+      return Optional.of(m_gameData);
+    } finally {
+      m_dataMutex.unlock();
+    }
+  }
+
+  /**
+   * Updates match info.
+   *
+   * @param gameData The current game data.
+   */
+  public static void refreshMatchInfo(String gameData) {
+    DriverStationJNI.getMatchInfo(m_matchInfoCache);
+    m_dataMutex.lock();
+    try {
+      var matchInfo = m_matchInfo;
+      m_matchInfo = m_matchInfoCache;
+      m_matchInfoCache = matchInfo;
+
+      m_gameData = gameData;
+    } finally {
+      m_dataMutex.unlock();
+    }
   }
 }

@@ -21,6 +21,8 @@ namespace wpi::romi {
  * RomiMotor.
  *
  * <p>A SimDevice based motor controller representing the motors on a Romi robot
+ *
+ * This class is provided by the Romi VendorDep
  */
 class RomiMotor : public wpi::MotorController, public wpi::MotorSafety {
  public:

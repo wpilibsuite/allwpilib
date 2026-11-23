@@ -97,9 +97,14 @@ ExpansionHubMotor::~ExpansionHubMotor() noexcept {
 }
 
 void ExpansionHubMotor::SetThrottle(double throttle) {
+  m_throttle = throttle;
   SetEnabled(true);
   m_modePublisher.Set(PERCENTAGE_MODE);
   m_setpointPublisher.Set(throttle);
+}
+
+double ExpansionHubMotor::GetThrottle() const {
+  return m_throttle;
 }
 
 void ExpansionHubMotor::SetVoltage(wpi::units::volt_t voltage) {
@@ -145,7 +150,16 @@ double ExpansionHubMotor::GetEncoderPosition() const {
 }
 
 void ExpansionHubMotor::SetReversed(bool reversed) {
-  m_reversedPublisher.Set(reversed);
+  SetInverted(reversed);
+}
+
+void ExpansionHubMotor::SetInverted(bool isInverted) {
+  m_isInverted = isInverted;
+  m_reversedPublisher.Set(isInverted);
+}
+
+bool ExpansionHubMotor::GetInverted() const {
+  return m_isInverted;
 }
 
 void ExpansionHubMotor::ResetEncoder() {
@@ -181,6 +195,7 @@ void ExpansionHubMotor::Follow(const ExpansionHubMotor& leader,
 
 void ExpansionHubMotor::Unfollow() {
   m_hub.RemoveFollower(m_channel);
+  m_throttle = 0;
   SetEnabled(false);
   m_modePublisher.Set(PERCENTAGE_MODE);
   m_setpointPublisher.Set(0);

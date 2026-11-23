@@ -7,7 +7,7 @@ generate_resources(
     name = "generate-resources",
     namespace = "dlt",
     prefix = "DLT",
-    resource_files = glob(["src/main/native/resources/*"]),
+    resource_files = glob(["src/main/native/resources/*.png"]),
     visibility = ["//tools/datalogtool/src/test/native/imgui:__pkg__"],
 )
 
@@ -20,13 +20,19 @@ generate_version_file(
 
 filegroup(
     name = "main-native-srcs",
-    srcs = glob(["src/main/native/cpp/*"]),
+    srcs = glob([
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/cpp/*.hpp",
+    ]),
     visibility = ["//tools/datalogtool/src/test/native/imgui:__pkg__"],
 )
 
 cc_binary(
     name = "datalogtool",
-    srcs = glob(["src/main/native/cpp/*"]) + [
+    srcs = glob([
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/cpp/*.hpp",
+    ]) + [
         ":generate-resources",
         ":generate-version",
     ],

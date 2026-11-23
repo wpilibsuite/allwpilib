@@ -11,6 +11,9 @@
 #include <utility>
 
 namespace wpi {
+/**
+ * This class is provided by the CameraServer VendorDep
+ */
 class CameraServerShared {
  public:
   virtual ~CameraServerShared() = default;

@@ -15,6 +15,8 @@ import org.wpilib.telemetry.TelemetryTable;
  *
  * <p>This class is for the Romi onboard gyro, and will only work in simulation/Romi mode. Only one
  * instance of a RomiGyro is supported.
+ *
+ * <p>This class is provided by the Romi VendorDep
  */
 public class RomiGyro implements TelemetryLoggable {
   private final SimDevice m_simDevice;

@@ -56,3 +56,8 @@ class MyRobot(wpilib.TimedRobot):
         rot *= Drivetrain.MAX_ANGULAR_VELOCITY
 
         self.drive.drive(x_velocity, rot)
+
+    @override
+    def disabled_init(self) -> None:
+        # This just makes sure that our simulation code knows that the motor's off.
+        self.drive.stop()

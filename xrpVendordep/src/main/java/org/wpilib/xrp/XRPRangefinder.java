@@ -6,7 +6,11 @@ package org.wpilib.xrp;
 
 import org.wpilib.hardware.discrete.AnalogInput;
 
-/** This class represents the ultrasonic rangefinder on an XRP robot. */
+/**
+ * This class represents the ultrasonic rangefinder on an XRP robot.
+ *
+ * <p>This class is provided by the XRP VendorDep
+ */
 public class XRPRangefinder {
   private final AnalogInput m_rangefinder = new AnalogInput(2);
 

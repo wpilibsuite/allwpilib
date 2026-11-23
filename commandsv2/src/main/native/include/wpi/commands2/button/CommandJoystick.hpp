@@ -13,6 +13,8 @@ namespace wpi::cmd {
  * A version of {@link wpi::Joystick} with {@link Trigger} factories for
  * command-based.
  *
+ * This class is provided by the Commands v2 VendorDep
+ *
  * @see wpi::Joystick
  */
 class CommandJoystick {

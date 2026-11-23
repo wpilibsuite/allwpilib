@@ -20,6 +20,8 @@ import java.util.Set;
  * <p>The sequence will <i>own</i> all mechanisms required by all commands in the sequence for the
  * entire duration of the sequence. This means that a mechanism owned by one command in the
  * sequence, but not by a later one, will be <i>uncommanded</i> while that later command executes.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 public final class SequentialGroup implements Command {
   private final String m_name;
