@@ -99,7 +99,9 @@ jobs:
 
     name: "${{ matrix.name }} ${{ matrix.action }} (${{ matrix.compilation_mode }})"
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
+    container:
+      image: ${{ matrix.container }}
+      options: --privileged
     steps:
       - name: Check disk free space pre-cleanup
         run: df -h
