@@ -33,14 +33,32 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    // Replace this with a call to a trajectory generator. Field poses use
-    // field center as the origin, with zero heading toward the blue wall.
+    feedback.setTolerance(new Pose2d(0.1, 0.1, Rotation2d.fromDegrees(5.0)));
+
+    // Stand-in for a pre-generated path. Replace this with a call to a
+    // trajectory generator. Field poses use field center as the origin,
+    // with zero heading toward the blue wall.
     trajectory =
         new HolonomicTrajectory(
             List.of(
                 new HolonomicSample(
                     0.0,
                     new Pose2d(0.0, 0.0, Rotation2d.ZERO),
+                    new ChassisVelocities(0.0, 0.0, 0.0),
+                    new ChassisAccelerations(2.0, 0.0, 0.0)),
+                new HolonomicSample(
+                    1.0,
+                    new Pose2d(1.0, 0.0, Rotation2d.ZERO),
+                    new ChassisVelocities(2.0, 0.0, 0.0),
+                    new ChassisAccelerations(0.0, 0.0, 0.0)),
+                new HolonomicSample(
+                    2.0,
+                    new Pose2d(3.0, 0.0, Rotation2d.ZERO),
+                    new ChassisVelocities(2.0, 0.0, 0.0),
+                    new ChassisAccelerations(-2.0, 0.0, 0.0)),
+                new HolonomicSample(
+                    3.0,
+                    new Pose2d(4.0, 0.0, Rotation2d.ZERO),
                     new ChassisVelocities(0.0, 0.0, 0.0),
                     new ChassisAccelerations(0.0, 0.0, 0.0))));
   }

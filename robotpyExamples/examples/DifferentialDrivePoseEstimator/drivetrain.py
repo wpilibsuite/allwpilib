@@ -78,6 +78,7 @@ class Drivetrain:
         # Simulation classes
         self.left_encoder_sim = wpilib.simulation.EncoderSim(self.left_encoder)
         self.right_encoder_sim = wpilib.simulation.EncoderSim(self.right_encoder)
+        self.imu_sim = wpilib.simulation.OnboardIMUSim()
         self.drivetrain_system = wpimath.Models.differential_drive_from_sys_id(
             1.98, 0.2, 1.5, 0.3
         )
@@ -260,7 +261,7 @@ class Drivetrain:
             self.drivetrain_simulator.get_right_position()
         )
         self.right_encoder_sim.set_rate(self.drivetrain_simulator.get_right_velocity())
-        # self.gyro_sim.set_angle(-self.drivetrain_simulator.get_heading().degrees())
+        self.imu_sim.set_yaw(self.drivetrain_simulator.get_heading().radians())
 
     def periodic(self) -> None:
         """This function is called periodically, no matter the mode."""
