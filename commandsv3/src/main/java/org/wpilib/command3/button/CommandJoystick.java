@@ -7,7 +7,9 @@ package org.wpilib.command3.button;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.GenericHID;
 import org.wpilib.driverstation.Joystick;
+import org.wpilib.driverstation.POVDirection;
 import org.wpilib.event.EventLoop;
 
 /**
@@ -101,6 +103,263 @@ public class CommandJoystick {
    */
   public Trigger top(EventLoop loop) {
     return m_hid.button(Joystick.ButtonType.TOP.value, loop);
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @return an event instance representing the button's digital signal attached to the {@link
+   *     Scheduler#getDefaultEventLoop() default scheduler button loop}.
+   * @see #button(int, EventLoop)
+   */
+  public Trigger button(int button) {
+    return m_hid.button(button);
+  }
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @param loop the event loop instance to attach the event to.
+   * @return an event instance representing the button's digital signal attached to the given loop.
+   */
+  public Trigger button(int button, EventLoop loop) {
+    return m_hid.button(button, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance based around this angle of the default (index 0) POV on the HID,
+   * attached to {@link Scheduler#getDefaultEventLoop() the default command scheduler button loop}.
+   *
+   * @param angle POV angle
+   * @return a Trigger instance based around this angle of a POV on the HID.
+   */
+  public Trigger pov(POVDirection angle) {
+    return m_hid.pov(angle);
+  }
+
+  /**
+   * Constructs a Trigger instance based around this angle of a POV on the HID.
+   *
+   * @param pov index of the POV to read (starting at 0). Defaults to 0.
+   * @param angle POV angle
+   * @param loop the event loop instance to attach the event to. Defaults to {@link
+   *     Scheduler#getDefaultEventLoop() the default command scheduler button loop}.
+   * @return a Trigger instance based around this angle of a POV on the HID.
+   */
+  public Trigger pov(int pov, POVDirection angle, EventLoop loop) {
+    return m_hid.pov(pov, angle, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance based around the 0 degree angle (up) of the default (index 0) POV
+   * on the HID, attached to {@link Scheduler#getDefaultEventLoop() the default command scheduler
+   * button loop}.
+   *
+   * @return a Trigger instance based around the 0 degree angle of a POV on the HID.
+   */
+  public Trigger povUp() {
+    return m_hid.povUp();
+  }
+
+  /**
+   * Constructs a Trigger instance based around the 45 degree angle (right up) of the default (index
+   * 0) POV on the HID, attached to {@link Scheduler#getDefaultEventLoop() the default command
+   * scheduler button loop}.
+   *
+   * @return a Trigger instance based around the 45 degree angle of a POV on the HID.
+   */
+  public Trigger povUpRight() {
+    return m_hid.povUpRight();
+  }
+
+  /**
+   * Constructs a Trigger instance based around the 90 degree angle (right) of the default (index 0)
+   * POV on the HID, attached to {@link Scheduler#getDefaultEventLoop() the default command
+   * scheduler button loop}.
+   *
+   * @return a Trigger instance based around the 90 degree angle of a POV on the HID.
+   */
+  public Trigger povRight() {
+    return m_hid.povRight();
+  }
+
+  /**
+   * Constructs a Trigger instance based around the 135 degree angle (right down) of the default
+   * (index 0) POV on the HID, attached to {@link Scheduler#getDefaultEventLoop() the default
+   * command scheduler button loop}.
+   *
+   * @return a Trigger instance based around the 135 degree angle of a POV on the HID.
+   */
+  public Trigger povDownRight() {
+    return m_hid.povDownRight();
+  }
+
+  /**
+   * Constructs a Trigger instance based around the 180 degree angle (down) of the default (index 0)
+   * POV on the HID, attached to {@link Scheduler#getDefaultEventLoop() the default command
+   * scheduler button loop}.
+   *
+   * @return a Trigger instance based around the 180 degree angle of a POV on the HID.
+   */
+  public Trigger povDown() {
+    return m_hid.povDown();
+  }
+
+  /**
+   * Constructs a Trigger instance based around the 225 degree angle (down left) of the default
+   * (index 0) POV on the HID, attached to {@link Scheduler#getDefaultEventLoop() the default
+   * command scheduler button loop}.
+   *
+   * @return a Trigger instance based around the 225 degree angle of a POV on the HID.
+   */
+  public Trigger povDownLeft() {
+    return m_hid.povDownLeft();
+  }
+
+  /**
+   * Constructs a Trigger instance based around the 270 degree angle (left) of the default (index 0)
+   * POV on the HID, attached to {@link Scheduler#getDefaultEventLoop() the default command
+   * scheduler button loop}.
+   *
+   * @return a Trigger instance based around the 270 degree angle of a POV on the HID.
+   */
+  public Trigger povLeft() {
+    return m_hid.povLeft();
+  }
+
+  /**
+   * Constructs a Trigger instance based around the 315 degree angle (left up) of the default (index
+   * 0) POV on the HID, attached to {@link Scheduler#getDefaultEventLoop() the default command
+   * scheduler button loop}.
+   *
+   * @return a Trigger instance based around the 315 degree angle of a POV on the HID.
+   */
+  public Trigger povUpLeft() {
+    return m_hid.povUpLeft();
+  }
+
+  /**
+   * Constructs a Trigger instance based around the center (not pressed) position of the default
+   * (index 0) POV on the HID, attached to {@link Scheduler#getDefaultEventLoop() the default
+   * command scheduler button loop}.
+   *
+   * @return a Trigger instance based around the center position of a POV on the HID.
+   */
+  public Trigger povCenter() {
+    return m_hid.povCenter();
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link Scheduler#getDefaultEventLoop() the default command scheduler button loop}.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value below which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(int axis, double threshold) {
+    return m_hid.axisLessThan(axis, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value below which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to
+   * @return a Trigger instance that is true when the axis value is less than the provided
+   *     threshold.
+   */
+  public Trigger axisLessThan(int axis, double threshold, EventLoop loop) {
+    return m_hid.axisLessThan(axis, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is less than {@code threshold},
+   * attached to {@link Scheduler#getDefaultEventLoop() the default command scheduler button loop}.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(int axis, double threshold) {
+    return m_hid.axisGreaterThan(axis, threshold);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis value is greater than the provided
+   *     threshold.
+   */
+  public Trigger axisGreaterThan(int axis, double threshold, EventLoop loop) {
+    return m_hid.axisGreaterThan(axis, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to the given loop.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @param loop the event loop instance to attach the trigger to.
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the
+   *     provided threshold.
+   */
+  public Trigger axisMagnitudeGreaterThan(int axis, double threshold, EventLoop loop) {
+    return m_hid.axisMagnitudeGreaterThan(axis, threshold, loop);
+  }
+
+  /**
+   * Constructs a Trigger instance that is true when the axis magnitude value is greater than {@code
+   * threshold}, attached to {@link Scheduler#getDefaultEventLoop() the default command scheduler
+   * button loop}.
+   *
+   * @param axis The axis to read, starting at 0
+   * @param threshold The value above which this trigger should return true.
+   * @return a Trigger instance that is true when the axis magnitude value is greater than the provided threshold.
+   */
+  public Trigger axisMagnitudeGreaterThan(int axis, double threshold) {
+    return m_hid.axisMagnitudeGreaterThan(axis, threshold);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read, starting at 0.
+   * @return The value of the axis.
+   */
+  public double getRawAxis(int axis) {
+    return m_hid.getRawAxis(axis);
+  }
+
+  /**
+   * Set the rumble output for the HID. The DS currently supports 2 rumble values, left rumble and
+   * right rumble.
+   *
+   * @param type Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  public void setRumble(GenericHID.RumbleType type, double value) {
+    m_hid.setRumble(type, value);
+  }
+
+  /**
+   * Get if the HID is connected.
+   *
+   * @return true if the HID is connected
+   */
+  public boolean isConnected() {
+    return m_hid.isConnected();
   }
 
   /**
