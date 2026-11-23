@@ -4,6 +4,8 @@
 
 package org.wpilib.math.controller;
 
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.linalg.DARE;
 import org.wpilib.math.linalg.MatBuilder;
@@ -68,6 +70,9 @@ public class LTVDifferentialDriveController {
       Vector<N5> qelems,
       Vector<N2> relems,
       double dt) {
+    requireNonNullParam(plant, "plant", "LTVDifferentialDriveController");
+    requireNonNullParam(qelems, "qelems", "LTVDifferentialDriveController");
+    requireNonNullParam(relems, "relems", "LTVDifferentialDriveController");
     m_trackwidth = trackwidth;
     m_A = plant.getA();
     m_B = plant.getB();

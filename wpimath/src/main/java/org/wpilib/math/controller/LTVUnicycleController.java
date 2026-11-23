@@ -4,6 +4,8 @@
 
 package org.wpilib.math.controller;
 
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.linalg.DARE;
@@ -61,6 +63,8 @@ public class LTVUnicycleController {
    * @param dt Discretization timestep in seconds.
    */
   public LTVUnicycleController(Vector<N3> qelems, Vector<N2> relems, double dt) {
+    requireNonNullParam(qelems, "qelems", "LTVUnicycleController");
+    requireNonNullParam(relems, "relems", "LTVUnicycleController");
     m_Q = StateSpaceUtil.costMatrix(qelems);
     m_R = StateSpaceUtil.costMatrix(relems);
     m_dt = dt;

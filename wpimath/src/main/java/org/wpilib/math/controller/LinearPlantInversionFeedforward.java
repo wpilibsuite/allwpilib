@@ -4,6 +4,8 @@
 
 package org.wpilib.math.controller;
 
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+
 import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
@@ -43,7 +45,10 @@ public class LinearPlantInversionFeedforward<
    * @param dt Discretization timestep in seconds.
    */
   public LinearPlantInversionFeedforward(LinearSystem<States, Inputs, Outputs> plant, double dt) {
-    this(plant.getA(), plant.getB(), dt);
+    this(
+        requireNonNullParam(plant, "plant", "LinearPlantInversionFeedforward").getA(),
+        plant.getB(),
+        dt);
   }
 
   /**
@@ -55,6 +60,8 @@ public class LinearPlantInversionFeedforward<
    */
   public LinearPlantInversionFeedforward(
       Matrix<States, States> A, Matrix<States, Inputs> B, double dt) {
+    requireNonNullParam(A, "A", "LinearPlantInversionFeedforward");
+    requireNonNullParam(B, "B", "LinearPlantInversionFeedforward");
     var discABPair = Discretization.discretizeAB(A, B, dt);
     this.m_A = discABPair.getFirst();
     this.m_B = discABPair.getSecond();

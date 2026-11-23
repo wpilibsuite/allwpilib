@@ -4,6 +4,8 @@
 
 package org.wpilib.math.controller;
 
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
@@ -43,7 +45,8 @@ public class ProfiledPIDController implements TelemetryLoggable, ComplexTunable 
    */
   public ProfiledPIDController(
       double Kp, double Ki, double Kd, TrapezoidProfile.Constraints constraints) {
-    this(Kp, Ki, Kd, constraints, 0.02);
+    this(
+        Kp, Ki, Kd, requireNonNullParam(constraints, "constraints", "ProfiledPIDController"), 0.02);
   }
 
   /**
@@ -62,6 +65,7 @@ public class ProfiledPIDController implements TelemetryLoggable, ComplexTunable 
   @SuppressWarnings("this-escape")
   public ProfiledPIDController(
       double Kp, double Ki, double Kd, TrapezoidProfile.Constraints constraints, double period) {
+    requireNonNullParam(constraints, "constraints", "ProfiledPIDController");
     m_controller = new PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
     m_profile = new TrapezoidProfile(m_constraints);
