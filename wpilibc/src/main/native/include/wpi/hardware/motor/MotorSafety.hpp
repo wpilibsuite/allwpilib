@@ -95,15 +95,24 @@ class MotorSafety {
  protected:
   /**
    * Called to stop the motor when the timeout expires.
+   *
+   * Subclasses must override this. The default implementation does nothing;
+   * it exists so a watchdog Check() that is already in flight when the
+   * derived destructor runs resolves to a no-op instead of aborting with a
+   * pure virtual call (see #9720).
    */
-  virtual void StopMotor() = 0;
+  virtual void StopMotor();
 
   /**
    * Returns a description to print when an error occurs.
    *
+   * Subclasses must override this. The default implementation returns a
+   * generic description; it exists for the same reason as the default
+   * StopMotor() (see #9720).
+   *
    * @return Description to print when an error occurs.
    */
-  virtual std::string GetDescription() const = 0;
+  virtual std::string GetDescription() const;
 
  private:
   static constexpr auto DEFAULT_SAFETY_EXPIRATION = 100_ms;
