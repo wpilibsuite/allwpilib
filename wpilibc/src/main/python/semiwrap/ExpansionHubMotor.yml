@@ -3,6 +3,7 @@ classes:
     methods:
       ExpansionHubMotor:
       SetThrottle:
+      GetThrottle:
       SetVoltage:
       SetPositionSetpoint:
       SetVelocitySetpoint:
@@ -12,6 +13,8 @@ classes:
       GetEncoderVelocity:
       GetEncoderPosition:
       SetReversed:
+      SetInverted:
+      GetInverted:
       ResetEncoder:
       IsHubConnected:
       Follow:

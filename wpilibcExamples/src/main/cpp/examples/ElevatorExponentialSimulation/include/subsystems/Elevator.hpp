@@ -31,15 +31,13 @@ class Elevator {
 
  private:
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  wpi::math::DCMotor elevatorGearbox = wpi::math::DCMotor::NEO(2);
+  wpi::math::DCMotor elevatorGearbox = wpi::math::DCMotor::Neo(2);
 
   // Standard classes for controlling our elevator
   wpi::math::ExponentialProfile<wpi::units::meters,
                                 wpi::units::volts>::Constraints constraints{
       Constants::ELEVATOR_MAX_V, Constants::ELEVATOR_KV,
       Constants::ELEVATOR_KA};
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts> profile{
-      constraints};
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
       setpoint;
 

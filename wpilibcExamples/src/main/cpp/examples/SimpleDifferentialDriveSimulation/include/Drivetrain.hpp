@@ -60,6 +60,7 @@ class Drivetrain {
       const wpi::math::DifferentialDriveWheelVelocities& velocities);
   void Drive(wpi::units::meters_per_second_t xVelocity,
              wpi::units::radians_per_second_t rot);
+  void Stop();
   void UpdateOdometry();
   void ResetOdometry(const wpi::math::Pose2d& pose);
 

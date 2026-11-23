@@ -67,6 +67,11 @@ wpilib_cc_library(
 
 wpilib_cc_shared_library(
     name = "shared/halsim_gui",
+    # As with wpinet's macOS helper, explicitly link the Objective-C++ archive.
+    additional_linker_inputs = select({
+        "@platforms//os:osx": ["//wpigui:wpigui-mac-metal"],
+        "//conditions:default": [],
+    }),
     dynamic_deps = [
         "//hal:shared/wpiHal",
         "//telemetry:shared/telemetry",
@@ -75,6 +80,16 @@ wpilib_cc_shared_library(
         "//datalog:shared/datalog",
         "//ntcore:shared/ntcore",
     ],
+    user_link_flags = select({
+        "@platforms//os:osx": [
+            "-Wl,-force_load,$(location //wpigui:wpigui-mac-metal)",
+            "-framework",
+            "AppKit",
+            "-framework",
+            "QuartzCore",
+        ],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         ":halsim_gui",

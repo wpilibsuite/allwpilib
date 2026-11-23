@@ -61,7 +61,7 @@ public class Robot extends TimedRobot {
   private static final double FLYWHEEL_MOMENT_OF_INERTIA =
       0.5 * lbsToKilograms(1.5) * Math.pow(inchesToMeters(4), 2);
 
-  private final DCMotor gearbox = DCMotor.getNEO(1);
+  private final DCMotor gearbox = DCMotor.getNeo(1);
 
   private final LinearSystem<N1, N1, N1> plant =
       Models.angularVelocityFromPhysicalConstants(
@@ -93,6 +93,12 @@ public class Robot extends TimedRobot {
 
     // Log bang-bang controller to telemetry
     Telemetry.log("BangBang Controller", bangBangController);
+  }
+
+  @Override
+  public void disabledInit() {
+    // This just makes sure that our simulation code knows that the motor's off.
+    flywheelMotor.setThrottle(0.0);
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */

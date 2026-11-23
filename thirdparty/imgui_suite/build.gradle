@@ -15,12 +15,12 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'imgui/cpp', 'generated/fonts/src', 'stb/cpp', 'implot/cpp', 'imgui/cpp/misc/cpp'
+                        srcDirs 'imgui/cpp', 'generated/fonts/src', 'stb/cpp', 'implot/cpp', 'imnodeflow/src', 'imgui/cpp/misc/cpp'
                         include '*.cpp', 'backends/imgui_impl_sdl3.cpp', 'backends/imgui_impl_sdlgpu3.cpp', 'backends/imgui_impl_sdlrenderer3.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'imgui/include', 'generated/fonts/include', 'stb/include', 'implot/include', 'imgui/include/misc/cpp', 'imgui/include/backends'
-                        include '*.h', 'backends/imgui_impl_sdl3.h', 'backends/imgui_impl_sdlgpu3.h', 'backends/imgui_impl_sdlrenderer3.h'
+                        srcDirs 'imgui/include', 'generated/fonts/include', 'stb/include', 'implot/include', 'imnodeflow/include', 'imnodeflow/src', 'imgui/include/misc/cpp', 'imgui/include/backends'
+                        include '*.h', '*.inl', 'backends/imgui_impl_sdl3.h', 'backends/imgui_impl_sdlgpu3.h', 'backends/imgui_impl_sdlrenderer3.h'
                     }
                 }
             }
@@ -33,6 +33,9 @@ model {
                     cppCompiler.args '-D_UNICODE', '-DUNICODE', '-DWIN32', '-D_WIN32', '-DSTRICT', '-DWIN32_LEAN_AND_MEAN', '-D_HAS_EXCEPTIONS=1'
                 } else {
                     cppCompiler.args '-Wshadow', '-fexceptions', '-Wno-missing-field-initializers'
+                    // Third-party imnodeflow trips -Wshadow and -Wcomment; keep
+                    // the warnings visible but don't fail the build on them.
+                    cppCompiler.args '-Wno-error=shadow', '-Wno-error=comment'
                 }
                 project.addLibSdlGpuDependency(it)
                 if (it in SharedLibraryBinarySpec && !it.targetPlatform.operatingSystem.isWindows()) {

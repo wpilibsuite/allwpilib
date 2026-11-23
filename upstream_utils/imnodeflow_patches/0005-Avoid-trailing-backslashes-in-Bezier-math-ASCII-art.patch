@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Drew Williams <williams.r.drew@gmail.com>
+Date: Wed, 2 Sep 2026 12:49:44 -0700
+Subject: [PATCH 5/5] Avoid trailing backslashes in Bezier math ASCII art
+
+GCC's -Wcomment (enabled by -Wall) treats the trailing backslash of the
+"/\" arrows as a line continuation and errors out on the multi-line
+comment. Draw the arrows with carets instead.
+---
+ src/imgui_bezier_math.inl | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/imgui_bezier_math.inl b/src/imgui_bezier_math.inl
+index addc2eec1f80bfd26c3377efbedff4413f8c2408..6349f15ead9792d0b2e7486420f4d07b3943aff0 100644
+--- a/src/imgui_bezier_math.inl
++++ b/src/imgui_bezier_math.inl
+@@ -403,8 +403,8 @@ inline ImCubicBezierIntersectResult ImCubicBezierLineIntersect(const ImVec2& p0,
+     // Expand and collect terms to form linear combinations of original Bezier
+     // controls.  This ends up with a vector cubic in t:
+     //     (-P0+3P1-3P2+P3)t^3 + (3P0-6P1+3P2)t^2 + (-3P0+3P1)t + P0
+-    //             /\                  /\                /\       /\
+-    //             ||                  ||                ||       ||
++    //              ^                   ^                 ^        ^
++    //              |                   |                 |        |
+     //             c3                  c2                c1       c0
+ 
+     // Calculate the coefficients

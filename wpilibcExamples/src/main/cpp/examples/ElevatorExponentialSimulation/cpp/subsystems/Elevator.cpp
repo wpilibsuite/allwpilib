@@ -43,7 +43,14 @@ void Elevator::ReachGoal(wpi::units::meter_t goal) {
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
       goalState{goal, 0_mps};
 
-  auto next = profile.Calculate(20_ms, setpoint, goalState);
+  auto sample =
+      wpi::math::ExponentialProfile<wpi::units::meters,
+                                    wpi::units::volts>::Generate(constraints,
+                                                                 setpoint,
+                                                                 goalState)
+          .SampleAt(20_ms);
+  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
+      next{sample.position, sample.velocity};
 
   auto pidOutput =
       controller.Calculate(encoder.GetDistance(), setpoint.position / 1_m);

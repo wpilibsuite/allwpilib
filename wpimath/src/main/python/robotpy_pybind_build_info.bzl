@@ -1182,7 +1182,18 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("wpi::math::ExponentialProfile", "wpi__math__ExponentialProfile.hpp"),
                 ("wpi::math::ExponentialProfile::Constraints", "wpi__math__ExponentialProfile__Constraints.hpp"),
                 ("wpi::math::ExponentialProfile::State", "wpi__math__ExponentialProfile__State.hpp"),
-                ("wpi::math::ExponentialProfile::ProfileTiming", "wpi__math__ExponentialProfile__ProfileTiming.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "ExponentialProfileSample",
+            yml_file = "semiwrap/ExponentialProfileSample.yml",
+            header_root = "$(execpath //wpimath:robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath //wpimath:robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/ExponentialProfileSample.hpp",
+            tmpl_class_names = [
+                ("ExponentialProfileSample_tmpl1", "ExponentialProfileSample"),
+            ],
+            trampolines = [
+                ("wpi::math::ExponentialProfileSample", "wpi__math__ExponentialProfileSample.hpp"),
             ],
         ),
         struct(
@@ -1214,6 +1225,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("Trajectory_tmpl1", "DifferentialTrajectoryBase"),
                 ("Trajectory_tmpl2", "DrivetrainSplineTrajectoryBase"),
                 ("Trajectory_tmpl3", "HolonomicTrajectoryBase"),
+                ("Trajectory_tmpl4", "ExponentialProfileTrajectoryBase"),
             ],
             trampolines = [
                 ("wpi::math::Trajectory", "wpi__math__Trajectory.hpp"),

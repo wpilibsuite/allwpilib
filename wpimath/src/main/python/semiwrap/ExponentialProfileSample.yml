@@ -1,0 +1,47 @@
+extra_includes:
+- format
+
+classes:
+  wpi::math::ExponentialProfileSample:
+    force_no_trampoline: true
+    force_type_casters:
+    - wpi::units::second_t
+    - wpi::units::meters_per_second_t
+    - wpi::units::meters_per_second_squared_t
+    template_params:
+    - Distance
+    - Input
+    attributes:
+      time:
+      position:
+      velocity:
+      acceleration:
+      input:
+    methods:
+      ExponentialProfileSample:
+        overloads:
+          "":
+          wpi::units::second_t, Distance_t, Velocity_t, Acceleration_t, Input_t:
+      operator==:
+    template_inline_code: |
+      {
+      std::string clsNameCopy = clsName;
+
+      cls_ExponentialProfileSample
+        .def("__repr__", [clsNameCopy](const wpi::math::ExponentialProfileSample<Distance, Input>& self) {
+          return std::format("{}(time={}, position={}, velocity={}, acceleration={}, input={})",
+            clsNameCopy,
+            self.time(),
+            self.position(),
+            self.velocity(),
+            self.acceleration(),
+            self.input());
+        });
+      }
+
+templates:
+  ExponentialProfileSample:
+    qualname: wpi::math::ExponentialProfileSample
+    params:
+    - wpi::units::meter
+    - wpi::units::volt
