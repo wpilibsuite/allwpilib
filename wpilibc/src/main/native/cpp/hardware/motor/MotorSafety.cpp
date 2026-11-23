@@ -118,6 +118,20 @@ MotorSafety& MotorSafety::operator=(MotorSafety&& rhs) {
   return *this;
 }
 
+// Default implementations for StopMotor() and GetDescription(). These methods
+// are intentionally non-pure: Check() reads the enabled/expired state into
+// locals and then calls these virtuals, so a Check() that started before
+// destruction can land after the derived destructor has run (while
+// ~MotorSafety() is still waiting to unregister the object). With pure
+// virtuals, that call aborts with "pure virtual function called" (#9720).
+// With these defaults, it safely does nothing. All subclasses still override
+// both methods; the defaults only run during that destruction window.
+void MotorSafety::StopMotor() {}
+
+std::string MotorSafety::GetDescription() const {
+  return "MotorSafety";
+}
+
 void MotorSafety::Feed() {
   std::scoped_lock lock(m_thisMutex);
   m_stopTime = Timer::GetMonotonicTimestamp() + m_expiration;
