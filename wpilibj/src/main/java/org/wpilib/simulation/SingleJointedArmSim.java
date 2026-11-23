@@ -190,7 +190,10 @@ public class SingleJointedArmSim extends LinearSystemSim<N2, N1, N2> {
     // Reductions are greater than 1, so a reduction of 10:1 would mean the motor is
     // spinning 10x faster than the output
     var motorVelocity = m_x.get(1, 0) * m_gearing;
-    return m_gearbox.getCurrent(motorVelocity, m_u.get(0, 0)) * Math.signum(m_u.get(0, 0));
+    // Use 1, not signum(V), at zero applied voltage: signum(0) is 0, which would
+    // hide the back-EMF braking current through the motor at 0 V.
+    return m_gearbox.getCurrent(motorVelocity, m_u.get(0, 0))
+        * (m_u.get(0, 0) < 0.0 ? -1.0 : 1.0);
   }
 
   /**
