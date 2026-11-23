@@ -40,6 +40,11 @@ import org.wpilib.util.concurrent.Event;
  * and the current file is at most 10 MB, the file is transferred in the background and logging
  * continues on USB storage.
  *
+ * <p>If a custom directory is specified but is not accessible at startup (for example, it is on a
+ * USB drive that has not mounted yet), logging starts in the default location instead and the log
+ * is transferred to the requested directory once it becomes available (checked every 5 seconds),
+ * so early log data is buffered instead of being dropped.
+ *
  * <p>Log files are initially named "WPILIB_TBD_{random}.wpilog" until the DS connects. After the DS
  * connects, the log file is renamed to "WPILIB_yyyyMMdd_HHmmss.wpilog" (where the date/time is
  * UTC). If the FMS is connected and provides a match number, the log file is renamed to
@@ -58,6 +63,7 @@ public final class DataLogManager {
   private static DataLogBackgroundWriter m_log;
   private static boolean m_stopped;
   private static boolean m_internalStorage;
+  private static String m_pendingDir = "";
   private static boolean m_filenameOverride;
   private static Thread m_thread;
   private static final ZoneId m_utc = ZoneId.of("UTC");
@@ -313,17 +319,44 @@ public final class DataLogManager {
     return false;
   }
 
+  static boolean tryTransferToDir(DataLogBackgroundWriter log, Path dir) {
+    if (log.getDir().equals(dir.toString())) {
+      return true;
+    }
+    // Only transfer once the directory actually exists. In particular, do not
+    // create it: the parent may be an unmounted USB mount point, and creating
+    // the directory there would shadow the mount.
+    if (Files.isDirectory(dir)) {
+      log.setDir(dir.toString(), MAX_TRANSFER_SIZE);
+    }
+    return false;
+  }
+
   private static String makeLogDir(String dir) {
     if (!dir.isEmpty()) {
-      return dir;
+      if (Files.isDirectory(Path.of(dir))) {
+        return dir;
+      }
+      // The requested directory is not accessible yet (e.g. it is on a USB
+      // drive that has not mounted). Fall through to the default location and
+      // transfer the log there once the directory becomes available, so early
+      // log data is buffered instead of being dropped.
+      DriverStationErrors.reportWarning(
+          "DataLogManager: log directory "
+              + dir
+              + " is not available; logging to the default location until it becomes available",
+          false);
+      m_pendingDir = dir;
     }
 
     if (RobotBase.isReal()) {
-      // Prefer a mounted USB drive if one is accessible.
-      String usbDir = findUsbLogDir(Path.of("/u"));
-      if (!usbDir.isEmpty()) {
-        UsageReporting.reportUsage("DataLogManager", "USB");
-        return usbDir;
+      if (m_pendingDir.isEmpty()) {
+        // Prefer a mounted USB drive if one is accessible.
+        String usbDir = findUsbLogDir(Path.of("/u"));
+        if (!usbDir.isEmpty()) {
+          UsageReporting.reportUsage("DataLogManager", "USB");
+          return usbDir;
+        }
       }
       if (!new File("/home/systemcore/logs").mkdir()) {
         // ignored
@@ -478,7 +511,15 @@ public final class DataLogManager {
       }
       long spaceCheckTime = System.nanoTime();
       if (spaceCheckTime - nextSpaceCheck >= 0) {
-        if (m_internalStorage && tryTransferToUsb(m_log, Path.of("/u"))) {
+        if (!m_pendingDir.isEmpty()) {
+          if (tryTransferToDir(m_log, Path.of(m_pendingDir))) {
+            m_pendingDir = "";
+            if (m_internalStorage) {
+              m_internalStorage = false;
+              internalStorageAlert.set(false);
+            }
+          }
+        } else if (m_internalStorage && tryTransferToUsb(m_log, Path.of("/u"))) {
           m_internalStorage = false;
           internalStorageAlert.set(false);
           UsageReporting.reportUsage("DataLogManager", "USB");
