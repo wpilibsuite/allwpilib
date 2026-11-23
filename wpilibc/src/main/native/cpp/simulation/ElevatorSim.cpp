@@ -95,8 +95,10 @@ wpi::units::ampere_t ElevatorSim::GetCurrentDraw() const {
   wpi::units::radians_per_second_t motorVelocity = velocity * Kv * m_gearbox.Kv;
 
   // Perform calculation and return.
+  // Use 1, not sgn(V), at zero applied voltage: sgn(0) is 0, which would hide
+  // the back-EMF braking current through the motor at 0 V.
   return m_gearbox.Current(motorVelocity, wpi::units::volt_t{m_u(0)}) *
-         wpi::util::sgn(m_u(0));
+         (m_u(0) < 0.0 ? -1.0 : 1.0);
 }
 
 void ElevatorSim::SetInputVoltage(wpi::units::volt_t voltage) {
