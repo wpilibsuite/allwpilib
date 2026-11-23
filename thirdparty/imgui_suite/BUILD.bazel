@@ -9,7 +9,7 @@ load("//thirdparty/imgui_suite/imgui_test_engine:imgui_test.bzl", "IMGUI_TEST_EN
 cc_library(
     name = "fonts",
     srcs = glob(["generated/fonts/src/**"]),
-    hdrs = glob(["generated/fonts/include/**"]),
+    hdrs = glob(["generated/fonts/include/*.h"]),
     includes = ["generated/fonts/include"],
     deps = [
         ":imgui",
@@ -65,8 +65,8 @@ cc_library(
 
 cc_library(
     name = "implot",
-    srcs = glob(["implot/cpp/**"]),
-    hdrs = glob(["implot/include/**"]),
+    srcs = glob(["implot/cpp/*.cpp"]),
+    hdrs = glob(["implot/include/*.h"]),
     includes = ["implot/include"],
     linkstatic = True,
     strip_include_prefix = "implot/include",
@@ -112,8 +112,8 @@ cc_library(
 
 cc_library(
     name = "stb",
-    srcs = glob(["stb/cpp/**"]),
-    hdrs = glob(["stb/include/**"]),
+    srcs = ["stb/cpp/stb_image.cpp"],
+    hdrs = ["stb/include/stb_image.h"],
     linkstatic = True,
     strip_include_prefix = "stb/include",
 )
@@ -146,13 +146,13 @@ wpilib_cc_static_library(
 
 pkg_files(
     name = "imgui-hdrs-pkg",
-    srcs = glob(["imgui/include/**"]),
+    srcs = glob(["imgui/include/**/*.h"]),
     strip_prefix = "imgui/include",
 )
 
 pkg_files(
     name = "implot-hdrs-pkg",
-    srcs = glob(["implot/include/**"]),
+    srcs = glob(["implot/include/**/*.h"]),
     strip_prefix = "implot/include",
 )
 
@@ -173,13 +173,13 @@ pkg_files(
 
 pkg_files(
     name = "stb-hdrs-pkg",
-    srcs = glob(["stb/include/**"]),
+    srcs = ["stb/include/stb_image.h"],
     strip_prefix = "stb/include",
 )
 
 pkg_files(
     name = "generated-fonts-hdrs-pkg",
-    srcs = glob(["generated/fonts/include/**"]),
+    srcs = glob(["generated/fonts/include/*.h"]),
     strip_prefix = "generated/fonts/include/",
 )
 
@@ -201,13 +201,16 @@ pkg_zip(
 
 pkg_files(
     name = "imgui-srcs-pkg",
-    srcs = glob(["imgui/cpp/**"]),
+    srcs = glob([
+        "imgui/cpp/**/*.cpp",
+        "imgui/cpp/**/*.h",
+    ]),
     strip_prefix = "imgui/cpp",
 )
 
 pkg_files(
     name = "implot-srcs-pkg",
-    srcs = glob(["implot/cpp/**"]),
+    srcs = glob(["implot/cpp/*.cpp"]),
     strip_prefix = "implot/cpp",
 )
 
@@ -219,7 +222,7 @@ pkg_files(
 
 pkg_files(
     name = "stb-srcs-pkg",
-    srcs = glob(["stb/cpp/**"]),
+    srcs = ["stb/cpp/stb_image.cpp"],
     strip_prefix = "stb/cpp",
 )
 

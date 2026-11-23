@@ -4,7 +4,10 @@ load("//tools/wpical:copts.bzl", "COPTS", "CXXOPTS")
 cc_test(
     name = "wpical_tests",
     size = "medium",
-    srcs = glob(["cpp/**"]),
+    srcs = glob([
+        "cpp/*.cpp",
+        "cpp/*.hpp",
+    ]),
     copts = COPTS,
     cxxopts = CXXOPTS,
     data = ["//tools/wpical:test-assets"],

@@ -5,7 +5,7 @@ load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 wpilib_cc_library(
     name = "halsim_xrp",
     srcs = glob([
-        "src/main/native/cpp/*",
+        "src/main/native/cpp/*.cpp",
         "src/main/native/include/**/*.hpp",
     ]),
     includes = ["src/main/native/include"],
@@ -23,7 +23,7 @@ wpilib_cc_library(
 wpilib_cc_library(
     name = "halsim_xrp_static",
     srcs = glob([
-        "src/main/native/cpp/*",
+        "src/main/native/cpp/*.cpp",
         "src/main/native/include/**/*.hpp",
     ]),
     copts = [
