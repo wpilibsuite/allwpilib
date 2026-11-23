@@ -5,7 +5,6 @@
 #include "wpi/framework/OpModeRobot.hpp"
 
 #include <cstdio>
-#include <cstdlib>
 #include <format>
 #include <memory>
 #include <string>
@@ -15,7 +14,6 @@
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
-#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Notifier.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
@@ -23,7 +21,6 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
-#include "wpi/util/SafeThread.hpp"
 #include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/print.hpp"
 
@@ -75,8 +72,7 @@ void OpModeRobotBase::LoopFunc() {
   wpi::internal::DriverStationBackend::RefreshData();
 
   // Get current enabled state and opmode
-  const hal::ControlWord word =
-      wpi::internal::DriverStationBackend::GetControlWord();
+  const hal::ControlWord word = wpi::hal::GetControlWord();
   m_watchdog.Reset();
   const bool enabled = word.IsEnabled();
   // Treat disabled as unknown
@@ -204,7 +200,7 @@ void OpModeRobotBase::StartCompetition() {
 
   // Tell the DS that the robot is ready to be enabled
   std::puts("\n********** Robot program startup complete **********");
-  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
+  wpi::RobotState::ObserveUserProgramStarting();
 
   // Loop forever, calling the callback system which handles periodic functions
   while (true) {
