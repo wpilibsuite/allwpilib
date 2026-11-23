@@ -300,7 +300,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = [], extra_pyi_
     make_pyi(
         name = "wpiutil._wpiutil.make_pyi",
         package_name = "wpiutil._wpiutil",
-        output_files = [["wpiutil/_wpiutil/__init__.pyi", "wpiutil/_wpiutil/__init__.pyi"], ["wpiutil/_wpiutil/wpistruct.pyi", "wpiutil/_wpiutil/wpistruct.pyi"], ["wpiutil/_wpiutil/sync.pyi", "wpiutil/_wpiutil/sync.pyi"]],
+        output_files = [["wpiutil/_wpiutil/__init__.pyi", "wpiutil/_wpiutil/__init__.pyi"], ["wpiutil/_wpiutil/sync.pyi", "wpiutil/_wpiutil/sync.pyi"], ["wpiutil/_wpiutil/wpistruct.pyi", "wpiutil/_wpiutil/wpistruct.pyi"]],
         module_files = [["wpiutil", "wpiutil/__init__.py"], ["wpiutil._init__wpiutil", "wpiutil/_init__wpiutil.py"], ["wpiutil._wpiutil", "wpiutil/_wpiutil"]],
         runner = ":{}.make_pyi_runner".format(name),
     )

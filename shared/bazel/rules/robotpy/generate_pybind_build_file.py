@@ -190,6 +190,10 @@ class MakePyiConfig:
             self.output_files.append((args[idx], output_path))
             idx += 2
 
+        # Semiwrap can enumerate stub outputs in different orders. Keep the
+        # generated build file stable without changing module import order.
+        self.output_files.sort()
+
         self.module_files = []
         idx += 1
         while idx < len(args):
