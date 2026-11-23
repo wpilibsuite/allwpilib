@@ -2,6 +2,7 @@ import pathlib
 import wpilib
 import pytest
 import sys
+import time
 from wpilib.simulation import AlertSim
 from wpiutil import Alert
 
@@ -37,3 +38,29 @@ def test_get_log(tmp_path: pathlib.Path):
             wpilib.DataLogManager.stop()
         assert not any(a.group == "DataLogManager" for a in AlertSim.get_all())
     assert all(match.read_bytes() == b"match log" for match in matches)
+
+@pytest.mark.skipif(sys.platform == "darwin", reason="DataLogManager crashes on exit")
+def test_late_custom_dir(tmp_path: pathlib.Path):
+    # The custom directory does not exist yet: logging must fall back to the
+    # default location instead of dropping data, then transfer once it appears.
+    custom = tmp_path / "custom"
+    fallback_dir = None
+    try:
+        wpilib.DataLogManager.start(str(custom))
+        fallback_dir = pathlib.Path(wpilib.DataLogManager.get_log_dir())
+        assert fallback_dir != custom
+        wpilib.DataLogManager.log("hello")
+        custom.mkdir()
+        deadline = time.monotonic() + 15
+        while pathlib.Path(wpilib.DataLogManager.get_log_dir()) != custom:
+            assert time.monotonic() < deadline
+            time.sleep(0.1)
+        moved = [p for p in custom.iterdir() if p.suffix == ".wpilog"]
+        assert moved
+        assert not any((fallback_dir / p.name).exists() for p in moved)
+    finally:
+        wpilib.DataLogManager.stop()
+        if fallback_dir is not None:
+            for p in fallback_dir.iterdir():
+                if p.name.startswith("WPILIB_TBD_") and p.suffix == ".wpilog":
+                    p.unlink()
