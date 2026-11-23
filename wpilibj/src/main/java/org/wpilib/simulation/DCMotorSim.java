@@ -158,8 +158,10 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
     // I = V / R - omega / (Kv * R)
     // Reductions are output over input, so a reduction of 2:1 means the motor is spinning
     // 2x faster than the output
+    // Use 1, not signum(V), at zero applied voltage: signum(0) is 0, which would
+    // hide the back-EMF braking current through the motor at 0 V.
     return m_gearbox.getCurrent(m_x.get(1, 0) * m_gearing, m_u.get(0, 0))
-        * Math.signum(m_u.get(0, 0));
+        * (m_u.get(0, 0) < 0.0 ? -1.0 : 1.0);
   }
 
   /**
