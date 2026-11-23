@@ -7,6 +7,7 @@
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubPositionConstants.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
+#include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
@@ -17,7 +18,7 @@ namespace wpi {
 
 /** This class controls a specific motor and encoder hooked up to an
  * ExpansionHub. */
-class ExpansionHubMotor {
+class ExpansionHubMotor : public MotorController {
  public:
   /** The direction to follow a leader motor in when using the follow method. */
   enum class FollowDirection {
@@ -35,7 +36,7 @@ class ExpansionHubMotor {
    */
   ExpansionHubMotor(int usbId, int channel);
 
-  ~ExpansionHubMotor() noexcept;
+  ~ExpansionHubMotor() noexcept override;
 
   /**
    * Neutral mode applied when the motor output is commanded to 0.
@@ -54,7 +55,17 @@ class ExpansionHubMotor {
    *     indicates full forward.
    * @Common This is one of the commonly used methods for this class
    */
-  void SetThrottle(double throttle);
+  void SetThrottle(double throttle) override;
+
+  /**
+   * Gets the last commanded throttle, before inversion. Initially zero and
+   * reset to zero by Unfollow(). Commands in other control modes do not update
+   * this value.
+   *
+   * @return The commanded throttle where -1 represents full reverse and 1
+   *     represents full forward.
+   */
+  double GetThrottle() const override;
 
   /**
    * Sets the voltage to run the motor at. This value will be continuously
@@ -62,7 +73,7 @@ class ExpansionHubMotor {
    *
    * @param voltage The voltage to drive the motor at
    */
-  void SetVoltage(wpi::units::volt_t voltage);
+  void SetVoltage(wpi::units::volt_t voltage) override;
 
   /**
    * Command the motor to drive to a specific position setpoint. This value will
@@ -128,9 +139,23 @@ class ExpansionHubMotor {
   /**
    * Sets if the motor and encoder should be reversed.
    *
-   * @param reversed True to reverse encoder, false otherwise
+   * @param reversed True to reverse the motor and encoder, false otherwise
    */
   void SetReversed(bool reversed);
+
+  /**
+   * Sets the inversion state of the motor and encoder.
+   *
+   * @param isInverted True to reverse the motor and encoder, false otherwise
+   */
+  void SetInverted(bool isInverted) override;
+
+  /**
+   * Gets the inversion state of the motor and encoder.
+   *
+   * @return True if the motor and encoder are reversed, false otherwise
+   */
+  bool GetInverted() const override;
 
   /** Reset the encoder count to 0. */
   void ResetEncoder();
@@ -175,6 +200,8 @@ class ExpansionHubMotor {
  private:
   ExpansionHub m_hub;
   int m_channel;
+  double m_throttle = 0;
+  bool m_isInverted = false;
 
   wpi::nt::DoubleSubscriber m_encoderSubscriber;
   wpi::nt::DoubleSubscriber m_encoderVelocitySubscriber;
