@@ -207,7 +207,10 @@ public class ElevatorSim extends LinearSystemSim<N2, N1, N2> {
     double kV = -m_plant.getA().get(1, 1) * kA;
     double motorVelocity = m_x.get(1, 0) * kV * m_gearbox.Kv;
     var appliedVoltage = m_u.get(0, 0);
-    return m_gearbox.getCurrent(motorVelocity, appliedVoltage) * Math.signum(appliedVoltage);
+    // Use 1, not signum(V), at zero applied voltage: signum(0) is 0, which would
+    // hide the back-EMF braking current through the motor at 0 V.
+    return m_gearbox.getCurrent(motorVelocity, appliedVoltage)
+        * (appliedVoltage < 0.0 ? -1.0 : 1.0);
   }
 
   /**
