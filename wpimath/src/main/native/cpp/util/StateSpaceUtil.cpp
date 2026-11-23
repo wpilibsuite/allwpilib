@@ -38,7 +38,14 @@ Eigen::MatrixXd CovarianceMatrix(const std::span<const double> stdDevs) {
   return result;
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4723)
+#endif
 template Eigen::VectorXd DesaturateInputVector<Eigen::Dynamic>(
     const Eigen::VectorXd& u, double maxMagnitude);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 }  // namespace wpi::math
