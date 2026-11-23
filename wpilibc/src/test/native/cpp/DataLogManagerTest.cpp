@@ -166,6 +166,109 @@ TEST_CASE("DataLogManagerTest LateUsbStorage", "[wpilibc]") {
   CHECK_FALSE(fs::exists(source / "test.wpilog"));
 }
 
+TEST_CASE("DataLogManagerTest LateCustomDir", "[wpilibc]") {
+  auto root =
+      fs::temp_directory_path() /
+      ("DataLogManagerCustomTest_" +
+       std::to_string(
+           std::chrono::steady_clock::now().time_since_epoch().count()));
+  auto source = root / "internal";
+  auto custom = root / "custom";
+  fs::create_directories(source);
+  struct Cleanup {
+    fs::path root;
+    ~Cleanup() {
+      std::error_code ec;
+      fs::remove_all(root, ec);
+    }
+  } cleanup{root};
+
+  wpi::log::DataLogBackgroundWriter log{source.string(), "test.wpilog"};
+  int entry = log.Start("integer", "int64", {}, 1);
+  log.AppendInteger(entry, 42, 2);
+  // The custom directory does not exist yet: no transfer is requested.
+  CHECK_FALSE(wpi::internal::TryTransferDataLogToDir(log, custom.string()));
+  CHECK(log.GetDir() == source.string());
+
+  fs::create_directory(custom);
+  auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{2};
+  while (!wpi::internal::TryTransferDataLogToDir(log, custom.string())) {
+    REQUIRE(std::chrono::steady_clock::now() < deadline);
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+  }
+  CHECK(log.GetDir() == custom.string());
+  CHECK(fs::exists(custom / "test.wpilog"));
+  CHECK_FALSE(fs::exists(source / "test.wpilog"));
+}
+
+TEST_CASE("DataLogManagerTest LateCustomDirManager", "[wpilibc]") {
+  HAL_Initialize();
+  auto root =
+      fs::temp_directory_path() /
+      ("DataLogManagerCustomManagerTest_" +
+       std::to_string(
+           std::chrono::steady_clock::now().time_since_epoch().count()));
+  auto custom = root / "custom";
+  fs::create_directories(root);
+  struct Cleanup {
+    fs::path root;
+    std::string fallbackDir;
+    bool running = false;
+    ~Cleanup() {
+      if (running) {
+        wpi::DataLogManager::Stop();
+      }
+      std::error_code ec;
+      fs::remove_all(root, ec);
+      // Remove the temporary log file left in the fallback directory.
+      if (!fallbackDir.empty()) {
+        for (fs::directory_iterator it{fallbackDir, ec}, end;
+             !ec && it != end; it.increment(ec)) {
+          auto&& entry = *it;
+          if (entry.path().filename().string().starts_with("WPILIB_TBD_") &&
+              entry.path().extension() == ".wpilog") {
+            fs::remove(entry, ec);
+          }
+        }
+      }
+    }
+  } cleanup{root};
+
+  // The custom directory does not exist yet: logging must fall back to the
+  // default location instead of dropping data.
+  wpi::DataLogManager::Start(custom.string());
+  cleanup.running = true;
+  auto fallbackDir = wpi::DataLogManager::GetLogDir();
+  cleanup.fallbackDir = fallbackDir;
+  CHECK(fallbackDir != custom.string());
+  wpi::DataLogManager::Log("hello");
+
+  fs::create_directory(custom);
+  auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{15};
+  while (wpi::DataLogManager::GetLogDir() != custom.string()) {
+    REQUIRE(std::chrono::steady_clock::now() < deadline);
+    std::this_thread::sleep_for(std::chrono::milliseconds{100});
+  }
+  bool foundLog = false;
+  bool leftInFallback = false;
+  {
+    std::error_code ec;
+    for (fs::directory_iterator it{custom, ec}, end; !ec && it != end;
+         it.increment(ec)) {
+      if (it->path().extension() == ".wpilog") {
+        foundLog = true;
+        if (fs::exists(fs::path{fallbackDir} / it->path().filename())) {
+          leftInFallback = true;
+        }
+      }
+    }
+  }
+  CHECK(foundLog);
+  CHECK_FALSE(leftInFallback);
+  wpi::DataLogManager::Stop();
+  cleanup.running = false;
+}
+
 TEST_CASE("DataLogManagerTest FreeSpaceAlert", "[wpilibc]") {
   HAL_Initialize();
   wpi::util::Alert alert{"DataLogManagerTest", "lowSpace", "",
