@@ -31,6 +31,12 @@ namespace wpi {
  * most 10 MB, the file is transferred in the background and logging continues
  * on USB storage.
  *
+ * If a custom directory is specified but is not accessible at startup (for
+ * example, it is on a USB drive that has not mounted yet), logging starts in
+ * the default location instead and the log is transferred to the requested
+ * directory once it becomes available (checked every 5 seconds), so early log
+ * data is buffered instead of being dropped.
+ *
  * Log files are initially named "WPILIB_TBD_{random}.wpilog" until the DS
  * connects. After the DS connects, the log file is renamed to
  * "WPILIB_yyyyMMdd_HHmmss.wpilog" (where the date/time is UTC). If the FMS is
@@ -139,6 +145,18 @@ void DeleteOldDataLogs(std::string_view logDir, uintmax_t freeSpace);
  */
 bool TryTransferDataLogToUsb(wpi::log::DataLogBackgroundWriter& log,
                              std::string_view usbRoot);
+
+/**
+ * Checks whether a directory is available and requests a background log
+ * transfer to it if so. For testing purposes only.
+ *
+ * @param log data log
+ * @param dir directory to transfer the log to
+ * @return true if the log is already in the directory (or has successfully
+ *     transferred to it)
+ */
+bool TryTransferDataLogToDir(wpi::log::DataLogBackgroundWriter& log,
+                             std::string_view dir);
 
 /**
  * Updates the data log storage alert from the available disk space. For
