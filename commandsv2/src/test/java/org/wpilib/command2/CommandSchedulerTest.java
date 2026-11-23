@@ -9,8 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.wpilib.event.EventLoop;
@@ -134,6 +137,33 @@ class CommandSchedulerTest extends CommandTestBase {
 
       scheduler.run();
       assertEquals(1, counter.get());
+    }
+  }
+
+  @Test
+  void getAllRegisteredSubsystemsTest() {
+    try (CommandScheduler scheduler = new CommandScheduler()) {
+      Subsystem system1 = new Subsystem() {};
+      Subsystem system2 = new Subsystem() {};
+
+      assertTrue(scheduler.getAllRegisteredSubsystems().isEmpty());
+
+      scheduler.registerSubsystem(system1);
+      scheduler.registerSubsystem(system2);
+      assertEquals(
+          List.of(system1, system2),
+          new ArrayList<>(scheduler.getAllRegisteredSubsystems()));
+
+      assertThrows(
+          UnsupportedOperationException.class,
+          () -> scheduler.getAllRegisteredSubsystems().add(new Subsystem() {}));
+
+      scheduler.unregisterSubsystem(system1);
+      assertEquals(
+          List.of(system2), new ArrayList<>(scheduler.getAllRegisteredSubsystems()));
+
+      scheduler.unregisterAllSubsystems();
+      assertTrue(scheduler.getAllRegisteredSubsystems().isEmpty());
     }
   }
 
