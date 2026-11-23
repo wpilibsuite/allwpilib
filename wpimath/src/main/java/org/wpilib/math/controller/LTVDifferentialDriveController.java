@@ -82,6 +82,9 @@ public class LTVDifferentialDriveController {
    * @return True if the pose error is within tolerance of the reference.
    */
   public boolean atReference() {
+    if (m_error == null || m_tolerance == null) {
+      return false;
+    }
     return Math.abs(m_error.get(0, 0)) < m_tolerance.get(0, 0)
         && Math.abs(m_error.get(1, 0)) < m_tolerance.get(1, 0)
         && Math.abs(m_error.get(2, 0)) < m_tolerance.get(2, 0)
@@ -128,6 +131,10 @@ public class LTVDifferentialDriveController {
       Pose2d poseRef,
       double leftVelocityRef,
       double rightVelocityRef) {
+    if (currentPose == null || poseRef == null) {
+      return new DifferentialDriveWheelVoltages(0.0, 0.0);
+    }
+
     // See theorem 8.7.4 of
     // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
 
@@ -213,6 +220,9 @@ public class LTVDifferentialDriveController {
       double leftVelocity,
       double rightVelocity,
       DifferentialSample desiredState) {
+    if (currentPose == null || desiredState == null || desiredState.pose == null) {
+      return new DifferentialDriveWheelVoltages(0.0, 0.0);
+    }
     return calculate(
         currentPose,
         leftVelocity,

@@ -233,6 +233,9 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @return True if the error is within tolerance of the reference.
    */
   public boolean atReference() {
+    if (m_error == null || m_tolerance == null) {
+      return false;
+    }
     for (int i = 0; i < m_error.getNumRows(); i++) {
       if (Math.abs(m_error.get(i, 0)) > m_tolerance.get(i, 0)) {
         return false;

@@ -72,6 +72,10 @@ public class LTVUnicycleController {
    * @return True if the pose error is within tolerance of the reference.
    */
   public boolean atReference() {
+    if (m_poseError == null || m_poseTolerance == null) {
+      return false;
+    }
+
     final var eTranslate = m_poseError.getTranslation();
     final var eRotate = m_poseError.getRotation();
     final var tolTranslate = m_poseTolerance.getTranslation();
@@ -104,6 +108,10 @@ public class LTVUnicycleController {
    */
   public ChassisVelocities calculate(
       Pose2d currentPose, Pose2d poseRef, double linearVelocityRef, double angularVelocityRef) {
+    if (currentPose == null || poseRef == null) {
+      return new ChassisVelocities(0.0, 0.0, 0.0);
+    }
+
     // See theorem 8.8.1 of
     // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
 
@@ -164,6 +172,13 @@ public class LTVUnicycleController {
    * @return The linear and angular velocity outputs of the LTV controller.
    */
   public ChassisVelocities calculate(Pose2d currentPose, HolonomicSample desiredState) {
+    if (currentPose == null
+        || desiredState == null
+        || desiredState.pose == null
+        || desiredState.velocity == null) {
+      return new ChassisVelocities(0.0, 0.0, 0.0);
+    }
+
     // The sample velocity is field-relative; the controller needs the
     // robot-relative forward (linear) velocity.
     double linearVelocity =

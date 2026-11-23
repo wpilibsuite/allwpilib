@@ -6,6 +6,8 @@ package org.wpilib.math.controller;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
@@ -14,12 +16,32 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
+import org.wpilib.math.trajectory.HolonomicSample;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.util.MathUtil;
 
 class LTVUnicycleControllerTest {
   private static final double TOLERANCE = 1 / 12.0;
   private static final double ANGULAR_TOLERANCE = Math.toRadians(2);
+
+  @Test
+  void testNullInputs() {
+    var controller = new LTVUnicycleController(0.02);
+
+    // A null tolerance makes atReference() return false instead of throwing.
+    controller.setTolerance(null);
+    assertFalse(controller.atReference());
+
+    // Null poses and null samples produce a zero output instead of throwing.
+    assertEquals(0.0, controller.calculate(null, Pose2d.ZERO, 0.0, 0.0).vx);
+    assertEquals(0.0, controller.calculate(Pose2d.ZERO, null, 0.0, 0.0).vx);
+    assertEquals(0.0, controller.calculate(Pose2d.ZERO, (HolonomicSample) null).vx);
+
+    // Normal operation is unaffected.
+    controller.setTolerance(new Pose2d(0.1, 0.1, Rotation2d.fromRadians(0.1)));
+    controller.calculate(Pose2d.ZERO, Pose2d.ZERO, 0.0, 0.0);
+    assertTrue(controller.atReference());
+  }
 
   @Test
   void testReachesReference() {

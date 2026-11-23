@@ -83,6 +83,10 @@ public class DifferentialDriveAccelerationLimiter {
    */
   public DifferentialDriveWheelVoltages calculate(
       double leftVelocity, double rightVelocity, double leftVoltage, double rightVoltage) {
+    if (m_system == null) {
+      return new DifferentialDriveWheelVoltages(0.0, 0.0);
+    }
+
     Matrix<N2, N1> u = VecBuilder.fill(leftVoltage, rightVoltage);
 
     // Find unconstrained wheel accelerations

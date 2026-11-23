@@ -242,6 +242,9 @@ public class ProfiledPIDController implements TelemetryLoggable, ComplexTunable 
    * @return True if the error is within the tolerance of the error.
    */
   public boolean atGoal() {
+    if (m_goal == null || m_setpoint == null) {
+      return false;
+    }
     return atSetpoint() && m_goal.equals(m_setpoint);
   }
 
