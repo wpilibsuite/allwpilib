@@ -415,6 +415,15 @@ public final class CommandScheduler implements TelemetryLoggable, ComplexTunable
   }
 
   /**
+   * Gets all registered subsystems, in the order they were registered.
+   *
+   * @return an unmodifiable set of the registered subsystems, in registration order
+   */
+  public Set<Subsystem> getAllRegisteredSubsystems() {
+    return Collections.unmodifiableSet(new LinkedHashSet<>(m_subsystems.keySet()));
+  }
+
+  /**
    * Sets the default command for a subsystem. Registers that subsystem if it is not already
    * registered. Default commands will run whenever there is no other command currently scheduled
    * that requires the subsystem. Default commands should be written to never end (i.e. their {@link
