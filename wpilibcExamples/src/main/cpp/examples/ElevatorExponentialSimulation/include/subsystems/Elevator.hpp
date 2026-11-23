@@ -38,8 +38,6 @@ class Elevator {
                                 wpi::units::volts>::Constraints constraints{
       Constants::ELEVATOR_MAX_V, Constants::ELEVATOR_KV,
       Constants::ELEVATOR_KA};
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts> profile{
-      constraints};
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
       setpoint;
 

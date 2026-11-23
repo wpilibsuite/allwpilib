@@ -1,13 +1,16 @@
 classes:
   wpi::math::ExponentialProfile:
+    force_no_trampoline: true
     doc_code_blocks:
     - |
       constraints = ExponentialProfile.Constraints.from_characteristics(MAX_V, kV, kA)
       previous_profiled_reference = ExponentialProfile.State(initial_reference, 0.0)
-      profile = ExponentialProfile(constraints)
     - |
-      previous_profiled_reference = profile.calculate(
-          time_since_previous_update, previous_profiled_reference, unprofiled_reference
+      sample = ExponentialProfile.generate(
+          constraints, previous_profiled_reference, unprofiled_reference
+      ).sample_at(time_since_previous_update)
+      previous_profiled_reference = ExponentialProfile.State(
+          sample.position, sample.velocity
       )
     force_type_casters:
     - wpi::units::meters_per_second_t
@@ -15,15 +18,8 @@ classes:
     - Distance
     - Input
     methods:
-      ExponentialProfile:
-      Calculate:
-      CalculateInflectionPoint:
-        overloads:
-          const State&, const State& [const]:
-      TimeLeftUntil:
-      CalculateProfileTiming:
-        overloads:
-          const State&, const State& [const]:
+      Interpolate:
+      Generate:
   wpi::math::ExponentialProfile::Constraints:
     attributes:
       maxInput:
@@ -54,12 +50,6 @@ classes:
       operator==:
     inline_code: |
       .def(py::init<Distance_t, Velocity_t>())
-  wpi::math::ExponentialProfile::ProfileTiming:
-    attributes:
-      inflectionTime:
-      totalTime:
-    methods:
-      IsFinished:
 
 templates:
   ExponentialProfile:

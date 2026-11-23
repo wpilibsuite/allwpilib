@@ -19,12 +19,10 @@ class Elevator:
         # This gearbox represents a gearbox containing 4 Vex 775pro motors.
         self.elevator_gearbox = wpimath.DCMotor.neo(2)
 
-        self.profile = wpimath.ExponentialProfile(
-            wpimath.ExponentialProfile.Constraints.from_characteristics(
-                constants.ELEVATOR_MAX_V,
-                constants.ELEVATOR_KV,
-                constants.ELEVATOR_KA,
-            )
+        self.constraints = wpimath.ExponentialProfile.Constraints.from_characteristics(
+            constants.ELEVATOR_MAX_V,
+            constants.ELEVATOR_KV,
+            constants.ELEVATOR_KA,
         )
 
         self.setpoint = wpimath.ExponentialProfile.State(0, 0)
@@ -104,7 +102,10 @@ class Elevator:
         """
         goal_state = wpimath.ExponentialProfile.State(goal, 0)
 
-        next_state = self.profile.calculate(0.020, self.setpoint, goal_state)
+        sample = wpimath.ExponentialProfile.generate(
+            self.constraints, self.setpoint, goal_state
+        ).sample_at(0.020)
+        next_state = wpimath.ExponentialProfile.State(sample.position, sample.velocity)
 
         # With the setpoint value we run PID control like normal
         pid_output = self.pid_controller.calculate(

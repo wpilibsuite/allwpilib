@@ -19,8 +19,8 @@ public class Robot extends TimedRobot {
 
   // Create a motion profile with the given maximum voltage and characteristics kV, kA
   // These gains should match your feedforward kV, kA for best results.
-  private final ExponentialProfile profile =
-      new ExponentialProfile(ExponentialProfile.Constraints.fromCharacteristics(10, 1, 1));
+  private final ExponentialProfile.Constraints constraints =
+      ExponentialProfile.Constraints.fromCharacteristics(10, 1, 1);
   private ExponentialProfile.State goal = new ExponentialProfile.State(0, 0);
   private ExponentialProfile.State setpoint = new ExponentialProfile.State(0, 0);
 
@@ -39,7 +39,8 @@ public class Robot extends TimedRobot {
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    ExponentialProfile.State next = profile.calculate(DT, setpoint, goal);
+    var sample = ExponentialProfile.generate(constraints, setpoint, goal).sampleAt(DT);
+    var next = new ExponentialProfile.State(sample.position, sample.velocity);
 
     // Send setpoint to offboard controller PID
     motor.setSetpoint(
