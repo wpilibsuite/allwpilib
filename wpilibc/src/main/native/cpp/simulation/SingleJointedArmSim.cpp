@@ -80,8 +80,10 @@ wpi::units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output
   wpi::units::radians_per_second_t motorVelocity{m_x(1) * m_gearing};
+  // Use 1, not sgn(V), at zero applied voltage: sgn(0) is 0, which would hide
+  // the back-EMF braking current through the motor at 0 V.
   return m_gearbox.Current(motorVelocity, wpi::units::volt_t{m_u(0)}) *
-         wpi::util::sgn(m_u(0));
+         (m_u(0) < 0.0 ? -1.0 : 1.0);
 }
 
 void SingleJointedArmSim::SetInputVoltage(wpi::units::volt_t voltage) {
