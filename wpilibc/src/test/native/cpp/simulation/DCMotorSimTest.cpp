@@ -97,3 +97,29 @@ TEST_CASE("DCMotorSimTest PositionFeedbackControl", "[wpilibc][simulation]") {
   CHECK_THAT(encoder.GetDistance(), Catch::Matchers::WithinAbs(750, 1.0));
   CHECK_THAT(encoder.GetRate(), Catch::Matchers::WithinAbs(0, 0.1));
 }
+
+TEST_CASE("DCMotorSimTest CurrentDrawAtZeroVoltage", "[wpilibc][simulation]") {
+  wpi::math::DCMotor gearbox = wpi::math::DCMotor::Neo(1);
+  auto plant = wpi::math::Models::AngularPositionFromPhysicalConstants(
+      wpi::math::DCMotor::Neo(1), wpi::units::kilogram_square_meter_t{0.0005},
+      1.0);
+  wpi::sim::DCMotorSim sim{plant, gearbox};
+
+  wpi::sim::RoboRioSim::ResetData();
+  wpi::sim::RoboRioSim::SetVInVoltage(12_V);
+
+  // Spin up at full voltage so the motor has back-EMF to report
+  sim.SetInputVoltage(12_V);
+  for (int i = 0; i < 100; i++) {
+    sim.Update(20_ms);
+  }
+  CHECK(sim.GetAngularVelocity().value() > 0.0);
+
+  // Cutting the voltage must not zero the current: the spinning motor still
+  // drives a braking current through its windings
+  sim.SetInputVoltage(0_V);
+  CHECK(sim.GetCurrentDraw().value() < 0.0);
+  CHECK_THAT(sim.GetCurrentDraw().value(),
+             Catch::Matchers::WithinAbs(
+                 gearbox.Current(sim.GetAngularVelocity(), 0_V).value(), 1.0));
+}
