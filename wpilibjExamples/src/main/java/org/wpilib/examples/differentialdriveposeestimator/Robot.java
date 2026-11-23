@@ -52,4 +52,10 @@ public class Robot extends TimedRobot {
 
     drive.drive(xVelocity, rot);
   }
+
+  @Override
+  public void disabledInit() {
+    // This just makes sure that our simulation code knows that the motor's off.
+    drive.stop();
+  }
 }

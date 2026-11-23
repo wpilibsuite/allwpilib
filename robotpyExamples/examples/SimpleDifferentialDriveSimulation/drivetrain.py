@@ -117,6 +117,11 @@ class Drivetrain:
             )
         )
 
+    def stop(self) -> None:
+        """Stop the drivetrain motors."""
+        self.left_leader.set_throttle(0.0)
+        self.right_leader.set_throttle(0.0)
+
     def update_odometry(self) -> None:
         """Update robot odometry."""
         self.odometry.update(

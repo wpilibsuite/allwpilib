@@ -95,6 +95,12 @@ public class Robot extends TimedRobot {
     Telemetry.log("BangBang Controller", bangBangController);
   }
 
+  @Override
+  public void disabledInit() {
+    // This just makes sure that our simulation code knows that the motor's off.
+    flywheelMotor.setThrottle(0.0);
+  }
+
   /** Update our simulation. This should be run every robot loop in simulation. */
   @Override
   public void simulationPeriodic() {

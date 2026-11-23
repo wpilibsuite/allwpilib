@@ -25,6 +25,11 @@ void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
   SetVelocities(kinematics.ToWheelVelocities({xVelocity, 0_mps, rot}));
 }
 
+void Drivetrain::Stop() {
+  leftLeader.SetThrottle(0.0);
+  rightLeader.SetThrottle(0.0);
+}
+
 void Drivetrain::UpdateOdometry() {
   odometry.Update(imu.GetRotation2d(),
                   wpi::units::meter_t{leftEncoder.GetDistance()},

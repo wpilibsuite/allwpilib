@@ -106,6 +106,11 @@ class MyRobot(wpilib.TimedRobot):
         )
 
     @override
+    def disabled_init(self) -> None:
+        # This just makes sure that our simulation code knows that the motor's off.
+        self.flywheel_motor.set_throttle(0.0)
+
+    @override
     def simulation_periodic(self) -> None:
         """Update our simulation. This should be run every robot loop in simulation."""
         # To update our simulation, we set motor voltage inputs, update the

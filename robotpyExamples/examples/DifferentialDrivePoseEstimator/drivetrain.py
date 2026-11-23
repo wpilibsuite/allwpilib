@@ -142,6 +142,11 @@ class Drivetrain:
         )
         self.set_velocities(wheel_velocities)
 
+    def stop(self) -> None:
+        """Stop the drivetrain motors."""
+        self.left_leader.set_throttle(0.0)
+        self.right_leader.set_throttle(0.0)
+
     def publish_camera_to_object(
         self,
         object_in_field: wpimath.Pose3d,

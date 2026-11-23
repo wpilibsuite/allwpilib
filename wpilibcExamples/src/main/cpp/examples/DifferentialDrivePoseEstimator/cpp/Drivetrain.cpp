@@ -53,6 +53,11 @@ void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
   SetVelocities(kinematics.ToWheelVelocities({xVelocity, 0_mps, rot}));
 }
 
+void Drivetrain::Stop() {
+  leftLeader.SetThrottle(0.0);
+  rightLeader.SetThrottle(0.0);
+}
+
 void Drivetrain::PublishCameraToObject(
     wpi::math::Pose3d objectInField, wpi::math::Transform3d robotToCamera,
     wpi::nt::DoubleArrayEntry& cameraToObjectEntry,
