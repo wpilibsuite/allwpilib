@@ -237,9 +237,11 @@ public class DifferentialDrivetrainSim {
    * @return the drivetrain's left side current draw, in amps
    */
   public double getLeftCurrentDraw() {
+    // Use 1, not signum(V), at zero applied voltage: signum(0) is 0, which would
+    // hide the back-EMF braking current through the motor at 0 V.
     return m_motor.getCurrent(
             getState(State.LEFT_VELOCITY) * m_currentGearing / m_wheelRadius, m_u.get(0, 0))
-        * Math.signum(m_u.get(0, 0));
+        * (m_u.get(0, 0) < 0.0 ? -1.0 : 1.0);
   }
 
   /**
@@ -248,9 +250,11 @@ public class DifferentialDrivetrainSim {
    * @return the drivetrain's right side current draw, in amps
    */
   public double getRightCurrentDraw() {
+    // Use 1, not signum(V), at zero applied voltage: signum(0) is 0, which would
+    // hide the back-EMF braking current through the motor at 0 V.
     return m_motor.getCurrent(
             getState(State.RIGHT_VELOCITY) * m_currentGearing / m_wheelRadius, m_u.get(1, 0))
-        * Math.signum(m_u.get(1, 0));
+        * (m_u.get(1, 0) < 0.0 ? -1.0 : 1.0);
   }
 
   /**
