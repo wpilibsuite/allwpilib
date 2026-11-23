@@ -21,7 +21,7 @@
 TEST_CASE("ModelsTest AngularVelocityFromPhysicalConstants", "[wpimath]") {
   constexpr auto model =
       wpi::math::Models::AngularVelocityFromPhysicalConstants(
-          wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
+          wpi::math::DCMotor::Neo(2), 0.00032_kg_sq_m, 1.0);
 
   REQUIRE(model.A().isApprox(wpi::math::Matrixd<1, 1>{-26.87032}, 0.001));
   REQUIRE(model.B().isApprox(wpi::math::Matrixd<1, 1>{1354.166667}, 0.001));
@@ -43,7 +43,7 @@ TEST_CASE("ModelsTest AngularVelocityFromSysId", "[wpimath]") {
 TEST_CASE("ModelsTest DifferentialDriveFromPhysicalConstants", "[wpimath]") {
   constexpr auto model =
       wpi::math::Models::DifferentialDriveFromPhysicalConstants(
-          wpi::math::DCMotor::NEO(4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m, 6.0);
+          wpi::math::DCMotor::Neo(4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m, 6.0);
 
   REQUIRE(model.A().isApprox(
       wpi::math::Matrixd<2, 2>{{-10.14132, 3.06598}, {3.06598, -10.14132}},
@@ -58,7 +58,7 @@ TEST_CASE("ModelsTest DifferentialDriveFromPhysicalConstants", "[wpimath]") {
 
 TEST_CASE("ModelsTest LinearPositionFromPhysicalConstants", "[wpimath]") {
   auto model = wpi::math::Models::LinearPositionFromPhysicalConstants(
-                   wpi::math::DCMotor::NEO(2), 5_kg, 0.05_m, 12)
+                   wpi::math::DCMotor::Neo(2), 5_kg, 0.05_m, 12)
                    .Slice(0);
   REQUIRE(model.A().isApprox(
       wpi::math::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -99.05473}}, 0.001));

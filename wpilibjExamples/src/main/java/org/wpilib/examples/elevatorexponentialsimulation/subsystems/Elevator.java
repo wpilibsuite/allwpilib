@@ -26,7 +26,7 @@ import org.wpilib.telemetry.Telemetry;
 
 public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  private final DCMotor elevatorGearbox = DCMotor.getNEO(2);
+  private final DCMotor elevatorGearbox = DCMotor.getNeo(2);
 
   private final ExponentialProfile.Constraints constraints =
       ExponentialProfile.Constraints.fromCharacteristics(

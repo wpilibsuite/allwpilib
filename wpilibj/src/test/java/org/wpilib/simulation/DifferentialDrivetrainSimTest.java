@@ -33,7 +33,7 @@ class DifferentialDrivetrainSimTest {
   void testConvergence() {
     RoboRioSim.resetData();
 
-    var motor = DCMotor.getNEO(2);
+    var motor = DCMotor.getNeo(2);
     var plant =
         Models.differentialDriveFromPhysicalConstants(
             motor, 50, inchesToMeters(2), inchesToMeters(12), 0.5, 1.0);
@@ -100,7 +100,7 @@ class DifferentialDrivetrainSimTest {
 
   @Test
   void testCurrent() {
-    var motor = DCMotor.getNEO(2);
+    var motor = DCMotor.getNeo(2);
     var plant =
         Models.differentialDriveFromPhysicalConstants(
             motor, 50, inchesToMeters(2), inchesToMeters(12), 0.5, 1.0);
@@ -130,7 +130,7 @@ class DifferentialDrivetrainSimTest {
 
   @Test
   void testModelStability() {
-    var motor = DCMotor.getNEO(2);
+    var motor = DCMotor.getNeo(2);
     var plant =
         Models.differentialDriveFromPhysicalConstants(
             motor, 50, inchesToMeters(2), inchesToMeters(12), 2.0, 5.0);

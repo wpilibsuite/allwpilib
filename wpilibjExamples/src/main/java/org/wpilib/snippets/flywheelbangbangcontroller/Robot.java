@@ -61,7 +61,7 @@ public class Robot extends TimedRobot {
   private static final double FLYWHEEL_MOMENT_OF_INERTIA =
       0.5 * lbsToKilograms(1.5) * Math.pow(inchesToMeters(4), 2);
 
-  private final DCMotor gearbox = DCMotor.getNEO(1);
+  private final DCMotor gearbox = DCMotor.getNeo(1);
 
   private final LinearSystem<N1, N1, N1> plant =
       Models.angularVelocityFromPhysicalConstants(

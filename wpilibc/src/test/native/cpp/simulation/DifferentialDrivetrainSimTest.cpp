@@ -26,7 +26,7 @@ TEST_CASE("DifferentialDrivetrainSimTest Convergence",
 
   wpi::sim::RoboRioSim::ResetData();
 
-  auto motor = wpi::math::DCMotor::NEO(2);
+  auto motor = wpi::math::DCMotor::Neo(2);
   auto plant = wpi::math::Models::DifferentialDriveFromPhysicalConstants(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
 
@@ -83,7 +83,7 @@ TEST_CASE("DifferentialDrivetrainSimTest Convergence",
 }
 
 TEST_CASE("DifferentialDrivetrainSimTest Current", "[wpilibc][simulation]") {
-  auto motor = wpi::math::DCMotor::NEO(2);
+  auto motor = wpi::math::DCMotor::Neo(2);
   auto plant = wpi::math::Models::DifferentialDriveFromPhysicalConstants(
       motor, 50_kg, 2_in, 12_in, 0.5_kg_sq_m, 1.0);
 
@@ -111,7 +111,7 @@ TEST_CASE("DifferentialDrivetrainSimTest Current", "[wpilibc][simulation]") {
 
 TEST_CASE("DifferentialDrivetrainSimTest ModelStability",
           "[wpilibc][simulation]") {
-  auto motor = wpi::math::DCMotor::NEO(2);
+  auto motor = wpi::math::DCMotor::Neo(2);
   auto plant = wpi::math::Models::DifferentialDriveFromPhysicalConstants(
       motor, 50_kg, 2_in, 12_in, 2_kg_sq_m, 5.0);
 
