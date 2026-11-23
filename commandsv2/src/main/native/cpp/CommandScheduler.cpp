@@ -277,6 +277,15 @@ void CommandScheduler::UnregisterAllSubsystems() {
   m_impl->subsystems.clear();
 }
 
+std::vector<Subsystem*> CommandScheduler::GetAllRegisteredSubsystems() const {
+  std::vector<Subsystem*> subsystems;
+  subsystems.reserve(m_impl->subsystems.size());
+  for (auto&& subsystem : m_impl->subsystems) {
+    subsystems.push_back(subsystem.getFirst());
+  }
+  return subsystems;
+}
+
 void CommandScheduler::SetDefaultCommand(Subsystem* subsystem,
                                          CommandPtr&& defaultCommand) {
   if (!defaultCommand.get()->HasRequirement(subsystem)) {
