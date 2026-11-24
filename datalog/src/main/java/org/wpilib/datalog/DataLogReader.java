@@ -118,12 +118,12 @@ public class DataLogReader implements Iterable<DataLogRecord> {
       if (headerLen > remaining - pos) {
         throw new NoSuchElementException();
       }
-      int entry = (int) readVarInt(pos + 1, entryLen);
+      final int entry = (int) readVarInt(pos + 1, entryLen);
       long size = readVarInt(pos + 1 + entryLen, sizeLen);
       if (size > remaining - pos - headerLen) {
         throw new NoSuchElementException();
       }
-      int checkedSize = (int) size;
+      final int checkedSize = (int) size;
       long timestamp = readVarInt(pos + 1 + entryLen + sizeLen, timestampLen);
       if (timestamp < 0 || timestamp > Long.MAX_VALUE / 1000) {
         throw new NoSuchElementException();
@@ -134,8 +134,7 @@ public class DataLogReader implements Iterable<DataLogRecord> {
       data.position(pos + headerLen);
       data.limit(pos + headerLen + checkedSize);
       return new RecordInfo(
-          new DataLogRecord(entry, timestamp, data.slice()),
-          pos + headerLen + checkedSize);
+          new DataLogRecord(entry, timestamp, data.slice()), pos + headerLen + checkedSize);
     } catch (BufferUnderflowException | IndexOutOfBoundsException ex) {
       throw new NoSuchElementException();
     }

@@ -35,6 +35,7 @@ class DataLogReaderTest {
         return super.getRecordInfo(pos);
       }
     }
+
     CountingReader reader = new CountingReader();
     DataLogIterator iterator = reader.iterator();
     assertTrue(iterator.hasNext());
