@@ -81,6 +81,6 @@ class MyRobot(wpilib.TimedRobot):
         self.drive.simulation_periodic()
 
     @override
-    def disabled_init(self) -> None:
+    def disabled_start(self) -> None:
         # This just makes sure that our simulation code knows that the motor's off.
         self.drive.stop()

@@ -96,7 +96,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {
+  public void disabledStart() {
     // This just makes sure that our simulation code knows that the motor's off.
     flywheelMotor.setThrottle(0.0);
   }

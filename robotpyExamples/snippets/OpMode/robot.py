@@ -26,7 +26,7 @@ class Robot(wpilib.OpModeRobot):
         """
 
     @override
-    def disabled_init(self) -> None:
+    def disabled_start(self) -> None:
         """This function is called once when the robot becomes disabled."""
 
     @override
@@ -34,7 +34,7 @@ class Robot(wpilib.OpModeRobot):
         """This function is called periodically while the robot is disabled."""
 
     @override
-    def disabled_exit(self) -> None:
+    def disabled_end(self) -> None:
         """This function is called once when the robot exits the disabled state."""
 
     @override

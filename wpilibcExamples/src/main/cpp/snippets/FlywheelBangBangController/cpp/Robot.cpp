@@ -44,7 +44,7 @@ class Robot : public wpi::TimedRobot {
     wpi::telemetry::Log("BangBangController", bangBangController);
   }
 
-  void DisabledInit() override {
+  void DisabledStart() override {
     // This just makes sure that our simulation code knows that the motor's off.
     flywheelMotor.SetThrottle(0.0);
   }

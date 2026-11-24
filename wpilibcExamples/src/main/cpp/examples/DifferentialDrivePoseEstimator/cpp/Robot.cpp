@@ -34,7 +34,7 @@ class Robot : public wpi::TimedRobot {
 
   void SimulationPeriodic() override { drive.SimulationPeriodic(); }
 
-  void DisabledInit() override {
+  void DisabledStart() override {
     // This just makes sure that our simulation code knows that the motor's off.
     drive.Stop();
   }
