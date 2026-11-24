@@ -74,6 +74,26 @@ class CommandComplexTunableTest extends CommandTestBase {
   }
 
   @Test
+  void tunableUsesSpecifiedScheduler() {
+    // Requirement-free command
+    Command reqFreeCmd = Command.noRequirements(co -> co.park()).named("ReqFreeCommand");
+
+    // Published with the specified scheduler
+    Tunables.publish("cmd", reqFreeCmd.tunableUsing(m_scheduler));
+    TunableRegistry.update();
+
+    // Check that command runs when value is true
+    m_dashboard.setBoolean("/cmd/running", true);
+    TunableRegistry.update();
+    assertTrue(m_scheduler.isScheduledOrRunning(reqFreeCmd));
+
+    // Check that command does not run when value is false
+    m_dashboard.setBoolean("/cmd/running", false);
+    TunableRegistry.update();
+    assertFalse(m_scheduler.isScheduledOrRunning(reqFreeCmd));
+  }
+
+  @Test
   void tunableTypeIsCommand() {
     // Check that the tunable type is "Command"
     assertEquals("Command", m_cmd.getTunableType());

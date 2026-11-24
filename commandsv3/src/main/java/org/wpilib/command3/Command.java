@@ -237,6 +237,58 @@ public interface Command extends ComplexTunable {
   }
 
   /**
+   * Creates a tunable for this command that is bound to a specified scheduler. When published, it
+   * shows the command's name and a toggle labelled 'running'. Setting this toggle true schedules
+   * the command on the specified scheduler, and toggling false cancels it.
+   *
+   * <p>A command can alternatively be published directly with {@code Tunables.publish(name,
+   * command)}, which implicitly calls this method using the scheduler of the command's first
+   * requirement, or falling back to {@link Scheduler#getDefault()} if the command takes no
+   * requirements. Use this method when the command is requirement-free and runs on a different
+   * scheduler, such as one created using {@link Scheduler#createIndependentScheduler()}.
+   *
+   * @param scheduler the specified scheduler
+   * @return the tunable
+   */
+  default ComplexTunable tunableUsing(Scheduler scheduler) {
+    Command cmd = this;
+    return new ComplexTunable() {
+      @Override
+      public void publishTunable(TunableTable table) {
+        // Borrows the publish logic of command V2
+        table.publishValue(
+            "name",
+            cmd::name,
+            null,
+            String.class,
+            TunableConfig.of(TunableOption.IMMUTABLE, TunableOption.GET_ON_CHANGE));
+
+        table.publishBoolean(
+            "running",
+            () -> scheduler.isScheduledOrRunning(cmd),
+            value -> {
+              boolean isScheduled = scheduler.isScheduledOrRunning(cmd);
+              if (value) {
+                if (!isScheduled) {
+                  scheduler.schedule(cmd);
+                }
+              } else {
+                if (isScheduled) {
+                  scheduler.cancel(cmd);
+                }
+              }
+            },
+            TunableConfig.of(TunableOption.ALWAYS_GET));
+      }
+
+      @Override
+      public String getTunableType() {
+        return cmd.getTunableType();
+      }
+    };
+  }
+
+  /**
    * Creates a command that does not require any hardware; that is, it does not affect the state of
    * any physical objects. This is useful for commands that do some cleanup or state management,
    * such as resetting odometry or sensors, that you don't want to interrupt a command that's
@@ -440,30 +492,8 @@ public interface Command extends ComplexTunable {
             .map(Mechanism::getRegisteredScheduler)
             .orElseGet(Scheduler::getDefault);
 
-    // Borrows the publish logic of command V2
-    table.publishValue(
-        "name",
-        this::name,
-        null,
-        String.class,
-        TunableConfig.of(TunableOption.IMMUTABLE, TunableOption.GET_ON_CHANGE));
-
-    table.publishBoolean(
-        "running",
-        () -> scheduler.isScheduledOrRunning(this),
-        value -> {
-          boolean isScheduled = scheduler.isScheduledOrRunning(this);
-          if (value) {
-            if (!isScheduled) {
-              scheduler.schedule(this);
-            }
-          } else {
-            if (isScheduled) {
-              scheduler.cancel(this);
-            }
-          }
-        },
-        TunableConfig.of(TunableOption.ALWAYS_GET));
+    // Publish the cmd using the inferred scheduler
+    tunableUsing(scheduler).publishTunable(table);
   }
 
   @Override
