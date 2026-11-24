@@ -48,7 +48,8 @@ public class LTVDifferentialDriveController {
   private final double m_dt;
 
   private Matrix<N5, N1> m_error = new Matrix<>(Nat.N5(), Nat.N1());
-  private Matrix<N5, N1> m_tolerance = new Matrix<>(Nat.N5(), Nat.N1());
+  private Matrix<N5, N1> m_tolerance =
+      VecBuilder.fill(0.05, 0.05, 0.05, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 
   /**
    * Constructs a linear time-varying differential drive controller.
@@ -99,6 +100,9 @@ public class LTVDifferentialDriveController {
 
   /**
    * Sets the pose error which is considered tolerable for use with atReference().
+   *
+   * <p>The default tolerance is (x = 0.05 m, y = 0.05 m, heading = 0.05 rad, left velocity = ∞,
+   * right velocity = ∞).
    *
    * @param poseTolerance Pose error which is tolerable.
    * @param leftVelocityTolerance Left velocity error which is tolerable in meters per second.

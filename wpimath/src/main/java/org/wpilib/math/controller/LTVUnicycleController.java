@@ -7,6 +7,7 @@ package org.wpilib.math.controller;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.linalg.DARE;
 import org.wpilib.math.linalg.MatBuilder;
@@ -32,8 +33,8 @@ public class LTVUnicycleController {
 
   private final double m_dt;
 
-  private Pose2d m_poseError;
-  private Pose2d m_poseTolerance;
+  private Pose2d m_poseError = Pose2d.ZERO;
+  private Pose2d m_poseTolerance = new Pose2d(0.05, 0.05, new Rotation2d(0.05));
   private boolean m_enabled = true;
 
   /**
@@ -91,6 +92,8 @@ public class LTVUnicycleController {
 
   /**
    * Sets the pose error which is considered tolerable for use with atReference().
+   *
+   * <p>The default tolerance is (x = 0.05 m, y = 0.05 m, heading = 0.05 rad).
    *
    * @param poseTolerance Pose error which is tolerable.
    */
