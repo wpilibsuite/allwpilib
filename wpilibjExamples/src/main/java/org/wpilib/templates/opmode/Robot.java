@@ -24,6 +24,22 @@ public class Robot extends OpModeRobot {
   @Override
   public void driverStationConnected() {}
 
+  /** This function is called periodically every loop, regardless of enabled state or opmode. */
+  @Override
+  public void robotPeriodic() {}
+
+  /** This function is called once when the robot becomes disabled. */
+  @Override
+  public void disabledInit() {}
+
+  /** This function is called periodically while the robot is disabled. */
+  @Override
+  public void disabledPeriodic() {}
+
+  /** This function is called once when the robot exits the disabled state. */
+  @Override
+  public void disabledExit() {}
+
   /**
    * This function is called periodically anytime when no opmode is selected, including when the
    * Driver Station is disconnected.
