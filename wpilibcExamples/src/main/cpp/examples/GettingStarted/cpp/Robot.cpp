@@ -17,7 +17,7 @@ class Robot : public wpi::TimedRobot {
     right.SetInverted(true);
   }
 
-  void AutonomousInit() override { timer.Restart(); }
+  void AutonomousStart() override { timer.Restart(); }
 
   void AutonomousPeriodic() override {
     // Drive for 2 seconds
@@ -30,14 +30,14 @@ class Robot : public wpi::TimedRobot {
     }
   }
 
-  void TeleopInit() override {}
+  void TeleopStart() override {}
 
   void TeleopPeriodic() override {
     // Drive with arcade style (use right stick to steer)
     robotDrive.ArcadeDrive(-controller.GetLeftY(), controller.GetRightX());
   }
 
-  void UtilityInit() override {}
+  void UtilityStart() override {}
 
   void UtilityPeriodic() override {}
 

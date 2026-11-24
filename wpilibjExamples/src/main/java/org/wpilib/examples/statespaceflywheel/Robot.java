@@ -88,7 +88,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {
+  public void teleopStart() {
     loop.reset(VecBuilder.fill(encoder.getRate()));
   }
 

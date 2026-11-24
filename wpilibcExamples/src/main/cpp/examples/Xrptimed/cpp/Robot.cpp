@@ -22,7 +22,7 @@ Robot::Robot() {
 void Robot::RobotPeriodic() {}
 
 // This function is only once each time Autonomous is enabled
-void Robot::AutonomousInit() {
+void Robot::AutonomousStart() {
   timer.Restart();
 }
 
@@ -38,10 +38,10 @@ void Robot::AutonomousPeriodic() {
   }
 }
 
-// This function is only once each time telop is enabled
-void Robot::TeleopInit() {}
+// This function is called each time telop is enabled
+void Robot::TeleopStart() {}
 
-// This function is called periodically during teleop mode
+// This function is called periodically during teleoperated mode
 void Robot::TeleopPeriodic() {
   drive.ArcadeDrive(-controller.GetRawAxis(2), -controller.GetRawAxis(1));
 }

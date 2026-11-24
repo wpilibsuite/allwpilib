@@ -26,9 +26,9 @@ classes:
       RobotPeriodic:
       SimulationInit:
       SimulationPeriodic:
-      DisabledInit:
+      DisabledStart:
       DisabledPeriodic:
-      DisabledExit:
+      DisabledEnd:
       AddPeriodic:
         param_override:
           offset:
