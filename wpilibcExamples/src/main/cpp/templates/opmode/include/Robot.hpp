@@ -11,8 +11,8 @@ class Robot : public wpi::OpModeRobot<Robot> {
   Robot();
   void DriverStationConnected() override;
   void RobotPeriodic() override;
-  void DisabledInit() override;
+  void DisabledStart() override;
   void DisabledPeriodic() override;
-  void DisabledExit() override;
+  void DisabledEnd() override;
   void NonePeriodic() override;
 };
