@@ -29,7 +29,7 @@ DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\"wpi/math/protobu
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'wpi.math.protobuf.kinematics_pb2', _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'wpimath.protobuf._generated.kinematics_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\n\'org.wpilib.math.kinematics.proto.detailB\034ProtobufKinematicsDescriptorP\001'

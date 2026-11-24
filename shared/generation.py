@@ -146,7 +146,7 @@ def generate_quickbuf(
 
 
 def generate_python_protobuf(
-    protoc: Sequence[str], output_directory: Path, proto_dir: Path
+    protoc: Sequence[str], output_directory: Path, proto_dir: Path, package: str
 ) -> None:
     """Generates Python protobuf files (*_pb2.py and *_pb2.pyi) with the official protoc.
 
@@ -154,6 +154,7 @@ def generate_python_protobuf(
     protoc -- The command that runs the Protocol Buffers compiler.
     output_directory -- The package directory to write generated files to.
     proto_dir -- The base directory with protobuf files.
+    package -- The dotted import path of output_directory (e.g. "wpimath.protobuf._generated").
     """
     protos = sorted(proto_dir.glob("**/*.proto"))
     with tempfile.TemporaryDirectory() as tmp:
@@ -184,11 +185,22 @@ def generate_python_protobuf(
         local_import = re.compile(
             rf"^from (?!google\.)[\w.]+ import ({modules})\b", re.MULTILINE
         )
+        # protoc names each module after the .proto path (e.g. wpi.math.protobuf.system_pb2),
+        # but the module is flattened into `package`. Fix the name passed to the builder so
+        # the message classes' __module__ matches where they can actually be imported from.
+        module_name = re.compile(
+            r"(_builder\.BuildTopDescriptorsAndMessages\(DESCRIPTOR, )'[\w.]+'"
+        )
         for file in generated:
+            content = local_import.sub(
+                r"from . import \1", file.read_text(encoding="utf-8")
+            )
+            if file.suffix == ".py":
+                content = module_name.sub(
+                    rf"\g<1>'{package}.{file.name.split('.')[0]}'", content
+                )
             (output_directory / file.name).write_text(
-                local_import.sub(r"from . import \1", file.read_text(encoding="utf-8")),
-                encoding="utf-8",
-                newline="\n",
+                content, encoding="utf-8", newline="\n"
             )
 
         # Mark the directory as a package. This is written here so that syncing the

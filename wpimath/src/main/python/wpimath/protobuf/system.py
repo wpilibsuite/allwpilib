@@ -109,9 +109,21 @@ class LinearSystemProto(
                 f"No LinearSystem class for {key[0]} states, {key[1]} inputs and "
                 f"{key[2]} outputs; supported sizes are {sorted(_LINEAR_SYSTEMS)}"
             )
-        return system(
-            MatrixProto.unpack(msg.a),
-            MatrixProto.unpack(msg.b),
-            MatrixProto.unpack(msg.c),
-            MatrixProto.unpack(msg.d),
-        )
+        states, inputs, outputs = key
+        expected = {
+            "a": (states, states),
+            "b": (states, inputs),
+            "c": (outputs, states),
+            "d": (outputs, inputs),
+        }
+        matrices = []
+        for name, shape in expected.items():
+            matrix = MatrixProto.unpack(getattr(msg, name))
+            if matrix.shape != shape:
+                raise ValueError(
+                    f"LinearSystem matrix {name.upper()} must be {shape[0]}x{shape[1]} for "
+                    f"{states} states, {inputs} inputs and {outputs} outputs, "
+                    f"got {matrix.shape[0]}x{matrix.shape[1]}"
+                )
+            matrices.append(matrix)
+        return system(*matrices)

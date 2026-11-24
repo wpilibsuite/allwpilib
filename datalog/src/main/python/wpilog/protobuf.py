@@ -4,7 +4,7 @@ Log protobuf data to a DataLog.
 An entry is bound to a :class:`wpiutil.protobuf.ProtobufDescriptor` serializer, which converts between a
 Python type and its wire message::
 
-    from wpimath import Pose2dProto
+    from wpimath.protobuf import Pose2dProto
 
     entry = wpilog.ProtobufLogEntry(log, "/pose", Pose2dProto)
     entry.append(Pose2d(1.0, 2.0, Rotation2d(0.5)))

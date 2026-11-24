@@ -1,7 +1,7 @@
 import ntcore
 import pytest
 import wpimath
-from wpimath import (
+from wpimath.protobuf import (
     HolonomicTrajectoryProto,
     Pose2dProto,
     SwerveDriveKinematicsProto,

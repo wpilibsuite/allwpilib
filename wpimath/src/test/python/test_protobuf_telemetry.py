@@ -1,7 +1,7 @@
 import telemetry
 import telemetry.mock_backend as mock_backend
 import wpimath
-from wpimath import HolonomicTrajectoryProto
+from wpimath.protobuf import HolonomicTrajectoryProto
 
 
 def test_telemetry_logs_trajectory_as_protobuf():

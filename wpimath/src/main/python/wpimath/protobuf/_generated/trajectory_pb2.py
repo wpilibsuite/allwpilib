@@ -30,7 +30,7 @@ DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\"wpi/math/protobu
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'wpi.math.protobuf.trajectory_pb2', _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'wpimath.protobuf._generated.trajectory_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\n\'org.wpilib.math.trajectory.proto.detailB\034ProtobufTrajectoryDescriptorP\001'

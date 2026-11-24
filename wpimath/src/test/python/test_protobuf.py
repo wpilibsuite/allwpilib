@@ -1,4 +1,5 @@
 import inspect
+import pickle
 
 import numpy as np
 import pytest
@@ -274,6 +275,15 @@ def test_linear_system_sizes_and_values():
     assert np.array_equal(result.b(), system.b())
 
 
+def test_linear_system_matrix_dimensions_are_validated():
+    msg = protobuf.system_pb2.ProtobufLinearSystem()
+    LinearSystemProto.pack(msg, _values()[LinearSystemProto]())
+    # 2 states, but a 1x4 A matrix with a consistent data length
+    MatrixProto.pack(msg.a, np.zeros((1, 4)))
+    with pytest.raises(ValueError):
+        LinearSystemProto.unpack(msg)
+
+
 def test_matrix_is_column_major_like_cpp():
     msg = protobuf.wpimath_pb2.ProtobufMatrix()
     MatrixProto.pack(msg, np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]))
@@ -286,11 +296,13 @@ def test_matrix_is_column_major_like_cpp():
     )
 
 
-def test_serializers_are_exported_from_wpimath():
-    for serializer in _SERIALIZERS:
-        name = serializer.__name__
-        assert getattr(wpimath, name) is serializer
-        assert name in wpimath.__all__
+@pytest.mark.parametrize(
+    "serializer", _SERIALIZERS, ids=lambda serializer: serializer.__name__
+)
+def test_messages_are_picklable(serializer):
+    message = serializer.message_type()
+    serializer.pack(message, _values()[serializer]())
+    assert pickle.loads(pickle.dumps(message)) == message
 
 
 def test_serializers_are_registered_for_their_value_types():

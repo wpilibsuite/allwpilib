@@ -4,7 +4,7 @@ Publish and subscribe to protobuf data over NetworkTables.
 A topic is bound to a :class:`wpiutil.protobuf.ProtobufDescriptor` serializer, which converts between a
 Python type and its wire message::
 
-    from wpimath import Pose2dProto
+    from wpimath.protobuf import Pose2dProto
 
     topic = ntcore.get_protobuf_topic(inst, "/pose", Pose2dProto)
     topic.publish().set(Pose2d(1.0, 2.0, Rotation2d(0.5)))
@@ -45,7 +45,7 @@ __all__ = [
 
 @dataclasses.dataclass
 class TimestampedProtobuf[T]:
-    """A decoded value with its local timestamp and the server timestamp, in microseconds."""
+    """A decoded value with its local timestamp and the server timestamp, in nanoseconds."""
 
     time: int
     server_time: int
@@ -129,7 +129,7 @@ class ProtobufPublisher[T, M: Message]:
         Publishes a new value.
 
         :param value: value to publish
-        :param time: timestamp in microseconds; 0 means the current NT time
+        :param time: timestamp in nanoseconds; 0 means the current NT time
         """
         self._pub.set(self._serializer.serialize(value), time)
 

@@ -12,7 +12,10 @@ from shared.generation import (
 )
 from wpimath.generate_nanopb import generate_nanopb
 from wpimath.generate_numbers import generate_numbers
-from wpimath.generate_python_protobuf import generate_python_protobuf
+from wpimath.generate_python_protobuf import (
+    PYTHON_PROTOBUF_PACKAGE,
+    generate_python_protobuf,
+)
 from wpimath.generate_quickbuf import generate_quickbuf
 
 
@@ -49,6 +52,7 @@ def main(argv):
         [str(args.protoc)],
         args.python_output_directory,
         args.proto_directory,
+        PYTHON_PROTOBUF_PACKAGE,
     )
 
 

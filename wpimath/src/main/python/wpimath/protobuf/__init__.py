@@ -8,8 +8,7 @@ generated message. They are stateless, so use the class directly::
     data = Pose2dProto.serialize(pose)
     pose = Pose2dProto.deserialize(data)
 
-The serializers are also available from ``wpimath`` itself. The generated message classes
-live in ``wpimath.protobuf._generated`` (from ``wpimath/src/main/proto``) and their modules
+The generated message classes live in ``wpimath.protobuf._generated`` (from ``wpimath/src/main/proto``) and their modules
 are re-exported here (``geometry2d_pb2`` and so on). The matrix types need ``numpy``.
 """
 

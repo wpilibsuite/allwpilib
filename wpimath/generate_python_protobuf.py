@@ -14,6 +14,8 @@ sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from shared.generation import generate_python_protobuf
 
+PYTHON_PROTOBUF_PACKAGE = "wpimath.protobuf._generated"
+
 
 def main(argv):
     dirname = Path(__file__).resolve().parent
@@ -37,9 +39,16 @@ def main(argv):
         nargs="+",
         required=True,
     )
+    parser.add_argument(
+        "--package",
+        help="Dotted import path of the output directory.",
+        default=PYTHON_PROTOBUF_PACKAGE,
+    )
     args = parser.parse_args(argv)
 
-    generate_python_protobuf(args.protoc, args.output_directory, args.proto_directory)
+    generate_python_protobuf(
+        args.protoc, args.output_directory, args.proto_directory, args.package
+    )
 
 
 if __name__ == "__main__":
