@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.wpilib.tunable.util.PathUtil;
 import org.wpilib.util.collections.PrefixMap;
 import org.wpilib.util.collections.prefixmap.StringPrefixMap;
@@ -39,6 +40,18 @@ public final class TunableRegistry {
      * @return tunable
      */
     Tunable<T> createTunable(T initialValue, TunableConfig config);
+
+    /**
+     * Create tunable with custom handlers.
+     *
+     * @param getter the getter
+     * @param setter the setter
+     * @param config tunable configuration
+     * @return tunable
+     */
+    default Tunable<T> createTunable(Supplier<T> getter, Consumer<T> setter, TunableConfig config) {
+      return null;
+    }
   }
 
   /**
@@ -417,6 +430,27 @@ public final class TunableRegistry {
       }
       return null;
     }
+  }
+
+  /**
+   * Gets the handler for logging an object of a particular class or interface. Should generally
+   * only be used by Tunable.
+   *
+   * @param <T> class
+   * @param cls class value
+   * @return handler or null if no match
+   */
+  public static <T> TypeHandler<T> getTypeHandler(Class<T> cls) {
+    synchronized (s_typeHandlers) {
+      for (TypeHandlerData<?> entry : s_typeHandlers) {
+        if (entry.cls.isAssignableFrom(cls)) {
+          @SuppressWarnings("unchecked")
+          TypeHandler<T> handler = (TypeHandler<T>) entry.handler;
+          return handler;
+        }
+      }
+    }
+    return null;
   }
 
   /**

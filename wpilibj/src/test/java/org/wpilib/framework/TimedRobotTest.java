@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import org.wpilib.system.WPILibVersion;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryRegistry;
 import org.wpilib.tunable.Tunable;
+import org.wpilib.tunable.TunableConfig;
 import org.wpilib.tunable.TunableRegistry;
 import org.wpilib.tunable.Tunables;
 import org.wpilib.units.Units;
@@ -268,6 +270,94 @@ class TimedRobotTest {
       TunableRegistry.update();
 
       assertEquals(2.0, feetTunableDistance.get().in(Units.Meters));
+    } finally {
+      TelemetryRegistry.reset();
+      TunableRegistry.reset();
+    }
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void measureGetterSetterTunablesPublishAndTuneInBaseUnits() {
+    TelemetryRegistry.reset();
+    TunableRegistry.reset();
+    var inst = NetworkTableInstance.getDefault();
+
+    try (var robot = new MockRobot();
+        var valueEntry = inst.getDoubleTopic("/Tunables/getterDistance/value").getEntry(-1);
+        var tuneEntry = inst.getDoubleTopic("/Tunables/getterDistance/tune").getEntry(-1)) {
+      AtomicReference<Distance> value = new AtomicReference<>(Units.Inches.of(5));
+      AtomicInteger calls = new AtomicInteger();
+      final Tunable<Distance> tunable =
+          Tunables.publishValue(
+              "getterDistance",
+              value::get,
+              value::set,
+              Distance.class,
+              new TunableConfig().withRobust(true).withOnTune(calls::incrementAndGet));
+
+      assertEquals(0.127, valueEntry.get(), 1e-9);
+      assertEquals("\"m\"", valueEntry.getTopic().getProperty("unit"));
+
+      value.set(Units.Feet.of(2));
+      TunableRegistry.update();
+      assertEquals(0.6096, valueEntry.get(), 1e-9);
+      assertEquals(value.get(), tunable.get());
+      assertEquals(0, calls.get());
+
+      tunable.set(Units.Feet.of(3));
+      assertTrue(tunable.hasChanged());
+      assertEquals(36, value.get().in(Units.Inches), 1e-9);
+      TunableRegistry.update();
+      assertEquals(0.9144, valueEntry.get(), 1e-9);
+      assertFalse(tunable.hasChanged());
+      assertEquals(0, calls.get());
+
+      tuneEntry.set(1.0);
+      inst.flush();
+      TunableRegistry.update();
+
+      assertEquals(1.0, value.get().in(Units.Meters), 1e-9);
+      assertEquals(Units.Inches, value.get().unit());
+      assertEquals(1.0, valueEntry.get(), 1e-9);
+      assertEquals(1, calls.get());
+      assertEquals(1, TunableRegistry.getTuneRevision(tunable));
+      assertFalse(tunable.hasChanged());
+    } finally {
+      TelemetryRegistry.reset();
+      TunableRegistry.reset();
+    }
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void measureGetterTunableSupportsNullSetter() {
+    TelemetryRegistry.reset();
+    TunableRegistry.reset();
+    var inst = NetworkTableInstance.getDefault();
+
+    try (var robot = new MockRobot();
+        var entry = inst.getDoubleTopic("/Tunables/readOnlyDistance").getEntry(-1)) {
+      AtomicReference<Distance> value = new AtomicReference<>(Units.Feet.of(2));
+      final Tunable<Distance> tunable =
+          Tunables.publishValue("readOnlyDistance", value::get, null, Distance.class);
+
+      assertEquals(0.6096, entry.get(), 1e-9);
+      assertEquals("\"m\"", entry.getTopic().getProperty("unit"));
+
+      value.set(Units.Feet.of(3));
+      TunableRegistry.update();
+      assertEquals(0.9144, entry.get(), 1e-9);
+
+      tunable.set(Units.Meters.of(1));
+      assertEquals(3, value.get().in(Units.Feet), 1e-9);
+
+      entry.set(2.0);
+      inst.flush();
+      TunableRegistry.update();
+      assertEquals(3, value.get().in(Units.Feet), 1e-9);
+      assertEquals(value.get(), tunable.get());
+      assertEquals(0.9144, entry.get(), 1e-9);
     } finally {
       TelemetryRegistry.reset();
       TunableRegistry.reset();
