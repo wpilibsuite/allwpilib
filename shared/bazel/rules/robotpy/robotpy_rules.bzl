@@ -4,7 +4,7 @@ load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 load("@rules_pycross//pycross:defs.bzl", "pycross_wheel_library")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_python//python:packaging.bzl", "py_wheel")
-load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select", "robotpy_host_only_select")
+load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
 
 def create_pybind_library(
         name,
@@ -85,8 +85,6 @@ def robotpy_library(
         <name> - The python library
         <name>-wheel - A wheel for the library
     """
-    host_pyi_srcs = robotpy_host_only_select(pyi_srcs)
-
     if pyi_srcs:
         py_binary(
             name = name + ".make_pyi_runner",
@@ -104,8 +102,9 @@ def robotpy_library(
 
     py_library(
         name = name + "-lib",
-        data = data + host_pyi_srcs,
+        data = data,
         deps = deps,
+        pyi_srcs = pyi_srcs,
         tags = ["robotpy"],
         **kwargs
     )
@@ -118,7 +117,7 @@ def robotpy_library(
         requires = requires,
         project_urls = project_urls,
         author_email = author_email,
-        deps = data + host_pyi_srcs + [":{}-lib".format(name)],
+        deps = data + pyi_srcs + [":{}-lib".format(name)],
         strip_path_prefixes = strip_path_prefixes,
         entry_points = entry_points,
         description_file = description_file,
