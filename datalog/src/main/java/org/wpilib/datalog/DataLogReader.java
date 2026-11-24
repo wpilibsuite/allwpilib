@@ -88,16 +88,7 @@ public class DataLogReader implements Iterable<DataLogRecord> {
 
   @Override
   public void forEach(Consumer<? super DataLogRecord> action) {
-    int size = m_buf.remaining();
-    for (int pos = 12 + m_buf.getInt(8); pos < size; pos = getNextRecord(pos)) {
-      DataLogRecord record;
-      try {
-        record = getRecord(pos);
-      } catch (NoSuchElementException ex) {
-        break;
-      }
-      action.accept(record);
-    }
+    iterator().forEachRemaining(action);
   }
 
   @Override
@@ -113,24 +104,7 @@ public class DataLogReader implements Iterable<DataLogRecord> {
     return val;
   }
 
-  DataLogRecord getRecord(int pos) {
-    return getRecordInfo(pos).record;
-  }
-
-  int getNextRecord(int pos) {
-    return getRecordInfo(pos).nextPos;
-  }
-
-  boolean hasRecord(int pos) {
-    try {
-      getRecordInfo(pos);
-      return true;
-    } catch (NoSuchElementException ex) {
-      return false;
-    }
-  }
-
-  private RecordInfo getRecordInfo(int pos) {
+  RecordInfo getRecordInfo(int pos) {
     try {
       int remaining = m_buf.remaining();
       if (pos < 0 || pos >= remaining || remaining - pos < 4) {
@@ -167,11 +141,7 @@ public class DataLogReader implements Iterable<DataLogRecord> {
     }
   }
 
-  int size() {
-    return m_buf.remaining();
-  }
-
-  private static class RecordInfo {
+  static class RecordInfo {
     RecordInfo(DataLogRecord record, int nextPos) {
       this.record = record;
       this.nextPos = nextPos;

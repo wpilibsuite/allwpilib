@@ -6,6 +6,7 @@ package org.wpilib.datalog;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /** DataLogReader iterator. */
@@ -17,30 +18,37 @@ public class DataLogIterator implements Iterator<DataLogRecord> {
 
   @Override
   public void forEachRemaining(Consumer<? super DataLogRecord> action) {
-    int size = m_reader.size();
-    for (; m_pos < size; m_pos = m_reader.getNextRecord(m_pos)) {
-      DataLogRecord record;
-      try {
-        record = m_reader.getRecord(m_pos);
-      } catch (NoSuchElementException ex) {
-        break;
-      }
-      action.accept(record);
+    Objects.requireNonNull(action);
+    while (hasNext()) {
+      action.accept(next());
     }
   }
 
   @Override
   public boolean hasNext() {
-    return m_reader.hasRecord(m_pos);
+    if (m_next == null && !m_done) {
+      try {
+        m_next = m_reader.getRecordInfo(m_pos);
+      } catch (NoSuchElementException ex) {
+        m_done = true;
+      }
+    }
+    return m_next != null;
   }
 
   @Override
   public DataLogRecord next() {
-    DataLogRecord record = m_reader.getRecord(m_pos);
-    m_pos = m_reader.getNextRecord(m_pos);
+    if (!hasNext()) {
+      throw new NoSuchElementException();
+    }
+    DataLogRecord record = m_next.record;
+    m_pos = m_next.nextPos;
+    m_next = null;
     return record;
   }
 
   private final DataLogReader m_reader;
   private int m_pos;
+  private DataLogReader.RecordInfo m_next;
+  private boolean m_done;
 }
