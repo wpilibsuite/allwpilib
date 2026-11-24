@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/util/Errno.hpp"
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/string.hpp"
@@ -515,13 +516,15 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
 
         // sync to storage
 #if defined(__linux__)
-        if (!blocked && ::fdatasync(state.f) != 0) {
+        if (!blocked &&
+            wpi::util::sys::RetryAfterSignal(-1, ::fdatasync, state.f) != 0) {
           [[unlikely]] WPI_ERROR(m_msglog, "Error syncing log file '{}': {}",
                                  state.filename, std::strerror(errno));
           blocked = true;
         }
 #elif defined(__APPLE__)
-        if (!blocked && ::fsync(state.f) != 0) {
+        if (!blocked &&
+            wpi::util::sys::RetryAfterSignal(-1, ::fsync, state.f) != 0) {
           [[unlikely]] WPI_ERROR(m_msglog, "Error syncing log file '{}': {}",
                                  state.filename, std::strerror(errno));
           blocked = true;
