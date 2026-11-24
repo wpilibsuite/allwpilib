@@ -9,6 +9,8 @@ exports_files([
     "version_template.in",
 ])
 
+toolchain_type(name = "stubgen_toolchain_type")
+
 stubgen_toolchains()
 
 py_library(

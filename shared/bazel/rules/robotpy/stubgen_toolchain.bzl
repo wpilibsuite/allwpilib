@@ -1,6 +1,6 @@
 """Toolchain resolution for actions that import a target-built extension."""
 
-STUBGEN_TOOLCHAIN_TYPE = "//shared/bazel/rules/robotpy:stubgen_toolchain_type"
+STUBGEN_TOOLCHAIN_TYPE = Label("//shared/bazel/rules/robotpy:stubgen_toolchain_type")
 
 def _stubgen_toolchain_impl(_ctx):
     return [platform_common.ToolchainInfo()]
@@ -8,7 +8,6 @@ def _stubgen_toolchain_impl(_ctx):
 stubgen_toolchain = rule(implementation = _stubgen_toolchain_impl)
 
 def stubgen_toolchains():
-    native.toolchain_type(name = "stubgen_toolchain_type")
     stubgen_toolchain(name = "stubgen_toolchain")
 
     # The toolchain supplies no tools: it lets Bazel prefer an executor that

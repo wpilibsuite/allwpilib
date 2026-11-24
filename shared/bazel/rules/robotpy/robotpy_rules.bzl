@@ -104,6 +104,7 @@ def robotpy_library(
         name = name + "-lib",
         data = data,
         deps = deps,
+        pyi_deps = pyi_deps,
         pyi_srcs = pyi_srcs,
         tags = ["robotpy"],
         **kwargs
@@ -117,7 +118,7 @@ def robotpy_library(
         requires = requires,
         project_urls = project_urls,
         author_email = author_email,
-        deps = data + pyi_srcs + [":{}-lib".format(name)],
+        deps = data + [":{}-lib".format(name)],
         strip_path_prefixes = strip_path_prefixes,
         entry_points = entry_points,
         description_file = description_file,
