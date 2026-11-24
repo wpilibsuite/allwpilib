@@ -4,6 +4,8 @@
 
 package org.wpilib.math.controller;
 
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+
 import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
@@ -42,7 +44,11 @@ public class ImplicitModelFollower<States extends Num, Inputs extends Num, Outpu
    */
   public ImplicitModelFollower(
       LinearSystem<States, Inputs, Outputs> plant, LinearSystem<States, Inputs, Outputs> plantRef) {
-    this(plant.getA(), plant.getB(), plantRef.getA(), plantRef.getB());
+    this(
+        requireNonNullParam(plant, "plant", "ImplicitModelFollower").getA(),
+        plant.getB(),
+        requireNonNullParam(plantRef, "plantRef", "ImplicitModelFollower").getA(),
+        plantRef.getB());
   }
 
   /**
@@ -58,6 +64,10 @@ public class ImplicitModelFollower<States extends Num, Inputs extends Num, Outpu
       Matrix<States, Inputs> B,
       Matrix<States, States> Aref,
       Matrix<States, Inputs> Bref) {
+    requireNonNullParam(A, "A", "ImplicitModelFollower");
+    requireNonNullParam(B, "B", "ImplicitModelFollower");
+    requireNonNullParam(Aref, "Aref", "ImplicitModelFollower");
+    requireNonNullParam(Bref, "Bref", "ImplicitModelFollower");
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
 
     // Find u_imf that makes real model match reference model.

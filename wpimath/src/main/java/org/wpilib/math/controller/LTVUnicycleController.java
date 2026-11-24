@@ -4,6 +4,8 @@
 
 package org.wpilib.math.controller;
 
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.linalg.DARE;
@@ -61,6 +63,8 @@ public class LTVUnicycleController {
    * @param dt Discretization timestep in seconds.
    */
   public LTVUnicycleController(Vector<N3> qelems, Vector<N2> relems, double dt) {
+    requireNonNullParam(qelems, "qelems", "LTVUnicycleController");
+    requireNonNullParam(relems, "relems", "LTVUnicycleController");
     m_Q = StateSpaceUtil.costMatrix(qelems);
     m_R = StateSpaceUtil.costMatrix(relems);
     m_dt = dt;
@@ -72,6 +76,10 @@ public class LTVUnicycleController {
    * @return True if the pose error is within tolerance of the reference.
    */
   public boolean atReference() {
+    if (m_poseError == null || m_poseTolerance == null) {
+      return false;
+    }
+
     final var eTranslate = m_poseError.getTranslation();
     final var eRotate = m_poseError.getRotation();
     final var tolTranslate = m_poseTolerance.getTranslation();
@@ -104,6 +112,10 @@ public class LTVUnicycleController {
    */
   public ChassisVelocities calculate(
       Pose2d currentPose, Pose2d poseRef, double linearVelocityRef, double angularVelocityRef) {
+    if (currentPose == null || poseRef == null) {
+      return new ChassisVelocities(0.0, 0.0, 0.0);
+    }
+
     // See theorem 8.8.1 of
     // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
 
@@ -164,6 +176,13 @@ public class LTVUnicycleController {
    * @return The linear and angular velocity outputs of the LTV controller.
    */
   public ChassisVelocities calculate(Pose2d currentPose, HolonomicSample desiredState) {
+    if (currentPose == null
+        || desiredState == null
+        || desiredState.pose == null
+        || desiredState.velocity == null) {
+      return new ChassisVelocities(0.0, 0.0, 0.0);
+    }
+
     // The sample velocity is field-relative; the controller needs the
     // robot-relative forward (linear) velocity.
     double linearVelocity =
