@@ -63,12 +63,16 @@ class DriveSubsystem(commands2.Subsystem):
             self.left_leader.set_throttle, self.right_leader.set_throttle
         )
 
-        self.profile = wpimath.TrapezoidProfile(
-            wpimath.TrapezoidProfile.Constraints(
-                constants.DriveConstants.MAX_VELOCITY,
-                constants.DriveConstants.MAX_ACCELERATION,
-            )
+        self.constraints = wpimath.TrapezoidProfile.Constraints(
+            constants.DriveConstants.MAX_VELOCITY,
+            constants.DriveConstants.MAX_ACCELERATION,
         )
+        self.left_profile = wpimath.TrapezoidProfile.generate(
+            self.constraints,
+            wpimath.TrapezoidProfile.State(),
+            wpimath.TrapezoidProfile.State(),
+        )
+        self.right_profile = self.left_profile
         self.timer = wpilib.Timer()
         self._initial_left_distance = 0.0
         self._initial_right_distance = 0.0
@@ -84,10 +88,10 @@ class DriveSubsystem(commands2.Subsystem):
 
     def set_drive_states(
         self,
-        current_left: wpimath.TrapezoidProfile.State,
-        current_right: wpimath.TrapezoidProfile.State,
-        next_left: wpimath.TrapezoidProfile.State,
-        next_right: wpimath.TrapezoidProfile.State,
+        current_left: wpimath.TrapezoidProfileSample,
+        current_right: wpimath.TrapezoidProfileSample,
+        next_left: wpimath.TrapezoidProfileSample,
+        next_right: wpimath.TrapezoidProfileSample,
     ):
         """
         Attempts to follow the given drive states using offboard PID.
@@ -150,20 +154,23 @@ class DriveSubsystem(commands2.Subsystem):
 
     def profiled_drive_distance(self, distance: float) -> commands2.Command:
         def on_init():
+            # Restart timer so profile setpoints start at the beginning
             self.timer.restart()
             self.reset_encoders()
-
-        def on_execute():
-            current_time = self.timer.get()
-            current_setpoint = self.profile.calculate(
-                current_time,
+            # Both encoders start at zero, so they can share a profile
+            self.left_profile = wpimath.TrapezoidProfile.generate(
+                self.constraints,
                 wpimath.TrapezoidProfile.State(),
                 wpimath.TrapezoidProfile.State(distance, 0),
             )
-            next_setpoint = self.profile.calculate(
-                current_time + constants.DriveConstants.DT,
-                wpimath.TrapezoidProfile.State(),
-                wpimath.TrapezoidProfile.State(distance, 0),
+
+        def on_execute():
+            # Current state never changes, so we need to use a timer to get the
+            # setpoints we need to be at
+            current_time = self.timer.get()
+            current_setpoint = self.left_profile.sample_at(current_time)
+            next_setpoint = self.left_profile.sample_at(
+                current_time + constants.DriveConstants.DT
             )
             self.set_drive_states(
                 current_setpoint, current_setpoint, next_setpoint, next_setpoint
@@ -174,7 +181,7 @@ class DriveSubsystem(commands2.Subsystem):
             self.right_leader.set_throttle(0)
 
         def is_finished() -> bool:
-            return self.profile.is_finished(0)
+            return self.timer.get() >= self.left_profile.duration()
 
         return commands2.FunctionalCommand(
             on_init, on_execute, on_end, is_finished, self
@@ -182,40 +189,35 @@ class DriveSubsystem(commands2.Subsystem):
 
     def dynamic_profiled_drive_distance(self, distance: float) -> commands2.Command:
         def on_init():
+            # Restart timer so profile setpoints start at the beginning
             self.timer.restart()
+            # Store distance so we know the target distance for each encoder
             self._initial_left_distance = self.get_left_encoder_distance()
             self._initial_right_distance = self.get_right_encoder_distance()
+            self.left_profile = wpimath.TrapezoidProfile.generate(
+                self.constraints,
+                wpimath.TrapezoidProfile.State(self._initial_left_distance, 0),
+                wpimath.TrapezoidProfile.State(
+                    self._initial_left_distance + distance, 0
+                ),
+            )
+            self.right_profile = wpimath.TrapezoidProfile.generate(
+                self.constraints,
+                wpimath.TrapezoidProfile.State(self._initial_right_distance, 0),
+                wpimath.TrapezoidProfile.State(
+                    self._initial_right_distance + distance, 0
+                ),
+            )
 
         def on_execute():
+            # Current state never changes for the duration of the command, so we
+            # need to use a timer to get the setpoints we need to be at
             current_time = self.timer.get()
-            current_left = self.profile.calculate(
-                current_time,
-                wpimath.TrapezoidProfile.State(self._initial_left_distance, 0),
-                wpimath.TrapezoidProfile.State(
-                    self._initial_left_distance + distance, 0
-                ),
-            )
-            current_right = self.profile.calculate(
-                current_time,
-                wpimath.TrapezoidProfile.State(self._initial_right_distance, 0),
-                wpimath.TrapezoidProfile.State(
-                    self._initial_right_distance + distance, 0
-                ),
-            )
-            next_left = self.profile.calculate(
-                current_time + constants.DriveConstants.DT,
-                wpimath.TrapezoidProfile.State(self._initial_left_distance, 0),
-                wpimath.TrapezoidProfile.State(
-                    self._initial_left_distance + distance, 0
-                ),
-            )
-            next_right = self.profile.calculate(
-                current_time + constants.DriveConstants.DT,
-                wpimath.TrapezoidProfile.State(self._initial_right_distance, 0),
-                wpimath.TrapezoidProfile.State(
-                    self._initial_right_distance + distance, 0
-                ),
-            )
+            next_time = current_time + constants.DriveConstants.DT
+            current_left = self.left_profile.sample_at(current_time)
+            current_right = self.right_profile.sample_at(current_time)
+            next_left = self.left_profile.sample_at(next_time)
+            next_right = self.right_profile.sample_at(next_time)
             self.set_drive_states(current_left, current_right, next_left, next_right)
 
         def on_end(interrupted: bool):
@@ -223,7 +225,10 @@ class DriveSubsystem(commands2.Subsystem):
             self.right_leader.set_throttle(0)
 
         def is_finished() -> bool:
-            return self.profile.is_finished(0)
+            return (
+                self.timer.get() >= self.left_profile.duration()
+                and self.timer.get() >= self.right_profile.duration()
+            )
 
         return commands2.FunctionalCommand(
             on_init, on_execute, on_end, is_finished, self

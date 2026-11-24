@@ -1226,6 +1226,8 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("Trajectory_tmpl2", "DrivetrainSplineTrajectoryBase"),
                 ("Trajectory_tmpl3", "HolonomicTrajectoryBase"),
                 ("Trajectory_tmpl4", "ExponentialProfileTrajectoryBase"),
+                ("Trajectory_tmpl5", "TrapezoidProfileTrajectoryBase"),
+                ("Trajectory_tmpl6", "TrapezoidProfileRadiansTrajectoryBase"),
             ],
             trampolines = [
                 ("wpi::math::Trajectory", "wpi__math__Trajectory.hpp"),
@@ -1254,9 +1256,21 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
             trampolines = [
                 ("wpi::math::TrapezoidProfile", "wpi__math__TrapezoidProfile.hpp"),
-                ("wpi::math::detail::TrapezoidProfileConstraints", "wpi__math__detail__TrapezoidProfileConstraints.hpp"),
                 ("wpi::math::TrapezoidProfile::State", "wpi__math__TrapezoidProfile__State.hpp"),
-                ("wpi::math::TrapezoidProfile::ProfileTiming", "wpi__math__TrapezoidProfile__ProfileTiming.hpp"),
+                ("wpi::math::TrapezoidProfileConstraints", "wpi__math__TrapezoidProfileConstraints.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TrapezoidProfileSample",
+            yml_file = "semiwrap/TrapezoidProfileSample.yml",
+            header_root = "$(execpath //wpimath:robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath //wpimath:robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrapezoidProfileSample.hpp",
+            tmpl_class_names = [
+                ("TrapezoidProfileSample_tmpl1", "TrapezoidProfileSample"),
+                ("TrapezoidProfileSample_tmpl2", "TrapezoidProfileRadiansSample"),
+            ],
+            trampolines = [
+                ("wpi::math::TrapezoidProfileSample", "wpi__math__TrapezoidProfileSample.hpp"),
             ],
         ),
         struct(

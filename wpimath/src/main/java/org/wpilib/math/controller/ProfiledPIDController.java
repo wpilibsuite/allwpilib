@@ -26,7 +26,6 @@ public class ProfiledPIDController implements TelemetryLoggable, ComplexTunable 
   private double m_maximumInput;
 
   private TrapezoidProfile.Constraints m_constraints;
-  private TrapezoidProfile m_profile;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
@@ -64,7 +63,6 @@ public class ProfiledPIDController implements TelemetryLoggable, ComplexTunable 
       double Kp, double Ki, double Kd, TrapezoidProfile.Constraints constraints, double period) {
     m_controller = new PIDController(Kp, Ki, Kd, period);
     m_constraints = constraints;
-    m_profile = new TrapezoidProfile(m_constraints);
     instances++;
 
     UsageReporting.reportUsage("ProfiledPIDController", String.valueOf(instances));
@@ -252,7 +250,6 @@ public class ProfiledPIDController implements TelemetryLoggable, ComplexTunable 
    */
   public void setConstraints(TrapezoidProfile.Constraints constraints) {
     m_constraints = constraints;
-    m_profile = new TrapezoidProfile(m_constraints);
     setChildTunableChanged("constraints");
   }
 
@@ -382,7 +379,8 @@ public class ProfiledPIDController implements TelemetryLoggable, ComplexTunable 
       m_setpoint.position = setpointMinDistance + measurement;
     }
 
-    m_setpoint = m_profile.calculate(getPeriod(), m_setpoint, m_goal);
+    var sample = TrapezoidProfile.generate(m_constraints, m_setpoint, m_goal).sampleAt(getPeriod());
+    m_setpoint = new TrapezoidProfile.State(sample.position, sample.velocity);
     return m_controller.calculate(measurement, m_setpoint.position);
   }
 

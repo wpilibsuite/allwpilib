@@ -64,9 +64,7 @@ class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
   constexpr ProfiledPIDController(double Kp, double Ki, double Kd,
                                   Constraints constraints,
                                   wpi::units::second_t period = 20_ms)
-      : m_controller{Kp, Ki, Kd, period},
-        m_constraints{constraints},
-        m_profile{m_constraints} {
+      : m_controller{Kp, Ki, Kd, period}, m_constraints{constraints} {
     if !consteval {
       int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
       wpi::util::ReportUsage("ProfiledPIDController",
@@ -247,7 +245,6 @@ class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
    */
   constexpr void SetConstraints(Constraints constraints) {
     m_constraints = constraints;
-    m_profile = TrapezoidProfile<Distance>{m_constraints};
     if !consteval {
       SetChildTunableChanged("constraints");
     }
@@ -379,7 +376,10 @@ class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
       m_setpoint.position = setpointMinDistance + measurement;
     }
 
-    m_setpoint = m_profile.Calculate(GetPeriod(), m_setpoint, m_goal);
+    auto sample = wpi::math::TrapezoidProfile<Distance>::Generate(
+                      m_constraints, m_setpoint, m_goal)
+                      .SampleAt(GetPeriod());
+    m_setpoint = {sample.position, sample.velocity};
     return m_controller.Calculate(measurement.value(),
                                   m_setpoint.position.value());
   }
@@ -507,7 +507,6 @@ class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
   Distance_t m_maximumInput{0};
 
   typename wpi::math::TrapezoidProfile<Distance>::Constraints m_constraints;
-  TrapezoidProfile<Distance> m_profile;
   typename wpi::math::TrapezoidProfile<Distance>::State m_goal;
   typename wpi::math::TrapezoidProfile<Distance>::State m_setpoint;
   double m_goalPosition = 0.0;

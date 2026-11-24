@@ -31,7 +31,10 @@ class Robot : public wpi::TimedRobot {
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    setpoint = profile.Calculate(DT, setpoint, goal);
+    auto sample = wpi::math::TrapezoidProfile<wpi::units::meters>::Generate(
+                      constraints, setpoint, goal)
+                      .SampleAt(DT);
+    setpoint = {sample.position, sample.velocity};
 
     // Send setpoint to offboard controller PID
     motor.SetSetpoint(ExampleSmartMotorController::PIDMode::POSITION,
@@ -48,8 +51,8 @@ class Robot : public wpi::TimedRobot {
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  wpi::math::TrapezoidProfile<wpi::units::meters> profile{
-      {1.75_mps, 0.75_mps_sq}};
+  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
+      1.75_mps, 0.75_mps_sq};
   wpi::math::TrapezoidProfile<wpi::units::meters>::State goal;
   wpi::math::TrapezoidProfile<wpi::units::meters>::State setpoint;
 };

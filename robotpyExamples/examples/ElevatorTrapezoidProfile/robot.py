@@ -26,7 +26,7 @@ class MyRobot(wpilib.TimedRobot):
 
         # Create a motion profile with the given maximum velocity and maximum
         # acceleration constraints for the next setpoint.
-        self.profile = TrapezoidProfile(TrapezoidProfile.Constraints(1.75, 0.75))
+        self.constraints = TrapezoidProfile.Constraints(1.75, 0.75)
 
         self.goal = TrapezoidProfile.State()
         self.setpoint = TrapezoidProfile.State()
@@ -43,7 +43,10 @@ class MyRobot(wpilib.TimedRobot):
 
         # Retrieve the profiled setpoint for the next timestep. This setpoint moves
         # toward the goal while obeying the constraints.
-        self.setpoint = self.profile.calculate(self.DT, self.setpoint, self.goal)
+        sample = TrapezoidProfile.generate(
+            self.constraints, self.setpoint, self.goal
+        ).sample_at(self.DT)
+        self.setpoint = TrapezoidProfile.State(sample.position, sample.velocity)
 
         # Send setpoint to offboard controller PID
         self.motor.set_setpoint(

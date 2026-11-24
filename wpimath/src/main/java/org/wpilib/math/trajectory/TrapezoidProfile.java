@@ -4,6 +4,7 @@
 
 package org.wpilib.math.trajectory;
 
+import java.util.List;
 import java.util.Objects;
 import org.wpilib.math.trajectory.struct.TrapezoidProfileConstraintsStruct;
 import org.wpilib.math.trajectory.struct.TrapezoidProfileStateStruct;
@@ -11,7 +12,7 @@ import org.wpilib.util.UsageReporting;
 import org.wpilib.util.struct.StructSerializable;
 
 /**
- * A trapezoid-shaped velocity profile.
+ * A trajectory that follows a trapezoid-shaped velocity profile.
  *
  * <p>While this class can be used for a profiled movement from start to finish, the intended usage
  * is to filter a reference's dynamics based on trapezoidal velocity constraints. To compute the
@@ -24,27 +25,24 @@ import org.wpilib.util.struct.StructSerializable;
  *   new TrapezoidProfile.Constraints(kMaxV, kMaxA);
  * TrapezoidProfile.State previousProfiledReference =
  *   new TrapezoidProfile.State(initialReference, 0.0);
- * TrapezoidProfile profile = new TrapezoidProfile(constraints);
  * </code></pre>
  *
  * <p>Run on update:
  *
  * <pre><code>
- * previousProfiledReference =
- * profile.calculate(timeSincePreviousUpdate, previousProfiledReference, unprofiledReference);
+ * var sample =
+ *   TrapezoidProfile.generate(constraints, previousProfiledReference, unprofiledReference)
+ *     .sampleAt(timeSincePreviousUpdate);
+ * previousProfiledReference = new TrapezoidProfile.State(sample.position, sample.velocity);
  * </code></pre>
  *
  * <p>where `unprofiledReference` is free to change between calls. Note that when the unprofiled
- * reference is within the constraints, `calculate()` returns the unprofiled reference unchanged.
+ * reference is within the constraints, sampling returns the unprofiled reference unchanged.
  *
- * <p>Otherwise, a timer can be started to provide monotonic values for `calculate()` and to
- * determine when the profile has completed via `isFinished()`.
+ * <p>Otherwise, a timer can be started to provide monotonic values for `sampleAt()` and to
+ * determine when the profile has completed by comparing against `duration()`.
  */
-public class TrapezoidProfile {
-  private final Constraints m_constraints;
-
-  private ProfileTiming m_profile = new ProfileTiming();
-
+public final class TrapezoidProfile extends Trajectory<TrapezoidProfileSample> {
   /** Profile constraints. */
   public static class Constraints implements StructSerializable {
     /** The struct used to serialize this class. */
@@ -112,172 +110,162 @@ public class TrapezoidProfile {
     }
   }
 
-  /** Profile Timing. */
-  public static class ProfileTiming {
-    /** The time the profile spends in the first leg. */
-    public double t_1;
-
-    /** The time the profile spends at the velocity limit. */
-    public double t_2;
-
-    /** The time the profile spends in the last leg. */
-    public double t_3;
-
+  /**
+   * TrapezoidProfile timings.
+   *
+   * @param t_1 The time the profile spends in the first segment.
+   * @param t_2 The time the profile spends at the velocity limit.
+   * @param t_3 The time the profile spends in the last segment.
+   */
+  @SuppressWarnings("checkstyle:MemberName")
+  private record Timing(double t_1, double t_2, double t_3) {
     /**
-     * Constructs the timing object for a Trapezoid Profile.
+     * Returns the duration of the profile.
      *
-     * @param t_1 The time the profile spends on the first leg.
-     * @param t_2 The time the profile spends at the velocity limit.
-     * @param t_3 the time the profile spends on the last leg.
+     * @return The duration of the profile.
      */
-    public ProfileTiming(double t_1, double t_2, double t_3) {
-      if (t_1 < 0.0 || t_2 < 0.0 || t_3 < 0.0) {
-        throw new IllegalArgumentException("Times must be non-negative");
-      }
-      this.t_1 = t_1;
-      this.t_2 = t_2;
-      this.t_3 = t_3;
-    }
-
-    /** Zero initializes the timing object for a Trapezoid Profile. */
-    public ProfileTiming() {
-      this.t_1 = 0.0;
-      this.t_2 = 0.0;
-      this.t_3 = 0.0;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-      return other instanceof ProfileTiming rhs
-          && this.t_1 == rhs.t_1
-          && this.t_2 == rhs.t_2
-          && this.t_3 == rhs.t_3;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(t_1, t_2, t_3);
+    double duration() {
+      return t_1 + t_2 + t_3;
     }
   }
 
   /**
-   * Constructs a TrapezoidProfile.
+   * Constructs a TrapezoidProfile from its phase transition samples.
+   *
+   * @param samples The samples of the trajectory.
+   * @throws IllegalArgumentException if the list of samples is empty.
+   */
+  private TrapezoidProfile(List<TrapezoidProfileSample> samples) {
+    super(samples);
+  }
+
+  /**
+   * Interpolates between two samples along the profile.
+   *
+   * <p>The profile's samples are its phase transitions, so the acceleration is constant between
+   * consecutive samples. The start sample's state is integrated forward using its acceleration, so
+   * the result lies exactly on the profile.
+   *
+   * @param start The starting sample.
+   * @param end The ending sample.
+   * @param t The interpolation parameter between 0 and 1.
+   * @return The interpolated sample.
+   */
+  @Override
+  public TrapezoidProfileSample interpolate(
+      TrapezoidProfileSample start, TrapezoidProfileSample end, double t) {
+    if (t <= 0.0) {
+      return start;
+    } else if (t >= 1.0) {
+      return end;
+    }
+
+    double dt = t * (end.time - start.time);
+
+    // v = v_i + at   (1)
+    double velocity = start.velocity + start.acceleration * dt;
+    // x = x_i + v_i t + at² / 2   (2)
+    double position = start.position + start.velocity * dt + start.acceleration / 2.0 * dt * dt;
+
+    return new TrapezoidProfileSample(start.time + dt, position, velocity, start.acceleration);
+  }
+
+  /**
+   * Generates a profile from the current state to the goal state.
+   *
+   * <p>The trajectory starts at the current state at t = 0 and ends at the goal state once the
+   * profile completes. Sampling past the end of the trajectory returns the goal state.
    *
    * @param constraints The constraints on the profile, like maximum velocity.
-   */
-  public TrapezoidProfile(Constraints constraints) {
-    m_constraints = constraints;
-  }
-
-  /**
-   * Calculates the position and velocity for the profile at a time t where the current state is at
-   * time t = 0.
-   *
-   * @param t The amount of time to advance from the current state toward the desired state.
    * @param current The current state.
    * @param goal The desired state when the profile is complete.
-   * @return The position and velocity of the profile at time t.
+   * @return The trajectory from the current state to the goal state.
    */
-  public State calculate(double t, State current, State goal) {
+  public static TrapezoidProfile generate(Constraints constraints, State current, State goal) {
     State state = new State(current.position, current.velocity);
     State target = new State(goal.position, goal.velocity);
 
     // Adjust states so that they are within the constraints and get the time required for the
     // current state to return to a valid state.
-    double recoveryTime = adjustStates(state, target);
-    double sign = getSign(state, target);
-    m_profile = generateProfile(sign, state, target);
-
-    // Sampled state should start at the current state, regardless of validity.
-    state = new State(current.position, current.velocity);
+    double recoveryTime = adjustStates(constraints, state, target);
+    double sign = getSign(constraints, state, target);
+    Timing timing = generateTiming(sign, constraints, state, target);
 
     // In the case that the sign of the profile and the sign of the acceleration are identical, the
     // recovery can be treated as an extension of the first segment. In the case that they differ,
     // the recovered state will have a velocity of v_l and the above calculated t_1 will be zero. To
-    // handle this, a check is added to the sampling of the first segment to ensure proper recovery.
-    m_profile.t_1 += recoveryTime;
+    // handle this, the first segment's acceleration is flipped to ensure proper recovery.
+    //
+    // Floating point error can make segment durations slightly negative, which would place samples
+    // before the start of the trajectory, so they're clamped to zero.
+    timing =
+        new Timing(
+            Math.max(timing.t_1() + recoveryTime, 0.0),
+            Math.max(timing.t_2(), 0.0),
+            Math.max(timing.t_3(), 0.0));
 
-    double acceleration = sign * m_constraints.maxAcceleration;
-    advanceState(
-        Math.min(t, m_profile.t_1),
-        // Handle recovery to a feasible state if necessary.
-        recoveryTime > 0.0 && sign * state.velocity > 0.0 ? -acceleration : acceleration,
-        state);
+    double acceleration = sign * constraints.maxAcceleration;
+    double firstLegAcceleration =
+        recoveryTime > 0.0 && current.velocity * sign > 0.0 ? -acceleration : acceleration;
+    double lastLegAcceleration = -acceleration;
 
-    if (t > m_profile.t_1) {
-      t -= m_profile.t_1;
-      advanceState(Math.min(t, m_profile.t_2), 0.0, state);
+    // The samples are the profile's phase transitions: the start, the end of the first segment, the
+    // end of the constant velocity segment, and the end of the profile. Each sample's acceleration
+    // is the acceleration of the segment that starts at it. The sampled trajectory starts at the
+    // current state, regardless of validity.
+    double[] segmentDurations = {timing.t_1(), timing.t_2(), timing.t_3()};
+    double[] segmentAccelerations = {firstLegAcceleration, 0.0, lastLegAcceleration};
 
-      if (t > m_profile.t_2) {
-        t -= m_profile.t_2;
-        advanceState(Math.min(t, m_profile.t_3), -acceleration, state);
+    var samples = new TrapezoidProfileSample[4];
 
-        if (t > m_profile.t_3) {
-          state = target;
-        }
-      }
+    double time = 0.0;
+    double position = current.position;
+    double velocity = current.velocity;
+    for (int i = 0; i < segmentDurations.length; ++i) {
+      samples[i] =
+          new TrapezoidProfileSample(
+              time,
+              position,
+              velocity,
+              accelerationAt(time, timing, firstLegAcceleration, lastLegAcceleration));
+
+      double dt = segmentDurations[i];
+      double a = segmentAccelerations[i];
+      double v_i = velocity;
+      // v = v_i + at   (1)
+      velocity = v_i + a * dt;
+      // x = x_i + v_i t + at² / 2   (2)
+      position += v_i * dt + a / 2.0 * dt * dt;
+      time += dt;
     }
 
-    return state;
+    // Use the goal state directly for the last sample to avoid accumulating floating point error
+    samples[3] =
+        new TrapezoidProfileSample(timing.duration(), target.position, target.velocity, 0.0);
+
+    return new TrapezoidProfile(List.of(samples));
   }
 
   /**
-   * Returns the time to get between two states. This does not affect the internal variables, and as
-   * a result, may be used for states not on the active trajectory.
+   * Returns the acceleration of a profile at the given time.
    *
-   * @param current The current state.
-   * @param goal The goal state.
-   * @return The time to transition between the two states while respecting profile constraints.
+   * @param time The time relative to the profile start.
+   * @param timing The time spent in each segment of the profile.
+   * @param firstLegAcceleration The acceleration during the first segment of the profile.
+   * @param lastLegAcceleration The acceleration during the last segment of the profile.
+   * @return The acceleration of the profile at the given time.
    */
-  public double timeLeftUntil(State current, State goal) {
-    State state = new State(current.position, current.velocity);
-    State target = new State(goal.position, goal.velocity);
-
-    // Adjust states so that they are within the constraints and get the time required for the
-    // current state to return to a valid state.
-    double recoveryTime = adjustStates(state, target);
-    double sign = getSign(state, target);
-    ProfileTiming profile = generateProfile(sign, state, target);
-
-    profile.t_1 += recoveryTime;
-
-    return profile.t_1 + profile.t_2 + profile.t_3;
-  }
-
-  /**
-   * Returns the duration of the profile.
-   *
-   * @return The duration of the profile, or zero if no goal was set.
-   */
-  public double duration() {
-    return m_profile.t_1 + m_profile.t_2 + m_profile.t_3;
-  }
-
-  /**
-   * Returns true if the profile has reached the goal.
-   *
-   * <p>The profile has reached the goal if the time since the profile started has exceeded the
-   * profile's total time.
-   *
-   * @param t The time since the beginning of the profile.
-   * @return True if the profile has reached the goal.
-   */
-  public boolean isFinished(double t) {
-    return t >= duration();
-  }
-
-  /**
-   * Adjusts the members of the state to reflect a constant acceleration over a specified time.
-   *
-   * @param time The time to advance the state by.
-   * @param acceleration The acceleration to advance the state with.
-   * @param state The state to advance.
-   */
-  private static void advanceState(double time, double acceleration, State state) {
-    // x = x_i + v_i t + at² / 2   (2)
-    state.position += state.velocity * time + acceleration / 2.0 * time * time;
-    // v = v_i + at   (1)
-    state.velocity += acceleration * time;
+  private static double accelerationAt(
+      double time, Timing timing, double firstLegAcceleration, double lastLegAcceleration) {
+    if (time < timing.t_1()) {
+      return firstLegAcceleration;
+    } else if (time < timing.t_1() + timing.t_2()) {
+      return 0.0;
+    } else if (time < timing.duration()) {
+      return lastLegAcceleration;
+    } else {
+      return 0.0;
+    }
   }
 
   /**
@@ -289,29 +277,30 @@ public class TrapezoidProfile {
    * method returns the time this transition takes. By contrast, the goal velocity is simply clamped
    * to the valid region.
    *
+   * @param constraints The constraints on the profile, like maximum velocity.
    * @param current The current state to be adjusted.
    * @param goal The goal state state to be adjusted.
    * @return The time taken to make the current state valid.
    */
-  private double adjustStates(State current, State goal) {
-    if (Math.abs(goal.velocity) > m_constraints.maxVelocity) {
-      goal.velocity = Math.copySign(m_constraints.maxVelocity, goal.velocity);
+  private static double adjustStates(Constraints constraints, State current, State goal) {
+    if (Math.abs(goal.velocity) > constraints.maxVelocity) {
+      goal.velocity = Math.copySign(constraints.maxVelocity, goal.velocity);
     }
 
     double recoveryTime = 0.0;
-    double violationAmount = Math.abs(current.velocity) - m_constraints.maxVelocity;
+    double violationAmount = Math.abs(current.velocity) - constraints.maxVelocity;
 
     if (violationAmount > 0.0) {
-      recoveryTime = violationAmount / m_constraints.maxAcceleration;
+      recoveryTime = violationAmount / constraints.maxAcceleration;
       // x = x_i + v_i t + at² / 2   (2)
       current.position +=
           current.velocity * recoveryTime
-              + Math.copySign(m_constraints.maxAcceleration, -current.velocity)
+              + Math.copySign(constraints.maxAcceleration, -current.velocity)
                   * recoveryTime
                   * recoveryTime
                   / 2.0;
       // The closest valid velocity will have the magnitude of the max velocity.
-      current.velocity = Math.copySign(m_constraints.maxVelocity, current.velocity);
+      current.velocity = Math.copySign(constraints.maxVelocity, current.velocity);
     }
 
     return recoveryTime;
@@ -322,11 +311,12 @@ public class TrapezoidProfile {
    *
    * <p>The current and goal states must be within the profile constraints for a valid sign.
    *
+   * @param constraints The constraints on the profile, like maximum velocity.
    * @param current The initial state, adjusted not to violate the constraints.
    * @param goal The goal state of the profile.
    * @return 1.0 if the profile direction is positive, -1.0 if it is not.
    */
-  double getSign(State current, State goal) {
+  private static double getSign(Constraints constraints, State current, State goal) {
     double dx = goal.position - current.position;
 
     // Calculate threshold displacement
@@ -334,7 +324,7 @@ public class TrapezoidProfile {
     double d =
         Math.abs(goal.velocity - current.velocity)
             * (goal.velocity + current.velocity)
-            / (2.0 * m_constraints.maxAcceleration);
+            / (2.0 * constraints.maxAcceleration);
 
     // As discussed in TrapezoidProfile.md, the correct sign must be chosen when dx == d because
     // following a suboptimal profile may lead to "chattering". Additionally, if numerical precision
@@ -362,15 +352,15 @@ public class TrapezoidProfile {
    * velocities.
    *
    * @param sign The sign of the profile to generate.
+   * @param constraints The constraints on the profile, like maximum velocity.
    * @param current The valid current state.
    * @param goal The valid goal state.
    * @return The time for each section of the profile.
    */
-  private ProfileTiming generateProfile(double sign, State current, State goal) {
-    ProfileTiming profile = new ProfileTiming();
-
-    double acceleration = sign * m_constraints.maxAcceleration;
-    double velocityLimit = sign * m_constraints.maxVelocity;
+  private static Timing generateTiming(
+      double sign, Constraints constraints, State current, State goal) {
+    double acceleration = sign * constraints.maxAcceleration;
+    double velocityLimit = sign * constraints.maxVelocity;
     double dx = goal.position - current.position;
 
     // Calculate the peak velocity to compare to velocity constraint.
@@ -384,11 +374,11 @@ public class TrapezoidProfile {
                     0));
 
     // Handle the case where we hit maximum velocity.
-    if (sign * peakVelocity > m_constraints.maxVelocity) {
+    if (sign * peakVelocity > constraints.maxVelocity) {
       // t_1 = (v_l - v_i) / a   (13)
-      profile.t_1 = (velocityLimit - current.velocity) / acceleration;
+      double t_1 = (velocityLimit - current.velocity) / acceleration;
       // t_3 = (v_l - v_t) / a   (15)
-      profile.t_3 = (velocityLimit - goal.velocity) / acceleration;
+      double t_3 = (velocityLimit - goal.velocity) / acceleration;
 
       // x_1 = (v_p² - v_i²) / (2a)   (6)
       // Substitute v_p for v_l because this is the velocity constrained case.
@@ -407,14 +397,16 @@ public class TrapezoidProfile {
       double x_2 = dx - x_1 - x_3;
 
       // t_2 = x_2 / v_l   (14)
-      profile.t_2 = x_2 / velocityLimit;
+      double t_2 = x_2 / velocityLimit;
+
+      return new Timing(t_1, t_2, t_3);
     } else {
       // t_1 = (v_p - v_i) / a   (13)
-      profile.t_1 = (peakVelocity - current.velocity) / acceleration;
+      double t_1 = (peakVelocity - current.velocity) / acceleration;
       // t_3 = (v_p - v_t) / a   (15)
-      profile.t_3 = (peakVelocity - goal.velocity) / acceleration;
-    }
+      double t_3 = (peakVelocity - goal.velocity) / acceleration;
 
-    return profile;
+      return new Timing(t_1, 0.0, t_3);
+    }
   }
 }
