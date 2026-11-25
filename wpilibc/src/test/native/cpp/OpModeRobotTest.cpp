@@ -129,12 +129,14 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest PeriodicOrdering",
     std::atomic<int> interleavedCount{0};
     bool inPeriodic = false;
     OrderedRobot() {
-      AddPeriodic([this] {
-        ++callbackCount;
-        if (inPeriodic) {
-          ++interleavedCount;
-        }
-      }, 5_ms, 1_ms);
+      AddPeriodic(
+          [this] {
+            ++callbackCount;
+            if (inPeriodic) {
+              ++interleavedCount;
+            }
+          },
+          5_ms, 1_ms);
       AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "Ordered", [this] {
         return std::make_unique<OrderedOpMode>(events);
       });
@@ -172,14 +174,15 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest PeriodicOrdering",
   checkLoop({"enabled", "robot", "mode", "post", "simulation"});
   checkLoop({"enabled", "robot", "mode", "post", "simulation"});
   wpi::sim::DriverStationSim::SetEnabled(false);
-  checkLoop({"disabled", "mode disabled", "robot", "post", "simulation"});
+  // Disabling closes the active opmode; it is recreated on the next loop.
+  checkLoop({"disabled", "robot", "post", "simulation"});
   wpi::sim::DriverStationSim::SetOpMode(0);
   checkLoop({"disabled", "none", "robot", "post", "simulation"});
   wpi::sim::DriverStationSim::SetEnabled(true);
   checkLoop({"none", "robot", "post", "simulation"});
   wpi::sim::DriverStationSim::SetOpMode(GetOnlyOpModeId());
-  checkLoop({"mode disabled", "enabled", "robot", "mode", "post",
-             "simulation"});
+  checkLoop(
+      {"mode disabled", "enabled", "robot", "mode", "post", "simulation"});
   CHECK(robot.callbackCount.load() > 8);
   CHECK(robot.interleavedCount.load() == 0);
 
