@@ -22,7 +22,7 @@ class Robot : public wpi::TimedRobot {
   void TeleopStart() override;
   void TeleopPeriodic() override;
   void UtilityPeriodic() override;
-  void SimulationInit() override;
+  void SimulationStart() override;
   void SimulationPeriodic() override;
 
  private:

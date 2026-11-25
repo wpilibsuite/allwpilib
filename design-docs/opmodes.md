@@ -177,7 +177,7 @@ public abstract class OpModeRobot extends RobotBase {
     // called periodically every loop, regardless of enabled state or opmode
   }
 
-  public void simulationInit() {
+  public void simulationStart() {
     // called once during robot initialization in simulation
   }
 

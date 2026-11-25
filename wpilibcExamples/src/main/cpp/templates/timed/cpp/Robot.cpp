@@ -68,7 +68,7 @@ void Robot::UtilityStart() {}
 
 void Robot::UtilityPeriodic() {}
 
-void Robot::SimulationInit() {}
+void Robot::SimulationStart() {}
 
 void Robot::SimulationPeriodic() {}
 

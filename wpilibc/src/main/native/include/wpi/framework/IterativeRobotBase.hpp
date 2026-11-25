@@ -72,14 +72,14 @@ class IterativeRobotBase : public RobotBase {
   virtual void DriverStationConnected();
 
   /**
-   * Robot-wide simulation initialization code should go here.
+   * Start code for simulation should go here.
    *
    * Users should override this method for default Robot-wide simulation
    * related initialization which will be called when the robot is first
    * started. It will be called exactly one time after the robot class
    * constructor is called only when the robot is in simulation.
    */
-  virtual void SimulationInit();
+  virtual void SimulationStart();
 
   /**
    * Start code for disabled mode should go here.

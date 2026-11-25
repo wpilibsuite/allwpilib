@@ -109,13 +109,13 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void driverStationConnected() {}
 
   /**
-   * Robot-wide simulation initialization code should go here.
+   * Start code for simulation should go here.
    *
    * <p>Users should override this method for default Robot-wide simulation related initialization
    * which will be called when the robot is first started. It will be called exactly one time after
    * the robot class constructor is called only when the robot is in simulation.
    */
-  public void simulationInit() {}
+  public void simulationStart() {}
 
   /**
    * Start code for disabled mode should go here.

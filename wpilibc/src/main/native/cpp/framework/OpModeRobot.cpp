@@ -199,7 +199,7 @@ void OpModeRobotBase::LoopFunc() {
 
 void OpModeRobotBase::StartCompetition() {
   if constexpr (IsSimulation()) {
-    SimulationInit();
+    SimulationStart();
   }
 
   // Tell the DS that the robot is ready to be enabled

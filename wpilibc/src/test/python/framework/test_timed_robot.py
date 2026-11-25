@@ -20,7 +20,7 @@ _PERIOD = 0.02  # 20 ms
 class MockRobot(TimedRobot):
     def __init__(self):
         super().__init__(_PERIOD)
-        self.simulation_init_count = 0
+        self.simulation_start_count = 0
         self.disabled_start_count = 0
         self.autonomous_start_count = 0
         self.teleop_start_count = 0
@@ -38,8 +38,8 @@ class MockRobot(TimedRobot):
         self.teleop_periodic_count = 0
         self.utility_periodic_count = 0
 
-    def simulation_init(self):
-        self.simulation_init_count += 1
+    def simulation_start(self):
+        self.simulation_start_count += 1
 
     def disabled_start(self):
         self.disabled_start_count += 1
@@ -138,7 +138,7 @@ def test_disabled_mode(robot: MockRobot):
     DriverStationSim.set_enabled(False)
     DriverStationSim.notify_new_data()
 
-    assert robot.simulation_init_count == 1
+    assert robot.simulation_start_count == 1
     assert robot.disabled_start_count == 0
     assert robot.robot_periodic_count == 0
     assert robot.simulation_periodic_count == 0
@@ -146,7 +146,7 @@ def test_disabled_mode(robot: MockRobot):
 
     step_timing(_PERIOD)
 
-    assert robot.simulation_init_count == 1
+    assert robot.simulation_start_count == 1
     assert robot.disabled_start_count == 1
     assert robot.autonomous_start_count == 0
     assert robot.teleop_start_count == 0
@@ -180,14 +180,14 @@ def test_autonomous_mode(robot: MockRobot):
     DriverStationSim.set_robot_mode(RobotMode.AUTONOMOUS)
     DriverStationSim.notify_new_data()
 
-    assert robot.simulation_init_count == 1
+    assert robot.simulation_start_count == 1
     assert robot.disabled_start_count == 0
     assert robot.autonomous_start_count == 0
     assert robot.robot_periodic_count == 0
 
     step_timing(_PERIOD)
 
-    assert robot.simulation_init_count == 1
+    assert robot.simulation_start_count == 1
     assert robot.disabled_start_count == 0
     assert robot.autonomous_start_count == 1
     assert robot.teleop_start_count == 0
@@ -221,7 +221,7 @@ def test_teleop_mode(robot: MockRobot):
     DriverStationSim.set_robot_mode(RobotMode.TELEOPERATED)
     DriverStationSim.notify_new_data()
 
-    assert robot.simulation_init_count == 1
+    assert robot.simulation_start_count == 1
     assert robot.teleop_start_count == 0
     assert robot.robot_periodic_count == 0
 
@@ -257,7 +257,7 @@ def test_utility_mode(robot: MockRobot):
     DriverStationSim.set_robot_mode(RobotMode.UTILITY)
     DriverStationSim.notify_new_data()
 
-    assert robot.simulation_init_count == 1
+    assert robot.simulation_start_count == 1
     assert robot.utility_start_count == 0
     assert robot.robot_periodic_count == 0
 

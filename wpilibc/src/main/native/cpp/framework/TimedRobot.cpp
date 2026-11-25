@@ -18,7 +18,7 @@ using namespace wpi;
 
 void TimedRobot::StartCompetition() {
   if constexpr (IsSimulation()) {
-    SimulationInit();
+    SimulationStart();
   }
 
   // Tell the DS that the robot is ready to be enabled

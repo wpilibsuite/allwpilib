@@ -72,7 +72,7 @@ void Robot::UtilityPeriodic() {}
 /**
  * This function is called once when the robot is first started up.
  */
-void Robot::SimulationInit() {}
+void Robot::SimulationStart() {}
 
 /**
  * This function is called periodically whilst in simulation.

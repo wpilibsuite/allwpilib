@@ -17,7 +17,7 @@ classes:
             ignore: true
           wpi::units::second_t:
       LoopFunc:
-      SimulationInit:
+      SimulationStart:
       SimulationPeriodic:
       DisabledEnd:
       AutonomousEnd:

@@ -141,7 +141,7 @@ class OpModeRobotBase : public RobotBase {
   /**
    * Function called once during robot initialization in simulation.
    */
-  virtual void SimulationInit() {}
+  virtual void SimulationStart() {}
 
   /**
    * Function called periodically in simulation.
