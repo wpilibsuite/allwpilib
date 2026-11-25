@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cstdio>
+#include <format>
 #include <memory>
 #include <string>
 #include <vector>
@@ -294,8 +295,8 @@ Alert::Alert(std::string_view text, Level level) : Alert{text, level, true} {}
 
 Alert::Alert(std::string_view text, Level level, bool reportErrors)
     : Alert{"Alerts",
-            "auto-" + std::to_string(
-                          nextAlertId.fetch_add(1, std::memory_order_relaxed)),
+            std::format("auto-{}",
+                        nextAlertId.fetch_add(1, std::memory_order_relaxed)),
             text, level, reportErrors} {
   if (!*this) {
     return;
