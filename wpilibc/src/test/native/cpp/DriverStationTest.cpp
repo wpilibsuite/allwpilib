@@ -234,6 +234,11 @@ TEST_CASE(
     "DriverStation joystick alert collision does not commit partial "
     "alerts",
     "[wpilibc][driverstation]") {
+  constexpr std::string_view EXPECTED_WARNING =
+      "Warning: Failed to create alert \"\" in group \"DriverStation\" with ID "
+      "\"joystick0AxisUnavailable\". Check for duplicate IDs. Alerts should be "
+      "created once and reused.\n";
+
   ResetJoystickAlerts();
 
   HALSIM_SetJoystickButtonsAvailable(0, 1);
@@ -249,7 +254,7 @@ TEST_CASE(
     StderrCapture capture;
 
     CHECK_FALSE(wpi::internal::DriverStationBackend::GetStickButton(0, 2));
-    CHECK(capture.Stop() == "");
+    CHECK(capture.Stop() == EXPECTED_WARNING);
 
     auto alerts = wpi::sim::AlertSim::GetAll();
     REQUIRE(alerts.size() == 1u);
@@ -259,7 +264,9 @@ TEST_CASE(
     CHECK(alerts[0].level == wpi::util::Alert::Level::MEDIUM);
     CHECK_FALSE(alerts[0].isActive());
 
+    StderrCapture retryCapture;
     CHECK(wpi::internal::DriverStationBackend::GetStickAxis(0, 1) == 0.0);
+    CHECK(retryCapture.Stop() == EXPECTED_WARNING);
     CHECK(wpi::sim::AlertSim::GetAll().size() == 1u);
   }
 
