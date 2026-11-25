@@ -231,8 +231,8 @@ static void UpdateMsgpackValueSource(NetworkTablesModel& model,
       break;
     }
     default:
+      // Nil is a scalar, so there is no compound type to close.
       out->value = {};
-      mpack_done_type(&r, mpack_tag_type(&tag));
       break;
   }
 }

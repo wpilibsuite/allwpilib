@@ -155,6 +155,42 @@ NT_Publisher PublishMsgpack(wpi::nt::NetworkTableInstance inst,
 
 }  // namespace
 
+TEST_CASE("NetworkTablesModel DecodesMsgpackNilInContainers",
+          "[networktables]") {
+  bool isMap = GENERATE(false, true);
+  auto inst = wpi::nt::NetworkTableInstance::Create();
+  {
+    wpi::glass::NetworkTablesModel model{inst};
+    MsgpackWriter writer;
+    if (isMap) {
+      mpack::mpack_start_map(&writer, 2);
+      mpack::mpack_write_str(&writer, "nil");
+    } else {
+      mpack::mpack_start_array(&writer, 2);
+    }
+    mpack::mpack_write_nil(&writer);
+    if (isMap) {
+      mpack::mpack_write_str(&writer, "value");
+    }
+    mpack::mpack_write_i64(&writer, 42);
+    if (isMap) {
+      mpack::mpack_finish_map(&writer);
+    } else {
+      mpack::mpack_finish_array(&writer);
+    }
+    PublishMsgpack(inst, "/Value", writer.Finish());
+    model.Update();
+
+    auto* entry = model.GetEntry("/Value");
+    REQUIRE(entry);
+    REQUIRE(entry->valueChildren.size() == 2);
+    CHECK(entry->valueChildren[0].value.type() == NT_UNASSIGNED);
+    REQUIRE(entry->valueChildren[1].value.IsInteger());
+    CHECK(entry->valueChildren[1].value.GetInteger() == 42);
+  }
+  wpi::nt::NetworkTableInstance::Destroy(inst);
+}
+
 TEST_CASE("NetworkTablesModel TopicSubscribersUnavailableWithoutMetadata",
           "[networktables]") {
   auto inst = wpi::nt::NetworkTableInstance::Create();
