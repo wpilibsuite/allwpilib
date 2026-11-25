@@ -3,7 +3,7 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
-load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "publish_casters", "resolve_casters", "run_header_gen")
+load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "make_pyi", "publish_casters", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
 def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
@@ -260,7 +260,7 @@ def publish_library_casters():
         tags = ["robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = [], extra_pyi_deps = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -297,6 +297,14 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         version_variable = "ROBOTPY_VERSION",
     )
 
+    make_pyi(
+        name = "wpiutil._wpiutil.make_pyi",
+        package_name = "wpiutil._wpiutil",
+        output_files = [["wpiutil/_wpiutil/__init__.pyi", "wpiutil/_wpiutil/__init__.pyi"], ["wpiutil/_wpiutil/sync.pyi", "wpiutil/_wpiutil/sync.pyi"], ["wpiutil/_wpiutil/wpistruct.pyi", "wpiutil/_wpiutil/wpistruct.pyi"]],
+        module_files = [["wpiutil", "wpiutil/__init__.py"], ["wpiutil._init__wpiutil", "wpiutil/_init__wpiutil.py"], ["wpiutil._wpiutil", "wpiutil/_wpiutil"]],
+        runner = ":{}.make_pyi_runner".format(name),
+    )
+
     robotpy_library(
         name = name,
         distribution = "robotpy-wpiutil",
@@ -310,6 +318,10 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
             ":wpiutil/_wpiutil",
             ":wpiutil.trampoline_hdr_files",
         ],
+        pyi_srcs = [
+            ":wpiutil._wpiutil.make_pyi",
+        ],
+        pyi_deps = extra_pyi_deps,
         imports = ["."],
         deps = [
             "//wpiutil:robotpy-native-wpiutil",

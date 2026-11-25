@@ -36,6 +36,7 @@ wpimath_test_extension(
 define_test_pybind_library(
     name = "robotpy-wpimath-test",
     extra_pybind_hdrs = glob(["cpp/**/*.h"]),
+    extra_pyi_deps = ["//wpimath/src/main/python"],
     pkgcfgs = TEST_PYBIND_PKGCFG_DEPS,
 )
 

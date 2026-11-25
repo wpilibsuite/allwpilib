@@ -1,7 +1,7 @@
 # THIS FILE IS AUTO GENERATED
 
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
-load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
+load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "make_pyi", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
 def wpimath_test_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
@@ -99,7 +99,7 @@ def wpimath_test_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], 
         tags = ["manual", "robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = [], extra_pyi_deps = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -127,6 +127,14 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         tags = ["manual", "robotpy"],
     )
 
+    make_pyi(
+        name = "wpimath_test._wpimath_test.make_pyi",
+        package_name = "wpimath_test._wpimath_test",
+        output_files = [["wpimath_test/_wpimath_test.pyi", "cpp/wpimath_test/_wpimath_test.pyi"]],
+        module_files = [["wpimath_test", "cpp/wpimath_test/__init__.py"], ["wpimath_test._init__wpimath_test", "cpp/wpimath_test/_init__wpimath_test.py"], ["wpimath_test._wpimath_test", "cpp/wpimath_test/_wpimath_test"]],
+        runner = ":{}.make_pyi_runner".format(name),
+    )
+
     robotpy_library(
         name = name,
         distribution = "wpimath_test",
@@ -139,6 +147,10 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
             ":cpp/wpimath_test/_wpimath_test",
             ":wpimath_test.trampoline_hdr_files",
         ],
+        pyi_srcs = [
+            ":wpimath_test._wpimath_test.make_pyi",
+        ],
+        pyi_deps = extra_pyi_deps,
         imports = ["cpp/"],
         deps = [
         ],

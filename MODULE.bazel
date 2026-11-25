@@ -71,6 +71,16 @@ pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "allwpilib_pip_deps",
     python_version = "3.13",
+    # Stub generation imports target-built extensions on the executor, which
+    # may be a different architecture from the machine invoking Bazel.
+    target_platforms = [
+        "linux_aarch64",
+        "linux_x86_64",
+        "osx_aarch64",
+        "osx_x86_64",
+        "windows_aarch64",
+        "windows_x86_64",
+    ],
     uv_lock = "//:uv.lock",
 )
 use_repo(pip, "allwpilib_pip_deps")
@@ -78,6 +88,13 @@ use_repo(pip, "allwpilib_pip_deps")
 bazel_dep(name = "rules_jvm_external", version = "7.2")
 
 register_toolchains("//:java_toolchain_definition")
+
+register_toolchains(
+    "//shared/bazel/rules/robotpy:stubgen_linux_aarch64",
+    "//shared/bazel/rules/robotpy:stubgen_linux_x86_64",
+    "//shared/bazel/rules/robotpy:stubgen_osx_aarch64",
+    "//shared/bazel/rules/robotpy:stubgen_osx_x86_64",
+)
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.from_toml(

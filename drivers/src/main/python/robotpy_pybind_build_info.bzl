@@ -2,7 +2,7 @@
 
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
-load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
+load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "make_pyi", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
 def drivers_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
@@ -257,7 +257,7 @@ def drivers_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
         tags = ["manual", "robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = [], extra_pyi_deps = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -292,6 +292,14 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         version_variable = "ROBOTPY_VERSION",
     )
 
+    make_pyi(
+        name = "wpilib_drivers._drivers.make_pyi",
+        package_name = "wpilib_drivers._drivers",
+        output_files = [["wpilib_drivers/_drivers.pyi", "wpilib_drivers/_drivers.pyi"]],
+        module_files = [["wpilib_drivers", "wpilib_drivers/__init__.py"], ["wpilib_drivers._init__drivers", "wpilib_drivers/_init__drivers.py"], ["wpilib_drivers._drivers", "wpilib_drivers/_drivers"]],
+        runner = ":{}.make_pyi_runner".format(name),
+    )
+
     robotpy_library(
         name = name,
         distribution = "wpilib-drivers",
@@ -305,6 +313,10 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
             ":wpilib_drivers/_drivers",
             ":drivers.trampoline_hdr_files",
         ],
+        pyi_srcs = [
+            ":wpilib_drivers._drivers.make_pyi",
+        ],
+        pyi_deps = extra_pyi_deps,
         imports = ["."],
         deps = [
             "//drivers:robotpy-native-wpilib-drivers",
