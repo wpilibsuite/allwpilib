@@ -25,7 +25,7 @@ dev = [
     "jinja2==3.1.6",
     "protobuf==5.28.3",
     "pytest-order",
-    "semiwrap==0.8.1",
+    "semiwrap==0.9.0",
 ]
 
 [tool.black]
