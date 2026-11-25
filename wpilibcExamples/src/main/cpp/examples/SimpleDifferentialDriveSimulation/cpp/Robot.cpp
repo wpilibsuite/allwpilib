@@ -27,14 +27,33 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot()
-      // Replace this with a call to a trajectory generator. Field poses use
-      // field center as the origin, with zero heading toward the blue wall.
+      // Stand-in for a pre-generated path. Replace this with a call to a
+      // trajectory generator. Field poses use field center as the origin,
+      // with zero heading toward the blue wall.
       : trajectory{wpi::math::HolonomicTrajectory{
-            std::vector<wpi::math::HolonomicSample>{wpi::math::HolonomicSample{
-                0_s, wpi::math::Pose2d{0_m, 0_m, 0_rad},
-                wpi::math::ChassisVelocities{0_mps, 0_mps, 0_rad_per_s},
-                wpi::math::ChassisAccelerations{0_mps_sq, 0_mps_sq,
-                                                0_rad_per_s_sq}}}}} {}
+            std::vector<wpi::math::HolonomicSample>{
+                wpi::math::HolonomicSample{
+                    0_s, wpi::math::Pose2d{0_m, 0_m, 0_rad},
+                    wpi::math::ChassisVelocities{0_mps, 0_mps, 0_rad_per_s},
+                    wpi::math::ChassisAccelerations{2_mps_sq, 0_mps_sq,
+                                                    0_rad_per_s_sq}},
+                wpi::math::HolonomicSample{
+                    1_s, wpi::math::Pose2d{1_m, 0_m, 0_rad},
+                    wpi::math::ChassisVelocities{2_mps, 0_mps, 0_rad_per_s},
+                    wpi::math::ChassisAccelerations{0_mps_sq, 0_mps_sq,
+                                                    0_rad_per_s_sq}},
+                wpi::math::HolonomicSample{
+                    2_s, wpi::math::Pose2d{3_m, 0_m, 0_rad},
+                    wpi::math::ChassisVelocities{2_mps, 0_mps, 0_rad_per_s},
+                    wpi::math::ChassisAccelerations{-2_mps_sq, 0_mps_sq,
+                                                    0_rad_per_s_sq}},
+                wpi::math::HolonomicSample{
+                    3_s, wpi::math::Pose2d{4_m, 0_m, 0_rad},
+                    wpi::math::ChassisVelocities{0_mps, 0_mps, 0_rad_per_s},
+                    wpi::math::ChassisAccelerations{0_mps_sq, 0_mps_sq,
+                                                    0_rad_per_s_sq}}}}} {
+    feedback.SetTolerance(wpi::math::Pose2d{0.1_m, 0.1_m, 5_deg});
+  }
 
   void RobotPeriodic() override { drive.Periodic(); }
 

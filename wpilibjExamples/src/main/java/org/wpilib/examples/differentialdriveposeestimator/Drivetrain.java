@@ -257,7 +257,7 @@ public class Drivetrain {
     leftEncoderSim.setRate(drivetrainSimulator.getLeftVelocity());
     rightEncoderSim.setDistance(drivetrainSimulator.getRightPosition());
     rightEncoderSim.setRate(drivetrainSimulator.getRightVelocity());
-    OnboardIMUSim.setYaw(-drivetrainSimulator.getHeading().getRadians());
+    OnboardIMUSim.setYaw(drivetrainSimulator.getHeading().getRadians());
   }
 
   /** This function is called periodically, no matter the mode. */
