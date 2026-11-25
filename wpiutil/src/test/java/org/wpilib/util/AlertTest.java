@@ -11,6 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +22,18 @@ import org.junit.jupiter.api.Test;
 
 class AlertTest {
   private static final int ALERT_ALREADY_ALLOCATED = -2;
+
+  private static String captureStderr(Runnable action) {
+    var output = new ByteArrayOutputStream();
+    PrintStream original = System.err;
+    try (var stream = new PrintStream(output, true, StandardCharsets.UTF_8)) {
+      System.setErr(stream);
+      action.run();
+    } finally {
+      System.setErr(original);
+    }
+    return output.toString(StandardCharsets.UTF_8);
+  }
 
   @AfterEach
   void resetAlerts() {
@@ -99,6 +114,61 @@ class AlertTest {
       assertEquals(1, infos.length);
       assertEquals("auto-" + (firstId + 2), infos[0].id);
     }
+  }
+
+  @Test
+  void duplicateTextWarnsButStillCreatesAlert() {
+    try (Alert first = new Alert("group", "id", "initial", Alert.Level.HIGH)) {
+      first.setText("duplicate text");
+      String warning =
+          captureStderr(
+              () -> {
+                try (Alert second = new Alert("duplicate text", Alert.Level.LOW)) {
+                  second.set(true);
+                  assertTrue(second.get());
+                  assertFalse(first.get());
+                  assertEquals(2, AlertDataJNI.getNumAlerts());
+                }
+              });
+      assertTrue(
+          warning.contains("Warning: An alert with text \"duplicate text\" already exists."));
+    }
+  }
+
+  @Test
+  void distinctTextAndReusedTextDoNotWarn() {
+    String warning =
+        captureStderr(
+            () -> {
+              try (Alert first = new Alert("text", Alert.Level.LOW);
+                  Alert second = new Alert("other text", Alert.Level.LOW);
+                  Alert explicit = new Alert("id", "text", Alert.Level.LOW)) {
+                first.setText("updated");
+              }
+              try (Alert reused = new Alert("text", Alert.Level.LOW)) {
+                AlertDataJNI.resetData();
+                try (Alert afterReset = new Alert("text", Alert.Level.LOW)) {
+                  assertEquals(1, AlertDataJNI.getNumAlerts());
+                }
+              }
+            });
+    assertEquals("", warning);
+  }
+
+  @Test
+  void duplicateIdThrowsWithoutWarning() {
+    String warning =
+        captureStderr(
+            () -> {
+              try (Alert first = new Alert("id", "text", Alert.Level.HIGH)) {
+                assertThrows(
+                    AlertException.class, () -> new Alert("id", "other text", Alert.Level.HIGH));
+                assertThrows(
+                    AlertException.class,
+                    () -> new Alert("Alerts", "id", "other text", Alert.Level.HIGH));
+              }
+            });
+    assertEquals("", warning);
   }
 
   @Test

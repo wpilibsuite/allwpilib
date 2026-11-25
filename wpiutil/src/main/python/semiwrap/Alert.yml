@@ -13,6 +13,8 @@ functions:
         ignore: true
 
 classes:
+  wpi::util::detail::AlertFactory:
+    ignore: true
   wpi::util::Alert:
     doc_code_blocks:
     - |
@@ -36,29 +38,47 @@ classes:
           std::string_view, Level:
             cpp_code: |
               [](std::string_view text, wpi::util::Alert::Level level) {
-                auto alert = std::make_unique<wpi::util::Alert>(text, level);
+                auto alert = std::make_unique<wpi::util::Alert>(
+                    wpi::util::detail::AlertFactory::Create(text, level));
                 if (!static_cast<bool>(*alert)) {
                   throw std::runtime_error("Alert already allocated");
                 }
                 return alert;
               }
           std::string_view, std::string_view, Level:
+            doc: |
+              Creates a new alert in the default group - "Alerts".
+
+              :param id: Alert identifier. This should be unique within the group.
+              :param text: Text to be displayed when the alert is active.
+              :param level: Alert urgency level.
+              :raises RuntimeError: If the alert cannot be created.
             cpp_code: |
               [](std::string_view id, std::string_view text,
                  wpi::util::Alert::Level level) {
-                auto alert =
-                    std::make_unique<wpi::util::Alert>(id, text, level);
+                auto alert = std::make_unique<wpi::util::Alert>(
+                    wpi::util::detail::AlertFactory::Create("Alerts", id, text,
+                                                           level));
                 if (!static_cast<bool>(*alert)) {
                   throw std::runtime_error("Alert already allocated");
                 }
                 return alert;
               }
           std::string_view, std::string_view, std::string_view, Level:
+            doc: |
+              Creates a new alert.
+
+              :param group: Group identifier.
+              :param id: Alert identifier. This should be unique within the group.
+              :param text: Text to be displayed when the alert is active.
+              :param level: Alert urgency level.
+              :raises RuntimeError: If the alert cannot be created.
             cpp_code: |
               [](std::string_view group, std::string_view id,
                  std::string_view text, wpi::util::Alert::Level level) {
-                auto alert = std::make_unique<wpi::util::Alert>(group, id, text,
-                                                                level);
+                auto alert = std::make_unique<wpi::util::Alert>(
+                    wpi::util::detail::AlertFactory::Create(group, id, text,
+                                                           level));
                 if (!static_cast<bool>(*alert)) {
                   throw std::runtime_error("Alert already allocated");
                 }

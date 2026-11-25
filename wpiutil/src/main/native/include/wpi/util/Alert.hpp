@@ -18,6 +18,8 @@ class Alert;
 
 namespace detail {
 
+struct AlertFactory;
+
 // Used by RobotPy close()/__exit__() without exposing close-style semantics on
 // the C++ Alert API.
 void CloseAlertHandle(Alert& alert);
@@ -90,6 +92,8 @@ class Alert {
    *
    * The identifier uses the prefix "auto-" followed by a static incrementing
    * value.
+   * If another allocated alert has the same text, a warning is printed to
+   * standard error.
    *
    * @param text Text to be displayed when the alert is active.
    * @param level Alert urgency level.
@@ -98,6 +102,7 @@ class Alert {
 
   /**
    * Creates a new alert in the default group - "Alerts".
+   * If creation fails, a warning is printed to standard error.
    *
    * @param text Text to be displayed when the alert is active.
    * @param id Alert identifier. This should be unique within the group.
@@ -107,6 +112,7 @@ class Alert {
 
   /**
    * Creates a new alert.
+   * If creation fails, a warning is printed to standard error.
    *
    * @param group Group identifier
    * @param id Alert identifier. This should be unique within the group.
@@ -158,13 +164,47 @@ class Alert {
   Level GetLevel() const;
 
  private:
+  friend struct detail::AlertFactory;
   friend void detail::CloseAlertHandle(Alert& alert);
   friend void detail::ReleaseAlertHandle(Alert& alert);
+
+  Alert(std::string_view text, Level level, bool reportErrors);
+  Alert(std::string_view group, std::string_view id, std::string_view text,
+        Level level, bool reportErrors);
 
   Handle<WPI_AlertHandle, WPI_DestroyAlert> m_handle;
 };
 
 namespace detail {
+
+// Used by bindings that throw on construction failure instead of printing a
+// warning. Duplicate-text warnings are still reported.
+struct AlertFactory {
+  /**
+   * Creates an alert with an automatic ID without printing creation failures.
+   *
+   * @param text Text to display.
+   * @param level Alert urgency level.
+   * @return The alert, or an invalid alert if creation failed.
+   */
+  static Alert Create(std::string_view text, Alert::Level level) {
+    return Alert{text, level, false};
+  }
+
+  /**
+   * Creates an alert with an explicit ID without printing creation failures.
+   *
+   * @param group Group identifier.
+   * @param id Alert identifier.
+   * @param text Text to display.
+   * @param level Alert urgency level.
+   * @return The alert, or an invalid alert if creation failed.
+   */
+  static Alert Create(std::string_view group, std::string_view id,
+                      std::string_view text, Alert::Level level) {
+    return Alert{group, id, text, level, false};
+  }
+};
 
 inline void CloseAlertHandle(Alert& alert) {
   alert.m_handle = WPI_INVALID_HANDLE;

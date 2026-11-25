@@ -80,13 +80,27 @@ public class Alert implements AutoCloseable {
   /**
    * Creates a new alert in the default group - "Alerts" with an automatically generated identifier.
    *
-   * <p>The identifier uses the prefix {@code auto-} followed by a static incrementing value.
+   * <p>The identifier uses the prefix {@code auto-} followed by a static incrementing value. If
+   * another allocated alert has the same text, a warning is printed to standard error.
    *
    * @param text Text to be displayed when the alert is active.
    * @param level Alert urgency level.
    */
   public Alert(String text, Level level) {
     this("auto-" + s_nextId.getAndIncrement(), text, level);
+    int matches = 0;
+    for (var info : AlertDataJNI.getAlerts()) {
+      if (text.equals(info.text)) {
+        matches++;
+        if (matches == 2) {
+          System.err.println(
+              "Warning: An alert with text \""
+                  + text
+                  + "\" already exists. Alerts should be created once and reused.");
+          break;
+        }
+      }
+    }
   }
 
   /**
