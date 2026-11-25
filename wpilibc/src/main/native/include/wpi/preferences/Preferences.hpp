@@ -14,12 +14,12 @@ namespace wpi {
 
 /**
  * The preferences class provides a relatively simple way to save important
- * values to the roboRIO to access the next time the roboRIO is booted.
+ * values to the Systemcore to access the next time the Systemcore is booted.
  *
- * This class loads and saves from a file inside the roboRIO.  The user cannot
- * access the file directly, but may modify values at specific fields which will
- * then be automatically periodically saved to the file by the NetworkTable
- * server.
+ * This class loads and saves from a file inside the Systemcore.  The user
+ * cannot access the file directly, but may modify values at specific fields
+ * which will then be automatically periodically saved to the file by the
+ * NetworkTable server.
  *
  * This class is thread safe.
  *

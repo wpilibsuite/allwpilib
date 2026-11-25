@@ -18,7 +18,7 @@ namespace wpi::filesystem {
 std::string GetLaunchDirectory();
 
 /**
- * Obtains the operating directory of the program. On the roboRIO, this
+ * Obtains the operating directory of the program. On the Systemcore, this
  * is /home/systemcore. In simulation, it is where the simulation was launched
  * from (`pwd`).
  *
@@ -28,7 +28,7 @@ std::string GetOperatingDirectory();
 
 /**
  * Obtains the deploy directory of the program, which is the remote location
- * src/main/deploy is deployed to by default. On the roboRIO, this is
+ * src/main/deploy is deployed to by default. On the Systemcore, this is
  * /home/systemcore/deploy. In simulation, it is where the simulation was
  * launched from, in the subdirectory "src/main/deploy" (`pwd`/src/main/deploy).
  *

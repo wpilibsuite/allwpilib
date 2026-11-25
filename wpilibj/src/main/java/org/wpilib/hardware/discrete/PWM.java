@@ -13,11 +13,11 @@ import org.wpilib.units.Units;
 import org.wpilib.util.UsageReporting;
 
 /**
- * Class implements the PWM generation in the FPGA.
+ * Class implements the PWM generation in Smart I/O.
  *
  * <p>The values supplied as arguments for PWM outputs range from -1.0 to 1.0. They are mapped to
  * the microseconds to keep the pulse high, with a range of 0 (off) to 4096. Changes are immediately
- * sent to the FPGA, and the update occurs at the next FPGA cycle (5.05ms). There is no delay.
+ * sent to the Smart I/O, and the update occurs at the next cycle (5.05ms). There is no delay.
  */
 public class PWM implements TelemetryLoggable, AutoCloseable {
   private final int m_channel;
