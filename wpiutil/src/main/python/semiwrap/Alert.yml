@@ -33,6 +33,15 @@ classes:
         overloads:
           "":
             ignore: true
+          std::string_view, Level:
+            cpp_code: |
+              [](std::string_view text, wpi::util::Alert::Level level) {
+                auto alert = std::make_unique<wpi::util::Alert>(text, level);
+                if (!static_cast<bool>(*alert)) {
+                  throw std::runtime_error("Alert already allocated");
+                }
+                return alert;
+              }
           std::string_view, std::string_view, Level:
             cpp_code: |
               [](std::string_view id, std::string_view text,

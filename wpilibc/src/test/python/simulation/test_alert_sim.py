@@ -127,6 +127,35 @@ def test_close_releases_duplicate_id(group_name):
         assert is_alert_active("second", Alert.Level.HIGH)
 
 
+def test_auto_generated_ids(group_name):
+    with (
+        Alert("text", Alert.Level.LOW) as first,
+        Alert("text", Alert.Level.LOW) as second,
+    ):
+        infos = AlertSim.get_all()
+        assert len(infos) == 2
+        for info in infos:
+            assert info.group == "Alerts"
+            assert info.id.startswith("auto-")
+            assert info.text == "text"
+            assert info.level == Alert.Level.LOW
+        first_id = int(infos[0].id.removeprefix("auto-"))
+        assert infos[1].id == f"auto-{first_id + 1}"
+
+        first.set(True)
+        assert first.get()
+        assert not second.get()
+
+    assert AlertSim.get_count() == 0
+    AlertSim.reset_data()
+
+    with Alert("text", Alert.Level.LOW) as third:
+        assert third
+        infos = AlertSim.get_all()
+        assert len(infos) == 1
+        assert infos[0].id == f"auto-{first_id + 2}"
+
+
 def test_duplicate_id_raises(group_name):
     with Alert(group_name, "alert", "first", Alert.Level.HIGH) as first:
         first.set(True)

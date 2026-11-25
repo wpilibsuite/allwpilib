@@ -85,6 +85,18 @@ class Alert {
   Alert() = default;
 
   /**
+   * Creates a new alert in the default group - "Alerts" with an automatically
+   * generated identifier.
+   *
+   * The identifier uses the prefix "auto-" followed by a static incrementing
+   * value.
+   *
+   * @param text Text to be displayed when the alert is active.
+   * @param level Alert urgency level.
+   */
+  Alert(std::string_view text, Level level);
+
+  /**
    * Creates a new alert in the default group - "Alerts".
    *
    * @param text Text to be displayed when the alert is active.

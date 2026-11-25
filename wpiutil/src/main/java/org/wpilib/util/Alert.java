@@ -4,6 +4,8 @@
 
 package org.wpilib.util;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Persistent alert. Alerts are tagged with a type of {@code HIGH}, {@code MEDIUM}, or {@code LOW}
  * to denote urgency. See {@link org.wpilib.util.Alert.Level Level} for suggested usage of each
@@ -70,8 +72,22 @@ public class Alert implements AutoCloseable {
     }
   }
 
+  private static final AtomicLong s_nextId = new AtomicLong();
+
   private final Level m_level;
   private int m_handle;
+
+  /**
+   * Creates a new alert in the default group - "Alerts" with an automatically generated identifier.
+   *
+   * <p>The identifier uses the prefix {@code auto-} followed by a static incrementing value.
+   *
+   * @param text Text to be displayed when the alert is active.
+   * @param level Alert urgency level.
+   */
+  public Alert(String text, Level level) {
+    this("auto-" + s_nextId.getAndIncrement(), text, level);
+  }
 
   /**
    * Creates a new alert in the default group - "Alerts".

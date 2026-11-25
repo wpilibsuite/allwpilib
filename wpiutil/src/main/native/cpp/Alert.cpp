@@ -282,8 +282,14 @@ const WPI_AlertBackend defaultBackend{
     DefaultFreeAlerts,    DefaultResetAlertData};
 
 std::atomic<const WPI_AlertBackend*> backend{&defaultBackend};
+std::atomic<uint64_t> nextAlertId{0};
 
 }  // namespace
+
+Alert::Alert(std::string_view text, Level level)
+    : Alert{"auto-" + std::to_string(
+                          nextAlertId.fetch_add(1, std::memory_order_relaxed)),
+            text, level} {}
 
 Alert::Alert(std::string_view id, std::string_view text, Level level)
     : Alert{"Alerts", id, text, level} {}
