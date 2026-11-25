@@ -252,9 +252,21 @@ class WPILIB_DLLEXPORT Translation3d final {
    *
    * @return The sum of the translations.
    */
+  // MSVC 19.52 (VS 18.12) x64 /O2 can merge the Y and Z stores here when this
+  // is inlined, so Z gets Y's value (Transform3dTest Composition). Turn off
+  // optimization and inlining for this function on the affected MSVC versions.
+  // This doesn't change constant evaluation. Remove once MSVC is fixed. See
+  // https://developercommunity.visualstudio.com/t/x64-MSVC-1952-O2-miscompiles-inline-ar/11182010
+#if defined(_MSC_VER) && !defined(__clang__) && _MSC_VER >= 1952
+#pragma optimize("", off)
+  __declspec(noinline)
+#endif
   constexpr Translation3d operator+(const Translation3d& other) const {
     return {X() + other.X(), Y() + other.Y(), Z() + other.Z()};
   }
+#if defined(_MSC_VER) && !defined(__clang__) && _MSC_VER >= 1952
+#pragma optimize("", on)
+#endif
 
   /**
    * Returns the difference between two translations.

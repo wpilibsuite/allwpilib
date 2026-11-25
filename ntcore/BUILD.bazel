@@ -10,13 +10,17 @@ load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native
 
 filegroup(
     name = "generated-native-include-files",
-    srcs = glob(["src/generated/main/native/include/**/*"]),
+    srcs = glob([
+        "src/generated/main/native/include/**/*.h",
+        "src/generated/main/native/include/**/*.hpp",
+    ]),
 )
 
 filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/main/native/include/**/*",
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
     ]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
@@ -67,11 +71,6 @@ third_party_cc_lib_helper(
 )
 
 filegroup(
-    name = "generated_jni",
-    srcs = glob(["src/generated/main/native/cpp/jni/**"]),
-)
-
-filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//ntcore:__subpackages__"],
@@ -80,10 +79,16 @@ filegroup(
 wpilib_cc_library(
     name = "ntcore",
     srcs = glob(
-        ["src/main/native/cpp/**"],
+        [
+            "src/main/native/cpp/**/*.cpp",
+            "src/main/native/cpp/**/*.hpp",
+        ],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
-    hdrs = glob(["src/main/native/include/**/*"]),
+    hdrs = glob([
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
+    ]),
     extra_src_pkg_files = [
         "//ntcore/src/main/java:ntcore-java-jni-hdrs-pkg",
     ],
@@ -131,7 +136,10 @@ wpilib_cc_static_library(
 
 wpilib_jni_cc_library(
     name = "ntcorejni",
-    srcs = glob(["src/main/native/cpp/jni/**"]) + [":generated_jni"],
+    srcs = [
+        "src/generated/main/native/cpp/jni/types_jni.cpp",
+        "src/main/native/cpp/jni/NetworkTablesJNI.cpp",
+    ],
     java_dep = "//ntcore/src/main/java:ntcore-java",
     visibility = ["//visibility:public"],
     deps = [

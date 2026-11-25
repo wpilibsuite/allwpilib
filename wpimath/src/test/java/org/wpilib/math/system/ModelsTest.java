@@ -15,7 +15,7 @@ import org.wpilib.math.util.Nat;
 class ModelsTest {
   @Test
   void testAngularVelocityFromPhysicalConstants() {
-    var model = Models.angularVelocityFromPhysicalConstants(DCMotor.getNEO(2), 0.00032, 1.0);
+    var model = Models.angularVelocityFromPhysicalConstants(DCMotor.getNeo(2), 0.00032, 1.0);
     assertTrue(model.getA().isEqual(VecBuilder.fill(-26.87032), 0.001));
 
     assertTrue(model.getB().isEqual(VecBuilder.fill(1354.166667), 0.001));
@@ -38,7 +38,7 @@ class ModelsTest {
   @Test
   void testDifferentialDriveFromPhysicalConstants() {
     var model =
-        Models.differentialDriveFromPhysicalConstants(DCMotor.getNEO(4), 70, 0.05, 0.4, 6.0, 6);
+        Models.differentialDriveFromPhysicalConstants(DCMotor.getNeo(4), 70, 0.05, 0.4, 6.0, 6);
     assertTrue(
         model
             .getA()
@@ -61,7 +61,7 @@ class ModelsTest {
 
   @Test
   void testLinearPositionFromPhysicalConstants() {
-    var model = Models.linearPositionFromPhysicalConstants(DCMotor.getNEO(2), 5, 0.05, 12);
+    var model = Models.linearPositionFromPhysicalConstants(DCMotor.getNeo(2), 5, 0.05, 12);
     assertTrue(
         model.getA().isEqual(MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -99.05473), 0.001));
 

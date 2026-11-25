@@ -4,6 +4,8 @@
 
 package org.wpilib.math.controller;
 
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.linalg.DARE;
 import org.wpilib.math.linalg.MatBuilder;
@@ -46,7 +48,8 @@ public class LTVDifferentialDriveController {
   private final double m_dt;
 
   private Matrix<N5, N1> m_error = new Matrix<>(Nat.N5(), Nat.N1());
-  private Matrix<N5, N1> m_tolerance = new Matrix<>(Nat.N5(), Nat.N1());
+  private Matrix<N5, N1> m_tolerance =
+      VecBuilder.fill(0.05, 0.05, 0.05, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 
   /**
    * Constructs a linear time-varying differential drive controller.
@@ -68,6 +71,9 @@ public class LTVDifferentialDriveController {
       Vector<N5> qelems,
       Vector<N2> relems,
       double dt) {
+    requireNonNullParam(plant, "plant", "LTVDifferentialDriveController");
+    requireNonNullParam(qelems, "qelems", "LTVDifferentialDriveController");
+    requireNonNullParam(relems, "relems", "LTVDifferentialDriveController");
     m_trackwidth = trackwidth;
     m_A = plant.getA();
     m_B = plant.getB();
@@ -82,6 +88,9 @@ public class LTVDifferentialDriveController {
    * @return True if the pose error is within tolerance of the reference.
    */
   public boolean atReference() {
+    if (m_error == null || m_tolerance == null) {
+      return false;
+    }
     return Math.abs(m_error.get(0, 0)) < m_tolerance.get(0, 0)
         && Math.abs(m_error.get(1, 0)) < m_tolerance.get(1, 0)
         && Math.abs(m_error.get(2, 0)) < m_tolerance.get(2, 0)
@@ -91,6 +100,9 @@ public class LTVDifferentialDriveController {
 
   /**
    * Sets the pose error which is considered tolerable for use with atReference().
+   *
+   * <p>The default tolerance is (x = 0.05 m, y = 0.05 m, heading = 0.05 rad, left velocity = ∞,
+   * right velocity = ∞).
    *
    * @param poseTolerance Pose error which is tolerable.
    * @param leftVelocityTolerance Left velocity error which is tolerable in meters per second.
@@ -128,6 +140,10 @@ public class LTVDifferentialDriveController {
       Pose2d poseRef,
       double leftVelocityRef,
       double rightVelocityRef) {
+    if (currentPose == null || poseRef == null) {
+      return new DifferentialDriveWheelVoltages(0.0, 0.0);
+    }
+
     // See theorem 8.7.4 of
     // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
 
@@ -213,6 +229,9 @@ public class LTVDifferentialDriveController {
       double leftVelocity,
       double rightVelocity,
       DifferentialSample desiredState) {
+    if (currentPose == null || desiredState == null || desiredState.pose == null) {
+      return new DifferentialDriveWheelVoltages(0.0, 0.0);
+    }
     return calculate(
         currentPose,
         leftVelocity,

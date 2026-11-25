@@ -8,6 +8,7 @@ import static org.wpilib.math.autodiff.Variable.pow;
 import static org.wpilib.math.optimization.Constraints.eq;
 import static org.wpilib.units.Units.Meters;
 
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
@@ -22,9 +23,15 @@ import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a 2d ellipse space containing translational, rotational, and scaling components. */
+@Json
 public final class Ellipse2d implements ProtobufSerializable, StructSerializable {
+  @Json.Property("center")
   private final Pose2d m_center;
+
+  @Json.Property("xSemiAxis")
   private final double m_xSemiAxis;
+
+  @Json.Property("ySemiAxis")
   private final double m_ySemiAxis;
 
   /**
@@ -34,6 +41,7 @@ public final class Ellipse2d implements ProtobufSerializable, StructSerializable
    * @param xSemiAxis The x semi-axis.
    * @param ySemiAxis The y semi-axis.
    */
+  @Json.Creator
   public Ellipse2d(Pose2d center, double xSemiAxis, double ySemiAxis) {
     if (xSemiAxis <= 0 || ySemiAxis <= 0) {
       throw new IllegalArgumentException("Ellipse2d semi-axes must be positive");

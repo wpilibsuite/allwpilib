@@ -190,6 +190,9 @@ javadoc(
         "-encoding",
         "UTF8",
     ],
+    tags = [
+        "requires-network",
+    ],
     deps = [
         "//apriltag/src/main/java",
         "//cameraserver/src/main/java",

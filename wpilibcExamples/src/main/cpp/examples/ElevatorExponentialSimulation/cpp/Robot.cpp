@@ -17,7 +17,7 @@ void Robot::SimulationPeriodic() {
   elevator.SimulationPeriodic();
 }
 
-void Robot::TeleopInit() {
+void Robot::TeleopStart() {
   // This just makes sure that our simulation code knows that the motor's off.
   elevator.Reset();
 }
@@ -32,7 +32,7 @@ void Robot::TeleopPeriodic() {
   }
 }
 
-void Robot::DisabledInit() {
+void Robot::DisabledStart() {
   // This just makes sure that our simulation code knows that the motor's off.
   elevator.Stop();
 }

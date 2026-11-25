@@ -27,7 +27,7 @@ class MyRobot(wpilib.TimedRobot):
 
     @override
     def teleop_periodic(self) -> None:
-        """This function is called periodically during operator control."""
+        """This function is called periodically during teleoperated mode."""
         # Activate the intake while the trigger is held
         if self.joystick.get_trigger():
             self.intake.activate(constants.IntakeConstants.INTAKE_VELOCITY)

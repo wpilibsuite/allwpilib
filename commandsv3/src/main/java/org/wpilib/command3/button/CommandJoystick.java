@@ -13,6 +13,8 @@ import org.wpilib.event.EventLoop;
 /**
  * A version of {@link Joystick} with {@link Trigger} factories for command-based.
  *
+ * <p>This class is provided by the Commands v3 VendorDep
+ *
  * @see Joystick
  */
 public class CommandJoystick {

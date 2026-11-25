@@ -112,13 +112,14 @@ void DataLog::StartFile() {
   }
 
   m_active = true;
+  m_blocked = false;
 }
 
 void DataLog::FlushBufs(std::vector<Buffer>* writeBufs) {
   std::scoped_lock lock{m_mutex};
   writeBufs->swap(m_outgoing);
   DoReleaseBufs(&m_outgoing);
-  m_paused = m_manuallyPaused;
+  m_bufferFull = false;
 }
 
 void DataLog::ReleaseBufs(std::vector<Buffer>* bufs) {
@@ -128,19 +129,33 @@ void DataLog::ReleaseBufs(std::vector<Buffer>* bufs) {
 
 void DataLog::Pause() {
   std::scoped_lock lock{m_mutex};
-  m_manuallyPaused = true;
   m_paused = true;
 }
 
 void DataLog::Resume() {
   std::scoped_lock lock{m_mutex};
-  m_manuallyPaused = false;
   m_paused = false;
 }
 
 void DataLog::Stop() {
   std::scoped_lock lock{m_mutex};
   m_active = false;
+}
+
+void DataLog::SetBlocked(bool blocked) {
+  std::scoped_lock lock{m_mutex};
+  m_blocked = blocked;
+}
+
+size_t DataLog::GetBufferFreeSpace() const {
+  std::scoped_lock lock{m_mutex};
+  if (!m_active || m_paused || m_bufferFull || m_blocked ||
+      m_outgoing.size() > MAX_BUFFER_COUNT) {
+    return 0;
+  }
+  size_t freeBuffers = MAX_BUFFER_COUNT - m_outgoing.size();
+  return freeBuffers * BLOCK_SIZE +
+         (m_outgoing.empty() ? 0 : m_outgoing.back().GetRemaining());
 }
 
 void DataLog::BufferHalfFull() {}
@@ -282,8 +297,8 @@ uint8_t* DataLog::Reserve(size_t size) {
     if (m_free.empty()) {
       if (m_outgoing.size() >= MAX_BUFFER_COUNT) {
         [[unlikely]]
-        if (!m_paused && BufferFull()) {
-          m_paused = true;
+        if (!m_bufferFull && BufferFull()) {
+          m_bufferFull = true;
         }
       }
       m_outgoing.emplace_back();
@@ -328,7 +343,7 @@ void DataLog::AppendRaw(int entry, std::span<const uint8_t> data,
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
+  if (m_paused || m_bufferFull || m_blocked) {
     [[unlikely]] return;
   }
   StartRecord(entry, timestamp, data.size(), 0);
@@ -342,7 +357,7 @@ void DataLog::AppendRaw2(int entry,
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
+  if (m_paused || m_bufferFull || m_blocked) {
     [[unlikely]] return;
   }
   size_t size = 0;
@@ -360,7 +375,7 @@ void DataLog::AppendBoolean(int entry, bool value, int64_t timestamp) {
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
+  if (m_paused || m_bufferFull || m_blocked) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 1, 1);
@@ -372,7 +387,7 @@ void DataLog::AppendInteger(int entry, int64_t value, int64_t timestamp) {
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
+  if (m_paused || m_bufferFull || m_blocked) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 8, 8);
@@ -384,7 +399,7 @@ void DataLog::AppendFloat(int entry, float value, int64_t timestamp) {
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
+  if (m_paused || m_bufferFull || m_blocked) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 4, 4);
@@ -400,7 +415,7 @@ void DataLog::AppendDouble(int entry, double value, int64_t timestamp) {
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
+  if (m_paused || m_bufferFull || m_blocked) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, 8, 8);
@@ -424,7 +439,7 @@ void DataLog::AppendBooleanArray(int entry, std::span<const bool> arr,
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
+  if (m_paused || m_bufferFull || m_blocked) {
     [[unlikely]] return;
   }
   StartRecord(entry, timestamp, arr.size(), 0);
@@ -448,7 +463,7 @@ void DataLog::AppendBooleanArray(int entry, std::span<const int> arr,
     return;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
+  if (m_paused || m_bufferFull || m_blocked) {
     [[unlikely]] return;
   }
   StartRecord(entry, timestamp, arr.size(), 0);
@@ -482,7 +497,7 @@ void DataLog::AppendIntegerArray(int entry, std::span<const int64_t> arr,
       return;
     }
     std::scoped_lock lock{m_mutex};
-    if (m_paused) {
+    if (m_paused || m_bufferFull || m_blocked) {
       [[unlikely]] return;
     }
     StartRecord(entry, timestamp, arr.size() * 8, 0);
@@ -514,7 +529,7 @@ void DataLog::AppendFloatArray(int entry, std::span<const float> arr,
       return;
     }
     std::scoped_lock lock{m_mutex};
-    if (m_paused) {
+    if (m_paused || m_bufferFull || m_blocked) {
       [[unlikely]] return;
     }
     StartRecord(entry, timestamp, arr.size() * 4, 0);
@@ -547,7 +562,7 @@ void DataLog::AppendDoubleArray(int entry, std::span<const double> arr,
       return;
     }
     std::scoped_lock lock{m_mutex};
-    if (m_paused) {
+    if (m_paused || m_bufferFull || m_blocked) {
       [[unlikely]] return;
     }
     StartRecord(entry, timestamp, arr.size() * 8, 0);
@@ -581,7 +596,7 @@ void DataLog::AppendStringArray(int entry, std::span<const std::string> arr,
     size += 4 + str.size();
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
+  if (m_paused || m_bufferFull || m_blocked) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
@@ -604,7 +619,7 @@ void DataLog::AppendStringArray(int entry,
     size += 4 + str.size();
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
+  if (m_paused || m_bufferFull || m_blocked) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
@@ -627,7 +642,7 @@ void DataLog::AppendStringArray(int entry,
     size += 4 + str.len;
   }
   std::scoped_lock lock{m_mutex};
-  if (m_paused) {
+  if (m_paused || m_bufferFull || m_blocked) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(entry, timestamp, size, 4);
@@ -758,6 +773,10 @@ void WPI_DataLog_Resume(struct WPI_DataLog* datalog) {
 
 void WPI_DataLog_Stop(struct WPI_DataLog* datalog) {
   reinterpret_cast<DataLog*>(datalog)->Stop();
+}
+
+size_t WPI_DataLog_GetBufferFreeSpace(struct WPI_DataLog* datalog) {
+  return reinterpret_cast<DataLog*>(datalog)->GetBufferFreeSpace();
 }
 
 int WPI_DataLog_Start(struct WPI_DataLog* datalog,

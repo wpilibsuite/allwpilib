@@ -432,7 +432,9 @@ void Downloader::ThreadMain() {
               continue;
             }
             lock.lock();
-          err: {}
+          err:
+            {
+            }
           }
           if (m_state == STATE_DOWNLOAD) {
             m_state = STATE_DOWNLOAD_DONE;

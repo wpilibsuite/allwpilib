@@ -10,7 +10,11 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.util.Nat;
 
-/** A detection of an AprilTag tag. */
+/**
+ * A detection of an AprilTag tag.
+ *
+ * <p>This class is provided by the AprilTag VendorDep
+ */
 public class AprilTagDetection {
   /**
    * Gets the decoded tag's family name.

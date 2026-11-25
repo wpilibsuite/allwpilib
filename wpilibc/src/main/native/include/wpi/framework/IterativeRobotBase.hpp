@@ -24,17 +24,13 @@ namespace wpi {
  * DriverStationConnected() -- provide for initialization the first time the DS
  * is connected
  *
- * Init() functions -- each of the following functions is called once when the
- * appropriate mode is entered:
+ * Start() functions -- each of the following functions is called once when the
+ * appropriate mode starts:
  *
- * \li DisabledInit() -- called each and every time disabled is entered from
- *   another mode
- * \li AutonomousInit() -- called each and every time autonomous is entered from
- *   another mode
- * \li TeleopInit() -- called each and every time teleop is entered from another
- *   mode
- * \li UtilityInit() -- called each and every time utility is entered from
- * another mode
+ * \li DisabledStart() -- called each and every time disabled mode starts
+ * \li AutonomousStart() -- called each and every time autonomous mode starts
+ * \li TeleopStart() -- called each and every time teleoperated mode starts
+ * \li UtilityStart() -- called each and every time utility mode starts
  *
  * Periodic() functions -- each of these functions is called on an interval:
  *
@@ -47,7 +43,7 @@ namespace wpi {
  * Order within one loop iteration:
  *
  * 1. DriverStationConnected(), once, the first time the DS is connected
- * 2. The exit function of the previous mode and the init function of the new
+ * 2. The end function of the previous mode and the start function of the new
  *    mode, only on a mode change
  * 3. The periodic function for the current mode (DisabledPeriodic(),
  *    AutonomousPeriodic(), TeleopPeriodic(), or UtilityPeriodic())
@@ -57,13 +53,13 @@ namespace wpi {
  * The mode-specific periodic function runs before RobotPeriodic(). Exactly one
  * mode-specific periodic function runs per iteration.
  *
- * Exit() functions -- each of the following functions is called once when the
- * appropriate mode is exited:
+ * End() functions -- each of the following functions is called once when the
+ * appropriate mode ends:
  *
- * \li DisabledExit() -- called each and every time disabled is exited
- * \li AutonomousExit() -- called each and every time autonomous is exited
- * \li TeleopExit() -- called each and every time teleop is exited
- * \li UtilityExit() -- called each and every time utility is exited
+ * \li DisabledEnd() -- called each and every time disabled mode ends
+ * \li AutonomousEnd() -- called each and every time autonomous mode ends
+ * \li TeleopEnd() -- called each and every time teleoperated mode ends
+ * \li UtilityEnd() -- called each and every time utility mode ends
  */
 class IterativeRobotBase : public RobotBase {
  public:
@@ -86,37 +82,36 @@ class IterativeRobotBase : public RobotBase {
   virtual void SimulationInit();
 
   /**
-   * Initialization code for disabled mode should go here.
+   * Start code for disabled mode should go here.
    *
-   * Users should override this method for initialization code which will be
-   * called each time
-   * the robot enters disabled mode.
+   * Users should override this method for code which will be called each time
+   * disabled mode starts.
    */
-  virtual void DisabledInit();
+  virtual void DisabledStart();
 
   /**
-   * Initialization code for autonomous mode should go here.
+   * Start code for autonomous mode should go here.
    *
-   * Users should override this method for initialization code which will be
-   * called each time the robot enters autonomous mode.
+   * Users should override this method for code which will be called each time
+   * autonomous mode starts.
    */
-  virtual void AutonomousInit();
+  virtual void AutonomousStart();
 
   /**
-   * Initialization code for teleop mode should go here.
+   * Start code for teleoperated mode should go here.
    *
-   * Users should override this method for initialization code which will be
-   * called each time the robot enters teleop mode.
+   * Users should override this method for code which will be called each time
+   * teleoperated mode starts.
    */
-  virtual void TeleopInit();
+  virtual void TeleopStart();
 
   /**
-   * Initialization code for utility mode should go here.
+   * Start code for utility mode should go here.
    *
-   * Users should override this method for initialization code which will be
-   * called each time the robot enters utility mode.
+   * Users should override this method for code which will be called each time
+   * utility mode starts.
    */
-  virtual void UtilityInit();
+  virtual void UtilityStart();
 
   /**
    * Periodic code for all modes should go here.
@@ -163,7 +158,7 @@ class IterativeRobotBase : public RobotBase {
   virtual void AutonomousPeriodic();
 
   /**
-   * Periodic code for teleop mode should go here.
+   * Periodic code for teleoperated mode should go here.
    *
    * Users should override this method for code which will be called each time a
    * new packet is received from the driver station and the robot is in teleop
@@ -185,36 +180,36 @@ class IterativeRobotBase : public RobotBase {
   virtual void UtilityPeriodic();
 
   /**
-   * Exit code for disabled mode should go here.
+   * End code for disabled mode should go here.
    *
    * Users should override this method for code which will be called each time
-   * the robot exits disabled mode.
+   * disabled mode ends.
    */
-  virtual void DisabledExit();
+  virtual void DisabledEnd();
 
   /**
-   * Exit code for autonomous mode should go here.
+   * End code for autonomous mode should go here.
    *
    * Users should override this method for code which will be called each time
-   * the robot exits autonomous mode.
+   * autonomous mode ends.
    */
-  virtual void AutonomousExit();
+  virtual void AutonomousEnd();
 
   /**
-   * Exit code for teleop mode should go here.
+   * End code for teleoperated mode should go here.
    *
    * Users should override this method for code which will be called each time
-   * the robot exits teleop mode.
+   * teleoperated mode ends.
    */
-  virtual void TeleopExit();
+  virtual void TeleopEnd();
 
   /**
-   * Exit code for utility mode should go here.
+   * End code for utility mode should go here.
    *
    * Users should override this method for code which will be called each time
-   * the robot exits utility mode.
+   * utility mode ends.
    */
-  virtual void UtilityExit();
+  virtual void UtilityEnd();
 
   /**
    * Gets time period between calls to Periodic() functions.

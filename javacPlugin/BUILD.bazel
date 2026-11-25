@@ -2,7 +2,10 @@ load("@rules_java//java:java_plugin.bzl", "java_plugin")
 
 filegroup(
     name = "resources-files",
-    srcs = glob(["src/main/resources/**"]),
+    srcs = [
+        "src/main/resources/META-INF/services/com.sun.source.util.Plugin",
+        "src/main/resources/META-INF/services/javax.annotation.processing.Processor",
+    ],
     visibility = ["//javacPlugin/src/main/java:__pkg__"],
 )
 

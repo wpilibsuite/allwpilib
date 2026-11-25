@@ -122,6 +122,10 @@ public class AntiTipping {
    *     threshold.
    */
   public ChassisVelocities calculate(Rotation3d attitude) {
+    if (attitude == null) {
+      return new ChassisVelocities(0.0, 0.0, 0.0);
+    }
+
     // To find the correction, we rotate the z axis (scaled by the P gain) by the attitude, then
     // project onto the x-y plane.
     var correction = new Translation3d(0.0, 0.0, m_kp).rotateBy(attitude).toTranslation2d();

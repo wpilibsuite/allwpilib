@@ -135,19 +135,35 @@ public abstract class RobotBase implements AutoCloseable {
       m_unit = initialValue.unit();
       m_baseUnit = m_unit.getBaseUnit();
       m_value = initialValue;
-      m_magnitudeTunable =
-          new TunableDouble(config, true) {
-            @Override
-            public void set(double value) {
-              m_value = m_unit.ofBaseUnits(value);
-              markChanged();
-            }
+      m_getter = () -> m_value;
+      m_setter = v -> m_value = v;
+      m_magnitudeTunable = createMagnitudeTunable(config);
+    }
 
-            @Override
-            public double get() {
-              return m_value.baseUnitMagnitude();
-            }
-          };
+    TunableMeasure(Supplier<Measure> getter, Consumer<Measure> setter, TunableConfig config) {
+      super(config);
+      m_unit = getter.get().unit();
+      m_baseUnit = m_unit.getBaseUnit();
+      m_getter = getter;
+      m_setter = setter;
+      m_magnitudeTunable = createMagnitudeTunable(config);
+    }
+
+    private TunableDouble createMagnitudeTunable(TunableConfig config) {
+      return new TunableDouble(config, true) {
+        @Override
+        public void set(double value) {
+          if (m_setter != null) {
+            m_setter.accept(m_unit.ofBaseUnits(value));
+          }
+          markChanged();
+        }
+
+        @Override
+        public double get() {
+          return m_getter.get().baseUnitMagnitude();
+        }
+      };
     }
 
     @Override
@@ -161,13 +177,14 @@ public abstract class RobotBase implements AutoCloseable {
 
     @Override
     public Measure get() {
-      return m_value;
+      return m_getter.get();
     }
 
     @Override
     public Measure mutate() {
-      m_magnitudeTunable.set(m_value.baseUnitMagnitude());
-      return m_value;
+      var currentValue = get();
+      m_magnitudeTunable.set(currentValue.baseUnitMagnitude());
+      return currentValue;
     }
 
     @Override
@@ -197,13 +214,23 @@ public abstract class RobotBase implements AutoCloseable {
 
     private final Unit m_unit;
     private final Unit m_baseUnit;
+    private final Supplier<Measure> m_getter;
+    private final Consumer<Measure> m_setter;
     private Measure m_value;
     private final TunableDouble m_magnitudeTunable;
   }
 
+  @SuppressWarnings("rawtypes")
+  private static TunableConfig tunableConfigWithUnit(TunableConfig config, Unit unit) {
+    if (config == null) {
+      config = new TunableConfig();
+    }
+    return config.withProperty("unit", UnitTelemetry.getUnitMetadata(unit.getBaseUnit()));
+  }
+
   /**
    * Constructor for a generic robot program. User code can be placed in the constructor that runs
-   * before the Autonomous or Operator Control period starts. The constructor will run to completion
+   * before the autonomous or teleoperated period starts. The constructor will run to completion
    * before Autonomous is entered.
    *
    * <p>This must be used to ensure that the communications code starts. In the future it would be
@@ -234,17 +261,23 @@ public abstract class RobotBase implements AutoCloseable {
     // set up tunables
     TunableRegistry.setReportWarning(m_tunableWarningReporter);
     TunableRegistry.registerBackend("", new NetworkTablesTunableBackend(inst, "/Tunables"));
-    TunableRegistry.registerTypeHandler(
-        Measure.class,
-        (initialValue, config) -> {
-          if (config == null) {
-            config = new TunableConfig();
+    @SuppressWarnings("rawtypes")
+    TunableRegistry.TypeHandler<Measure> measureHandler =
+        new TunableRegistry.TypeHandler<>() {
+          @Override
+          public Tunable<Measure> createTunable(Measure initialValue, TunableConfig config) {
+            return new TunableMeasure(
+                initialValue, tunableConfigWithUnit(config, initialValue.unit()));
           }
-          return new TunableMeasure(
-              initialValue,
-              config.withProperty(
-                  "unit", UnitTelemetry.getUnitMetadata(initialValue.unit().getBaseUnit())));
-        });
+
+          @Override
+          public Tunable<Measure> createTunable(
+              Supplier<Measure> getter, Consumer<Measure> setter, TunableConfig config) {
+            return new TunableMeasure(
+                getter, setter, tunableConfigWithUnit(config, getter.get().unit()));
+          }
+        };
+    TunableRegistry.registerTypeHandler(Measure.class, measureHandler);
 
     // wait for the NT server to actually start
     try {
@@ -387,8 +420,7 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Operator Control mode as determined by the Driver
-   * Station.
+   * Determine if the robot is currently in teleoperated mode as determined by the Driver Station.
    *
    * @return True if the robot is currently operating in Tele-Op mode.
    */
@@ -397,7 +429,7 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   /**
-   * Determine if the robot is currently in Operator Control mode and enabled as determined by the
+   * Determine if the robot is currently in teleoperated mode and enabled as determined by the
    * Driver Station.
    *
    * @return True if the robot is currently operating in Tele-Op mode while enabled.

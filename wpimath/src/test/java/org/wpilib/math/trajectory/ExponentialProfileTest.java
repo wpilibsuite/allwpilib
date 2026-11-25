@@ -41,8 +41,11 @@ class ExponentialProfileTest {
   }
 
   private static ExponentialProfile.State checkDynamics(
-      ExponentialProfile profile, ExponentialProfile.State current, ExponentialProfile.State goal) {
-    var next = profile.calculate(DT, current, goal);
+      ExponentialProfile.Constraints profileConstraints,
+      ExponentialProfile.State current,
+      ExponentialProfile.State goal) {
+    var sample = ExponentialProfile.generate(profileConstraints, current, goal).sampleAt(DT);
+    var next = new ExponentialProfile.State(sample.position, sample.velocity);
     var signal = feedforward.calculate(current.velocity, next.velocity);
 
     assertTrue(Math.abs(signal) < constraints.maxInput + 1e-9);
@@ -52,13 +55,13 @@ class ExponentialProfileTest {
 
   @Test
   void reachesGoal() {
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
 
     ExponentialProfile.State goal = new ExponentialProfile.State(10, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
     for (int i = 0; i < 450; ++i) {
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -67,19 +70,18 @@ class ExponentialProfileTest {
   // moving faster than the new max is handled correctly
   @Test
   void posContinuousUnderVelChange() {
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
 
     ExponentialProfile.State goal = new ExponentialProfile.State(10, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
     for (int i = 0; i < 300; ++i) {
       if (i == 150) {
-        profile =
-            new ExponentialProfile(
-                ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B));
+        profileConstraints =
+            ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B);
       }
 
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -88,19 +90,18 @@ class ExponentialProfileTest {
   // moving faster than the new max is handled correctly
   @Test
   void posContinuousUnderVelChangeBackward() {
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
 
     ExponentialProfile.State goal = new ExponentialProfile.State(-10, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
     for (int i = 0; i < 300; ++i) {
       if (i == 150) {
-        profile =
-            new ExponentialProfile(
-                ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B));
+        profileConstraints =
+            ExponentialProfile.Constraints.fromStateSpace(9, constraints.A, constraints.B);
       }
 
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -111,10 +112,10 @@ class ExponentialProfileTest {
     ExponentialProfile.State goal = new ExponentialProfile.State(-10, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
 
     for (int i = 0; i < 400; ++i) {
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -124,15 +125,15 @@ class ExponentialProfileTest {
     ExponentialProfile.State goal = new ExponentialProfile.State(-10, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
     for (int i = 0; i < 50; ++i) {
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
     }
     assertNotEquals(state, goal);
 
     goal = new ExponentialProfile.State(0.0, 0.0);
     for (int i = 0; i < 100; ++i) {
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
     }
     assertEquals(state, goal);
   }
@@ -143,10 +144,10 @@ class ExponentialProfileTest {
     ExponentialProfile.State goal = new ExponentialProfile.State(40, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
     double maxVelocity = 0;
     for (int i = 0; i < 900; ++i) {
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
       maxVelocity = Math.max(maxVelocity, state.velocity);
     }
 
@@ -159,10 +160,10 @@ class ExponentialProfileTest {
     ExponentialProfile.State goal = new ExponentialProfile.State(-40, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
     double maxVelocity = 0;
     for (int i = 0; i < 900; ++i) {
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
       maxVelocity = Math.min(maxVelocity, state.velocity);
     }
 
@@ -175,9 +176,9 @@ class ExponentialProfileTest {
     ExponentialProfile.State goal = new ExponentialProfile.State(40, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 8);
 
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
     for (int i = 0; i < 900; ++i) {
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
     }
 
     assertEquals(state, goal);
@@ -188,12 +189,68 @@ class ExponentialProfileTest {
     ExponentialProfile.State goal = new ExponentialProfile.State(-40, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, -8);
 
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
     for (int i = 0; i < 900; ++i) {
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
     }
 
     assertEquals(state, goal);
+  }
+
+  @Test
+  void samplesArePhaseTransitions() {
+    var current = new ExponentialProfile.State(0, 0);
+    var goal = new ExponentialProfile.State(2, 0);
+    var profile = ExponentialProfile.generate(constraints, current, goal);
+
+    var samples = profile.getSamples();
+    assertEquals(3, samples.size());
+
+    // The profile applies max input until the inflection point, then max input in the opposite
+    // direction until the goal
+    var start = samples.get(0);
+    assertEquals(0.0, start.time);
+    assertEquals(current.position, start.position);
+    assertEquals(current.velocity, start.velocity);
+    assertEquals(constraints.maxInput, start.input);
+    assertNear(start.acceleration, constraints.B * constraints.maxInput, 1e-12);
+
+    var inflection = samples.get(1);
+    assertTrue(0.0 < inflection.time && inflection.time < profile.duration());
+    assertEquals(-constraints.maxInput, inflection.input);
+
+    var end = samples.get(2);
+    assertEquals(new ExponentialProfileSample(profile.duration(), 2, 0, 0, 0), end);
+
+    // Each segment is continuous with the samples at its boundaries
+    double eps = 1e-9;
+    var beforeInflection = profile.sampleAt(inflection.time - eps);
+    assertNear(beforeInflection.position, inflection.position, 1e-6);
+    assertNear(beforeInflection.velocity, inflection.velocity, 1e-6);
+    var beforeEnd = profile.sampleAt(profile.duration() - eps);
+    assertNear(beforeEnd.position, end.position, 1e-6);
+    assertNear(beforeEnd.velocity, end.velocity, 1e-6);
+
+    // Interpolated samples obey the system dynamics with the segment's input
+    for (double t = 0.0; t < profile.duration(); t += 0.05) {
+      var sample = profile.sampleAt(t);
+      double u = t < inflection.time ? constraints.maxInput : -constraints.maxInput;
+      assertEquals(u, sample.input);
+      assertNear(sample.acceleration, constraints.A * sample.velocity + constraints.B * u, 1e-9);
+    }
+  }
+
+  @Test
+  void currentEqualsGoal() {
+    var state = new ExponentialProfile.State(1, 2);
+    var profile = ExponentialProfile.generate(constraints, state, state);
+
+    assertEquals(0.0, profile.duration());
+
+    var sample = profile.sampleAt(DT);
+    assertEquals(state, new ExponentialProfile.State(sample.position, sample.velocity));
+    assertEquals(0.0, sample.acceleration);
+    assertNear(sample.input, -constraints.A * state.velocity / constraints.B, 1e-12);
   }
 
   @SuppressWarnings("PMD.TestClassWithoutTestCases")
@@ -297,10 +354,12 @@ class ExponentialProfileTest {
                 new ExponentialProfile.State(-1, 0),
                 new ExponentialProfile.State(-0.785, -4.346)));
 
-    var profile = new ExponentialProfile(constraints);
-
     for (var testCase : testCases) {
-      var state = profile.calculateInflectionPoint(testCase.initial, testCase.goal);
+      var sample =
+          ExponentialProfile.generate(constraints, testCase.initial, testCase.goal)
+              .getSamples()
+              .get(1);
+      var state = new ExponentialProfile.State(sample.position, sample.velocity);
       assertNear(testCase.inflectionPoint, state, 1e-3);
     }
   }
@@ -310,24 +369,25 @@ class ExponentialProfileTest {
     ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
     for (int i = 0; i < 400; i++) {
-      state = checkDynamics(profile, state, goal);
-      assertNear(profile.timeLeftUntil(state, state), 0, 2e-2);
+      state = checkDynamics(profileConstraints, state, goal);
+      assertNear(ExponentialProfile.generate(profileConstraints, state, state).duration(), 0, 2e-2);
     }
   }
 
   @Test
   void timingToGoal() {
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
 
     ExponentialProfile.State goal = new ExponentialProfile.State(2, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
-    double predictedTimeLeft = profile.timeLeftUntil(state, goal);
+    double predictedTimeLeft =
+        ExponentialProfile.generate(profileConstraints, state, goal).duration();
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
 
       if (!reachedGoal && state.equals(goal)) {
         // Expected value using for loop index is just an approximation since
@@ -341,15 +401,16 @@ class ExponentialProfileTest {
 
   @Test
   void timingToNegativeGoal() {
-    ExponentialProfile profile = new ExponentialProfile(constraints);
+    ExponentialProfile.Constraints profileConstraints = constraints;
 
     ExponentialProfile.State goal = new ExponentialProfile.State(-2, 0);
     ExponentialProfile.State state = new ExponentialProfile.State(0, 0);
 
-    double predictedTimeLeft = profile.timeLeftUntil(state, goal);
+    double predictedTimeLeft =
+        ExponentialProfile.generate(profileConstraints, state, goal).duration();
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      state = checkDynamics(profile, state, goal);
+      state = checkDynamics(profileConstraints, state, goal);
 
       if (!reachedGoal && state.equals(goal)) {
         // Expected value using for loop index is just an approximation since

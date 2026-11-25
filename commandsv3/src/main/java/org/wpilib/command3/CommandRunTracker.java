@@ -27,6 +27,8 @@ import org.wpilib.command3.Scheduler.ScheduleResult;
  * {@code i} represents {@code m_commands[i]}. For {@code N > 64} commands, tracking uses an array
  * of 64-bit {@code long} words where bit {@code (i & 63)} of word {@code (i >>> 6)} represents
  * {@code m_commands[i]}.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 abstract sealed class CommandRunTracker {
   protected final Scheduler m_scheduler;

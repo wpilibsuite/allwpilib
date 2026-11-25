@@ -10,7 +10,11 @@ import org.wpilib.command3.Trigger;
 import org.wpilib.driverstation.GenericHID;
 import org.wpilib.driverstation.HIDDevice;
 
-/** A {@link Trigger} that gets its state from a {@link GenericHID}. */
+/**
+ * A {@link Trigger} that gets its state from a {@link GenericHID}.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
+ */
 public class JoystickButton extends Trigger {
   /**
    * Creates a joystick button for triggering commands.

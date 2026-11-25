@@ -12,6 +12,7 @@
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/math/trajectory/TrapezoidProfileSample.hpp"
 #include "wpi/system/Timer.hpp"
 #include "wpi/units/length.hpp"
 
@@ -27,18 +28,18 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
   // Subsystem methods go here.
 
   /**
-   * Attempts to follow the given drive states using offboard PID.
+   * Attempts to follow the given drive samples using offboard PID.
    *
-   * @param currentLeft The current left wheel state.
-   * @param currentRight The current right wheel state.
-   * @param nextLeft The next left wheel state.
-   * @param nextRight The next right wheel state.
+   * @param currentLeft The current left wheel sample.
+   * @param currentRight The current right wheel sample.
+   * @param nextLeft The next left wheel sample.
+   * @param nextRight The next right wheel sample.
    */
   void SetDriveStates(
-      wpi::math::TrapezoidProfile<wpi::units::meters>::State currentLeft,
-      wpi::math::TrapezoidProfile<wpi::units::meters>::State currentRight,
-      wpi::math::TrapezoidProfile<wpi::units::meters>::State nextLeft,
-      wpi::math::TrapezoidProfile<wpi::units::meters>::State nextRight);
+      const wpi::math::TrapezoidProfileSample<wpi::units::meters>& currentLeft,
+      const wpi::math::TrapezoidProfileSample<wpi::units::meters>& currentRight,
+      const wpi::math::TrapezoidProfileSample<wpi::units::meters>& nextLeft,
+      const wpi::math::TrapezoidProfileSample<wpi::units::meters>& nextRight);
 
   /**
    * Drives the robot using arcade controls.
@@ -95,8 +96,14 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
       wpi::units::meter_t distance);
 
  private:
-  wpi::math::TrapezoidProfile<wpi::units::meters> profile{
-      {DriveConstants::MAX_VELOCITY, DriveConstants::MAX_ACCELERATION}};
+  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
+      DriveConstants::MAX_VELOCITY, DriveConstants::MAX_ACCELERATION};
+  wpi::math::TrapezoidProfile<wpi::units::meters> leftProfile =
+      wpi::math::TrapezoidProfile<wpi::units::meters>::Generate(constraints, {},
+                                                                {});
+  wpi::math::TrapezoidProfile<wpi::units::meters> rightProfile =
+      wpi::math::TrapezoidProfile<wpi::units::meters>::Generate(constraints, {},
+                                                                {});
   wpi::Timer timer;
   wpi::units::meter_t initialLeftDistance;
   wpi::units::meter_t initialRightDistance;

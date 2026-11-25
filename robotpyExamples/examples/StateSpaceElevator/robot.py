@@ -39,13 +39,10 @@ class MyRobot(wpilib.TimedRobot):
     def __init__(self) -> None:
         super().__init__()
 
-        self.profile = wpimath.TrapezoidProfile(
-            wpimath.TrapezoidProfile.Constraints(
-                wpimath.units.feet_to_meters(3.0),
-                wpimath.units.feet_to_meters(
-                    6.0
-                ),  # Max elevator velocity and acceleration.
-            )
+        # Max elevator velocity and acceleration.
+        self.constraints = wpimath.TrapezoidProfile.Constraints(
+            wpimath.units.feet_to_meters(3.0),
+            wpimath.units.feet_to_meters(6.0),
         )
 
         self.last_profiled_reference = wpimath.TrapezoidProfile.State()
@@ -114,7 +111,7 @@ class MyRobot(wpilib.TimedRobot):
         self.encoder.set_distance_per_pulse(math.tau * DRUM_RADIUS / 4096)
 
     @override
-    def teleop_init(self) -> None:
+    def teleop_start(self) -> None:
         # Reset our loop to make sure it's in a known state.
         self.loop.reset([self.encoder.get_distance(), self.encoder.get_rate()])
 
@@ -137,8 +134,11 @@ class MyRobot(wpilib.TimedRobot):
             goal = wpimath.TrapezoidProfile.State(LOW_GOAL_POSITION, 0.0)
 
         # Step our TrapezoidalProfile forward 20ms and set it as our next reference
-        self.last_profiled_reference = self.profile.calculate(
-            0.020, self.last_profiled_reference, goal
+        sample = wpimath.TrapezoidProfile.generate(
+            self.constraints, self.last_profiled_reference, goal
+        ).sample_at(0.020)
+        self.last_profiled_reference = wpimath.TrapezoidProfile.State(
+            sample.position, sample.velocity
         )
         self.loop.set_next_r(
             [

@@ -229,9 +229,9 @@ enum NetworkTablesFlags_ {
   NetworkTablesFlags_ShowServerTimestamp = 1 << 6,
   NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 7,
   NetworkTablesFlags_Precision = 0xff
-                                 << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT,
+      << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT,
   NetworkTablesFlags_Default = NetworkTablesFlags_TreeView |
-                               (6 << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT),
+      (6 << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT),
 };
 
 void DisplayNetworkTablesInfo(NetworkTablesModel* model);

@@ -11,7 +11,11 @@ import org.wpilib.command3.proto.ProtobufCommands.ProtobufCommand;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors;
 
-/** Protobuf serde for running commands. */
+/**
+ * Protobuf serde for running commands.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
+ */
 public class CommandProto implements Protobuf<Command, ProtobufCommand> {
   private final Scheduler m_scheduler;
 

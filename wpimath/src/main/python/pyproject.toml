@@ -1597,11 +1597,13 @@ DrivetrainSplineTrajectory = "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp
 DrivetrainSplineTrajectoryGenerator = "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
 DrivetrainSplineTrajectoryParameterizer = "wpi/math/trajectory/DrivetrainSplineTrajectoryParameterizer.hpp"
 ExponentialProfile = "wpi/math/trajectory/ExponentialProfile.hpp"
+ExponentialProfileSample = "wpi/math/trajectory/ExponentialProfileSample.hpp"
 HolonomicSample = "wpi/math/trajectory/HolonomicSample.hpp"
 HolonomicTrajectory = "wpi/math/trajectory/HolonomicTrajectory.hpp"
 Trajectory = "wpi/math/trajectory/Trajectory.hpp"
 TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
 TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
+TrapezoidProfileSample = "wpi/math/trajectory/TrapezoidProfileSample.hpp"
 
 # wpi/math/trajectory/constraint
 CentripetalAccelerationConstraint = "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp"

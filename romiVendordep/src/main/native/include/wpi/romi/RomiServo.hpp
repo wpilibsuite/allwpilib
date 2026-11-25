@@ -18,6 +18,8 @@ namespace wpi::romi {
  * RomiServo.
  *
  * <p>A SimDevice based servo
+ *
+ * This class is provided by the Romi VendorDep
  */
 class RomiServo {
  public:

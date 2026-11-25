@@ -15,6 +15,8 @@ import us.hebi.quickbuf.Descriptors;
  * serialized message will include information about commands that are currently running or
  * scheduled (but not yet started), as well as how long the most recent call to {@link
  * Scheduler#run()} took to execute.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 public class SchedulerProto implements Protobuf<Scheduler, ProtobufScheduler> {
   @Override

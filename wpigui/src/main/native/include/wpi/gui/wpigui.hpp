@@ -234,6 +234,10 @@ void SetStyle(Style style);
 /**
  * Sets the FPS limit.  Using this function makes this setting persistent.
  *
+ * With mailbox presentation, vsync uses software pacing 5% above the display's
+ * refresh rate to allow for timer jitter, or 60 FPS if the refresh rate is
+ * unavailable.
+ *
  * @param fps FPS (0=vsync)
  */
 void SetFPS(int fps);
@@ -262,8 +266,8 @@ void ConfigurePlatformSaveFile(const std::string& name);
 void EmitViewMenu();
 
 /**
- * Emits renderer information, including the SDL renderer backend when using
- * the 2D renderer.
+ * Emits renderer information, including the SDL renderer backend and the
+ * selected presentation mode when using the GPU renderer.
  */
 void EmitRendererInfo();
 

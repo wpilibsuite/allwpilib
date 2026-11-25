@@ -17,6 +17,8 @@ namespace wpi::cmd {
  * A version of {@link wpi::GenericHID} with {@link Trigger} factories for
  * command-based.
  *
+ * This class is provided by the Commands v2 VendorDep
+ *
  * @see GenericHID
  */
 class CommandGenericHID final {

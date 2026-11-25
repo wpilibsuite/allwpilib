@@ -200,16 +200,16 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
-   * Returns a gearbox of NEO brushless motors.
+   * Returns a gearbox of Neo brushless motors.
    */
-  static constexpr DCMotor NEO(int numMotors = 1) {
+  static constexpr DCMotor Neo(int numMotors = 1) {
     return DCMotor(12_V, 2.6_Nm, 105_A, 1.8_A, 5676_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of NEO 550 brushless motors.
+   * Returns a gearbox of Neo 550 brushless motors.
    */
-  static constexpr DCMotor NEO550(int numMotors = 1) {
+  static constexpr DCMotor Neo550(int numMotors = 1) {
     return DCMotor(12_V, 0.97_Nm, 100_A, 1.4_A, 11000_rpm, numMotors);
   }
 
@@ -285,6 +285,14 @@ class WPILIB_DLLEXPORT DCMotor {
   static constexpr DCMotor NeoVortex(int numMotors = 1) {
     // From https://www.revrobotics.com/next-generation-spark-neo/
     return DCMotor(12_V, 3.60_Nm, 211_A, 3.615_A, 6784_rpm, numMotors);
+  }
+
+  /**
+   * Return a gearbox of Neo 2.0 brushless motors.
+   */
+  static constexpr DCMotor Neo2(int numMotors = 1) {
+    // From https://docs.revrobotics.com/brushless/neo/2.0
+    return DCMotor(12_V, 3.75_Nm, 150_A, 1.8_A, 5676_rpm, numMotors);
   }
 };
 

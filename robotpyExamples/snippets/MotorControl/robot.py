@@ -16,7 +16,7 @@ import math
 
 class MyRobot(wpilib.TimedRobot):
     """
-    This sample program shows how to control a motor using a joystick. In the operator control part
+    This sample program shows how to control a motor using a joystick. In the teleoperated part
     of the program, the joystick is read and the value is written to the motor.
 
     Joystick analog values range from -1 to 1 and motor controller inputs also range from -1 to 1

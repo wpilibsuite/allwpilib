@@ -3,34 +3,18 @@ extra_includes:
 
 classes:
   wpi::math::TrapezoidProfile:
+    force_no_trampoline: true
     force_type_casters:
     - wpi::units::second_t
     - wpi::units::radians_per_second
     - wpi::units::radians_per_second_squared
+    # The scalar instantiation uses the units_per_second[_squared] casters.
+    - wpi::units::compound_unit
     template_params:
     - Distance
-    doc_code_blocks:
-    - |
-      constraints = TrapezoidProfile.Constraints(MAX_V, MAX_A)
-      previous_profiled_reference = TrapezoidProfile.State(initial_reference, 0.0)
-      profile = TrapezoidProfile(constraints)
-    - |
-      previous_profiled_reference = profile.calculate(
-          time_since_previous_update, previous_profiled_reference, unprofiled_reference
-      )
     methods:
-      TrapezoidProfile:
-        param_override:
-          constraints:
-            x_type: typename TrapezoidProfile<Distance>::Constraints
-          goal:
-            x_type: typename TrapezoidProfile<Distance>::State
-          initial:
-            x_type: typename TrapezoidProfile<Distance>::State
-      Calculate:
-      TimeLeftUntil:
-      Duration:
-      IsFinished:
+      Interpolate:
+      Generate:
     template_inline_code: |
       {
       std::string clsNameCopy = clsName;
@@ -50,32 +34,6 @@ classes:
             self.velocity());
         });
       }
-  wpi::math::detail::TrapezoidProfileConstraints:
-    template_params:
-    - Distance
-    attributes:
-      maxVelocity:
-      maxAcceleration:
-    methods:
-      TrapezoidProfileConstraints:
-        overloads:
-          '':
-          Velocity_t, Acceleration_t:
-            param_override:
-              maxVelocity:
-                default: '0'
-              maxAcceleration:
-                default: '0'
-    template_inline_code: |
-      std::string clsNameCopy = clsName;
-
-      cls_TrapezoidProfileConstraints
-        .def("__repr__", [clsNameCopy](const wpi::math::detail::TrapezoidProfileConstraints<Distance>& self) {
-          return std::format("{}(max_velocity={}, max_acceleration={})",
-            clsNameCopy,
-            self.maxVelocity(),
-            self.maxAcceleration());
-        });
   wpi::math::TrapezoidProfile::State:
     force_no_default_constructor: true
     attributes:
@@ -84,22 +42,34 @@ classes:
     methods:
       operator==:
         cpp_code: py::self == State()
-  wpi::math::TrapezoidProfile::ProfileTiming:
+  wpi::math::TrapezoidProfileConstraints:
+    force_no_trampoline: true
+    template_params:
+    - Distance
     attributes:
-      t_1:
-      t_2:
-      t_3:
+      maxVelocity:
+      maxAcceleration:
     methods:
-      operator==:
+      TrapezoidProfileConstraints:
+    template_inline_code: |
+      std::string clsNameCopy = clsName;
+
+      cls_TrapezoidProfileConstraints
+        .def("__repr__", [clsNameCopy](const wpi::math::TrapezoidProfileConstraints<Distance>& self) {
+          return std::format("{}(max_velocity={}, max_acceleration={})",
+            clsNameCopy,
+            self.maxVelocity(),
+            self.maxAcceleration());
+        });
 
 templates:
   TrapezoidProfileConstraints:
-    qualname: wpi::math::detail::TrapezoidProfileConstraints
+    qualname: wpi::math::TrapezoidProfileConstraints
     params:
     - wpi::units::dimensionless::scalar
 
   TrapezoidProfileRadiansConstraints:
-    qualname: wpi::math::detail::TrapezoidProfileConstraints
+    qualname: wpi::math::TrapezoidProfileConstraints
     params:
     - wpi::units::radian
 

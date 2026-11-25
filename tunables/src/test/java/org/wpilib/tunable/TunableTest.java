@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,6 +74,14 @@ class TunableTest {
     CustomThingTunable(CustomThing initialValue, TunableConfig config) {
       super(config);
       m_innerTunable = TunableInt.createConfig(initialValue.value(), config);
+    }
+
+    CustomThingTunable(
+        Supplier<CustomThing> getter, Consumer<CustomThing> setter, TunableConfig config) {
+      super(config);
+      m_innerTunable =
+          TunableInt.createConfig(
+              () -> getter.get().value(), value -> setter.accept(new CustomThing(value)), config);
     }
 
     @Override
@@ -1546,6 +1556,79 @@ class TunableTest {
     assertTrue(warnings.stream().allMatch(warning -> warning.contains("Unsupported tunable type")));
     assertTrue(
         warnings.stream().allMatch(warning -> warning.contains(CustomThing.class.getName())));
+  }
+
+  @Test
+  void testCustomGetterSetterTunable() {
+    List<String> warnings = new ArrayList<>();
+    TunableRegistry.setReportWarning(warnings::add);
+    TunableRegistry.registerTypeHandler(
+        CustomThing.class,
+        new TunableRegistry.TypeHandler<>() {
+          @Override
+          public Tunable<CustomThing> createTunable(
+              CustomThing initialValue, TunableConfig config) {
+            return new CustomThingTunable(initialValue, config);
+          }
+
+          @Override
+          public Tunable<CustomThing> createTunable(
+              Supplier<CustomThing> getter, Consumer<CustomThing> setter, TunableConfig config) {
+            return new CustomThingTunable(getter, setter, config);
+          }
+        });
+    AtomicReference<CustomThing> value = new AtomicReference<>(new CustomThing(1));
+    AtomicInteger calls = new AtomicInteger();
+    Tunable<CustomThing> tunable =
+        Tunables.publishValue(
+            "customGetterSetter",
+            value::get,
+            value::set,
+            CustomThing.class,
+            new TunableConfig().withProperty("max", "10").withOnTune(calls::incrementAndGet));
+
+    assertEquals(1, m_mock.getInteger("/customGetterSetter"));
+    assertEquals(TunableConfig.Polling.ALWAYS_GET, tunable.getConfig().getPolling());
+    assertEquals("{\"max\":10}", tunable.getProperties());
+
+    value.set(new CustomThing(2));
+    TunableRegistry.update();
+    assertEquals(new CustomThing(2), tunable.get());
+    assertEquals(2, m_mock.getInteger("/customGetterSetter"));
+
+    tunable.set(new CustomThing(3));
+    assertEquals(new CustomThing(3), value.get());
+    assertEquals(0, calls.get());
+
+    m_mock.setInt("/customGetterSetter", 4);
+    TunableRegistry.update();
+    assertEquals(new CustomThing(4), value.get());
+    assertEquals(new CustomThing(4), tunable.get());
+    assertEquals(1, calls.get());
+    assertEquals(1, TunableRegistry.getTuneRevision(tunable));
+    assertTrue(warnings.isEmpty());
+  }
+
+  @Test
+  void testCustomHandlerWithoutGetterSetterSupportFallsBack() {
+    List<String> warnings = new ArrayList<>();
+    TunableRegistry.setReportWarning(warnings::add);
+    TunableRegistry.registerTypeHandler(CustomThing.class, CustomThingTunable::new);
+    AtomicReference<CustomThing> value = new AtomicReference<>(new CustomThing(1));
+
+    Tunable<CustomThing> tunable = Tunable.create(value::get, value::set, CustomThing.class);
+
+    assertEquals(new CustomThing(1), tunable.get());
+    value.set(new CustomThing(2));
+    assertEquals(new CustomThing(2), tunable.get());
+    tunable.set(new CustomThing(3));
+    assertEquals(new CustomThing(3), value.get());
+    assertTrue(
+        warnings.stream()
+            .anyMatch(
+                warning ->
+                    warning.contains(CustomThing.class.getName())
+                        && warning.contains("does not support getter/setter tunables")));
   }
 
   @Test

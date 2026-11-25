@@ -4,6 +4,8 @@
 
 package org.wpilib.math.controller;
 
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.wpilib.math.linalg.Matrix;
@@ -64,6 +66,9 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
       Nat<Inputs> inputs,
       BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
       double dt) {
+    requireNonNullParam(states, "states", "ControlAffinePlantInversionFeedforward");
+    requireNonNullParam(inputs, "inputs", "ControlAffinePlantInversionFeedforward");
+    requireNonNullParam(f, "f", "ControlAffinePlantInversionFeedforward");
     this.m_dt = dt;
     this.m_f = f;
     this.m_states = states;
@@ -94,6 +99,10 @@ public class ControlAffinePlantInversionFeedforward<States extends Num, Inputs e
       Function<Matrix<States, N1>, Matrix<States, N1>> f,
       Matrix<States, Inputs> B,
       double dt) {
+    requireNonNullParam(states, "states", "ControlAffinePlantInversionFeedforward");
+    requireNonNullParam(inputs, "inputs", "ControlAffinePlantInversionFeedforward");
+    requireNonNullParam(f, "f", "ControlAffinePlantInversionFeedforward");
+    requireNonNullParam(B, "B", "ControlAffinePlantInversionFeedforward");
     this.m_dt = dt;
     this.m_states = states;
     this.m_inputs = inputs;

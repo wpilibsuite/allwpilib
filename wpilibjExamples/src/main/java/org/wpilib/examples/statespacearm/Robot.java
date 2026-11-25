@@ -41,10 +41,9 @@ public class Robot extends TimedRobot {
   // the motors, this number should be greater than one.
   private static final double ARM_GEARING = 10.0;
 
-  private final TrapezoidProfile profile =
-      new TrapezoidProfile(
-          new TrapezoidProfile.Constraints(
-              degreesToRadians(45), degreesToRadians(90))); // Max arm velocity and acceleration.
+  private final TrapezoidProfile.Constraints constraints =
+      new TrapezoidProfile.Constraints(
+          degreesToRadians(45), degreesToRadians(90)); // Max arm velocity and acceleration.
   private TrapezoidProfile.State lastProfiledReference = new TrapezoidProfile.State();
 
   // The plant holds a state-space model of our arm. This system has the following properties:
@@ -53,7 +52,7 @@ public class Robot extends TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   private final LinearSystem<N2, N1, N2> armPlant =
-      Models.angularPositionFromPhysicalConstants(DCMotor.getNEO(2), ARM_MOI, ARM_GEARING);
+      Models.angularPositionFromPhysicalConstants(DCMotor.getNeo(2), ARM_MOI, ARM_GEARING);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")
@@ -107,7 +106,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {
+  public void teleopStart() {
     // Reset our loop to make sure it's in a known state.
     loop.reset(VecBuilder.fill(encoder.getDistance(), encoder.getRate()));
 
@@ -128,7 +127,9 @@ public class Robot extends TimedRobot {
       goal = new TrapezoidProfile.State(LOWERED_POSITION, 0.0);
     }
     // Step our TrapezoidalProfile forward 20ms and set it as our next reference
-    lastProfiledReference = profile.calculate(0.020, lastProfiledReference, goal);
+    var sample =
+        TrapezoidProfile.generate(constraints, lastProfiledReference, goal).sampleAt(0.020);
+    lastProfiledReference = new TrapezoidProfile.State(sample.position, sample.velocity);
     loop.setNextR(lastProfiledReference.position, lastProfiledReference.velocity);
     // Correct our Kalman filter's state vector estimate with encoder data.
     loop.correct(VecBuilder.fill(encoder.getDistance()));

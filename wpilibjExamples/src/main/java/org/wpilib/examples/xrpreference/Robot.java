@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
+   * that you want ran during disabled, autonomous, teleoperated and utility.
    *
    * <p>This runs after the mode specific periodic functions, but before LiveWindow and
    * SmartDashboard integrated updating.
@@ -44,16 +44,16 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
   }
 
-  /** This function is called once each time the robot enters Disabled mode. */
+  /** This function is called each time Disabled mode starts. */
   @Override
-  public void disabledInit() {}
+  public void disabledStart() {}
 
   @Override
   public void disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {
+  public void autonomousStart() {
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {
+  public void autonomousEnd() {
     // This makes sure that the autonomous stops running when
     // autonomous mode ends. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -77,16 +77,16 @@ public class Robot extends TimedRobot {
     }
   }
 
-  /** This function is called once each time the robot enters operator control. */
+  /** This function is called each time teleoperated mode starts. */
   @Override
-  public void teleopInit() {}
+  public void teleopStart() {}
 
-  /** This function is called periodically during operator control. */
+  /** This function is called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {}
 
   @Override
-  public void utilityInit() {
+  public void utilityStart() {
     // Cancels all running commands at the start of utility mode.
     CommandScheduler.getInstance().cancelAll();
   }

@@ -30,8 +30,8 @@ class MyRobot(wpilib.TimedRobot):
         self.right_drive.set_inverted(True)
 
     @override
-    def autonomous_init(self):
-        """This function is run once each time the robot enters autonomous mode."""
+    def autonomous_start(self):
+        """This function is called each time autonomous mode starts."""
         self.timer.restart()
 
     @override
@@ -46,8 +46,8 @@ class MyRobot(wpilib.TimedRobot):
             self.robot_drive.arcade_drive(0, 0)  # Stop robot
 
     @override
-    def teleop_init(self):
-        """This function is called once each time the robot enters teleoperated mode."""
+    def teleop_start(self):
+        """This function is called each time teleoperated mode starts."""
 
     @override
     def teleop_periodic(self):
@@ -57,8 +57,8 @@ class MyRobot(wpilib.TimedRobot):
         )
 
     @override
-    def utility_init(self):
-        """This function is called once each time the robot enters utility mode."""
+    def utility_start(self):
+        """This function is called once each time utility mode starts."""
 
     @override
     def utility_periodic(self):

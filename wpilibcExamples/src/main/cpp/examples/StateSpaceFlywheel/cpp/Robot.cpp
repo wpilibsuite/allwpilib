@@ -41,7 +41,7 @@ class Robot : public wpi::TimedRobot {
   // Outputs (what we can measure): [velocity], in radians per second.
   wpi::math::LinearSystem<1, 1, 1> flywheelPlant =
       wpi::math::Models::AngularVelocityFromPhysicalConstants(
-          wpi::math::DCMotor::NEO(2), FLYWHEEL_MOMENT_OF_INERTIA,
+          wpi::math::DCMotor::Neo(2), FLYWHEEL_MOMENT_OF_INERTIA,
           FLYWHEEL_GEARING);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
@@ -84,7 +84,7 @@ class Robot : public wpi::TimedRobot {
     encoder.SetDistancePerPulse(2.0 * std::numbers::pi / 4096.0);
   }
 
-  void TeleopInit() override {
+  void TeleopStart() override {
     loop.Reset(wpi::math::Vectord<1>{encoder.GetRate()});
   }
 
