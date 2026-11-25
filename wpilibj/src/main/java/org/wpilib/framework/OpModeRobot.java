@@ -71,13 +71,13 @@ import org.wpilib.util.UsageReporting;
  *   <li>{@link #nonePeriodic()}, only when no opmode is selected
  *   <li>{@link #enabledPeriodic()}, only while enabled with an opmode selected
  *   <li>{@link #robotPeriodic()}
+ *   <li>{@link PeriodicOpMode#periodic()} of the active opmode, only while enabled
+ *   <li>{@link #robotPostPeriodic()}
  *   <li>{@link #simulationPeriodic()}, only in simulation
  * </ol>
  *
- * <p>Then, while enabled, {@link PeriodicOpMode#periodic()} runs. Both are scheduled on the same
- * period, and the loop function was registered first, so {@link #robotPeriodic()} and {@link
- * #simulationPeriodic()} always run before {@link PeriodicOpMode#periodic()} in a given period.
- * Additional callbacks from {@link #addPeriodic} or the opmode run on their own schedules.
+ * <p>The robot and active opmode periodic functions run directly in the same loop. Additional
+ * callbacks from {@link #addPeriodic} or the opmode run on their own schedules.
  *
  * <p>One exception to the list above: if an opmode is selected while the robot is already enabled,
  * its {@code disabledPeriodic()} is called once, right after construction and before {@code
@@ -104,7 +104,7 @@ public abstract class OpModeRobot extends RobotBase {
   private RobotMode m_lastMode;
   private OpMode m_currentOpMode;
   private String m_currentOpModeName;
-  private Callback m_currentOpModePeriodic;
+  private boolean m_currentOpModeStarted;
   private final Set<Callback> m_activeOpModeCallbacks = new HashSet<>();
   private final Watchdog m_watchdog;
   private final Alert m_loopOverrunAlert;
@@ -637,10 +637,22 @@ public abstract class OpModeRobot extends RobotBase {
    * Function called periodically every loop, regardless of enabled state or OpMode selection.
    *
    * <p>Runs after {@link #disabledPeriodic()}, the opmode's {@code disabledPeriodic()}, {@link
-   * #nonePeriodic()}, and {@link #enabledPeriodic()}, and before {@link #simulationPeriodic()}.
-   * When an opmode is enabled, this runs before its {@code periodic()} in the same period.
+   * #nonePeriodic()}, and {@link #enabledPeriodic()}. Runs immediately before the enabled
+   * opmode's {@code periodic()}, followed by {@link #robotPostPeriodic()}.
    */
   public void robotPeriodic() {}
+
+  /**
+   * Function called every loop regardless of enabled state or opmode selection, after {@link
+   * #robotPeriodic()} and the optional opmode {@code periodic()} call, before tunable updates and
+   * {@link #simulationPeriodic()}. The opmode call occurs only when an opmode has started and the
+   * robot is enabled.
+   *
+   * <p>Calling this hook does not imply that components are enabled. User code remains responsible
+   * for component enablement and safe-idle policy, including while disabled or when no opmode is
+   * selected.
+   */
+  public void robotPostPeriodic() {}
 
   /** Function called once during robot initialization in simulation. */
   public void simulationInit() {}
@@ -648,8 +660,7 @@ public abstract class OpModeRobot extends RobotBase {
   /**
    * Function called periodically in simulation.
    *
-   * <p>Runs after {@link #robotPeriodic()} and before the enabled opmode's {@code periodic()} in
-   * the same period.
+   * <p>Runs after {@link #robotPostPeriodic()} and tunable updates.
    */
   public void simulationPeriodic() {}
 
@@ -753,7 +764,7 @@ public abstract class OpModeRobot extends RobotBase {
         // Transitioning to disabled. Only tear down an opmode that was actually
         // running; a freshly selected opmode entering its disabled phase must
         // persist so it can be started on the next enable.
-        if (m_currentOpMode != null && m_currentOpModePeriodic != null) {
+        if (m_currentOpMode != null && m_currentOpModeStarted) {
           endCurrentOpMode();
           m_lastModeId = -1; // force recreate next loop
         }
@@ -766,7 +777,7 @@ public abstract class OpModeRobot extends RobotBase {
     // Start the opmode if enabled and not already started. This single check
     // covers both the disabled->enabled transition and an opmode constructed
     // while the robot is already enabled.
-    if (enabled && m_currentOpMode != null && m_currentOpModePeriodic == null) {
+    if (enabled && m_currentOpMode != null && !m_currentOpModeStarted) {
       startCurrentOpMode();
     }
 
@@ -797,6 +808,14 @@ public abstract class OpModeRobot extends RobotBase {
     robotPeriodic();
     m_watchdog.addEpoch("robotPeriodic()");
 
+    if (enabled && m_currentOpMode != null && m_currentOpModeStarted) {
+      runOpModePeriodic(m_currentOpMode);
+      m_watchdog.addEpoch("opMode.periodic()");
+    }
+
+    robotPostPeriodic();
+    m_watchdog.addEpoch("robotPostPeriodic()");
+
     TunableRegistry.update();
     m_watchdog.addEpoch("TunableRegistry.update()");
 
@@ -821,16 +840,13 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   private void startCurrentOpMode() {
-    if (m_currentOpMode == null || m_currentOpModePeriodic != null) {
+    if (m_currentOpMode == null || m_currentOpModeStarted) {
       return;
     }
 
     System.out.println("********** Starting OpMode " + m_currentOpModeName + " **********");
 
-    // Register the main opmode periodic callback
-    final OpMode opMode = m_currentOpMode;
-    m_currentOpModePeriodic =
-        m_callbacks.add(() -> runOpModePeriodic(opMode), m_startTimeNs, m_period);
+    m_currentOpModeStarted = true;
 
     m_currentOpMode.start();
     m_watchdog.addEpoch("opMode.start()");
@@ -846,15 +862,14 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   private void endCurrentOpMode() {
-    // If the opmode was started, end it and remove its main periodic callback.
-    if (m_currentOpModePeriodic != null) {
+    // Only end opmodes that have actually started.
+    if (m_currentOpModeStarted) {
       System.out.println("********** Ending OpMode " + m_currentOpModeName + " **********");
 
       m_currentOpMode.end();
       m_watchdog.addEpoch("opMode.end()");
 
-      m_callbacks.remove(m_currentOpModePeriodic);
-      m_currentOpModePeriodic = null;
+      m_currentOpModeStarted = false;
       m_opModePeriodicOverrunAlert.set(false);
     }
 

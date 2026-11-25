@@ -295,6 +295,71 @@ class OpModeRobotTest {
   }
 
   @Test
+  void periodicSequence() throws InterruptedException {
+    var calls = new java.util.ArrayList<String>();
+    var callbackCount = new AtomicInteger();
+    var interleavedCount = new AtomicInteger();
+    var inPeriodic = new java.util.concurrent.atomic.AtomicBoolean();
+    MockRobot robot = new MockRobot() {
+      @Override
+      public void robotPeriodic() {
+        inPeriodic.set(true);
+        calls.add("robot");
+      }
+
+      @Override
+      public void robotPostPeriodic() {
+        calls.add("post");
+        inPeriodic.set(false);
+      }
+
+      @Override
+      public void simulationPeriodic() {
+        calls.add("simulation");
+      }
+    };
+    robot.addPeriodic(() -> {
+      callbackCount.incrementAndGet();
+      if (inPeriodic.get()) {
+        interleavedCount.incrementAndGet();
+      }
+    }, 0.005, 0.001);
+    robot.addOpMode(RobotMode.TELEOPERATED, "Sequence", () -> new OpMode() {
+      @Override
+      public void periodic() {
+        calls.add("opmode");
+      }
+    });
+    robot.publishOpModes();
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+    SimHooks.waitForProgramStart();
+    try {
+      SimHooks.stepTiming(PERIOD);
+      assertEquals(java.util.List.of("robot", "post", "simulation"), calls);
+      calls.clear();
+      DriverStationSim.setDsAttached(true);
+      DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
+      DriverStationSim.setOpMode(getOnlyOpModeId());
+      DriverStationSim.setEnabled(true);
+      DriverStationSim.notifyNewData();
+      SimHooks.stepTiming(PERIOD);
+      assertEquals(java.util.List.of("robot", "opmode", "post", "simulation"), calls);
+      calls.clear();
+      DriverStationSim.setEnabled(false);
+      DriverStationSim.notifyNewData();
+      SimHooks.stepTiming(PERIOD);
+      assertEquals(java.util.List.of("robot", "post", "simulation"), calls);
+      org.junit.jupiter.api.Assertions.assertTrue(callbackCount.get() > 3);
+      assertEquals(0, interleavedCount.get());
+    } finally {
+      robot.endCompetition();
+      robotThread.join();
+      robot.close();
+    }
+  }
+
+  @Test
   void robotPeriodic() throws InterruptedException {
     class MyMockRobot extends MockRobot {
       MyMockRobot() {

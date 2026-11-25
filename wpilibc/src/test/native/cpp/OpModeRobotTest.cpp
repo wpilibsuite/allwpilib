@@ -7,6 +7,8 @@
 #include <sys/types.h>
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
@@ -110,6 +112,80 @@ int64_t GetOnlyOpModeId() {
   return options[0].id;
 }
 }  // namespace
+
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest PeriodicOrdering",
+                 "[wpilibc]") {
+  struct OrderedOpMode : public wpi::OpMode {
+    explicit OrderedOpMode(std::vector<std::string>& events) : events{events} {}
+    void DisabledPeriodic() override { events.emplace_back("mode disabled"); }
+    void Start() override {}
+    void End() override {}
+    void Periodic() override { events.emplace_back("mode"); }
+    std::vector<std::string>& events;
+  };
+  struct OrderedRobot : public wpi::OpModeRobot<OrderedRobot> {
+    std::vector<std::string> events;
+    std::atomic<int> callbackCount{0};
+    std::atomic<int> interleavedCount{0};
+    bool inPeriodic = false;
+    OrderedRobot() {
+      AddPeriodic([this] {
+        ++callbackCount;
+        if (inPeriodic) {
+          ++interleavedCount;
+        }
+      }, 5_ms, 1_ms);
+      AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "Ordered", [this] {
+        return std::make_unique<OrderedOpMode>(events);
+      });
+      PublishOpModes();
+    }
+    void DisabledPeriodic() override { events.emplace_back("disabled"); }
+    void NonePeriodic() override { events.emplace_back("none"); }
+    void EnabledPeriodic() override { events.emplace_back("enabled"); }
+    void RobotPeriodic() override {
+      inPeriodic = true;
+      events.emplace_back("robot");
+    }
+    void RobotPostPeriodic() override {
+      events.emplace_back("post");
+      inPeriodic = false;
+    }
+    void SimulationPeriodic() override { events.emplace_back("simulation"); }
+  } robot;
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+  auto checkLoop = [&](std::vector<std::string> expected) {
+    robot.events.clear();
+    wpi::sim::DriverStationSim::NotifyNewData();
+    wpi::sim::StepTiming(PERIOD);
+    CHECK(robot.events == expected);
+  };
+
+  wpi::sim::DriverStationSim::SetDsAttached(true);
+  checkLoop({"disabled", "none", "robot", "post", "simulation"});
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
+  wpi::sim::DriverStationSim::SetOpMode(GetOnlyOpModeId());
+  checkLoop({"disabled", "mode disabled", "robot", "post", "simulation"});
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  checkLoop({"enabled", "robot", "mode", "post", "simulation"});
+  checkLoop({"enabled", "robot", "mode", "post", "simulation"});
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  checkLoop({"disabled", "mode disabled", "robot", "post", "simulation"});
+  wpi::sim::DriverStationSim::SetOpMode(0);
+  checkLoop({"disabled", "none", "robot", "post", "simulation"});
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  checkLoop({"none", "robot", "post", "simulation"});
+  wpi::sim::DriverStationSim::SetOpMode(GetOnlyOpModeId());
+  checkLoop({"mode disabled", "enabled", "robot", "mode", "post",
+             "simulation"});
+  CHECK(robot.callbackCount.load() > 8);
+  CHECK(robot.interleavedCount.load() == 0);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
 
 static_assert(wpi::ConstructibleOpMode<MockOpMode, MockRobot>);
 static_assert(wpi::ConstructibleOpMode<OneArgOpMode, MockRobot>);
