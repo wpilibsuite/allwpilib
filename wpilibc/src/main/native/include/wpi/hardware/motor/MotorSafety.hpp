@@ -114,7 +114,7 @@ class MotorSafety {
   // True if motor safety is enabled for this motor
   bool m_enabled = false;
 
-  // The FPGA clock value when the motor has expired
+  // The monotonic clock value when the motor has expired
   wpi::units::second_t m_stopTime = Timer::GetMonotonicTimestamp();
 
   mutable wpi::util::mutex m_thisMutex;

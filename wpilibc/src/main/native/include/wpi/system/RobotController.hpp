@@ -28,9 +28,9 @@ class RobotController {
   RobotController() = delete;
 
   /**
-   * Return the serial number of the roboRIO.
+   * Return the serial number of the Systemcore.
    *
-   * @return The serial number of the roboRIO.
+   * @return The serial number of the Systemcore.
    */
   static std::string GetSerialNumber();
 
@@ -74,12 +74,12 @@ class RobotController {
   static wpi::units::volt_t GetBatteryVoltage();
 
   /**
-   * Check if the FPGA outputs are enabled.
+   * Check if the outputs are enabled.
    *
    * The outputs may be disabled if the robot is disabled or e-stopped, the
-   * watchdog has expired, or if the roboRIO browns out.
+   * watchdog has expired, or if the Systemcore browns out.
    *
-   * @return True if the FPGA outputs are enabled.
+   * @return True if the outputs are enabled.
    */
   static bool IsSysActive();
 

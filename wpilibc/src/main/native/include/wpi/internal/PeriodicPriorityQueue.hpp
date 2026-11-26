@@ -20,7 +20,7 @@ namespace wpi::internal {
  * execution time.
  *
  * <p>This class manages a collection of periodic callbacks that execute at
- * specified intervals. Callbacks are scheduled using FPGA timestamps and
+ * specified intervals. Callbacks are scheduled using monotonic timestamps and
  * automatically rescheduled after execution to maintain their periodic
  * behavior. The queue uses a priority heap to efficiently determine the next
  * callback to execute.
@@ -45,7 +45,7 @@ class PeriodicPriorityQueue {
     /** The period at which to run the callback. */
     std::chrono::nanoseconds period;
 
-    /** The next scheduled execution time in FPGA timestamp nanoseconds. */
+    /** The next scheduled execution time in monotonic timestamp nanoseconds. */
     std::chrono::nanoseconds expirationTime;
 
     /**
@@ -122,7 +122,7 @@ class PeriodicPriorityQueue {
    *
    * @param func      The callback to run.
    * @param startTime The common starting point for all callback scheduling in
-   *                  FPGA timestamp nanoseconds.
+   *                  monotonic timestamp nanoseconds.
    * @param period    The period at which to run the callback.
    */
   void Add(std::function<void()> func, std::chrono::nanoseconds startTime,
@@ -133,7 +133,7 @@ class PeriodicPriorityQueue {
    *
    * @param func      The callback to run.
    * @param startTime The common starting point for all callback scheduling in
-   *                  FPGA timestamp nanoseconds.
+   *                  monotonic timestamp nanoseconds.
    * @param period    The period at which to run the callback.
    * @param offset    The offset from the common starting time.
    */

@@ -38,7 +38,7 @@ class DigitalInput : public wpi::telemetry::TelemetryLoggable {
   /**
    * Get the value from a digital input channel.
    *
-   * Retrieve the value of a single digital input channel from the FPGA.
+   * Retrieve the value of a single digital input channel from the Smart I/O.
    *
    * @Common This is one of the commonly used methods for this class
    */
