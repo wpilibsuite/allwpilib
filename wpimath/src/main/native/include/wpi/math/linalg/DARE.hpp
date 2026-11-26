@@ -108,9 +108,8 @@ Eigen::Matrix<double, States, States> DARE(
     H_k = H_k1;
 
     // W = I + GₖHₖ
-    StateMatrix W = StateMatrix::Identity(H_k.rows(), H_k.cols()) + G_k * H_k;
-
-    auto W_solver = W.lu();
+    auto W_solver =
+        (StateMatrix::Identity(H_k.rows(), H_k.cols()) + G_k * H_k).lu();
 
     // Solve WV₁ = Aₖ for V₁
     StateMatrix V_1 = W_solver.solve(A_k);
