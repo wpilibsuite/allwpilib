@@ -285,6 +285,60 @@ def test_utility_mode(robot: MockRobot):
     robot_thread.join()
 
 
+def test_enabled_periodic(wpilib_state, nt):
+    class Robot(MockRobot):
+        def disabled_periodic(self):
+            calls.append("disabled")
+
+        def autonomous_periodic(self):
+            calls.append("autonomous")
+
+        def teleop_periodic(self):
+            calls.append("teleop")
+
+        def utility_periodic(self):
+            calls.append("utility")
+
+        def enabled_periodic(self):
+            calls.append("enabled")
+
+        def robot_periodic(self):
+            calls.append("robot")
+
+        def simulation_periodic(self):
+            calls.append("simulation")
+
+    calls = []
+    pause_timing()
+    try:
+        robot = Robot()
+        DriverStationSim.reset_data()
+        DriverStationSim.notify_new_data()
+        robot._loop_func()
+        assert calls == ["disabled", "robot", "simulation"]
+
+        for mode, name in (
+            (RobotMode.AUTONOMOUS, "autonomous"),
+            (RobotMode.TELEOPERATED, "teleop"),
+            (RobotMode.UTILITY, "utility"),
+        ):
+            DriverStationSim.set_robot_mode(mode)
+            DriverStationSim.set_enabled(True)
+            DriverStationSim.notify_new_data()
+            for _ in range(2):
+                calls.clear()
+                robot._loop_func()
+                assert calls == ["enabled", name, "robot", "simulation"]
+
+            DriverStationSim.set_enabled(False)
+            DriverStationSim.notify_new_data()
+            calls.clear()
+            robot._loop_func()
+            assert calls == ["disabled", "robot", "simulation"]
+    finally:
+        resume_timing()
+
+
 def test_mode_change(robot: MockRobot):
     robot_thread = threading.Thread(target=robot.start_competition, daemon=True)
     robot_thread.start()

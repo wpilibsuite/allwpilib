@@ -21,7 +21,7 @@ import org.wpilib.units.measure.Temperature;
 import org.wpilib.units.measure.Time;
 import org.wpilib.units.measure.Voltage;
 
-/** Contains functions for roboRIO functionality. */
+/** Contains functions for Systemcore functionality. */
 public final class RobotController {
   private static LongSupplier m_timeSource = RobotController::getMonotonicTime;
 
@@ -30,9 +30,9 @@ public final class RobotController {
   }
 
   /**
-   * Return the serial number of the roboRIO.
+   * Return the serial number of the Systemcore.
    *
-   * @return The serial number of the roboRIO.
+   * @return The serial number of the Systemcore.
    */
   public static String getSerialNumber() {
     return HALUtil.getSerialNumber();
@@ -116,10 +116,10 @@ public final class RobotController {
   }
 
   /**
-   * Gets a value indicating whether the FPGA outputs are enabled. The outputs may be disabled if
-   * the robot is disabled or e-stopped, the watchdog has expired, or if the roboRIO browns out.
+   * Gets a value indicating whether the outputs are enabled. The outputs may be disabled if the
+   * robot is disabled or e-stopped, the watchdog has expired, or if the Systemcore browns out.
    *
-   * @return True if the FPGA outputs are enabled.
+   * @return True if the outputs are enabled.
    */
   public static boolean isSysActive() {
     return HAL.getSystemActive();

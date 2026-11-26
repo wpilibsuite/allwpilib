@@ -21,7 +21,7 @@ namespace wpi {
  * output to make code more readable if the encoder is mounted such that forward
  * movement generates negative values. Quadrature encoders have two digital
  * outputs, an A Channel and a B Channel that are out of phase with each other
- * to allow the FPGA to do direction sensing.
+ * to allow the Smart I/O to do direction sensing.
  *
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
@@ -41,13 +41,12 @@ class Encoder : public CounterBase, public wpi::telemetry::TelemetryLoggable {
    *                         inverts the output values if necessary so forward
    *                         represents positive values.
    * @param encodingType     either X1, X2, or X4 to indicate 1X, 2X or 4X
-   *                         decoding. If 4X is selected, then an encoder FPGA
-   *                         object is used and the returned counts will be 4x
-   *                         the encoder spec'd value since all rising and
-   *                         falling edges are counted. If 1X or 2X are selected
-   *                         then a counter object will be used and the returned
-   *                         value will either exactly match the spec'd count or
-   *                         be double (2x) the spec'd count.
+   *                         decoding. If 4X is selected, the returned counts
+   *                         will be 4x the encoder spec'd value since all
+   *                         rising and falling edges are counted. If 1X or 2X
+   *                         are selected the returned value will either
+   *                         exactly match the spec'd count or be double (2x)
+   *                         the spec'd count.
    */
   Encoder(int aChannel, int bChannel, bool reverseDirection = false,
           EncodingType encodingType = EncodingType::X4);
@@ -196,13 +195,12 @@ class Encoder : public CounterBase, public wpi::telemetry::TelemetryLoggable {
    * @param reverseDirection If true, counts down instead of up (this is all
    *                         relative)
    * @param encodingType     either X1, X2, or X4 to indicate 1X, 2X or 4X
-   *                         decoding. If 4X is selected, then an encoder FPGA
-   *                         object is used and the returned counts will be 4x
-   *                         the encoder spec'd value since all rising and
-   *                         falling edges are counted. If 1X or 2X are selected
-   *                         then a counter object will be used and the returned
-   *                         value will either exactly match the spec'd count or
-   *                         be double (2x) the spec'd count.
+   *                         decoding. If 4X is selected, the returned counts
+   *                         will be 4x the encoder spec'd value since all
+   *                         rising and falling edges are counted. If 1X or 2X
+   *                         are selected the returned value will either
+   *                         exactly match the spec'd count or be double (2x)
+   *                         the spec'd count.
    */
   void InitEncoder(int aChannel, int bChannel, bool reverseDirection,
                    EncodingType encodingType);

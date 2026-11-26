@@ -13,15 +13,19 @@ class Robot : public wpi::TimedRobot {
 
   void AutonomousStart() override;
   void AutonomousPeriodic() override;
+  void AutonomousEnd() override;
 
   void TeleopStart() override;
   void TeleopPeriodic() override;
+  void TeleopEnd() override;
 
   void DisabledStart() override;
   void DisabledPeriodic() override;
+  void DisabledEnd() override;
 
   void UtilityStart() override;
   void UtilityPeriodic() override;
+  void UtilityEnd() override;
 
   void SimulationStart() override;
   void SimulationPeriodic() override;

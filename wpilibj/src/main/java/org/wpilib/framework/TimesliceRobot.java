@@ -67,9 +67,7 @@ package org.wpilib.framework;
  * org.wpilib.system.Threads#setCurrentThreadPriority(int)}. An RT priority of 15 is a reasonable
  * choice.
  *
- * <p>If you do enable RT though, <i>make sure your periodic functions do not block</i>. If they do,
- * the operating system will lock up, and you'll have to boot the roboRIO into safe mode and delete
- * the robot program to recover.
+ * <p>If you do enable RT though, <i>make sure your periodic functions do not block</i>.
  */
 public class TimesliceRobot extends TimedRobot {
   /**

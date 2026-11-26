@@ -8,6 +8,7 @@ classes:
       UtilityStart:
       RobotPeriodic:
       DisabledPeriodic:
+      EnabledPeriodic:
       AutonomousPeriodic:
       TeleopPeriodic:
       UtilityPeriodic:
@@ -50,9 +51,15 @@ classes:
 
       - RobotPeriodic()
       - DisabledPeriodic()
+      - EnabledPeriodic()
       - AutonomousPeriodic()
       - TeleopPeriodic()
       - UtilityPeriodic()
+
+      EnabledPeriodic() runs only while enabled, after any mode transition
+      callbacks and before the current mode's periodic function. RobotPeriodic()
+      runs after the current mode's periodic function, followed by
+      SimulationPeriodic() in simulation.
 
       End() functions -- each of the following functions is called once when the
       appropriate mode ends:

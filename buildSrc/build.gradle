@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    // Kept out of gradle/libs.versions.toml because Bazel imports that file
-    // with maven.from_toml and these Gradle plugins aren't Bazel dependencies.
-    implementation 'org.wpilib:native-utils:2027.15.0'
-    implementation 'org.wpilib:gradle-cpp-vscode:2027.0.0'
+    // Plugin coordinates are specified here instead of the version catalog so
+    // Bazel doesn't pick them up when using maven.from_toml
+    implementation "org.wpilib:native-utils:${libs.versions.nativeUtils.get()}"
+    implementation "org.wpilib:gradle-cpp-vscode:${libs.versions.gradleCppVscode.get()}"
 }

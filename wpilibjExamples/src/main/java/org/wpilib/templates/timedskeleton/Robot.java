@@ -28,10 +28,16 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
+  public void autonomousEnd() {}
+
+  @Override
   public void teleopStart() {}
 
   @Override
   public void teleopPeriodic() {}
+
+  @Override
+  public void teleopEnd() {}
 
   @Override
   public void disabledStart() {}
@@ -40,10 +46,16 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {}
 
   @Override
+  public void disabledEnd() {}
+
+  @Override
   public void utilityStart() {}
 
   @Override
   public void utilityPeriodic() {}
+
+  @Override
+  public void utilityEnd() {}
 
   @Override
   public void simulationStart() {}

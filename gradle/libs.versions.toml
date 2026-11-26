@@ -10,6 +10,11 @@ mrclib = "2027.1.0-alpha-1-116-g5288562"
 opencv = "2027-4.13.0-4"
 quickbuf = "1.4"
 
+# Gradle plugin versions for use in buildSrc. Can't specify full coordinates in
+# [libraries] because Bazel would pick them up through maven.from_toml
+gradleCppVscode = "2027.0.0"
+nativeUtils = "2027.15.0"
+
 [libraries]
 # General runtime dependencies
 avaje-jsonb = { module = "io.avaje:avaje-jsonb", version.ref = "avaje" }

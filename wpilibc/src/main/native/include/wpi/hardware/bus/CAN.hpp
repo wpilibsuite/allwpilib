@@ -16,7 +16,7 @@ namespace wpi {
  * High level class for interfacing with CAN devices conforming to
  * the standard CAN spec.
  *
- * No packets that can be sent gets blocked by the RoboRIO, so all methods
+ * No packets that can be sent gets blocked by the Systemcore, so all methods
  * work identically in all robot modes.
  *
  * All methods are thread save, however the buffer objects passed in
@@ -59,8 +59,8 @@ class CAN {
 
   /**
    * Write a repeating packet to the CAN device with a specific ID. This ID is
-   * 10 bits. The RoboRIO will automatically repeat the packet at the specified
-   * interval
+   * 10 bits. The Systemcore will automatically repeat the packet at the
+   * specified interval
    *
    * @param apiId The API ID to write.
    * @param message the CAN message.
@@ -89,8 +89,8 @@ class CAN {
 
   /**
    * Write a repeating packet to the CAN device with a specific ID. This ID is
-   * 10 bits. The RoboRIO will automatically repeat the packet at the specified
-   * interval
+   * 10 bits. The Systemcore will automatically repeat the packet at the
+   * specified interval
    *
    * @param apiId The API ID to write.
    * @param message the CAN message.

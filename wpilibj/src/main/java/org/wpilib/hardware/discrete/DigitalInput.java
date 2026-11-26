@@ -41,7 +41,7 @@ public class DigitalInput implements AutoCloseable, TelemetryLoggable {
 
   /**
    * Get the value from a digital input channel. Retrieve the value of a single digital input
-   * channel from the FPGA.
+   * channel from the Smart I/O.
    *
    * @return the status of the digital input
    */

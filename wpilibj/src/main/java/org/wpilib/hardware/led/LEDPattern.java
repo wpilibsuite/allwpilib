@@ -57,10 +57,9 @@ import org.wpilib.util.WPIUtilJNI;
  * </code></pre>
  *
  * <p>LED patterns are stateless, and as such can be applied to multiple LED strips (or different
- * sections of the same LED strip, since the roboRIO can only drive a single LED strip). In this
- * example, we split the single buffer into two views - one for the section of the LED strip on the
- * left side of a robot, and another view for the section of LEDs on the right side. The same
- * pattern is able to be applied to both sides.
+ * sections of the same LED strip). In this example, we split the single buffer into two views - one
+ * for the section of the LED strip on the left side of a robot, and another view for the section of
+ * LEDs on the right side. The same pattern is able to be applied to both sides.
  *
  * <pre><code>
  *   public class LEDs extends SubsystemBase {

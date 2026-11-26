@@ -8,7 +8,10 @@
 
 #include <atomic>
 #include <string>
+#include <string_view>
 #include <thread>
+#include <utility>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
@@ -497,6 +500,53 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest UtilityMode", "[wpilibc]") {
 
   robot.EndCompetition();
   robotThread.join();
+}
+
+TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest EnabledPeriodic",
+                 "[wpilibc]") {
+  class Robot : public MockRobot {
+   public:
+    std::vector<std::string_view> calls;
+
+    using MockRobot::LoopFunc;
+
+    void DisabledPeriodic() override { calls.emplace_back("disabled"); }
+    void AutonomousPeriodic() override { calls.emplace_back("autonomous"); }
+    void TeleopPeriodic() override { calls.emplace_back("teleop"); }
+    void UtilityPeriodic() override { calls.emplace_back("utility"); }
+    void EnabledPeriodic() override { calls.emplace_back("enabled"); }
+    void RobotPeriodic() override { calls.emplace_back("robot"); }
+    void SimulationPeriodic() override { calls.emplace_back("simulation"); }
+  } robot;
+
+  wpi::sim::DriverStationSim::ResetData();
+  wpi::sim::DriverStationSim::NotifyNewData();
+  robot.LoopFunc();
+  CHECK(robot.calls ==
+        std::vector<std::string_view>{"disabled", "robot", "simulation"});
+
+  static constexpr std::pair<hal::RobotMode, std::string_view> MODES[] = {
+      {hal::RobotMode::AUTONOMOUS, "autonomous"},
+      {hal::RobotMode::TELEOPERATED, "teleop"},
+      {hal::RobotMode::UTILITY, "utility"}};
+  for (auto [mode, name] : MODES) {
+    wpi::sim::DriverStationSim::SetRobotMode(mode);
+    wpi::sim::DriverStationSim::SetEnabled(true);
+    wpi::sim::DriverStationSim::NotifyNewData();
+    for (int i = 0; i < 2; ++i) {
+      robot.calls.clear();
+      robot.LoopFunc();
+      CHECK(robot.calls == std::vector<std::string_view>{
+                               "enabled", name, "robot", "simulation"});
+    }
+
+    wpi::sim::DriverStationSim::SetEnabled(false);
+    wpi::sim::DriverStationSim::NotifyNewData();
+    robot.calls.clear();
+    robot.LoopFunc();
+    CHECK(robot.calls ==
+          std::vector<std::string_view>{"disabled", "robot", "simulation"});
+  }
 }
 
 TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest ModeChange", "[wpilibc]") {

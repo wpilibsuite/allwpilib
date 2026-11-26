@@ -13,7 +13,7 @@ import org.wpilib.util.UsageReporting;
 /**
  * High level class for interfacing with CAN devices conforming to the standard CAN spec.
  *
- * <p>No packets that can be sent gets blocked by the RoboRIO, so all methods work identically in
+ * <p>No packets that can be sent gets blocked by the Systemcore, so all methods work identically in
  * all robot modes.
  *
  * <p>All methods are thread safe, however the CANData object passed into the read methods and the
@@ -76,8 +76,8 @@ public class CAN implements Closeable {
   }
 
   /**
-   * Write a repeating packet to the CAN device with a specific ID. This ID is 10 bits. The RoboRIO
-   * will automatically repeat the packet at the specified interval
+   * Write a repeating packet to the CAN device with a specific ID. This ID is 10 bits. The
+   * Systemcore will automatically repeat the packet at the specified interval
    *
    * @param apiId The API ID to write.
    * @param data The data to write
@@ -117,8 +117,8 @@ public class CAN implements Closeable {
   }
 
   /**
-   * Write a repeating packet to the CAN device with a specific ID. This ID is 10 bits. The RoboRIO
-   * will automatically repeat the packet at the specified interval
+   * Write a repeating packet to the CAN device with a specific ID. This ID is 10 bits. The
+   * Systemcore will automatically repeat the packet at the specified interval
    *
    * @param apiId The API ID to write.
    * @param data The data to write
