@@ -27,7 +27,9 @@ class ProtobufDescriptor[T, M: Message](ABC):
 
     def __init_subclass__(cls, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
-        for base in getattr(cls, "__orig_bases__", ()):
+        # Only the subclass's own bases: getattr would also find a parent's __orig_bases__ and
+        # re-register its value types for a subclass that declares none.
+        for base in cls.__dict__.get("__orig_bases__", ()):
             if get_origin(base) is ProtobufDescriptor:
                 for value_type in _classes_in(get_args(base)[0]):
                     register_serializer(value_type, cls)

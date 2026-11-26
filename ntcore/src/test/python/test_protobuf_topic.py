@@ -94,6 +94,16 @@ def test_set_default(nt: ntcore.NetworkTableInstance):
     assert sub.get().name == "dflt"
 
 
+def test_set_default_empty_message(nt: ntcore.NetworkTableInstance):
+    # An all-default message serializes to empty bytes, but it is still a published value.
+    topic = ntproto.get_protobuf_topic(nt, "outer_empty", Outer)
+    pub = topic.publish()
+    sub = topic.subscribe(Outer(name="fallback"))
+
+    pub.set_default(Outer())
+    assert sub.get().name == ""
+
+
 def test_schemas_registered_with_dependencies(nt: ntcore.NetworkTableInstance):
     topic = ntproto.get_protobuf_topic(nt, "outer", Outer)
     assert not nt.has_schema("proto:test/outer.proto")

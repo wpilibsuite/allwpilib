@@ -249,6 +249,21 @@ def test_dt_zero_falls_back_to_default_period():
     ArmFeedforwardProto.unpack(msg)  # must not raise
 
 
+@pytest.mark.parametrize("serializer", [ArmFeedforwardProto, ElevatorFeedforwardProto])
+def test_feedforward_writes_a_positive_period(serializer):
+    # Java rejects a non-positive period when decoding.
+    msg = serializer.message_type()
+    serializer.pack(msg, _values()[serializer]())
+    assert msg.dt == pytest.approx(0.020)
+
+
+def test_subclassing_a_serializer_keeps_the_registration():
+    class DerivedProto(Pose2dProto):
+        pass
+
+    assert get_serializer(wpimath.Pose2d) is Pose2dProto
+
+
 def test_swerve_kinematics_picks_class_by_module_count():
     for count, cls in (
         (2, wpimath.SwerveDrive2Kinematics),
@@ -273,6 +288,30 @@ def test_linear_system_sizes_and_values():
     assert isinstance(result, wpimath.LinearSystem_2_1_1)
     assert np.array_equal(result.a(), system.a())
     assert np.array_equal(result.b(), system.b())
+
+
+@pytest.mark.parametrize(
+    "serializer",
+    [
+        MatrixProto,
+        VectorProto,
+        CubicHermiteSplineProto,
+        QuinticHermiteSplineProto,
+        SwerveDriveKinematicsProto,
+        HolonomicTrajectoryProto,
+        DifferentialTrajectoryProto,
+    ],
+    ids=lambda serializer: serializer.__name__,
+)
+def test_pack_replaces_repeated_fields(serializer):
+    value = _values()[serializer]()
+    fresh = serializer.message_type()
+    serializer.pack(fresh, value)
+    # packing into an already-filled message must give the same result, not append
+    reused = serializer.message_type()
+    serializer.pack(reused, value)
+    serializer.pack(reused, value)
+    assert reused == fresh
 
 
 def test_linear_system_matrix_dimensions_are_validated():

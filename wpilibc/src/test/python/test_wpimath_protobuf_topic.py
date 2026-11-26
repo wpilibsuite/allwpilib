@@ -60,8 +60,17 @@ def test_swerve_kinematics_topic(nt: ntcore.NetworkTableInstance):
     kinematics = wpimath.SwerveDrive4Kinematics(*modules)
 
     topic = ntcore.get_protobuf_topic(nt, "/kinematics", SwerveDriveKinematicsProto)
-    topic.publish().set(kinematics)
-    result = topic.subscribe(kinematics).get()
+    # Keep the publisher alive (dropping it clears the topic), and subscribe with a default
+    # that differs from what is published so the result must have crossed the topic.
+    pub = topic.publish()
+    default = wpimath.SwerveDrive4Kinematics(
+        *(wpimath.Translation2d() for _ in range(4))
+    )
+    sub = topic.subscribe(default)
+    assert list(sub.get().get_modules()) != modules
+
+    pub.set(kinematics)
+    result = sub.get()
 
     assert isinstance(result, wpimath.SwerveDrive4Kinematics)
     assert list(result.get_modules()) == modules

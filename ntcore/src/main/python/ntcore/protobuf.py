@@ -43,6 +43,11 @@ __all__ = [
 ]
 
 
+#: Raw value returned when a topic has nothing published. A lone 0xFF byte is a truncated
+#: varint tag, so it is not a valid protobuf message.
+_NO_VALUE = b"\xff"
+
+
 @dataclasses.dataclass
 class TimestampedProtobuf[T]:
     """A decoded value with its local timestamp and the server timestamp, in nanoseconds."""
@@ -88,10 +93,10 @@ class ProtobufSubscriber[T, M: Message]:
 
     def get_atomic(self) -> TimestampedProtobuf[T]:
         """Like :meth:`get`, but also returns the timestamps."""
-        raw = self._sub.get_atomic(b"")
-        # Values set with set_default() have time 0, so only an empty value at time 0 means
-        # "nothing published".
-        if not raw.value and raw.time == 0:
+        raw = self._sub.get_atomic(_NO_VALUE)
+        # An empty payload is a valid (all-default) message, so "nothing published" is
+        # signalled by a payload that can never parse: the subscriber's raw default.
+        if raw.value == _NO_VALUE and raw.time == 0:
             return TimestampedProtobuf(0, 0, self._default)
         value = self._decode(raw.value)
         return TimestampedProtobuf(

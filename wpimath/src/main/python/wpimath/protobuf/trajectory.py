@@ -74,6 +74,7 @@ class HolonomicTrajectoryProto(
 
     @classmethod
     def pack(cls, msg, value):
+        del msg.samples[:]
         for sample in value.samples():
             HolonomicSampleProto.pack(msg.samples.add(), sample)
 
@@ -94,6 +95,7 @@ class DifferentialTrajectoryProto(
 
     @classmethod
     def pack(cls, msg, value):
+        del msg.samples[:]
         for sample in value.samples():
             DifferentialSampleProto.pack(msg.samples.add(), sample)
 

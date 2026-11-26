@@ -23,10 +23,10 @@ class CubicHermiteSplineProto(
     def pack(cls, msg, value):
         initial = value.get_initial_control_vector()
         final = value.get_final_control_vector()
-        msg.x_initial.extend(initial.x)
-        msg.x_final.extend(final.x)
-        msg.y_initial.extend(initial.y)
-        msg.y_final.extend(final.y)
+        msg.x_initial[:] = initial.x
+        msg.x_final[:] = final.x
+        msg.y_initial[:] = initial.y
+        msg.y_final[:] = final.y
 
     @classmethod
     def unpack(cls, msg):
@@ -47,10 +47,10 @@ class QuinticHermiteSplineProto(
     def pack(cls, msg, value):
         initial = value.get_initial_control_vector()
         final = value.get_final_control_vector()
-        msg.x_initial.extend(initial.x)
-        msg.x_final.extend(final.x)
-        msg.y_initial.extend(initial.y)
-        msg.y_final.extend(final.y)
+        msg.x_initial[:] = initial.x
+        msg.x_final[:] = final.x
+        msg.y_initial[:] = initial.y
+        msg.y_final[:] = final.y
 
     @classmethod
     def unpack(cls, msg):

@@ -264,6 +264,7 @@ class SwerveDriveKinematicsProto(
 
     @classmethod
     def pack(cls, msg, value):
+        del msg.modules[:]
         for module in value.get_modules():
             Translation2dProto.pack(msg.modules.add(), module)
 

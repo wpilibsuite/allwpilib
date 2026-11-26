@@ -31,7 +31,7 @@ class MatrixProto(
         if array.ndim != 2:
             raise ValueError(f"Expected a 2-D array, got {array.ndim} dimensions")
         msg.num_rows, msg.num_cols = array.shape
-        msg.data.extend(array.ravel(order="F").tolist())
+        msg.data[:] = array.ravel(order="F").tolist()
 
     @classmethod
     def unpack(cls, msg):
@@ -63,7 +63,7 @@ class VectorProto(
             array = array[:, 0]
         if array.ndim != 1:
             raise ValueError(f"Expected a vector, got an array of shape {array.shape}")
-        msg.rows.extend(array.tolist())
+        msg.rows[:] = array.tolist()
 
     @classmethod
     def unpack(cls, msg):

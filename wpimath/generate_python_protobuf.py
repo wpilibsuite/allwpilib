@@ -34,17 +34,20 @@ def main(argv):
         type=Path,
     )
     parser.add_argument(
-        "--protoc",
-        help="The protoc command to run, e.g. 'python -m grpc_tools.protoc'.",
-        nargs="+",
-        required=True,
-    )
-    parser.add_argument(
         "--package",
         help="Dotted import path of the output directory.",
         default=PYTHON_PROTOBUF_PACKAGE,
     )
+    parser.add_argument(
+        "--protoc",
+        help="The protoc command to run, e.g. '--protoc python -m grpc_tools.protoc'. "
+        "Everything after --protoc is part of the command, so it must be the last option.",
+        nargs=argparse.REMAINDER,
+        required=True,
+    )
     args = parser.parse_args(argv)
+    if not args.protoc:
+        parser.error("--protoc requires a command")
 
     generate_python_protobuf(
         args.protoc, args.output_directory, args.proto_directory, args.package

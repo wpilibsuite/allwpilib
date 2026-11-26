@@ -18,6 +18,11 @@ __all__ = [
 ]
 
 
+#: The constructors' default period, in seconds. The Arm/Elevator feedforward bindings don't
+#: expose the period they were built with, so it is written in place of the real one.
+_DEFAULT_DT = 0.020
+
+
 def _dt_kwargs(dt: float) -> dict[str, float]:
     # The feedforward constructors report an error for a non-positive period. A message with
     # no period (dt == 0) should just get the constructor's default.
@@ -35,9 +40,8 @@ class ArmFeedforwardProto(
         msg.kg = value.get_kg()
         msg.kv = value.get_kv()
         msg.ka = value.get_ka()
-        # The period isn't exposed by the bindings, so leave it unset; unpack then falls
-        # back to the default period.
-        msg.dt = 0.0
+        # The period isn't exposed by the bindings; see _DEFAULT_DT.
+        msg.dt = _DEFAULT_DT
 
     @classmethod
     def unpack(cls, msg):
@@ -56,7 +60,7 @@ class ElevatorFeedforwardProto(
         msg.kv = value.get_kv()
         msg.ka = value.get_ka()
         # See ArmFeedforwardProto.pack
-        msg.dt = 0.0
+        msg.dt = _DEFAULT_DT
 
     @classmethod
     def unpack(cls, msg):
