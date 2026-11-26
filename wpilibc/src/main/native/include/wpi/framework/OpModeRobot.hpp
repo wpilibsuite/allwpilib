@@ -64,15 +64,14 @@ concept ConstructibleOpMode =
  *
  * 1. DisabledPeriodic(), only while disabled
  * 2. DisabledPeriodic() of the selected opmode, only while disabled
- * 3. NonePeriodic(), only when no opmode is selected
- * 4. EnabledPeriodic(), only while enabled with an opmode selected
- * 5. RobotPeriodic()
- * 6. SimulationPeriodic(), only in simulation
+ * 3. EnabledPeriodic(), only while enabled with an active opmode
+ * 4. Periodic() of the active opmode, only while enabled
+ * 5. NonePeriodic(), only when no opmode is selected
+ * 6. RobotPeriodic()
+ * 7. SimulationPeriodic(), only in simulation
  *
- * Then, while enabled, the opmode's Periodic() runs. Both are scheduled on the
- * same period, and the loop function was registered first, so RobotPeriodic()
- * and SimulationPeriodic() always run before the opmode's Periodic() in a given
- * period. Additional callbacks from AddPeriodic() or the opmode run on their
+ * The opmode's Start() runs before EnabledPeriodic() on its first enabled loop.
+ * Additional callbacks from AddPeriodic() or the opmode run on their
  * own schedules.
  *
  * One exception to the list above: if an opmode is selected while the robot is
@@ -132,9 +131,8 @@ class OpModeRobotBase : public RobotBase {
    * OpMode selection.
    *
    * Runs after DisabledPeriodic(), the opmode's DisabledPeriodic(),
-   * NonePeriodic(), and EnabledPeriodic(), and before SimulationPeriodic().
-   * When an opmode is enabled, this runs before its Periodic() in the same
-   * period.
+   * NonePeriodic(), EnabledPeriodic(), and the enabled opmode's Periodic(),
+   * and before SimulationPeriodic().
    */
   virtual void RobotPeriodic() {}
 
@@ -146,8 +144,7 @@ class OpModeRobotBase : public RobotBase {
   /**
    * Function called periodically in simulation.
    *
-   * Runs after RobotPeriodic() and before the enabled opmode's Periodic() in
-   * the same period.
+   * Runs after RobotPeriodic().
    */
   virtual void SimulationPeriodic() {}
 
@@ -181,9 +178,8 @@ class OpModeRobotBase : public RobotBase {
    * Function called periodically while the robot is enabled and there is a
    * current opmode.
    *
-   * Runs after NonePeriodic() and before RobotPeriodic(). When an opmode is
-   * enabled, this runs before its Periodic() in the same period. Never runs
-   * while disabled or when no opmode is selected.
+   * Runs immediately before the active opmode's Periodic(), which runs before
+   * RobotPeriodic(). Never runs while disabled or without an active opmode.
    */
   virtual void EnabledPeriodic() {}
 
@@ -337,8 +333,7 @@ class OpModeRobotBase : public RobotBase {
   std::string m_currentOpModeName;
   std::vector<wpi::internal::PeriodicPriorityQueue::Callback>
       m_activeOpModeCallbacks;
-  std::optional<wpi::internal::PeriodicPriorityQueue::Callback>
-      m_opmodePeriodic;
+  bool m_opModeStarted = false;
 };
 
 /**

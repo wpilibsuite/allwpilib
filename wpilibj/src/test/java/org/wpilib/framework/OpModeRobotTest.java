@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.wpilib.driverstation.RobotState;
+import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.opmode.OpMode;
 import org.wpilib.simulation.DriverStationSim;
@@ -136,6 +138,7 @@ class OpModeRobotTest {
 
   @BeforeEach
   void setUp() {
+    HAL.initialize();
     SimHooks.pauseTiming();
     SimHooks.setProgramStarted(false);
     DriverStationSim.resetData();
@@ -406,6 +409,63 @@ class OpModeRobotTest {
     robot.endCompetition();
     robotThread.join();
     robot.close();
+  }
+
+  @Test
+  // Invoke one loop directly to verify ordering independently of the callback scheduler.
+  @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
+  void enabledLoopOrder() throws Exception {
+    var calls = new ArrayList<String>();
+    try (var robot =
+        new MockRobot() {
+          @Override
+          public void enabledPeriodic() {
+            calls.add("enabled");
+          }
+
+          @Override
+          public void robotPeriodic() {
+            calls.add("robot");
+          }
+
+          @Override
+          public void simulationPeriodic() {
+            calls.add("simulation");
+          }
+        }) {
+      robot.addOpMode(
+          RobotMode.TELEOPERATED,
+          "ordered",
+          () ->
+              new MockOpMode() {
+                @Override
+                public void start() {
+                  calls.add("start");
+                }
+
+                @Override
+                public void periodic() {
+                  calls.add("periodic");
+                }
+              });
+      robot.publishOpModes();
+      var loop = OpModeRobot.class.getDeclaredMethod("loopFunc");
+      loop.setAccessible(true);
+      DriverStationSim.setDsAttached(true);
+      DriverStationSim.setEnabled(true);
+      DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
+      DriverStationSim.notifyNewData();
+      loop.invoke(robot);
+      assertEquals(Arrays.asList("robot", "simulation"), calls);
+      calls.clear();
+      DriverStationSim.setOpMode(getOnlyOpModeId());
+      DriverStationSim.notifyNewData();
+      loop.invoke(robot);
+      assertEquals(Arrays.asList("start", "enabled", "periodic", "robot", "simulation"), calls);
+      calls.clear();
+      loop.invoke(robot);
+      assertEquals(Arrays.asList("enabled", "periodic", "robot", "simulation"), calls);
+    }
   }
 
   @Test

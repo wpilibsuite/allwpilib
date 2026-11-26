@@ -335,7 +335,24 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest OpModeLifecycle",
 
 TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest OpModeCreatedWhileEnabled",
                  "[wpilibc]") {
-  SingleOpModeRobot robot;
+  class OrderedRobot : public SingleOpModeRobot {
+   public:
+    std::atomic<uint32_t> m_periodicAtRobotPeriodic{0};
+    std::atomic<uint32_t> m_periodicAtEnabledPeriodic{0};
+    std::atomic<uint32_t> m_startAtEnabledPeriodic{0};
+    void EnabledPeriodic() override {
+      if (auto op = m_opMode.load()) {
+        m_periodicAtEnabledPeriodic = op->m_periodicCount.load();
+        m_startAtEnabledPeriodic = op->m_startCount.load();
+      }
+    }
+    void RobotPeriodic() override {
+      MockRobot::RobotPeriodic();
+      if (auto op = m_opMode.load()) {
+        m_periodicAtRobotPeriodic = op->m_periodicCount.load();
+      }
+    }
+  } robot;
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
   wpi::sim::WaitForProgramStart();
@@ -353,13 +370,19 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest OpModeCreatedWhileEnabled",
   REQUIRE(opMode != nullptr);
   CHECK(opMode->m_disabledPeriodicCount.load() == 1u);
   CHECK(opMode->m_startCount.load() == 1u);
+  CHECK(robot.m_periodicAtRobotPeriodic.load() == 1u);
+  CHECK(robot.m_periodicAtEnabledPeriodic.load() == 0u);
+  CHECK(robot.m_startAtEnabledPeriodic.load() == 1u);
   CHECK(robot.m_disabledStartCount.load() == 0u);
   CHECK(robot.m_disabledPeriodicCount.load() == 0u);
   CHECK(robot.m_disabledEndCount.load() == 0u);
 
-  // No further DisabledPeriodic calls while enabled
+  // No further DisabledPeriodic calls while enabled; preserve loop ordering.
   wpi::sim::StepTiming(PERIOD);
   CHECK(opMode->m_disabledPeriodicCount.load() == 1u);
+  CHECK(robot.m_periodicAtRobotPeriodic.load() == 2u);
+  CHECK(robot.m_periodicAtEnabledPeriodic.load() == 1u);
+  CHECK(robot.m_startAtEnabledPeriodic.load() == 1u);
 
   robot.EndCompetition();
   robotThread.join();
