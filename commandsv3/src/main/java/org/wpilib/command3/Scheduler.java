@@ -1224,10 +1224,38 @@ public final class Scheduler implements ProtobufSerializable {
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   private void removeOrphanedChildren(Command parent) {
-    m_runningCommands.entrySet().stream()
-        .filter(e -> e.getValue().parent() == parent)
-        .toList() // copy to an intermediate list to avoid concurrent modification
-        .forEach(e -> cancel(e.getKey()));
+    var currentState = currentState();
+    Command childContainingCurrentCommand = null;
+
+    var children =
+        m_runningCommands.entrySet().stream()
+            .filter(e -> e.getValue().parent() == parent)
+            .map(Map.Entry::getKey)
+            .toList(); // copy to an intermediate list to avoid concurrent modification
+
+    // Defer cancellation of the child containing the currently mounted command.
+    // This avoids issues where a mounted command canceling its parent (or further ancestor)
+    // would get cleaned up, but not its siblings.
+    for (Command child : children) {
+      if (childContainingCurrentCommand == null && containsCurrentCommand(child, currentState)) {
+        childContainingCurrentCommand = child;
+      } else {
+        cancel(child);
+      }
+    }
+
+    if (childContainingCurrentCommand != null) {
+      cancel(childContainingCurrentCommand);
+    }
+  }
+
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  private boolean containsCurrentCommand(Command command, CommandState currentState) {
+    if (currentState == null) {
+      return false;
+    }
+
+    return command == currentState.command() || isAncestorOf(command, currentState);
   }
 
   /**
