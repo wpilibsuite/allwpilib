@@ -164,7 +164,7 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
-   * Return a gearbox of BAG motor motors.
+   * Return a gearbox of BAG motors.
    *
    * @param numMotors Number of motors in the gearbox.
    * @return A gearbox of BAG motors.
