@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    // Versions live in gradle/libs.versions.toml, but the coordinates stay here: Bazel imports
-    // that catalog with maven.from_toml and would try to resolve these Gradle-only plugins.
+    // Plugin coordinates are specified here instead of the version catalog so
+    // Bazel doesn't pick them up when using maven.from_toml
     implementation "org.wpilib:native-utils:${libs.versions.nativeUtils.get()}"
     implementation "org.wpilib:gradle-cpp-vscode:${libs.versions.gradleCppVscode.get()}"
 }
