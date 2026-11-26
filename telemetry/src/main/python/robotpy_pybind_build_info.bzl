@@ -2,7 +2,7 @@
 
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
-load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
+load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "make_pyi", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
 def telemetry_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
@@ -247,7 +247,7 @@ def telemetry_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inc
         tags = ["manual", "robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = [], extra_pyi_deps = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -282,6 +282,14 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         version_variable = "ROBOTPY_VERSION",
     )
 
+    make_pyi(
+        name = "telemetry._telemetry.make_pyi",
+        package_name = "telemetry._telemetry",
+        output_files = [["telemetry/_telemetry.pyi", "telemetry/_telemetry.pyi"]],
+        module_files = [["telemetry", "telemetry/__init__.py"], ["telemetry._init__telemetry", "telemetry/_init__telemetry.py"], ["telemetry._telemetry", "telemetry/_telemetry"]],
+        runner = ":{}.make_pyi_runner".format(name),
+    )
+
     robotpy_library(
         name = name,
         distribution = "robotpy-telemetry",
@@ -295,6 +303,10 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
             ":telemetry/_telemetry",
             ":telemetry.trampoline_hdr_files",
         ],
+        pyi_srcs = [
+            ":telemetry._telemetry.make_pyi",
+        ],
+        pyi_deps = extra_pyi_deps,
         imports = ["."],
         deps = [
             "//telemetry:robotpy-native-telemetry",

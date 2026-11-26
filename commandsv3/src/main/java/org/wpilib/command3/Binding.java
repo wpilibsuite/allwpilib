@@ -9,6 +9,8 @@ import org.wpilib.util.ErrorMessages;
 /**
  * A single trigger binding.
  *
+ * <p>This class is provided by the Commands v3 VendorDep
+ *
  * @param scope The scope in which the binding is active.
  * @param type The type of binding; or, when the bound command should run
  * @param command The bound command. Cannot be null.

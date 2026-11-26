@@ -4,7 +4,16 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <cstddef>
+#include <ratio>
+#include <span>
+#include <string_view>
+
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/base.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/struct/Struct.hpp"
 
@@ -16,8 +25,7 @@ template <class Distance>
   requires wpi::units::length_unit<Distance> ||
            wpi::units::angle_unit<Distance> ||
            wpi::units::traits::is_dimensionless_unit<Distance>::value
-struct wpi::util::Struct<
-    wpi::math::detail::TrapezoidProfileConstraints<Distance>> {
+struct wpi::util::Struct<wpi::math::TrapezoidProfileConstraints<Distance>> {
   static constexpr std::string_view GetTypeName() {
     if constexpr (wpi::units::length_unit<Distance>) {
       return "TrapezoidProfileConstraintsMeters";
@@ -32,13 +40,12 @@ struct wpi::util::Struct<
     return "double maxVelocity;double maxAcceleration";
   }
 
-  static wpi::math::detail::TrapezoidProfileConstraints<Distance> Unpack(
+  static wpi::math::TrapezoidProfile<Distance>::Constraints Unpack(
       std::span<const uint8_t> data) {
     using BaseUnit =
         wpi::units::unit<std::ratio<1>,
                          wpi::units::traits::base_unit_of<Distance>>;
-    using BaseConstraints =
-        wpi::math::detail::TrapezoidProfileConstraints<BaseUnit>;
+    using BaseConstraints = wpi::math::TrapezoidProfile<BaseUnit>::Constraints;
     constexpr size_t MAX_VELOCITY_OFF = 0;
     constexpr size_t MAX_ACCELERATION_OFF = MAX_VELOCITY_OFF + 8;
     return {typename BaseConstraints::Velocity_t{
@@ -49,12 +56,11 @@ struct wpi::util::Struct<
 
   static void Pack(
       std::span<uint8_t> data,
-      const wpi::math::detail::TrapezoidProfileConstraints<Distance>& value) {
+      const wpi::math::TrapezoidProfile<Distance>::Constraints& value) {
     using BaseUnit =
         wpi::units::unit<std::ratio<1>,
                          wpi::units::traits::base_unit_of<Distance>>;
-    using BaseConstraints =
-        wpi::math::detail::TrapezoidProfileConstraints<BaseUnit>;
+    using BaseConstraints = wpi::math::TrapezoidProfile<BaseUnit>::Constraints;
     constexpr size_t MAX_VELOCITY_OFF = 0;
     constexpr size_t MAX_ACCELERATION_OFF = MAX_VELOCITY_OFF + 8;
     wpi::util::PackStruct<MAX_VELOCITY_OFF>(

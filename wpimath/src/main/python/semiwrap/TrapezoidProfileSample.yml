@@ -1,0 +1,48 @@
+extra_includes:
+- format
+
+classes:
+  wpi::math::TrapezoidProfileSample:
+    force_no_trampoline: true
+    force_type_casters:
+    - wpi::units::second_t
+    - wpi::units::radians_per_second
+    - wpi::units::radians_per_second_squared
+    template_params:
+    - Distance
+    attributes:
+      time:
+      position:
+      velocity:
+      acceleration:
+    methods:
+      TrapezoidProfileSample:
+        overloads:
+          "":
+          wpi::units::second_t, Distance_t, Velocity_t, Acceleration_t:
+      operator==:
+    template_inline_code: |
+      {
+      std::string clsNameCopy = clsName;
+
+      cls_TrapezoidProfileSample
+        .def("__repr__", [clsNameCopy](const wpi::math::TrapezoidProfileSample<Distance>& self) {
+          return std::format("{}(time={}, position={}, velocity={}, acceleration={})",
+            clsNameCopy,
+            self.time(),
+            self.position(),
+            self.velocity(),
+            self.acceleration());
+        });
+      }
+
+templates:
+  TrapezoidProfileSample:
+    qualname: wpi::math::TrapezoidProfileSample
+    params:
+    - wpi::units::dimensionless::scalar
+
+  TrapezoidProfileRadiansSample:
+    qualname: wpi::math::TrapezoidProfileSample
+    params:
+    - wpi::units::radian

@@ -2,7 +2,7 @@ load("@rules_pkg//:mappings.bzl", "pkg_files")
 
 pkg_files(
     name = "resources",
-    srcs = glob(["src/main/resources/**"]),
+    srcs = ["src/main/resources/META-INF/services/javax.annotation.processing.Processor"],
     strip_prefix = "src/main/resources/",
     visibility = ["//epilogue-processor/src/main/java:__pkg__"],
 )

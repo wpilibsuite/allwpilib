@@ -13,6 +13,8 @@ import org.wpilib.event.EventLoop;
 /**
  * A version of {@link Gamepad} with {@link Trigger} factories for command-based.
  *
+ * <p>This class is provided by the Commands v2 VendorDep
+ *
  * @see Gamepad
  */
 @SuppressWarnings("MethodName")

@@ -52,6 +52,8 @@ import org.wpilib.annotation.NoDiscard;
  *     .executing(coroutine -> ...)
  *     .named("Example Command");
  * }</pre>
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 @NoDiscard
 public final class StagedCommandBuilder {

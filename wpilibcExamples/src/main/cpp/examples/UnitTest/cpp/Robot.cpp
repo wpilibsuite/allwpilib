@@ -5,7 +5,7 @@
 #include "Robot.hpp"
 
 /**
- * This function is called periodically during operator control.
+ * This function is called periodically during teleoperated mode.
  */
 void Robot::TeleopPeriodic() {
   // Activate the intake while the trigger is held

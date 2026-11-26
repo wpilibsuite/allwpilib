@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Drew Williams <williams.r.drew@gmail.com>
+Date: Wed, 26 Aug 2026 11:45:18 -0700
+Subject: [PATCH 3/5] Drive wire color from destination pin + dim unselected
+ wires
+
+---
+ src/ImNodeFlow.cpp | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/src/ImNodeFlow.cpp b/src/ImNodeFlow.cpp
+index 2f494675de1e08b00c15a6248636130d07fc1853..2d489d4879db0189d2c214f4f8f809cae07a36af 100644
+--- a/src/ImNodeFlow.cpp
++++ b/src/ImNodeFlow.cpp
+@@ -22,10 +22,25 @@ namespace ImFlow {
+             }
+         } else { m_hovered = false; }
+ 
++        // Wire color comes from the *destination* (right) pin so a sink can
++        // color-code which series a wire feeds (e.g. plot in0 = blue, in1 =
++        // orange). Source pins keep their own color for the socket itself,
++        // so the socket-side still reads as "where the data comes from"
++        // while the wire reads as "what role it plays at the sink."
++        ImU32 base = m_right->getStyle()->color;
++        // Unselected, unhovered wires dim to ~55% alpha so a thicket of
++        // connections doesn't read louder than the nodes on top of them.
++        // Selected/hovered keep full alpha (and the existing outline).
++        if (!m_selected && !m_hovered) {
++            const ImU32 a = (base >> IM_COL32_A_SHIFT) & 0xFFu;
++            const ImU32 dimmedA = (a * 140u) / 255u;
++            base = (base & ~IM_COL32_A_MASK) | (dimmedA << IM_COL32_A_SHIFT);
++        }
++
+         if (m_selected)
+             smart_bezier(start, end, m_left->getStyle()->extra.outline_color,
+                          thickness + m_left->getStyle()->extra.link_selected_outline_thickness);
+-        smart_bezier(start, end, m_left->getStyle()->color, thickness);
++        smart_bezier(start, end, base, thickness);
+ 
+         if (m_selected && ImGui::IsKeyPressed(ImGuiKey_Delete, false))
+             m_right->deleteLink();

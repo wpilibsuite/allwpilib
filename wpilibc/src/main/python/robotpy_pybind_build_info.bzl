@@ -3,7 +3,7 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
-load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
+load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "make_pyi", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
 def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
@@ -1854,7 +1854,7 @@ def wpilib_simulation_extension(srcs = [], header_to_dat_deps = [], extra_hdrs =
         tags = ["manual", "robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = [], extra_pyi_deps = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -1891,6 +1891,22 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         version_variable = "ROBOTPY_VERSION",
     )
 
+    make_pyi(
+        name = "wpilib._wpilib.make_pyi",
+        package_name = "wpilib._wpilib",
+        output_files = [["wpilib/_wpilib/__init__.pyi", "wpilib/_wpilib/__init__.pyi"], ["wpilib/_wpilib/sysid.pyi", "wpilib/_wpilib/sysid.pyi"]],
+        module_files = [["wpilib", "wpilib/__init__.py"], ["wpilib._init__wpilib", "wpilib/_init__wpilib.py"], ["wpilib._wpilib", "wpilib/_wpilib"], ["wpilib.simulation", "wpilib/simulation/__init__.py"], ["wpilib.simulation._init__simulation", "wpilib/simulation/_init__simulation.py"], ["wpilib.simulation._simulation", "wpilib/simulation/_simulation"]],
+        runner = ":{}.make_pyi_runner".format(name),
+    )
+
+    make_pyi(
+        name = "wpilib.simulation._simulation.make_pyi",
+        package_name = "wpilib.simulation._simulation",
+        output_files = [["wpilib/simulation/_simulation.pyi", "wpilib/simulation/_simulation.pyi"]],
+        module_files = [["wpilib", "wpilib/__init__.py"], ["wpilib._init__wpilib", "wpilib/_init__wpilib.py"], ["wpilib._wpilib", "wpilib/_wpilib"], ["wpilib.simulation", "wpilib/simulation/__init__.py"], ["wpilib.simulation._init__simulation", "wpilib/simulation/_init__simulation.py"], ["wpilib.simulation._simulation", "wpilib/simulation/_simulation"]],
+        runner = ":{}.make_pyi_runner".format(name),
+    )
+
     robotpy_library(
         name = name,
         distribution = "wpilib",
@@ -1907,6 +1923,11 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
             ":wpilib.trampoline_hdr_files",
             ":wpilib_simulation.trampoline_hdr_files",
         ],
+        pyi_srcs = [
+            ":wpilib._wpilib.make_pyi",
+            ":wpilib.simulation._simulation.make_pyi",
+        ],
+        pyi_deps = extra_pyi_deps,
         imports = ["."],
         deps = [
             "//hal/src/main/python",

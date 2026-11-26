@@ -22,6 +22,8 @@ namespace wpi::xrp {
  * XRPServo.
  *
  * <p>A SimDevice based servo
+ *
+ * This class is provided by the XRP VendorDep
  */
 class XRPServo {
  public:

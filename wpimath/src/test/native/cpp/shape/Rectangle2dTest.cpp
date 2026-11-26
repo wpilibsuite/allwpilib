@@ -11,6 +11,20 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/util/json.hpp"
+
+TEST_CASE("Rectangle2dTest JSON", "[wpimath]") {
+  const wpi::math::Rectangle2d rectangle{{1_m, 2_m, 90_deg}, 3_m, 4_m};
+  wpi::util::json json = rectangle;
+
+  CHECK(json.at("center").get<wpi::math::Pose2d>() == rectangle.Center());
+  CHECK(json.at("xWidth").get_number() == 3.0);
+  CHECK(json.at("yWidth").get_number() == 4.0);
+  CHECK(json.get<wpi::math::Rectangle2d>() == rectangle);
+
+  json["xWidth"] = -1.0;
+  CHECK_THROWS(json.get<wpi::math::Rectangle2d>());
+}
 
 TEST_CASE("Rectangle2dTest NewWithCorners", "[wpimath]") {
   constexpr wpi::math::Translation2d cornerA{1_m, 2_m};

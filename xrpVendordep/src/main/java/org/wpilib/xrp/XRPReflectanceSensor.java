@@ -6,7 +6,11 @@ package org.wpilib.xrp;
 
 import org.wpilib.hardware.discrete.AnalogInput;
 
-/** This class represents the reflectance sensor pair on an XRP robot. */
+/**
+ * This class represents the reflectance sensor pair on an XRP robot.
+ *
+ * <p>This class is provided by the XRP VendorDep
+ */
 public class XRPReflectanceSensor {
   private final AnalogInput m_leftSensor = new AnalogInput(0);
   private final AnalogInput m_rightSensor = new AnalogInput(1);

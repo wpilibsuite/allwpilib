@@ -9,7 +9,11 @@
 
 namespace wpi::apriltag {
 
-/** A pair of AprilTag pose estimates. */
+/**
+ * A pair of AprilTag pose estimates.
+ *
+ * This class is provided by the AprilTag VendorDep
+ */
 struct WPILIB_DLLEXPORT AprilTagPoseEstimate {
   /** Pose 1. */
   wpi::math::Transform3d pose1;

@@ -23,6 +23,8 @@ namespace wpi::xrp {
  * XRPMotor.
  *
  * <p>A SimDevice based motor controller representing the motors on an XRP robot
+ *
+ * This class is provided by the XRP VendorDep
  */
 class XRPMotor : public wpi::MotorController, public wpi::MotorSafety {
  public:

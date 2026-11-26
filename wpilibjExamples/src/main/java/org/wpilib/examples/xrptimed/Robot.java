@@ -32,9 +32,9 @@ public class Robot extends TimedRobot {
     rightDrive.setInverted(true);
   }
 
-  /** This function is run once each time the robot enters autonomous mode. */
+  /** This function is called each time autonomous mode starts. */
   @Override
-  public void autonomousInit() {
+  public void autonomousStart() {
     timer.restart();
   }
 
@@ -50,9 +50,9 @@ public class Robot extends TimedRobot {
     }
   }
 
-  /** This function is called once each time the robot enters teleoperated mode. */
+  /** This function is called each time teleoperated mode starts. */
   @Override
-  public void teleopInit() {}
+  public void teleopStart() {}
 
   /** This function is called periodically during teleoperated mode. */
   @Override
@@ -60,9 +60,9 @@ public class Robot extends TimedRobot {
     robotDrive.arcadeDrive(-controller.getRawAxis(2), -controller.getRawAxis(1));
   }
 
-  /** This function is called once each time the robot enters utility mode. */
+  /** This function is called each time utility mode starts. */
   @Override
-  public void utilityInit() {}
+  public void utilityStart() {}
 
   /** This function is called periodically during utility mode. */
   @Override

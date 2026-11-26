@@ -4,6 +4,8 @@
 
 package org.wpilib.math.controller;
 
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+
 import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.linalg.DARE;
 import org.wpilib.math.linalg.Matrix;
@@ -61,10 +63,10 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
       Vector<Inputs> relms,
       double dt) {
     this(
-        plant.getA(),
+        requireNonNullParam(plant, "plant", "LinearQuadraticRegulator").getA(),
         plant.getB(),
-        StateSpaceUtil.costMatrix(qelms),
-        StateSpaceUtil.costMatrix(relms),
+        StateSpaceUtil.costMatrix(requireNonNullParam(qelms, "qelms", "LinearQuadraticRegulator")),
+        StateSpaceUtil.costMatrix(requireNonNullParam(relms, "relms", "LinearQuadraticRegulator")),
         dt);
   }
 
@@ -88,7 +90,12 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
       Vector<States> qelms,
       Vector<Inputs> relms,
       double dt) {
-    this(A, B, StateSpaceUtil.costMatrix(qelms), StateSpaceUtil.costMatrix(relms), dt);
+    this(
+        A,
+        B,
+        StateSpaceUtil.costMatrix(requireNonNullParam(qelms, "qelms", "LinearQuadraticRegulator")),
+        StateSpaceUtil.costMatrix(requireNonNullParam(relms, "relms", "LinearQuadraticRegulator")),
+        dt);
   }
 
   /**
@@ -107,6 +114,11 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
       Matrix<States, States> Q,
       Matrix<Inputs, Inputs> R,
       double dt) {
+    requireNonNullParam(A, "A", "LinearQuadraticRegulator");
+    requireNonNullParam(B, "B", "LinearQuadraticRegulator");
+    requireNonNullParam(Q, "Q", "LinearQuadraticRegulator");
+    requireNonNullParam(R, "R", "LinearQuadraticRegulator");
+
     var discABPair = Discretization.discretizeAB(A, B, dt);
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
@@ -149,6 +161,12 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
       Matrix<Inputs, Inputs> R,
       Matrix<States, Inputs> N,
       double dt) {
+    requireNonNullParam(A, "A", "LinearQuadraticRegulator");
+    requireNonNullParam(B, "B", "LinearQuadraticRegulator");
+    requireNonNullParam(Q, "Q", "LinearQuadraticRegulator");
+    requireNonNullParam(R, "R", "LinearQuadraticRegulator");
+    requireNonNullParam(N, "N", "LinearQuadraticRegulator");
+
     var discABPair = Discretization.discretizeAB(A, B, dt);
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
@@ -233,6 +251,9 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @return True if the error is within tolerance of the reference.
    */
   public boolean atReference() {
+    if (m_error == null || m_tolerance == null) {
+      return false;
+    }
     for (int i = 0; i < m_error.getNumRows(); i++) {
       if (Math.abs(m_error.get(i, 0)) > m_tolerance.get(i, 0)) {
         return false;

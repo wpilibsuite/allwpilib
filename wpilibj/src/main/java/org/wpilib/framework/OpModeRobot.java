@@ -71,6 +71,7 @@ import org.wpilib.util.UsageReporting;
  *   <li>{@link #disabledPeriodic()}, only while disabled
  *   <li>{@link PeriodicOpMode#disabledPeriodic()} of the selected opmode, only while disabled
  *   <li>{@link #nonePeriodic()}, only when no opmode is selected
+ *   <li>{@link #enabledPeriodic()}, only while enabled with an opmode selected
  *   <li>{@link #robotPeriodic()}
  *   <li>{@link #simulationPeriodic()}, only in simulation
  * </ol>
@@ -101,7 +102,7 @@ public abstract class OpModeRobot extends RobotBase {
   // OpMode lifecycle state
   private long m_lastModeId = -1;
   private boolean m_calledDriverStationConnected = false;
-  // null until the first loop, so that disabledInit() runs on startup
+  // null until the first loop, so that disabledStart() runs on startup
   private RobotMode m_lastMode;
   private OpMode m_currentOpMode;
   private String m_currentOpModeName;
@@ -717,9 +718,9 @@ public abstract class OpModeRobot extends RobotBase {
   /**
    * Function called periodically every loop, regardless of enabled state or OpMode selection.
    *
-   * <p>Runs after {@link #disabledPeriodic()}, the opmode's {@code disabledPeriodic()}, and {@link
-   * #nonePeriodic()}, and before {@link #simulationPeriodic()}. When an opmode is enabled, this
-   * runs before its {@code periodic()} in the same period.
+   * <p>Runs after {@link #disabledPeriodic()}, the opmode's {@code disabledPeriodic()}, {@link
+   * #nonePeriodic()}, and {@link #enabledPeriodic()}, and before {@link #simulationPeriodic()}.
+   * When an opmode is enabled, this runs before its {@code periodic()} in the same period.
    */
   public void robotPeriodic() {}
 
@@ -734,8 +735,8 @@ public abstract class OpModeRobot extends RobotBase {
    */
   public void simulationPeriodic() {}
 
-  /** Function called once when the robot becomes disabled. */
-  public void disabledInit() {}
+  /** Function called each time disabled mode starts. */
+  public void disabledStart() {}
 
   /**
    * Function called periodically while the robot is disabled.
@@ -745,8 +746,8 @@ public abstract class OpModeRobot extends RobotBase {
    */
   public void disabledPeriodic() {}
 
-  /** Function called once when the robot exits disabled state. */
-  public void disabledExit() {}
+  /** Function called each time disabled mode ends. */
+  public void disabledEnd() {}
 
   /**
    * Function called periodically anytime when no opmode is selected, including when the Driver
@@ -755,6 +756,15 @@ public abstract class OpModeRobot extends RobotBase {
    * <p>Runs after {@link #disabledPeriodic()} and before {@link #robotPeriodic()}.
    */
   public void nonePeriodic() {}
+
+  /**
+   * Function called periodically while the robot is enabled and there is a current opmode.
+   *
+   * <p>Runs after {@link #nonePeriodic()} and before {@link #robotPeriodic()}. When an opmode is
+   * enabled, this runs before its {@code periodic()} in the same period. Never runs while disabled
+   * or when no opmode is selected.
+   */
+  public void enabledPeriodic() {}
 
   /**
    * Return the system clock time in nanoseconds for the start of the current periodic loop. This is
@@ -767,7 +777,7 @@ public abstract class OpModeRobot extends RobotBase {
     return m_callbacks.getLoopStartTime();
   }
 
-  /** Main robot loop function. Handles disabled state logic and opmode management. */
+  /** Main robot loop function. Handles disabled mode logic and opmode management. */
   private void loopFunc() {
     DriverStationBackend.refreshData();
 
@@ -818,11 +828,11 @@ public abstract class OpModeRobot extends RobotBase {
       }
     }
 
-    // If mode changed, call disabled exit and entry functions
+    // If mode changed, call disabled end and start functions
     if (m_lastMode != mode) {
       if (m_lastMode == RobotMode.UNKNOWN) {
         // Transitioning out of disabled
-        disabledExit();
+        disabledEnd();
       }
       if (mode == RobotMode.UNKNOWN) {
         // Transitioning to disabled. Only tear down an opmode that was actually
@@ -832,8 +842,8 @@ public abstract class OpModeRobot extends RobotBase {
           endCurrentOpMode();
           m_lastModeId = -1; // force recreate next loop
         }
-        disabledInit();
-        m_watchdog.addEpoch("disabledInit()");
+        disabledStart();
+        m_watchdog.addEpoch("disabledStart()");
       }
       m_lastMode = mode;
     }
@@ -856,6 +866,10 @@ public abstract class OpModeRobot extends RobotBase {
         m_currentOpMode.disabledPeriodic();
         m_watchdog.addEpoch("opMode.disabledPeriodic()");
       }
+    } else if (m_currentOpMode != null) {
+      // Call enabledPeriodic when enabled with a current opmode
+      enabledPeriodic();
+      m_watchdog.addEpoch("enabledPeriodic()");
     }
 
     // Call nonePeriodic when no opmode is selected
@@ -964,7 +978,7 @@ public abstract class OpModeRobot extends RobotBase {
 
     // Tell the DS that the robot is ready to be enabled
     System.out.println("********** Robot program startup complete **********");
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
 
     // Loop forever, calling the callback system which handles periodic functions
     while (true) {

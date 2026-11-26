@@ -315,6 +315,23 @@ Java_org_wpilib_datalog_DataLogJNI_stop
 
 /*
  * Class:     org_wpilib_datalog_DataLogJNI
+ * Method:    getBufferFreeSpace
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL
+Java_org_wpilib_datalog_DataLogJNI_getBufferFreeSpace
+  (JNIEnv* env, jclass, jlong impl)
+{
+  if (impl == 0) {
+    nullPointerEx.Throw(env, "impl is null");
+    return 0;
+  }
+  return static_cast<jint>(
+      reinterpret_cast<DataLog*>(impl)->GetBufferFreeSpace());
+}
+
+/*
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    addSchema
  * Signature: (JLjava/lang/String;Ljava/lang/String;[BJ)V
  */

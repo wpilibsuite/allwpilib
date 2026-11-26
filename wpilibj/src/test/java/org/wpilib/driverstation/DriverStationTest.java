@@ -26,16 +26,6 @@ import org.wpilib.simulation.SimHooks;
 import org.wpilib.util.Alert;
 
 class DriverStationTest {
-  @BeforeEach
-  void setUp() {
-    DriverStationBackend.clearUserProgramStarted();
-  }
-
-  @AfterEach
-  void tearDown() {
-    DriverStationBackend.clearUserProgramStarted();
-  }
-
   @ParameterizedTest
   @MethodSource("isConnectedProvider")
   void testIsConnected(int axisCount, int buttonCount, int povCount, boolean expected) {
@@ -54,7 +44,7 @@ class DriverStationTest {
     DriverStationSim.notifyNewData();
     assertEquals(0, RobotState.getOpModeId());
 
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
     // need to manually mask because the upper eight bits include robot mode information
     assertEquals(0x1234, RobotState.getOpModeId() & 0xFFFF);
   }
@@ -65,7 +55,7 @@ class DriverStationTest {
     DriverStationSim.notifyNewData();
     assertEquals("", RobotState.getOpMode());
 
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
     // in Sim, the opmode string is just the stringified version of the opmode i64 "<0000...0000>"
     // we need to parse the string to get the
     // need to manually mask because the upper eight bits include robot mode information
@@ -90,7 +80,7 @@ class DriverStationTest {
     assertFalse(RobotState.isUtility());
     assertFalse(RobotState.isUtilityEnabled());
 
-    DriverStationBackend.observeUserProgramStarting();
+    RobotState.observeUserProgramStarting();
 
     assertEquals(RobotMode.AUTONOMOUS, RobotState.getRobotMode());
     assertTrue(RobotState.isAutonomous());
@@ -229,9 +219,10 @@ class DriverStationTest {
     DriverStationSim.setJoystickPOVsAvailable(stick, 0);
   }
 
+  @BeforeEach
   @AfterEach
-  @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
-  void resetUserProgramFlag() throws ReflectiveOperationException {
+  void resetDriverStation() {
+    DriverStationSim.resetData();
     disconnectJoystick(0);
     DriverStationSim.setFmsAttached(false);
     DriverStationSim.notifyNewData();
@@ -239,9 +230,6 @@ class DriverStationTest {
     AlertSim.resetData();
     DriverStationBackend.silenceJoystickConnectionAlert(false);
     assertFalse(isJoystickDisconnectedAlertActive(0));
-
-    var field = DriverStationBackend.class.getDeclaredField("m_userProgramStarted");
-    field.setAccessible(true);
-    field.set(null, false);
+    RobotState.clearUserProgramStarted();
   }
 }

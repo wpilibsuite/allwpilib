@@ -77,14 +77,17 @@ TAGS = {
     "RobotBase",
     "Educational",
     "OpMode",
+    # --- Competition ---
+    "FTC",
+    "FRC",
     # --- Misc ---
     # (try to keep this section minimal)
     "EventLoop",
     "Mechanism2d",
     "Preferences",
     "Skeleton",
-    "FTC",
     "ExpansionHub",
+    "UnitTests",
 }
 
 

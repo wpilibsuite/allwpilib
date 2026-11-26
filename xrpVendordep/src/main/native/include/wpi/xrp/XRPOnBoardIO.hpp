@@ -24,6 +24,8 @@ namespace wpi::xrp {
  *
  * <p>DIO 0 - USER Button (input only)
  * DIO 1 - LED (output only)
+ *
+ * This class is provided by the XRP VendorDep
  */
 class XRPOnBoardIO {
  public:

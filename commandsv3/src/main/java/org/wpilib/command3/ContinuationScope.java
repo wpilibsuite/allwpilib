@@ -9,7 +9,11 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Objects;
 
-/** A continuation scope. */
+/**
+ * A continuation scope.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
+ */
 @SuppressWarnings("PMD.AvoidCatchingGenericException")
 final class ContinuationScope {
   // The underlying jdk.internal.vm.ContinuationScope object

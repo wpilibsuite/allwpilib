@@ -32,9 +32,10 @@ macro(wpilib_target_warnings target)
         target_compile_options(${target} PRIVATE ${WARNING_FLAGS})
     endif()
 
-    # Suppress -Warray-bounds
+    # Suppress -Warray-bounds and -Wpsabi
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-array-bounds>)
+        target_compile_options(${target} PRIVATE -Wno-psabi)
     endif()
 
     # Compress debug info with GCC

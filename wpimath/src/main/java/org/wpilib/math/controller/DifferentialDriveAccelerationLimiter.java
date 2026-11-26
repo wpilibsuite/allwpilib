@@ -4,6 +4,8 @@
 
 package org.wpilib.math.controller;
 
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
+
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
@@ -39,7 +41,12 @@ public class DifferentialDriveAccelerationLimiter {
       double trackwidth,
       double maxLinearAccel,
       double maxAngularAccel) {
-    this(system, trackwidth, -maxLinearAccel, maxLinearAccel, maxAngularAccel);
+    this(
+        requireNonNullParam(system, "system", "DifferentialDriveAccelerationLimiter"),
+        trackwidth,
+        -maxLinearAccel,
+        maxLinearAccel,
+        maxAngularAccel);
   }
 
   /**
@@ -62,6 +69,7 @@ public class DifferentialDriveAccelerationLimiter {
       double minLinearAccel,
       double maxLinearAccel,
       double maxAngularAccel) {
+    requireNonNullParam(system, "system", "DifferentialDriveAccelerationLimiter");
     if (minLinearAccel > maxLinearAccel) {
       throw new IllegalArgumentException("maxLinearAccel must be greater than minLinearAccel");
     }

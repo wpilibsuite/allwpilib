@@ -13,7 +13,11 @@ namespace wpi::xrp {
  * @{
  */
 
-/** This class represents the reflectance sensor pair on an XRP robot. */
+/**
+ * This class represents the reflectance sensor pair on an XRP robot.
+ *
+ * This class is provided by the XRP VendorDep
+ */
 class XRPReflectanceSensor {
  public:
   /**

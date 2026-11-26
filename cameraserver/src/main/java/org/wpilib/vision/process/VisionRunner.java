@@ -14,6 +14,8 @@ import org.wpilib.vision.stream.CameraServerSharedStore;
  * code. The easiest way to use this is to run it in a {@link VisionThread} and use the listener to
  * take snapshots of the pipeline's outputs.
  *
+ * <p>This class is provided by the CameraServer VendorDep
+ *
  * @param <P> Vision pipeline type.
  * @see VisionPipeline
  * @see VisionThread

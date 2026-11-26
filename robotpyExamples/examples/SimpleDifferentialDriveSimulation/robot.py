@@ -9,6 +9,7 @@ from typing import override
 
 import wpilib
 import wpimath
+import wpimath.units
 
 from drivetrain import Drivetrain
 
@@ -25,19 +26,41 @@ class MyRobot(wpilib.TimedRobot):
 
         self.drive = Drivetrain()
         self.feedback = wpimath.LTVUnicycleController(0.020)
+        self.feedback.set_tolerance(
+            wpimath.Pose2d(0.1, 0.1, wpimath.units.degrees_to_radians(5.0))
+        )
         self.timer = wpilib.Timer()
 
         # Called once at the beginning of the robot program.
-        # Replace this with a call to a trajectory generator. Field poses use
-        # field center as the origin, with zero heading toward the blue wall.
+        # Stand-in for a pre-generated path. Replace this with a call to a
+        # trajectory generator. Field poses use field center as the origin,
+        # with zero heading toward the blue wall.
         self.trajectory = wpimath.HolonomicTrajectory(
             [
                 wpimath.HolonomicSample(
                     0.0,
                     wpimath.Pose2d(0.0, 0.0, 0.0),
                     wpimath.ChassisVelocities(0.0, 0.0, 0.0),
+                    wpimath.ChassisAccelerations(2.0, 0.0, 0.0),
+                ),
+                wpimath.HolonomicSample(
+                    1.0,
+                    wpimath.Pose2d(1.0, 0.0, 0.0),
+                    wpimath.ChassisVelocities(2.0, 0.0, 0.0),
                     wpimath.ChassisAccelerations(0.0, 0.0, 0.0),
-                )
+                ),
+                wpimath.HolonomicSample(
+                    2.0,
+                    wpimath.Pose2d(3.0, 0.0, 0.0),
+                    wpimath.ChassisVelocities(2.0, 0.0, 0.0),
+                    wpimath.ChassisAccelerations(-2.0, 0.0, 0.0),
+                ),
+                wpimath.HolonomicSample(
+                    3.0,
+                    wpimath.Pose2d(4.0, 0.0, 0.0),
+                    wpimath.ChassisVelocities(0.0, 0.0, 0.0),
+                    wpimath.ChassisAccelerations(0.0, 0.0, 0.0),
+                ),
             ]
         )
 
@@ -46,7 +69,7 @@ class MyRobot(wpilib.TimedRobot):
         self.drive.periodic()
 
     @override
-    def autonomous_init(self) -> None:
+    def autonomous_start(self) -> None:
         self.timer.restart()
         self.drive.reset_odometry(self.trajectory.start().pose)
 
@@ -79,3 +102,8 @@ class MyRobot(wpilib.TimedRobot):
     @override
     def simulation_periodic(self) -> None:
         self.drive.simulation_periodic()
+
+    @override
+    def disabled_start(self) -> None:
+        # This just makes sure that our simulation code knows that the motor's off.
+        self.drive.stop()

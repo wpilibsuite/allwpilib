@@ -211,7 +211,22 @@ class WPILIB_DLLEXPORT Ellipse2d final {
   }
 };
 
+WPILIB_DLLEXPORT
+void to_json(wpi::util::json& json, const Ellipse2d& ellipse);
+
 }  // namespace wpi::math
+
+namespace wpi::util {
+
+template <typename T>
+struct json_serializer;
+
+template <>
+struct WPILIB_DLLEXPORT json_serializer<wpi::math::Ellipse2d> {
+  static wpi::math::Ellipse2d from(const json& json);
+};
+
+}  // namespace wpi::util
 
 #include "wpi/math/shape/proto/Ellipse2dProto.hpp"
 #include "wpi/math/shape/struct/Ellipse2dStruct.hpp"

@@ -167,6 +167,15 @@ public class DataLogJNI {
   static native void stop(long impl);
 
   /**
+   * Gets the remaining capacity in the outgoing buffer in bytes, or 0 if the log is stopped,
+   * paused, blocked, or has exceeded its buffer capacity.
+   *
+   * @param impl data log implementation handle
+   * @return Remaining buffer capacity in bytes
+   */
+  static native int getBufferFreeSpace(long impl);
+
+  /**
    * Registers a data schema. Data schemas provide information for how a certain data type string
    * can be decoded. The type string of a data schema indicates the type of the schema itself (e.g.
    * "protobuf" for protobuf schemas, "struct" for struct schemas, etc). In the data log, schemas

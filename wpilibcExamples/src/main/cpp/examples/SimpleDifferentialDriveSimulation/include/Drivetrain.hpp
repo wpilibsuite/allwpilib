@@ -16,6 +16,7 @@
 #include "wpi/math/system/Models.hpp"
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
+#include "wpi/simulation/OnboardIMUSim.hpp"
 #include "wpi/smartdashboard/Field2d.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
@@ -60,6 +61,7 @@ class Drivetrain {
       const wpi::math::DifferentialDriveWheelVelocities& velocities);
   void Drive(wpi::units::meters_per_second_t xVelocity,
              wpi::units::radians_per_second_t rot);
+  void Stop();
   void UpdateOdometry();
   void ResetOdometry(const wpi::math::Pose2d& pose);
 
@@ -99,6 +101,7 @@ class Drivetrain {
   // Simulation classes help us simulate our robot
   wpi::sim::EncoderSim leftEncoderSim{leftEncoder};
   wpi::sim::EncoderSim rightEncoderSim{rightEncoder};
+  wpi::sim::OnboardIMUSim imuSim;
   wpi::Field2d fieldSim;
   wpi::math::LinearSystem<2, 2, 2> drivetrainSystem =
       wpi::math::Models::DifferentialDriveFromSysId(

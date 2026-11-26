@@ -5,7 +5,6 @@
 #include "wpi/framework/OpModeRobot.hpp"
 
 #include <cstdio>
-#include <cstdlib>
 #include <format>
 #include <map>
 #include <memory>
@@ -18,7 +17,6 @@
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
-#include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Notifier.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
@@ -26,7 +24,6 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
-#include "wpi/util/SafeThread.hpp"
 #include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/print.hpp"
 
@@ -125,8 +122,7 @@ void OpModeRobotBase::LoopFunc() {
   wpi::internal::DriverStationBackend::RefreshData();
 
   // Get current enabled state and opmode
-  const hal::ControlWord word =
-      wpi::internal::DriverStationBackend::GetControlWord();
+  const hal::ControlWord word = wpi::hal::GetControlWord();
   m_watchdog.Reset();
   const bool enabled = word.IsEnabled();
   // Treat disabled as unknown
@@ -176,11 +172,11 @@ void OpModeRobotBase::LoopFunc() {
     }
   }
 
-  // If mode changed, call disabled exit and entry functions
+  // If mode changed, call disabled end and start functions
   if (m_lastMode != mode) {
     if (m_lastMode == RobotMode::UNKNOWN) {
       // Transitioning out of disabled
-      DisabledExit();
+      DisabledEnd();
     }
     if (mode == RobotMode::UNKNOWN) {
       // Transitioning to disabled. Only tear down an opmode that was actually
@@ -190,8 +186,8 @@ void OpModeRobotBase::LoopFunc() {
         EndCurrentOpMode();
         m_lastModeId = -1;  // force recreate next loop
       }
-      DisabledInit();
-      m_watchdog.AddEpoch("DisabledInit()");
+      DisabledStart();
+      m_watchdog.AddEpoch("DisabledStart()");
     }
     m_lastMode = mode;
   }
@@ -214,6 +210,10 @@ void OpModeRobotBase::LoopFunc() {
       m_currentOpMode->DisabledPeriodic();
       m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
     }
+  } else if (m_currentOpMode) {
+    // Call EnabledPeriodic when enabled with a current opmode
+    EnabledPeriodic();
+    m_watchdog.AddEpoch("EnabledPeriodic()");
   }
 
   // Call NonePeriodic when no opmode is selected
@@ -256,7 +256,7 @@ void OpModeRobotBase::StartCompetition() {
 
   // Tell the DS that the robot is ready to be enabled
   std::puts("\n********** Robot program startup complete **********");
-  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
+  wpi::RobotState::ObserveUserProgramStarting();
 
   // Loop forever, calling the callback system which handles periodic functions
   while (true) {

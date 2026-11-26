@@ -27,7 +27,7 @@ Robot::Robot() : wpi::TimesliceRobot{5_ms, 10_ms} {
 /**
  * This function is called every robot packet, no matter the mode. Use
  * this for items like diagnostics that you want ran during disabled,
- * autonomous, teleoperated and test.
+ * autonomous, teleoperated and utility.
  *
  * <p> This runs after the mode specific periodic functions, but before
  * LiveWindow and SmartDashboard integrated updating.
@@ -46,7 +46,7 @@ void Robot::RobotPeriodic() {}
  * wpi::tunables::Selectable make sure to add them to the chooser code above as
  * well.
  */
-void Robot::AutonomousInit() {
+void Robot::AutonomousStart() {
   autoSelected = chooser.GetSelected();
   // autoSelected = SmartDashboard::GetString("Auto Selector",
   //     AUTO_NAME_DEFAULT);
@@ -67,15 +67,15 @@ void Robot::AutonomousPeriodic() {
   }
 }
 
-void Robot::TeleopInit() {}
+void Robot::TeleopStart() {}
 
 void Robot::TeleopPeriodic() {}
 
-void Robot::DisabledInit() {}
+void Robot::DisabledStart() {}
 
 void Robot::DisabledPeriodic() {}
 
-void Robot::UtilityInit() {}
+void Robot::UtilityStart() {}
 
 void Robot::UtilityPeriodic() {}
 

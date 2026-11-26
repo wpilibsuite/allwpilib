@@ -13,19 +13,19 @@ public class Robot extends TimedRobot {
    */
   public Robot() {}
 
-  /** This function is run once each time the robot enters autonomous mode. */
+  /** This function is called each time autonomous mode starts. */
   @Override
-  public void autonomousInit() {}
+  public void autonomousStart() {}
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
 
-  /** This function is called once each time the robot enters tele-operated mode. */
+  /** This function is called each time teleoperated mode starts. */
   @Override
-  public void teleopInit() {}
+  public void teleopStart() {}
 
-  /** This function is called periodically during operator control. */
+  /** This function is called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {}
 

@@ -12,6 +12,8 @@ import org.wpilib.hardware.hal.SimDouble;
  * RomiServo.
  *
  * <p>A SimDevice based servo
+ *
+ * <p>This class is provided by the Romi VendorDep
  */
 public class RomiServo {
   private final SimDouble m_simPosition;

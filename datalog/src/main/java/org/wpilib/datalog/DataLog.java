@@ -61,6 +61,16 @@ public class DataLog implements AutoCloseable {
   }
 
   /**
+   * Gets the remaining capacity in the outgoing buffer in bytes, or 0 if the log is stopped,
+   * paused, blocked, or has exceeded its buffer capacity.
+   *
+   * @return Remaining buffer capacity in bytes
+   */
+  public int getBufferFreeSpace() {
+    return DataLogJNI.getBufferFreeSpace(m_impl);
+  }
+
+  /**
    * Returns whether there is a data schema already registered with the given name.
    *
    * @param name Name (the string passed as the data type for records using this schema)

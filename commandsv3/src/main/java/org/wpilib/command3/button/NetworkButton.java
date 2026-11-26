@@ -12,7 +12,11 @@ import org.wpilib.networktables.BooleanTopic;
 import org.wpilib.networktables.NetworkTable;
 import org.wpilib.networktables.NetworkTableInstance;
 
-/** A {@link Trigger} that uses a {@link NetworkTable} boolean field. */
+/**
+ * A {@link Trigger} that uses a {@link NetworkTable} boolean field.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
+ */
 public class NetworkButton extends Trigger {
   /**
    * Creates a NetworkButton that commands can be bound to.

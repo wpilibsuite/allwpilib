@@ -8,21 +8,16 @@
 
 #include <array>
 #include <atomic>
-#include <format>
-#include <functional>
+#include <cstdint>
 #include <memory>
-#include <span>
 #include <string>
 #include <string_view>
-#include <utility>
-#include <vector>
 
-#include "wpi/datalog/DataLog.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
-#include "wpi/hal/DriverStation.h"
+#include "wpi/driverstation/RobotState.hpp"
+#include "wpi/hal/DriverStation.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
-#include "wpi/hal/Power.h"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTable.hpp"
@@ -30,27 +25,19 @@
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/StructTopic.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/Alert.hpp"
-#include "wpi/util/Color.hpp"
-#include "wpi/util/DenseMap.hpp"
 #include "wpi/util/EventVector.hpp"
-#include "wpi/util/StringExtras.hpp"
-#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/string.hpp"
 #include "wpi/util/timestamp.hpp"
 
 using namespace wpi;
 using namespace wpi::internal;
 
-static constexpr int availableToCount(uint64_t available) {
-  return 64 - std::countl_zero(available);
-}
-
 GenericHID DriverStationBackend::ConstructGenericHID(int port) {
   return GenericHID{port};
 }
+
+class DataLogSender;
 
 namespace {
 // A simple class which caches the previous value written to an NT entry
@@ -114,88 +101,6 @@ struct MatchDataSender {
   wpi::hal::ControlWord prevControlWord;
 };
 
-class JoystickLogSender {
- public:
-  void Init(wpi::log::DataLog& log, unsigned int stick, int64_t timestamp);
-  void Send(int64_t timestamp);
-
- private:
-  void AppendButtons(HAL_JoystickButtons buttons, int64_t timestamp);
-  void AppendPOVs(const HAL_JoystickPOVs& povs, int64_t timestamp);
-
-  unsigned int m_stick;
-  HAL_JoystickButtons m_prevButtons;
-  HAL_JoystickAxes m_prevAxes;
-  HAL_JoystickPOVs m_prevPOVs;
-  wpi::log::BooleanArrayLogEntry m_logButtons;
-  wpi::log::FloatArrayLogEntry m_logAxes;
-  wpi::log::IntegerArrayLogEntry m_logPOVs;
-};
-
-class DataLogSender {
- public:
-  void Init(wpi::log::DataLog& log, bool logJoysticks, int64_t timestamp);
-  void Send(int64_t timestamp);
-
- private:
-  std::atomic_bool m_initialized{false};
-
-  hal::ControlWord m_prevControlWord;
-  wpi::log::StructLogEntry<hal::ControlWord> m_logControlWord;
-  wpi::log::StringLogEntry m_logOpMode;
-
-  bool m_logJoysticks;
-  std::array<JoystickLogSender, DriverStationBackend::JOYSTICK_PORTS>
-      m_joysticks;
-};
-
-enum class JoystickResourceAlert { BUTTON, AXIS, POV };
-
-static constexpr std::array<JoystickResourceAlert, 3> JOYSTICK_RESOURCE_ALERTS{
-    JoystickResourceAlert::BUTTON, JoystickResourceAlert::AXIS,
-    JoystickResourceAlert::POV};
-
-static constexpr size_t JoystickResourceAlertIndex(JoystickResourceAlert type) {
-  return static_cast<size_t>(type);
-}
-
-static constexpr std::array<std::string_view, JOYSTICK_RESOURCE_ALERTS.size()>
-    JOYSTICK_RESOURCE_ALERT_ID_SUFFIXES{"ButtonUnavailable", "AxisUnavailable",
-                                        "POVUnavailable"};
-
-static constexpr std::array<std::string_view, JOYSTICK_RESOURCE_ALERTS.size()>
-    JOYSTICK_RESOURCE_ALERT_LABELS{"Button", "axis", "POV"};
-
-struct JoystickAlertState {
-  wpi::util::Alert alert;
-  bool active = false;
-};
-
-struct JoystickAlerts {
-  bool Initialize();
-  void Release();
-  bool PrepareForReport(bool silenceJoystickAlerts);
-  void Refresh();
-  void ClearAllAlerts();
-  void ClearResourceAlerts();
-  void RefreshResourceAlert(JoystickResourceAlert type);
-  bool IsResourceAlertAvailable(JoystickResourceAlert type) const;
-  void ReportResourceWarning(JoystickResourceAlert type, int resource);
-  void ReportTouchpadFingerWarning(int touchpad, int finger);
-  bool SetAlert(JoystickAlertState& alertState, bool active,
-                std::string_view alertText = {});
-
-  int stick = 0;
-  bool initialized = false;
-  JoystickAlertState connectionAlert;
-  std::array<JoystickAlertState, JOYSTICK_RESOURCE_ALERTS.size()>
-      resourceAlerts;
-  JoystickAlertState touchpadFingerAlert;
-  std::array<int, JOYSTICK_RESOURCE_ALERTS.size()> resourceAlertValues{};
-  int touchpadFingerAlertTouchpad = 0;
-  int touchpadFingerAlertFinger = 0;
-};
-
 struct Instance {
   Instance();
   ~Instance();
@@ -218,23 +123,6 @@ struct Instance {
   bool silenceJoystickAlerts = false;
   std::array<JoystickAlerts, DriverStationBackend::JOYSTICK_PORTS>
       joystickAlerts;
-
-  // Op mode lookup
-  wpi::util::mutex opModeMutex;
-  wpi::util::DenseMap<int64_t, HAL_OpModeOption> opModes;
-  bool userProgramStarted = false;
-
-  std::string OpModeToString(int64_t id) {
-    std::scoped_lock lock{opModeMutex};
-    if (id == 0) {
-      return "";
-    }
-    auto it = opModes.find(id);
-    if (it != opModes.end()) {
-      return std::string{wpi::util::to_string_view(&it->second.name)};
-    }
-    return std::format("<{}>", id);
-  }
 };
 }  // namespace
 
@@ -243,6 +131,12 @@ static Instance& GetInstance() {
   return instance;
 }
 
+extern DataLogSender* CreateDataLogSender();
+extern void InitDataLogSender(DataLogSender* sender, wpi::log::DataLog& log,
+                              bool logJoysticks, int64_t timestamp);
+extern void SendDataLogSender(DataLogSender* sender, int64_t timestamp);
+extern void DeleteDataLogSender(DataLogSender* sender);
+
 static void SendMatchData();
 static void ClearJoystickAlerts();
 static void ClearJoystickAlertsLocked();
@@ -250,198 +144,6 @@ static void ReportJoystickResourceWarning(int stick, JoystickResourceAlert type,
                                           int resource);
 static void ReportJoystickTouchpadFingerWarning(int stick, int touchpad,
                                                 int finger);
-
-template <typename S, typename... Args>
-static inline void ReportJoystickError(int stick, const S& format,
-                                       Args&&... args) {
-  ReportJoystickErrorV(stick, format, std::make_format_args(args...));
-}
-
-bool JoystickAlerts::Initialize() {
-  wpi::util::Alert newConnectionAlert(
-      "DriverStation", std::format("joystick{}Disconnected", stick),
-      std::format("Joystick on port {} not available, check if all "
-                  "controllers are plugged in",
-                  stick),
-      wpi::util::Alert::Level::HIGH);
-  if (!newConnectionAlert) {
-    return false;
-  }
-
-  std::array<wpi::util::Alert, JOYSTICK_RESOURCE_ALERTS.size()>
-      newResourceAlerts;
-  for (auto type : JOYSTICK_RESOURCE_ALERTS) {
-    auto index = JoystickResourceAlertIndex(type);
-    newResourceAlerts[index] = wpi::util::Alert(
-        "DriverStation",
-        std::format("joystick{}{}", stick,
-                    JOYSTICK_RESOURCE_ALERT_ID_SUFFIXES[index]),
-        {}, wpi::util::Alert::Level::MEDIUM);
-    if (!newResourceAlerts[index]) {
-      return false;
-    }
-  }
-
-  wpi::util::Alert newTouchpadFingerAlert(
-      "DriverStation",
-      std::format("joystick{}TouchpadFingerUnavailable", stick), {},
-      wpi::util::Alert::Level::MEDIUM);
-  if (!newTouchpadFingerAlert) {
-    return false;
-  }
-
-  connectionAlert.alert = std::move(newConnectionAlert);
-  for (auto type : JOYSTICK_RESOURCE_ALERTS) {
-    auto index = JoystickResourceAlertIndex(type);
-    resourceAlerts[index].alert = std::move(newResourceAlerts[index]);
-  }
-  touchpadFingerAlert.alert = std::move(newTouchpadFingerAlert);
-  initialized = true;
-  return true;
-}
-
-void JoystickAlerts::Release() {
-  wpi::util::detail::ReleaseAlertHandle(connectionAlert.alert);
-  for (auto& alertState : resourceAlerts) {
-    wpi::util::detail::ReleaseAlertHandle(alertState.alert);
-  }
-  wpi::util::detail::ReleaseAlertHandle(touchpadFingerAlert.alert);
-  initialized = false;
-}
-
-bool JoystickAlerts::PrepareForReport(bool silenceJoystickAlerts) {
-  if (!DriverStationBackend::IsFMSAttached() && silenceJoystickAlerts) {
-    return false;
-  }
-
-  if (DriverStationBackend::IsJoystickConnected(stick)) {
-    SetAlert(connectionAlert, false);
-    return true;
-  }
-
-  ClearResourceAlerts();
-  SetAlert(connectionAlert, true);
-  return false;
-}
-
-void JoystickAlerts::Refresh() {
-  if (!initialized) {
-    return;
-  }
-
-  if (!DriverStationBackend::IsJoystickConnected(stick)) {
-    ClearResourceAlerts();
-    return;
-  }
-
-  if (connectionAlert.active) {
-    SetAlert(connectionAlert, false);
-  }
-
-  for (auto type : JOYSTICK_RESOURCE_ALERTS) {
-    RefreshResourceAlert(type);
-  }
-
-  HAL_JoystickTouchpads touchpads;
-  HAL_GetJoystickTouchpads(stick, &touchpads);
-  int touchpad = touchpadFingerAlertTouchpad;
-  int finger = touchpadFingerAlertFinger;
-  if (touchpadFingerAlert.active && touchpad < touchpads.count &&
-      finger < touchpads.touchpads[touchpad].count) {
-    SetAlert(touchpadFingerAlert, false);
-  }
-}
-
-void JoystickAlerts::ClearAllAlerts() {
-  if (!initialized) {
-    return;
-  }
-
-  SetAlert(connectionAlert, false);
-  ClearResourceAlerts();
-}
-
-void JoystickAlerts::ClearResourceAlerts() {
-  for (auto& alertState : resourceAlerts) {
-    SetAlert(alertState, false);
-  }
-  SetAlert(touchpadFingerAlert, false);
-}
-
-void JoystickAlerts::RefreshResourceAlert(JoystickResourceAlert type) {
-  auto index = JoystickResourceAlertIndex(type);
-  if (resourceAlerts[index].active && IsResourceAlertAvailable(type)) {
-    SetAlert(resourceAlerts[index], false);
-  }
-}
-
-bool JoystickAlerts::IsResourceAlertAvailable(
-    JoystickResourceAlert type) const {
-  auto index = JoystickResourceAlertIndex(type);
-  auto resource = resourceAlertValues[index];
-  switch (type) {
-    case JoystickResourceAlert::BUTTON: {
-      HAL_JoystickButtons buttons;
-      HAL_GetJoystickButtons(stick, &buttons);
-      return (buttons.available & (1LLU << resource)) != 0;
-    }
-    case JoystickResourceAlert::AXIS: {
-      HAL_JoystickAxes axes;
-      HAL_GetJoystickAxes(stick, &axes);
-      return (axes.available & (1 << resource)) != 0;
-    }
-    case JoystickResourceAlert::POV: {
-      HAL_JoystickPOVs povs;
-      HAL_GetJoystickPOVs(stick, &povs);
-      return (povs.available & (1 << resource)) != 0;
-    }
-  }
-  return false;
-}
-
-void JoystickAlerts::ReportResourceWarning(JoystickResourceAlert type,
-                                           int resource) {
-  auto index = JoystickResourceAlertIndex(type);
-  resourceAlertValues[index] = resource;
-  SetAlert(resourceAlerts[index], true,
-           std::format("Joystick {} {} on port {} not available",
-                       JOYSTICK_RESOURCE_ALERT_LABELS[index], resource, stick));
-}
-
-void JoystickAlerts::ReportTouchpadFingerWarning(int touchpad, int finger) {
-  touchpadFingerAlertTouchpad = touchpad;
-  touchpadFingerAlertFinger = finger;
-  SetAlert(touchpadFingerAlert, true,
-           std::format("Joystick touchpad finger {} on touchpad {} on port {} "
-                       "not available",
-                       finger, touchpad, stick));
-}
-
-bool JoystickAlerts::SetAlert(JoystickAlertState& alertState, bool active,
-                              std::string_view alertText) {
-  if (!active && !alertState.active) {
-    return true;
-  }
-
-  if (active && !initialized && !Initialize()) {
-    return false;
-  }
-  if (active && !alertText.empty()) {
-    alertState.alert.SetText(alertText);
-  }
-  alertState.alert.Set(active);
-  if (active && !alertState.alert.Get()) {
-    if (!Initialize()) {
-      return false;
-    }
-    if (!alertText.empty()) {
-      alertState.alert.SetText(alertText);
-    }
-    alertState.alert.Set(true);
-  }
-  alertState.active = active;
-  return true;
-}
 
 Instance::Instance() {
   HAL_Initialize();
@@ -462,7 +164,7 @@ Instance::~Instance() {
     alerts.Release();
   }
   if (dataLogSender) {
-    delete dataLogSender.load();
+    DeleteDataLogSender(dataLogSender.load());
   }
 }
 
@@ -820,258 +522,6 @@ bool DriverStationBackend::IsJoystickConnected(int stick) {
          GetStickPOVsAvailable(stick) != 0;
 }
 
-static int64_t DoAddOpMode(RobotMode mode, std::string_view name,
-                           std::string_view group, std::string_view description,
-                           int32_t textColor, int32_t backgroundColor) {
-  if (wpi::util::trim(name).empty()) {
-    return 0;
-  }
-
-  WPI_String nameWpi = wpi::util::make_string(name);
-  WPI_String groupWpi = wpi::util::make_string(group);
-  WPI_String descriptionWpi = wpi::util::make_string(description);
-
-  auto& inst = ::GetInstance();
-  std::scoped_lock lock{inst.opModeMutex};
-  std::string nameCopy{name};
-  for (;;) {
-    int64_t id = HAL_MakeOpModeId(static_cast<HAL_RobotMode>(mode),
-                                  std::hash<std::string_view>{}(nameCopy));
-    auto [it, isNew] = inst.opModes.try_emplace(
-        id, HAL_OpModeOption{id, nameWpi, groupWpi, descriptionWpi, textColor,
-                             backgroundColor});
-    if (isNew) {
-      return id;
-    }
-    if (HAL_OpMode_GetRobotMode(it->second.id) ==
-            static_cast<HAL_RobotMode>(mode) &&
-        wpi::util::to_string_view(&it->second.name) == name) {
-      return 0;  // can't insert duplicate name
-    }
-    // collision, try again with space appended
-    nameCopy += ' ';
-  }
-}
-
-static int32_t ConvertColorToInt(const wpi::util::Color& color) {
-  return ((static_cast<int32_t>(color.red * 255) & 0xff) << 16) |
-         ((static_cast<int32_t>(color.green * 255) & 0xff) << 8) |
-         (static_cast<int32_t>(color.blue * 255) & 0xff);
-}
-
-int64_t DriverStationBackend::AddOpMode(
-    RobotMode mode, std::string_view name, std::string_view group,
-    std::string_view description, const wpi::util::Color& textColor,
-    const wpi::util::Color& backgroundColor) {
-  return DoAddOpMode(mode, name, group, description,
-                     ConvertColorToInt(textColor),
-                     ConvertColorToInt(backgroundColor));
-}
-
-int64_t DriverStationBackend::AddOpMode(RobotMode mode, std::string_view name,
-                                        std::string_view group,
-                                        std::string_view description) {
-  return DoAddOpMode(mode, name, group, description, -1, -1);
-}
-
-int64_t DriverStationBackend::RemoveOpMode(RobotMode mode,
-                                           std::string_view name) {
-  if (wpi::util::trim(name).empty()) {
-    return 0;
-  }
-
-  auto& inst = ::GetInstance();
-  std::scoped_lock lock{inst.opModeMutex};
-  // we have to loop over all entries to find the one with the correct name
-  // because the of the unique ID generation scheme
-  for (auto it = inst.opModes.begin(), end = inst.opModes.end(); it != end;
-       ++it) {
-    if (HAL_OpMode_GetRobotMode(it->second.id) ==
-            static_cast<HAL_RobotMode>(mode) &&
-        wpi::util::to_string_view(&it->second.name) == name) {
-      int64_t id = it->second.id;
-      inst.opModes.erase(it);
-      return id;
-    }
-  }
-  return 0;
-}
-
-void DriverStationBackend::PublishOpModes() {
-  auto& inst = ::GetInstance();
-  std::scoped_lock lock{inst.opModeMutex};
-  std::vector<HAL_OpModeOption> options;
-  options.reserve(inst.opModes.size());
-  for (auto&& [id, option] : inst.opModes) {
-    options.emplace_back(option);
-  }
-  HAL_SetOpModeOptions(options.data(), options.size());
-
-  int modeCounts[HAL_ROBOT_MODE_UTILITY + 1] = {0, 0, 0, 0};
-  for (const auto& opMode : options) {
-    ++modeCounts[HAL_OpMode_GetRobotMode(opMode.id)];
-  }
-
-  wpi::util::ReportUsage("OpMode/AUTONOMOUS",
-                         std::to_string(modeCounts[HAL_ROBOT_MODE_AUTONOMOUS]));
-  wpi::util::ReportUsage(
-      "OpMode/TELEOPERATED",
-      std::to_string(modeCounts[HAL_ROBOT_MODE_TELEOPERATED]));
-  wpi::util::ReportUsage("OpMode/UTILITY",
-                         std::to_string(modeCounts[HAL_ROBOT_MODE_UTILITY]));
-  wpi::util::ReportUsage("OpMode/UNKNOWN",
-                         std::to_string(modeCounts[HAL_ROBOT_MODE_UNKNOWN]));
-}
-
-void DriverStationBackend::ClearOpModes() {
-  auto& inst = ::GetInstance();
-  std::scoped_lock lock{inst.opModeMutex};
-  inst.opModes.clear();
-  HAL_SetOpModeOptions(nullptr, 0);
-}
-
-void DriverStationBackend::ObserveUserProgramStarting() {
-  ::GetInstance().userProgramStarted = true;
-  HAL_ObserveUserProgramStarting();
-}
-
-RobotMode DriverStationBackend::GetRobotMode() {
-  hal::ControlWord controlWord = GetControlWord();
-  if (!::GetInstance().userProgramStarted) {
-    return RobotMode::UNKNOWN;
-  }
-
-  return controlWord.GetRobotMode();
-}
-
-bool DriverStationBackend::IsAutonomousEnabled() {
-  hal::ControlWord controlWord = GetControlWord();
-  if (!::GetInstance().userProgramStarted) {
-    return false;
-  }
-
-  return controlWord.GetRobotMode() == RobotMode::AUTONOMOUS &&
-         controlWord.IsEnabled() && controlWord.IsDSAttached();
-}
-
-bool DriverStationBackend::IsTeleopEnabled() {
-  hal::ControlWord controlWord = GetControlWord();
-  if (!::GetInstance().userProgramStarted) {
-    return false;
-  }
-
-  return controlWord.GetRobotMode() == RobotMode::TELEOPERATED &&
-         controlWord.IsEnabled() && controlWord.IsDSAttached();
-}
-
-bool DriverStationBackend::IsUtilityEnabled() {
-  hal::ControlWord controlWord = GetControlWord();
-  if (!::GetInstance().userProgramStarted) {
-    return false;
-  }
-
-  return controlWord.GetRobotMode() == RobotMode::UTILITY &&
-         controlWord.IsEnabled() && controlWord.IsDSAttached();
-}
-
-int64_t DriverStationBackend::GetOpModeId() {
-  if (!::GetInstance().userProgramStarted) {
-    return 0;
-  }
-
-  return GetControlWord().GetOpModeId();
-}
-
-std::string DriverStationBackend::GetOpMode() {
-  if (!::GetInstance().userProgramStarted) {
-    return "";
-  }
-
-  return GetInstance().OpModeToString(GetOpModeId());
-}
-
-std::optional<std::string> DriverStationBackend::GetGameData() {
-  HAL_GameData info;
-  HAL_GetGameData(&info);
-  std::string_view gameDataView{reinterpret_cast<char*>(info.gameData)};
-  if (gameDataView.empty()) {
-    return std::nullopt;
-  }
-  return std::string(gameDataView);
-}
-
-std::string DriverStationBackend::GetEventName() {
-  HAL_MatchInfo info;
-  HAL_GetMatchInfo(&info);
-  return info.eventName;
-}
-
-MatchType DriverStationBackend::GetMatchType() {
-  HAL_MatchInfo info;
-  HAL_GetMatchInfo(&info);
-  return static_cast<MatchType>(info.matchType);
-}
-
-int DriverStationBackend::GetMatchNumber() {
-  HAL_MatchInfo info;
-  HAL_GetMatchInfo(&info);
-  return info.matchNumber;
-}
-
-int DriverStationBackend::GetReplayNumber() {
-  HAL_MatchInfo info;
-  HAL_GetMatchInfo(&info);
-  return info.replayNumber;
-}
-
-std::optional<Alliance> DriverStationBackend::GetAlliance() {
-  int32_t status = 0;
-  auto allianceStationID = HAL_GetAllianceStation(&status);
-  switch (allianceStationID) {
-    case HAL_ALLIANCE_STATION_RED_1:
-    case HAL_ALLIANCE_STATION_RED_2:
-    case HAL_ALLIANCE_STATION_RED_3:
-      return Alliance::RED;
-    case HAL_ALLIANCE_STATION_BLUE_1:
-    case HAL_ALLIANCE_STATION_BLUE_2:
-    case HAL_ALLIANCE_STATION_BLUE_3:
-      return Alliance::BLUE;
-    default:
-      return {};
-  }
-}
-
-std::optional<int> DriverStationBackend::GetLocation() {
-  int32_t status = 0;
-  auto allianceStationID = HAL_GetAllianceStation(&status);
-  switch (allianceStationID) {
-    case HAL_ALLIANCE_STATION_RED_1:
-    case HAL_ALLIANCE_STATION_BLUE_1:
-      return 1;
-    case HAL_ALLIANCE_STATION_RED_2:
-    case HAL_ALLIANCE_STATION_BLUE_2:
-      return 2;
-    case HAL_ALLIANCE_STATION_RED_3:
-    case HAL_ALLIANCE_STATION_BLUE_3:
-      return 3;
-    default:
-      return {};
-  }
-}
-
-wpi::units::second_t DriverStationBackend::GetMatchTime() {
-  int32_t status = 0;
-  return wpi::units::second_t{HAL_GetMatchTime(&status)};
-}
-
-double DriverStationBackend::GetBatteryVoltage() {
-  int32_t status = 0;
-  double voltage = HAL_GetVinVoltage(&status);
-  WPILIB_CheckErrorStatus(status, "getVinVoltage");
-
-  return voltage;
-}
-
 /**
  * Copy data from the DS task for the user.
  *
@@ -1107,7 +557,7 @@ void DriverStationBackend::RefreshData() {
 
   SendMatchData();
   if (auto sender = inst.dataLogSender.load()) {
-    sender->Send(wpi::util::Now());
+    SendDataLogSender(sender, wpi::util::Now());
   }
 }
 
@@ -1127,7 +577,7 @@ void DriverStationBackend::SilenceJoystickConnectionAlert(bool silence) {
   auto& inst = ::GetInstance();
   std::scoped_lock lock{inst.joystickAlertMutex};
   inst.silenceJoystickAlerts = silence;
-  if (silence && !IsFMSAttached()) {
+  if (silence && !wpi::RobotState::IsFMSAttached()) {
     ClearJoystickAlertsLocked();
   }
 }
@@ -1135,7 +585,7 @@ void DriverStationBackend::SilenceJoystickConnectionAlert(bool silence) {
 bool DriverStationBackend::IsJoystickConnectionAlertSilenced() {
   auto& inst = ::GetInstance();
   std::scoped_lock lock{inst.joystickAlertMutex};
-  return !IsFMSAttached() && inst.silenceJoystickAlerts;
+  return !wpi::RobotState::IsFMSAttached() && inst.silenceJoystickAlerts;
 }
 
 void DriverStationBackend::StartDataLog(wpi::log::DataLog& log,
@@ -1148,12 +598,12 @@ void DriverStationBackend::StartDataLog(wpi::log::DataLog& log,
     return;
   }
   DataLogSender* oldSender = nullptr;
-  DataLogSender* newSender = new DataLogSender;
+  DataLogSender* newSender = CreateDataLogSender();
   inst.dataLogSender.compare_exchange_strong(oldSender, newSender);
   if (oldSender) {
-    delete newSender;  // already had a sender
+    DeleteDataLogSender(newSender);  // already had a sender
   } else {
-    newSender->Init(log, logJoysticks, wpi::util::Now());
+    InitDataLogSender(newSender, log, logJoysticks, wpi::util::Now());
   }
 }
 
@@ -1188,7 +638,7 @@ void ClearJoystickAlerts() {
 
 void ClearJoystickAlertsLocked() {
   auto& inst = GetInstance();
-  if (!DriverStationBackend::IsFMSAttached() && inst.silenceJoystickAlerts) {
+  if (!wpi::RobotState::IsFMSAttached() && inst.silenceJoystickAlerts) {
     for (auto& alerts : inst.joystickAlerts) {
       alerts.ClearAllAlerts();
     }
@@ -1257,139 +707,11 @@ void SendMatchData() {
   if (ctlWord != inst.matchDataSender.prevControlWord) {
     int64_t opModeId = ctlWord.GetOpModeId();
     if (opModeId != inst.matchDataSender.prevControlWord.GetOpModeId()) {
-      inst.matchDataSender.opMode.Set(inst.OpModeToString(opModeId));
+      inst.matchDataSender.opMode.Set(
+          wpi::RobotState::OpModeToString(opModeId));
     }
 
     inst.matchDataSender.prevControlWord = ctlWord;
     inst.matchDataSender.controlWord.Set(ctlWord);
-  }
-}
-
-void JoystickLogSender::Init(wpi::log::DataLog& log, unsigned int stick,
-                             int64_t timestamp) {
-  m_stick = stick;
-
-  m_logButtons = wpi::log::BooleanArrayLogEntry{
-      log, std::format("DS:joystick{}/buttons", stick), timestamp};
-  m_logAxes = wpi::log::FloatArrayLogEntry{
-      log, std::format("DS:joystick{}/axes", stick), timestamp};
-  m_logPOVs = wpi::log::IntegerArrayLogEntry{
-      log, std::format("DS:joystick{}/povs", stick), timestamp};
-
-  HAL_GetJoystickButtons(m_stick, &m_prevButtons);
-  HAL_GetJoystickAxes(m_stick, &m_prevAxes);
-  HAL_GetJoystickPOVs(m_stick, &m_prevPOVs);
-  AppendButtons(m_prevButtons, timestamp);
-  int axesCount = availableToCount(m_prevAxes.available);
-  m_logAxes.Append(
-      std::span<const float>{m_prevAxes.axes, static_cast<size_t>(axesCount)},
-      timestamp);
-  AppendPOVs(m_prevPOVs, timestamp);
-}
-
-void JoystickLogSender::Send(int64_t timestamp) {
-  HAL_JoystickButtons buttons;
-  HAL_GetJoystickButtons(m_stick, &buttons);
-  if (buttons.available != m_prevButtons.available ||
-      buttons.buttons != m_prevButtons.buttons) {
-    AppendButtons(buttons, timestamp);
-  }
-  m_prevButtons = buttons;
-
-  HAL_JoystickAxes axes;
-  HAL_GetJoystickAxes(m_stick, &axes);
-  int axesCount = availableToCount(axes.available);
-  if (axes.available != m_prevAxes.available ||
-      std::memcmp(axes.axes, m_prevAxes.axes,
-                  sizeof(axes.axes[0]) * axesCount) != 0) {
-    m_logAxes.Append(
-        std::span<const float>{axes.axes, static_cast<size_t>(axesCount)},
-        timestamp);
-  }
-  m_prevAxes = axes;
-
-  HAL_JoystickPOVs povs;
-  HAL_GetJoystickPOVs(m_stick, &povs);
-  int povsCount = availableToCount(povs.available);
-  if (povs.available != m_prevPOVs.available ||
-      std::memcmp(povs.povs, m_prevPOVs.povs,
-                  sizeof(povs.povs[0]) * povsCount) != 0) {
-    AppendPOVs(povs, timestamp);
-  }
-  m_prevPOVs = povs;
-}
-
-void JoystickLogSender::AppendButtons(HAL_JoystickButtons buttons,
-                                      int64_t timestamp) {
-  int count = availableToCount(buttons.available);
-  uint8_t buttonsArr[64];
-  for (int i = 0; i < count; ++i) {
-    buttonsArr[i] = (buttons.buttons & (1llu << i)) != 0;
-  }
-  m_logButtons.Append(
-      std::span<const uint8_t>{buttonsArr, static_cast<size_t>(count)},
-      timestamp);
-}
-
-void JoystickLogSender::AppendPOVs(const HAL_JoystickPOVs& povs,
-                                   int64_t timestamp) {
-  int count = availableToCount(povs.available);
-  int64_t povsArr[HAL_MAX_JOYSTICK_POVS];
-  for (int i = 0; i < count; ++i) {
-    povsArr[i] = povs.povs[i];
-  }
-  m_logPOVs.Append(
-      std::span<const int64_t>{povsArr, static_cast<size_t>(count)}, timestamp);
-}
-
-void DataLogSender::Init(wpi::log::DataLog& log, bool logJoysticks,
-                         int64_t timestamp) {
-  m_logControlWord = wpi::log::StructLogEntry<hal::ControlWord>{
-      log, "DS:controlWord", timestamp};
-  m_logOpMode = wpi::log::StringLogEntry{log, "DS:opMode", timestamp};
-
-  // append initial control word value
-  m_prevControlWord = hal::GetControlWord();
-  m_logControlWord.Append(m_prevControlWord);
-
-  // append initial opmode value
-  auto& inst = GetInstance();
-  m_logOpMode.Append(inst.OpModeToString(m_prevControlWord.GetOpModeId()));
-
-  m_logJoysticks = logJoysticks;
-  if (logJoysticks) {
-    unsigned int i = 0;
-    for (auto&& joystick : m_joysticks) {
-      joystick.Init(log, i++, timestamp);
-    }
-  }
-
-  m_initialized = true;
-}
-
-void DataLogSender::Send(int64_t timestamp) {
-  if (!m_initialized) {
-    return;
-  }
-
-  // append control word value changes
-  hal::ControlWord ctlWord = hal::GetControlWord();
-  if (ctlWord != m_prevControlWord) {
-    // append opmode value changes
-    int64_t opModeId = ctlWord.GetOpModeId();
-    if (opModeId != m_prevControlWord.GetOpModeId()) {
-      auto& inst = GetInstance();
-      m_logOpMode.Append(inst.OpModeToString(opModeId));
-    }
-
-    m_prevControlWord = ctlWord;
-    m_logControlWord.Append(ctlWord);
-  }
-
-  if (m_logJoysticks) {
-    // append joystick value changes
-    for (auto&& joystick : m_joysticks) {
-      joystick.Send(timestamp);
-    }
   }
 }

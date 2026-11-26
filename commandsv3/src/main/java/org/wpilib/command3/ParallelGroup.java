@@ -16,6 +16,8 @@ import java.util.Set;
  * required commands have completed; if no command is explicitly required for completion, then the
  * group will end after any command in the group finishes. Any commands still running when the group
  * has reached its completion condition will be canceled.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 public final class ParallelGroup implements Command {
   private final Collection<Command> m_requiredCommands = new HashSet<>();

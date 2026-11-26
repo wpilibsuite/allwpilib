@@ -31,10 +31,10 @@ void DriveSubsystem::Periodic() {
 }
 
 void DriveSubsystem::SetDriveStates(
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State currentLeft,
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State currentRight,
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State nextLeft,
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State nextRight) {
+    const wpi::math::TrapezoidProfileSample<wpi::units::meters>& currentLeft,
+    const wpi::math::TrapezoidProfileSample<wpi::units::meters>& currentRight,
+    const wpi::math::TrapezoidProfileSample<wpi::units::meters>& nextLeft,
+    const wpi::math::TrapezoidProfileSample<wpi::units::meters>& nextRight) {
   // Feedforward is divided by battery voltage to normalize it to [-1, 1]
   leftLeader.SetSetpoint(
       ExampleSmartMotorController::PIDMode::POSITION,
@@ -72,56 +72,61 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
 wpi::cmd::CommandPtr DriveSubsystem::ProfiledDriveDistance(
     wpi::units::meter_t distance) {
   return StartRun(
-             [this] {
+             [this, distance] {
                // Restart timer so profile setpoints start at the beginning
                timer.Restart();
                ResetEncoders();
+               // Both encoders start at zero, so they can share a profile
+               leftProfile =
+                   wpi::math::TrapezoidProfile<wpi::units::meters>::Generate(
+                       constraints, {}, {distance, 0_mps});
              },
-             [this, distance] {
+             [this] {
                // Current state never changes, so we need to use a timer to get
                // the setpoints we need to be at
                auto currentTime = timer.Get();
-               auto currentSetpoint =
-                   profile.Calculate(currentTime, {}, {distance, 0_mps});
-               auto nextSetpoint =
-                   profile.Calculate(currentTime + DT, {}, {distance, 0_mps});
+               auto currentSetpoint = leftProfile.SampleAt(currentTime);
+               auto nextSetpoint = leftProfile.SampleAt(currentTime + DT);
                SetDriveStates(currentSetpoint, currentSetpoint, nextSetpoint,
                               nextSetpoint);
              })
-      .Until([this] { return profile.IsFinished(0_s); });
+      .Until([this] { return timer.Get() >= leftProfile.Duration(); });
 }
 
 wpi::cmd::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
     wpi::units::meter_t distance) {
   return StartRun(
-             [this] {
+             [this, distance] {
                // Restart timer so profile setpoints start at the beginning
                timer.Restart();
                // Store distance so we know the target distance for each encoder
                initialLeftDistance = GetLeftEncoderDistance();
                initialRightDistance = GetRightEncoderDistance();
+               leftProfile =
+                   wpi::math::TrapezoidProfile<wpi::units::meters>::Generate(
+                       constraints, {initialLeftDistance, 0_mps},
+                       {initialLeftDistance + distance, 0_mps});
+               rightProfile =
+                   wpi::math::TrapezoidProfile<wpi::units::meters>::Generate(
+                       constraints, {initialRightDistance, 0_mps},
+                       {initialRightDistance + distance, 0_mps});
              },
-             [this, distance] {
+             [this] {
                // Current state never changes for the duration of the command,
                // so we need to use a timer to get the setpoints we need to be
                // at
                auto currentTime = timer.Get();
 
-               auto currentLeftSetpoint =
-                   profile.Calculate(currentTime, {initialLeftDistance, 0_mps},
-                                     {initialLeftDistance + distance, 0_mps});
-               auto currentRightSetpoint =
-                   profile.Calculate(currentTime, {initialRightDistance, 0_mps},
-                                     {initialRightDistance + distance, 0_mps});
+               auto currentLeftSetpoint = leftProfile.SampleAt(currentTime);
+               auto currentRightSetpoint = rightProfile.SampleAt(currentTime);
 
-               auto nextLeftSetpoint = profile.Calculate(
-                   currentTime + DT, {initialLeftDistance, 0_mps},
-                   {initialLeftDistance + distance, 0_mps});
-               auto nextRightSetpoint = profile.Calculate(
-                   currentTime + DT, {initialRightDistance, 0_mps},
-                   {initialRightDistance + distance, 0_mps});
+               auto nextLeftSetpoint = leftProfile.SampleAt(currentTime + DT);
+               auto nextRightSetpoint = rightProfile.SampleAt(currentTime + DT);
                SetDriveStates(currentLeftSetpoint, currentRightSetpoint,
                               nextLeftSetpoint, nextRightSetpoint);
              })
-      .Until([this] { return profile.IsFinished(0_s); });
+      .Until([this] {
+        return timer.Get() >= leftProfile.Duration() &&
+               timer.Get() >= rightProfile.Duration();
+      });
 }

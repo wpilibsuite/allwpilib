@@ -20,6 +20,7 @@ import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.Models;
 import org.wpilib.simulation.DifferentialDrivetrainSim;
 import org.wpilib.simulation.EncoderSim;
+import org.wpilib.simulation.OnboardIMUSim;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.system.RobotController;
 import org.wpilib.telemetry.Telemetry;
@@ -110,6 +111,12 @@ public class Drivetrain {
     setVelocities(kinematics.toWheelVelocities(new ChassisVelocities(xVelocity, 0, rot)));
   }
 
+  /** Stop the drivetrain motors. */
+  public void stop() {
+    leftLeader.setThrottle(0.0);
+    rightLeader.setThrottle(0.0);
+  }
+
   /** Update robot odometry. */
   public void updateOdometry() {
     odometry.update(imu.getRotation2d(), leftEncoder.getDistance(), rightEncoder.getDistance());
@@ -142,7 +149,7 @@ public class Drivetrain {
     leftEncoderSim.setRate(drivetrainSimulator.getLeftVelocity());
     rightEncoderSim.setDistance(drivetrainSimulator.getRightPosition());
     rightEncoderSim.setRate(drivetrainSimulator.getRightVelocity());
-    // gyroSim.setAngle(-drivetrainSimulator.getHeading().getDegrees());
+    OnboardIMUSim.setYaw(drivetrainSimulator.getHeading().getRadians());
   }
 
   /** Update odometry - this should be run every robot loop. */

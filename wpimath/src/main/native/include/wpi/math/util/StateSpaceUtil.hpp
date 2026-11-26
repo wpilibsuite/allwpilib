@@ -192,11 +192,20 @@ WPILIB_DLLEXPORT Eigen::MatrixXd CovarianceMatrix(
  * @param maxMagnitude The maximum magnitude any input can have.
  * @return The normalizedInput
  */
+// MSVC 19.52 /WX reports C4723 (potential divide by 0) in Eigen's lpNorm when
+// the input is zero. Newer Eigen versions no longer trigger this.
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4723)
+#endif
 template <int Inputs>
 Eigen::Vector<double, Inputs> DesaturateInputVector(
     const Eigen::Vector<double, Inputs>& u, double maxMagnitude) {
   return u * std::min(1.0, maxMagnitude / u.template lpNorm<Eigen::Infinity>());
 }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 extern template WPILIB_DLLEXPORT Eigen::VectorXd
 DesaturateInputVector<Eigen::Dynamic>(const Eigen::VectorXd& u,

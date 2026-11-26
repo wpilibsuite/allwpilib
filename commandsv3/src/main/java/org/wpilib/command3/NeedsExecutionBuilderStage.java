@@ -13,6 +13,8 @@ import org.wpilib.annotation.NoDiscard;
  * are required. The next stage is a {@link NeedsNameBuilderStage} from {@link
  * #executing(Consumer)}. Additional requirements may still be added before moving on to the next
  * stage.
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 @NoDiscard
 public interface NeedsExecutionBuilderStage {

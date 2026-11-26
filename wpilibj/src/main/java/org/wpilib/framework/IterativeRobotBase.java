@@ -26,14 +26,14 @@ import org.wpilib.util.Alert;
  *
  * <p>driverStationConnected() -- provide for initialization the first time the DS is connected
  *
- * <p>init() functions -- each of the following functions is called once when the appropriate mode
- * is entered:
+ * <p>start() functions -- each of the following functions is called once when the appropriate mode
+ * starts:
  *
  * <ul>
- *   <li>disabledInit() -- called each and every time disabled is entered from another mode
- *   <li>autonomousInit() -- called each and every time autonomous is entered from another mode
- *   <li>teleopInit() -- called each and every time teleop is entered from another mode
- *   <li>utilityInit() -- called each and every time utility is entered from another mode
+ *   <li>disabledStart() -- called each and every time disabled mode starts
+ *   <li>autonomousStart() -- called each and every time autonomous mode starts
+ *   <li>teleopStart() -- called each and every time teleoperated mode starts
+ *   <li>utilityStart() -- called each and every time utility mode starts
  * </ul>
  *
  * <p>periodic() functions -- each of these functions is called on an interval:
@@ -50,7 +50,7 @@ import org.wpilib.util.Alert;
  *
  * <ol>
  *   <li>{@link #driverStationConnected()}, once, the first time the DS is connected
- *   <li>the exit function of the previous mode and the init function of the new mode, only on a
+ *   <li>the end function of the previous mode and the start function of the new mode, only on a
  *       mode change
  *   <li>the periodic function for the current mode ({@link #disabledPeriodic()}, {@link
  *       #autonomousPeriodic()}, {@link #teleopPeriodic()}, or {@link #utilityPeriodic()})
@@ -61,14 +61,14 @@ import org.wpilib.util.Alert;
  * <p>The mode-specific periodic function runs before {@link #robotPeriodic()}. Exactly one
  * mode-specific periodic function runs per iteration.
  *
- * <p>exit() functions -- each of the following functions is called once when the appropriate mode
- * is exited:
+ * <p>end() functions -- each of the following functions is called once when the appropriate mode is
+ * ends:
  *
  * <ul>
- *   <li>disabledExit() -- called each and every time disabled is exited
- *   <li>autonomousExit() -- called each and every time autonomous is exited
- *   <li>teleopExit() -- called each and every time teleop is exited
- *   <li>utilityExit() -- called each and every time utility is exited
+ *   <li>disabledEnd() -- called each and every time disabled mode ends
+ *   <li>autonomousEnd() -- called each and every time autonomous mode ends
+ *   <li>teleopEnd() -- called each and every time teleoperated mode ends
+ *   <li>utilityEnd() -- called each and every time utility mode ends
  * </ul>
  */
 public abstract class IterativeRobotBase extends RobotBase {
@@ -118,36 +118,36 @@ public abstract class IterativeRobotBase extends RobotBase {
   public void simulationInit() {}
 
   /**
-   * Initialization code for disabled mode should go here.
+   * Start code for disabled mode should go here.
    *
-   * <p>Users should override this method for initialization code which will be called each time the
-   * robot enters disabled mode.
+   * <p>Users should override this method for code which will be called each time disabled mode
+   * starts.
    */
-  public void disabledInit() {}
+  public void disabledStart() {}
 
   /**
-   * Initialization code for autonomous mode should go here.
+   * Start code for autonomous mode should go here.
    *
-   * <p>Users should override this method for initialization code which will be called each time the
-   * robot enters autonomous mode.
+   * <p>Users should override this method for code which will be called each time autonomous mode
+   * starts.
    */
-  public void autonomousInit() {}
+  public void autonomousStart() {}
 
   /**
-   * Initialization code for teleop mode should go here.
+   * Start code for teleoperated mode should go here.
    *
-   * <p>Users should override this method for initialization code which will be called each time the
-   * robot enters teleop mode.
+   * <p>Users should override this method for code which will be called each time teleoperated mode
+   * starts.
    */
-  public void teleopInit() {}
+  public void teleopStart() {}
 
   /**
-   * Initialization code for utility mode should go here.
+   * Start code for utility mode should go here.
    *
-   * <p>Users should override this method for initialization code which will be called each time the
-   * robot enters utility mode.
+   * <p>Users should override this method for code which will be called each time utility mode
+   * starts.
    */
-  public void utilityInit() {}
+  public void utilityStart() {}
 
   /* ----------- Overridable periodic code ----------------- */
 
@@ -215,7 +215,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   private boolean m_tpFirstRun = true;
 
   /**
-   * Periodic code for teleop mode should go here.
+   * Periodic code for teleoperated mode should go here.
    *
    * <p>Runs before {@link #robotPeriodic()} and {@link #simulationPeriodic()}.
    */
@@ -241,36 +241,35 @@ public abstract class IterativeRobotBase extends RobotBase {
   }
 
   /**
-   * Exit code for disabled mode should go here.
+   * End code for disabled mode should go here.
    *
-   * <p>Users should override this method for code which will be called each time the robot exits
-   * disabled mode.
+   * <p>Users should override this method for code which will be called each time disabled mode
+   * ends.
    */
-  public void disabledExit() {}
+  public void disabledEnd() {}
 
   /**
-   * Exit code for autonomous mode should go here.
+   * End code for autonomous mode should go here.
    *
-   * <p>Users should override this method for code which will be called each time the robot exits
-   * autonomous mode.
+   * <p>Users should override this method for code which will be called each time autonomous mode
+   * ends.
    */
-  public void autonomousExit() {}
+  public void autonomousEnd() {}
 
   /**
-   * Exit code for teleop mode should go here.
+   * End code for teleoperated mode should go here.
    *
-   * <p>Users should override this method for code which will be called each time the robot exits
-   * teleop mode.
+   * <p>Users should override this method for code which will be called each time teleoperated mode
+   * ends.
    */
-  public void teleopExit() {}
+  public void teleopEnd() {}
 
   /**
-   * Exit code for utility mode should go here.
+   * End code for utility mode should go here.
    *
-   * <p>Users should override this method for code which will be called each time the robot exits
-   * utility mode.
+   * <p>Users should override this method for code which will be called each time utility mode ends.
    */
-  public void utilityExit() {}
+  public void utilityEnd() {}
 
   /**
    * Gets time period between calls to Periodic() functions.
@@ -296,38 +295,38 @@ public abstract class IterativeRobotBase extends RobotBase {
       driverStationConnected();
     }
 
-    // If mode changed, call mode exit and entry functions
+    // If mode changed, call mode end and start functions
     if (m_lastMode != mode) {
       if (m_lastMode != null) {
-        // Call last mode's exit function
+        // Call last mode's end function
         switch (m_lastMode) {
-          case UNKNOWN -> disabledExit();
-          case AUTONOMOUS -> autonomousExit();
-          case TELEOPERATED -> teleopExit();
-          case UTILITY -> utilityExit();
+          case UNKNOWN -> disabledEnd();
+          case AUTONOMOUS -> autonomousEnd();
+          case TELEOPERATED -> teleopEnd();
+          case UTILITY -> utilityEnd();
           default -> {
             // NOP
           }
         }
       }
 
-      // Call current mode's entry function
+      // Call current mode's start function
       switch (mode) {
         case UNKNOWN -> {
-          disabledInit();
-          m_watchdog.addEpoch("disabledInit()");
+          disabledStart();
+          m_watchdog.addEpoch("disabledStart()");
         }
         case AUTONOMOUS -> {
-          autonomousInit();
-          m_watchdog.addEpoch("autonomousInit()");
+          autonomousStart();
+          m_watchdog.addEpoch("autonomousStart()");
         }
         case TELEOPERATED -> {
-          teleopInit();
-          m_watchdog.addEpoch("teleopInit()");
+          teleopStart();
+          m_watchdog.addEpoch("teleopStart()");
         }
         case UTILITY -> {
-          utilityInit();
-          m_watchdog.addEpoch("utilityInit()");
+          utilityStart();
+          m_watchdog.addEpoch("utilityStart()");
         }
         default -> {
           // NOP

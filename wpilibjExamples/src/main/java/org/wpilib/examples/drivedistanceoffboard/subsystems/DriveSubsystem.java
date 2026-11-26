@@ -12,6 +12,7 @@ import org.wpilib.examples.drivedistanceoffboard.ExampleSmartMotorController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.trajectory.TrapezoidProfile.State;
+import org.wpilib.math.trajectory.TrapezoidProfileSample;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Timer;
 
@@ -38,11 +39,16 @@ public class DriveSubsystem extends SubsystemBase {
   private final DifferentialDrive drive =
       new DifferentialDrive(leftLeader::setThrottle, rightLeader::setThrottle);
 
-  // The trapezoid profile
-  private final TrapezoidProfile profile =
-      new TrapezoidProfile(
-          new TrapezoidProfile.Constraints(
-              DriveConstants.MAX_VELOCITY, DriveConstants.MAX_ACCELERATION));
+  // The trapezoid profile constraints
+  private final TrapezoidProfile.Constraints constraints =
+      new TrapezoidProfile.Constraints(
+          DriveConstants.MAX_VELOCITY, DriveConstants.MAX_ACCELERATION);
+
+  // The trapezoid profiles for each side of the drive
+  private TrapezoidProfile leftProfile =
+      TrapezoidProfile.generate(constraints, new State(), new State());
+  private TrapezoidProfile rightProfile =
+      TrapezoidProfile.generate(constraints, new State(), new State());
 
   // The timer
   private final Timer timer = new Timer();
@@ -72,18 +78,18 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Attempts to follow the given drive states using offboard PID.
+   * Attempts to follow the given drive samples using offboard PID.
    *
-   * @param currentLeft The current left wheel state.
-   * @param currentRight The current right wheel state.
-   * @param nextLeft The next left wheel state.
-   * @param nextRight The next right wheel state.
+   * @param currentLeft The current left wheel sample.
+   * @param currentRight The current right wheel sample.
+   * @param nextLeft The next left wheel sample.
+   * @param nextRight The next right wheel sample.
    */
   public void setDriveStates(
-      TrapezoidProfile.State currentLeft,
-      TrapezoidProfile.State currentRight,
-      TrapezoidProfile.State nextLeft,
-      TrapezoidProfile.State nextRight) {
+      TrapezoidProfileSample currentLeft,
+      TrapezoidProfileSample currentRight,
+      TrapezoidProfileSample nextLeft,
+      TrapezoidProfileSample nextRight) {
     // Feedforward is divided by battery voltage to normalize it to [-1, 1]
     leftLeader.setSetpoint(
         ExampleSmartMotorController.PIDMode.POSITION,
@@ -142,19 +148,19 @@ public class DriveSubsystem extends SubsystemBase {
               // Restart timer so profile setpoints start at the beginning
               timer.restart();
               resetEncoders();
+              // Both encoders start at zero, so they can share a profile
+              leftProfile =
+                  TrapezoidProfile.generate(constraints, new State(), new State(distance, 0));
             },
             () -> {
               // Current state never changes, so we need to use a timer to get the setpoints we need
               // to be at
               var currentTime = timer.get();
-              var currentSetpoint =
-                  profile.calculate(currentTime, new State(), new State(distance, 0));
-              var nextSetpoint =
-                  profile.calculate(
-                      currentTime + DriveConstants.DT, new State(), new State(distance, 0));
+              var currentSetpoint = leftProfile.sampleAt(currentTime);
+              var nextSetpoint = leftProfile.sampleAt(currentTime + DriveConstants.DT);
               setDriveStates(currentSetpoint, currentSetpoint, nextSetpoint, nextSetpoint);
             })
-        .until(() -> profile.isFinished(0));
+        .until(() -> timer.get() >= leftProfile.duration());
   }
 
   private double initialLeftDistance;
@@ -175,34 +181,29 @@ public class DriveSubsystem extends SubsystemBase {
               // Store distance so we know the target distance for each encoder
               initialLeftDistance = getLeftEncoderDistance();
               initialRightDistance = getRightEncoderDistance();
+              leftProfile =
+                  TrapezoidProfile.generate(
+                      constraints,
+                      new State(initialLeftDistance, 0),
+                      new State(initialLeftDistance + distance, 0));
+              rightProfile =
+                  TrapezoidProfile.generate(
+                      constraints,
+                      new State(initialRightDistance, 0),
+                      new State(initialRightDistance + distance, 0));
             },
             () -> {
               // Current state never changes for the duration of the command, so we need to use a
               // timer to get the setpoints we need to be at
               var currentTime = timer.get();
-              var currentLeftSetpoint =
-                  profile.calculate(
-                      currentTime,
-                      new State(initialLeftDistance, 0),
-                      new State(initialLeftDistance + distance, 0));
-              var currentRightSetpoint =
-                  profile.calculate(
-                      currentTime,
-                      new State(initialRightDistance, 0),
-                      new State(initialRightDistance + distance, 0));
-              var nextLeftSetpoint =
-                  profile.calculate(
-                      currentTime + DriveConstants.DT,
-                      new State(initialLeftDistance, 0),
-                      new State(initialLeftDistance + distance, 0));
-              var nextRightSetpoint =
-                  profile.calculate(
-                      currentTime + DriveConstants.DT,
-                      new State(initialRightDistance, 0),
-                      new State(initialRightDistance + distance, 0));
+              var currentLeftSetpoint = leftProfile.sampleAt(currentTime);
+              var currentRightSetpoint = rightProfile.sampleAt(currentTime);
+              var nextLeftSetpoint = leftProfile.sampleAt(currentTime + DriveConstants.DT);
+              var nextRightSetpoint = rightProfile.sampleAt(currentTime + DriveConstants.DT);
               setDriveStates(
                   currentLeftSetpoint, currentRightSetpoint, nextLeftSetpoint, nextRightSetpoint);
             })
-        .until(() -> profile.isFinished(0));
+        .until(
+            () -> timer.get() >= leftProfile.duration() && timer.get() >= rightProfile.duration());
   }
 }

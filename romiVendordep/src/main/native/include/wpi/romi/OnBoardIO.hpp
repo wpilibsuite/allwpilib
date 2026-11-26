@@ -26,6 +26,8 @@ namespace wpi::romi {
  * DIO 1 - Button B (input) or Green LED (output)
  * DIO 2 - Button C (input) or Red LED (output)
  * DIO 3 - Yellow LED (output only)
+ *
+ * This class is provided by the Romi VendorDep
  */
 class OnBoardIO {
  public:

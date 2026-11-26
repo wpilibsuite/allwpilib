@@ -137,6 +137,7 @@ model {
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include',
+                                'src/generated/main/native/include',
                                 project(':wpiutil').file('src/main/native/include')
                     }
                 }

@@ -98,6 +98,14 @@ class DataLog {
   virtual void Stop();
 
   /**
+   * Gets the remaining capacity in the outgoing buffer in bytes, or 0 if the
+   * log is stopped, paused, blocked, or has exceeded its buffer capacity.
+   *
+   * @return Remaining buffer capacity in bytes
+   */
+  size_t GetBufferFreeSpace() const;
+
+  /**
    * Returns whether there is a data schema already registered with the given
    * name.
    *
@@ -452,6 +460,13 @@ class DataLog {
   void StartFile();
 
   /**
+   * Sets whether the log is blocked from writing due to a disk or I/O error.
+   *
+   * @param blocked True if blocked
+   */
+  void SetBlocked(bool blocked);
+
+  /**
    * Provides complete set of all buffers that need to be written.
    *
    * Any existing contents of writeBufs will be released as if ReleaseBufs()
@@ -509,7 +524,8 @@ class DataLog {
   mutable wpi::util::mutex m_mutex;
   bool m_active = false;
   bool m_paused = false;
-  bool m_manuallyPaused = false;
+  bool m_bufferFull = false;
+  bool m_blocked = false;
   std::string m_extraHeader;
   std::vector<Buffer> m_free;
   std::vector<Buffer> m_outgoing;

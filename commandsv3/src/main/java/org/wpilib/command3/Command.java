@@ -93,6 +93,8 @@ import org.wpilib.units.measure.Time;
  *   }
  * }
  * }</pre>
+ *
+ * <p>This class is provided by the Commands v3 VendorDep
  */
 @NoDiscard("Commands must be used! Did you mean to fork it or bind it to a trigger?")
 public interface Command {

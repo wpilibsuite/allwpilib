@@ -47,7 +47,7 @@ class Robot : public wpi::TimedRobot {
   // Outputs (what we can measure): [position], in radians.
   wpi::math::LinearSystem<2, 1, 1> armPlant =
       wpi::math::Models::AngularPositionFromPhysicalConstants(
-          wpi::math::DCMotor::NEO(2), ARM_MOI, ARM_GEARING)
+          wpi::math::DCMotor::Neo(2), ARM_MOI, ARM_GEARING)
           .Slice(0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
@@ -87,8 +87,8 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax motor{MOTOR_PORT};
   wpi::Gamepad joystick{JOYSTICK_PORT};
 
-  wpi::math::TrapezoidProfile<wpi::units::radians> profile{
-      {45_deg_per_s, 90_deg_per_s / 1_s}};
+  wpi::math::TrapezoidProfile<wpi::units::radians>::Constraints constraints{
+      45_deg_per_s, 90_deg_per_s / 1_s};
 
   wpi::math::TrapezoidProfile<wpi::units::radians>::State lastProfiledReference;
 
@@ -98,7 +98,7 @@ class Robot : public wpi::TimedRobot {
     encoder.SetDistancePerPulse(2.0 * std::numbers::pi / 4096.0);
   }
 
-  void TeleopInit() override {
+  void TeleopStart() override {
     loop.Reset(wpi::math::Vectord<2>{encoder.GetDistance(), encoder.GetRate()});
 
     lastProfiledReference = {
@@ -117,8 +117,10 @@ class Robot : public wpi::TimedRobot {
       // We released the bumper, so let's spin down
       goal = {LOWERED_POSITION, 0_rad_per_s};
     }
-    lastProfiledReference =
-        profile.Calculate(20_ms, lastProfiledReference, goal);
+    auto sample = wpi::math::TrapezoidProfile<wpi::units::radians>::Generate(
+                      constraints, lastProfiledReference, goal)
+                      .SampleAt(20_ms);
+    lastProfiledReference = {sample.position, sample.velocity};
 
     loop.SetNextR(
         wpi::math::Vectord<2>{lastProfiledReference.position.value(),

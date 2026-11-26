@@ -4,7 +4,11 @@
 
 package org.wpilib.vision.stream;
 
-/** CameraServer shared functions. */
+/**
+ * CameraServer shared functions.
+ *
+ * <p>This class is provided by the CameraServer VendorDep
+ */
 public interface CameraServerShared {
   /**
    * get the main thread id func.

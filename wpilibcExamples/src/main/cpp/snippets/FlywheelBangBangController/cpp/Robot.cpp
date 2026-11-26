@@ -44,6 +44,11 @@ class Robot : public wpi::TimedRobot {
     wpi::telemetry::Log("BangBangController", bangBangController);
   }
 
+  void DisabledStart() override {
+    // This just makes sure that our simulation code knows that the motor's off.
+    flywheelMotor.SetThrottle(0.0);
+  }
+
   Robot() {
     // Add bang-bang controller to SmartDashboard and networktables.
     wpi::tunables::Publish("BangBangController", bangBangController);
@@ -98,7 +103,7 @@ class Robot : public wpi::TimedRobot {
   static constexpr wpi::units::kilogram_square_meter_t
       FLYWHEEL_MOMENT_OF_INERTIA = 0.5 * 1.5_lb * 4_in * 4_in;
 
-  wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
+  wpi::math::DCMotor gearbox = wpi::math::DCMotor::Neo(1);
   wpi::math::LinearSystem<1, 1, 1> plant{
       wpi::math::Models::AngularVelocityFromPhysicalConstants(
           gearbox, FLYWHEEL_MOMENT_OF_INERTIA, FLYWHEEL_GEARING)};

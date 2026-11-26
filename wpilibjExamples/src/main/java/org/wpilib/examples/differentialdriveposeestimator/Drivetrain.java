@@ -156,6 +156,12 @@ public class Drivetrain {
     setVelocities(wheelVelocities);
   }
 
+  /** Stop the drivetrain motors. */
+  public void stop() {
+    leftLeader.setThrottle(0.0);
+    rightLeader.setThrottle(0.0);
+  }
+
   /**
    * Computes and publishes to a network tables topic the transformation from the camera's pose to
    * the object's pose. This function exists solely for the purposes of simulation, and this would
@@ -251,7 +257,7 @@ public class Drivetrain {
     leftEncoderSim.setRate(drivetrainSimulator.getLeftVelocity());
     rightEncoderSim.setDistance(drivetrainSimulator.getRightPosition());
     rightEncoderSim.setRate(drivetrainSimulator.getRightVelocity());
-    OnboardIMUSim.setYaw(-drivetrainSimulator.getHeading().getRadians());
+    OnboardIMUSim.setYaw(drivetrainSimulator.getHeading().getRadians());
   }
 
   /** This function is called periodically, no matter the mode. */

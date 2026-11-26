@@ -26,12 +26,11 @@ import org.wpilib.telemetry.Telemetry;
 
 public class Elevator implements AutoCloseable {
   // This gearbox represents a gearbox containing 4 Vex 775pro motors.
-  private final DCMotor elevatorGearbox = DCMotor.getNEO(2);
+  private final DCMotor elevatorGearbox = DCMotor.getNeo(2);
 
-  private final ExponentialProfile profile =
-      new ExponentialProfile(
-          ExponentialProfile.Constraints.fromCharacteristics(
-              Constants.ELEVATOR_MAX_V, Constants.ELEVATOR_KV, Constants.ELEVATOR_KA));
+  private final ExponentialProfile.Constraints constraints =
+      ExponentialProfile.Constraints.fromCharacteristics(
+          Constants.ELEVATOR_MAX_V, Constants.ELEVATOR_KV, Constants.ELEVATOR_KA);
 
   private ExponentialProfile.State setpoint = new ExponentialProfile.State(0, 0);
 
@@ -101,7 +100,8 @@ public class Elevator implements AutoCloseable {
   public void reachGoal(double goal) {
     var goalState = new ExponentialProfile.State(goal, 0);
 
-    var next = profile.calculate(0.020, setpoint, goalState);
+    var sample = ExponentialProfile.generate(constraints, setpoint, goalState).sampleAt(0.020);
+    var next = new ExponentialProfile.State(sample.position, sample.velocity);
 
     // With the setpoint value we run PID control like normal
     double pidOutput = pidController.calculate(encoder.getDistance(), setpoint.position);

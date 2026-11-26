@@ -136,6 +136,15 @@ void WPI_DataLog_Resume(struct WPI_DataLog* datalog);
 void WPI_DataLog_Stop(struct WPI_DataLog* datalog);
 
 /**
+ * Gets the remaining capacity in the outgoing buffer in bytes, or 0 if the
+ * log is stopped, paused, or has exceeded its buffer capacity.
+ *
+ * @param datalog data log
+ * @return Remaining buffer capacity in bytes
+ */
+size_t WPI_DataLog_GetBufferFreeSpace(struct WPI_DataLog* datalog);
+
+/**
  * Start an entry.  Duplicate names are allowed (with the same type), and
  * result in the same index being returned (Start/Finish are reference
  * counted).  A duplicate name with a different type will result in an error

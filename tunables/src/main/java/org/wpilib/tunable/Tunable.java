@@ -7,6 +7,7 @@ package org.wpilib.tunable;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import org.wpilib.tunable.TunableRegistry.TypeHandler;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.Struct;
@@ -577,6 +578,20 @@ public abstract class Tunable<T> extends TunableBase implements Supplier<T>, Con
       Protobuf<T, ?> proto = getProtobuf(cls);
       if (proto != null) {
         return createGetterSetterTunable(getter, setter, proto, config);
+      }
+    } else if (cls != null) {
+      TypeHandler<T> handler = TunableRegistry.getTypeHandler(cls);
+      if (handler != null) {
+        Tunable<T> tunable = handler.createTunable(getter, setter, config);
+        if (tunable != null) {
+          warnIfUnpublishableTunable(tunable);
+          return tunable;
+        }
+        TunableRegistry.reportWarning(
+            UNSUPPORTED_TUNABLE_TYPE
+                + "type handler for "
+                + getTypeName(cls)
+                + " does not support getter/setter tunables");
       }
     }
     warnIfUnsupportedBasicType(cls);

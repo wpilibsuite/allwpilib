@@ -82,8 +82,9 @@ concept ConstructibleOpMode =
  * 1. DisabledPeriodic(), only while disabled
  * 2. DisabledPeriodic() of the selected opmode, only while disabled
  * 3. NonePeriodic(), only when no opmode is selected
- * 4. RobotPeriodic()
- * 5. SimulationPeriodic(), only in simulation
+ * 4. EnabledPeriodic(), only while enabled with an opmode selected
+ * 5. RobotPeriodic()
+ * 6. SimulationPeriodic(), only in simulation
  *
  * Then, while enabled, the opmode's Periodic() runs. Both are scheduled on the
  * same period, and the loop function was registered first, so RobotPeriodic()
@@ -147,9 +148,10 @@ class OpModeRobotBase : public RobotBase {
    * Function called periodically every loop, regardless of enabled state or
    * OpMode selection.
    *
-   * Runs after DisabledPeriodic(), the opmode's DisabledPeriodic(), and
-   * NonePeriodic(), and before SimulationPeriodic(). When an opmode is enabled,
-   * this runs before its Periodic() in the same period.
+   * Runs after DisabledPeriodic(), the opmode's DisabledPeriodic(),
+   * NonePeriodic(), and EnabledPeriodic(), and before SimulationPeriodic().
+   * When an opmode is enabled, this runs before its Periodic() in the same
+   * period.
    */
   virtual void RobotPeriodic() {}
 
@@ -167,9 +169,9 @@ class OpModeRobotBase : public RobotBase {
   virtual void SimulationPeriodic() {}
 
   /**
-   * Function called once when the robot becomes disabled.
+   * Function called each time disabled mode starts.
    */
-  virtual void DisabledInit() {}
+  virtual void DisabledStart() {}
 
   /**
    * Function called periodically while the robot is disabled.
@@ -180,9 +182,9 @@ class OpModeRobotBase : public RobotBase {
   virtual void DisabledPeriodic() {}
 
   /**
-   * Function called once when the robot exits disabled state.
+   * Function called each time disabled mode ends.
    */
-  virtual void DisabledExit() {}
+  virtual void DisabledEnd() {}
 
   /**
    * Function called periodically anytime when no opmode is selected, including
@@ -191,6 +193,16 @@ class OpModeRobotBase : public RobotBase {
    * Runs after DisabledPeriodic() and before RobotPeriodic().
    */
   virtual void NonePeriodic() {}
+
+  /**
+   * Function called periodically while the robot is enabled and there is a
+   * current opmode.
+   *
+   * Runs after NonePeriodic() and before RobotPeriodic(). When an opmode is
+   * enabled, this runs before its Periodic() in the same period. Never runs
+   * while disabled or when no opmode is selected.
+   */
+  virtual void EnabledPeriodic() {}
 
   /**
    * Add a callback to run at a specific period with a starting time offset.
@@ -353,7 +365,7 @@ class OpModeRobotBase : public RobotBase {
 
  protected:
   /**
-   * Main robot loop function. Handles disabled state logic.
+   * Main robot loop function. Handles disabled mode logic.
    */
   void LoopFunc();
 
@@ -390,7 +402,7 @@ class OpModeRobotBase : public RobotBase {
   // OpMode lifecycle state
   int64_t m_lastModeId = -1;
   bool m_calledDriverStationConnected = false;
-  // Empty until the first loop, so that DisabledInit() runs on startup
+  // Empty until the first loop, so that DisabledStart() runs on startup
   std::optional<RobotMode> m_lastMode;
   std::shared_ptr<OpMode> m_currentOpMode;
   std::string m_currentOpModeName;

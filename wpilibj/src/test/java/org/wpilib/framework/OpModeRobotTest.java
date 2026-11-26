@@ -18,7 +18,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
-import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.hardware.hal.OpModeOption;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.opmode.OpMode;
@@ -76,17 +76,17 @@ class OpModeRobotTest {
     public final AtomicInteger m_driverStationConnectedCount = new AtomicInteger(0);
     public final AtomicInteger m_nonePeriodicCount = new AtomicInteger(0);
     public final AtomicInteger m_robotPeriodicCount = new AtomicInteger(0);
-    public final AtomicInteger m_disabledInitCount = new AtomicInteger(0);
+    public final AtomicInteger m_disabledStartCount = new AtomicInteger(0);
     public final AtomicInteger m_disabledPeriodicCount = new AtomicInteger(0);
-    public final AtomicInteger m_disabledExitCount = new AtomicInteger(0);
+    public final AtomicInteger m_disabledEndCount = new AtomicInteger(0);
 
     MockRobot() {
       super();
     }
 
     @Override
-    public void disabledInit() {
-      m_disabledInitCount.incrementAndGet();
+    public void disabledStart() {
+      m_disabledStartCount.incrementAndGet();
     }
 
     @Override
@@ -95,8 +95,8 @@ class OpModeRobotTest {
     }
 
     @Override
-    public void disabledExit() {
-      m_disabledExitCount.incrementAndGet();
+    public void disabledEnd() {
+      m_disabledEndCount.incrementAndGet();
     }
 
     @Override
@@ -146,14 +146,14 @@ class OpModeRobotTest {
 
   @AfterEach
   void tearDown() {
-    DriverStationBackend.clearOpModes();
+    RobotState.clearOpModes();
     SimHooks.resumeTiming();
   }
 
   @AfterEach
   @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
   void resetUserProgramFlag() throws ReflectiveOperationException {
-    var field = DriverStationBackend.class.getDeclaredField("m_userProgramStarted");
+    var field = RobotState.class.getDeclaredField("m_userProgramStarted");
     field.setAccessible(true);
     field.set(null, false);
   }
@@ -339,19 +339,19 @@ class OpModeRobotTest {
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
 
-    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledStartCount.get());
     assertEquals(0, robot.m_disabledPeriodicCount.get());
 
-    // disabledInit and disabledPeriodic both run on the first loop
+    // disabledStart and disabledPeriodic both run on the first loop
     SimHooks.stepTiming(PERIOD);
-    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledStartCount.get());
     assertEquals(1, robot.m_disabledPeriodicCount.get());
-    assertEquals(0, robot.m_disabledExitCount.get());
+    assertEquals(0, robot.m_disabledEndCount.get());
 
     SimHooks.stepTiming(PERIOD);
-    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledStartCount.get());
     assertEquals(2, robot.m_disabledPeriodicCount.get());
-    assertEquals(0, robot.m_disabledExitCount.get());
+    assertEquals(0, robot.m_disabledEndCount.get());
 
     robot.endCompetition();
     robotThread.join();
@@ -376,35 +376,35 @@ class OpModeRobotTest {
     SimHooks.stepTiming(PERIOD);
     MockOpMode opMode = robot.m_opMode;
     assertNotNull(opMode);
-    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledStartCount.get());
     assertEquals(1, robot.m_disabledPeriodicCount.get());
     assertEquals(1, opMode.m_disabledPeriodicCount.get());
     assertEquals(0, opMode.m_startCount.get());
 
     SimHooks.stepTiming(PERIOD);
-    assertEquals(1, robot.m_disabledInitCount.get());
+    assertEquals(1, robot.m_disabledStartCount.get());
     assertEquals(2, robot.m_disabledPeriodicCount.get());
     assertEquals(2, opMode.m_disabledPeriodicCount.get());
 
-    // Enable: disabledExit runs and the opmode starts
+    // Enable: disabledEnd runs and the opmode starts
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(PERIOD);
-    assertEquals(1, robot.m_disabledExitCount.get());
+    assertEquals(1, robot.m_disabledEndCount.get());
     assertEquals(2, robot.m_disabledPeriodicCount.get());
     assertEquals(2, opMode.m_disabledPeriodicCount.get());
     assertEquals(1, opMode.m_startCount.get());
     assertEquals(0, opMode.m_endCount.get());
 
-    // Disable: the opmode ends and is closed, and disabledInit runs again
+    // Disable: the opmode ends and is closed, and disabledStart runs again
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
     SimHooks.stepTiming(PERIOD);
     assertEquals(1, opMode.m_endCount.get());
     assertEquals(1, opMode.m_closeCount.get());
-    assertEquals(2, robot.m_disabledInitCount.get());
+    assertEquals(2, robot.m_disabledStartCount.get());
     assertEquals(3, robot.m_disabledPeriodicCount.get());
-    assertEquals(1, robot.m_disabledExitCount.get());
+    assertEquals(1, robot.m_disabledEndCount.get());
 
     robot.endCompetition();
     robotThread.join();
@@ -432,9 +432,9 @@ class OpModeRobotTest {
     assertNotNull(opMode);
     assertEquals(1, opMode.m_disabledPeriodicCount.get());
     assertEquals(1, opMode.m_startCount.get());
-    assertEquals(0, robot.m_disabledInitCount.get());
+    assertEquals(0, robot.m_disabledStartCount.get());
     assertEquals(0, robot.m_disabledPeriodicCount.get());
-    assertEquals(0, robot.m_disabledExitCount.get());
+    assertEquals(0, robot.m_disabledEndCount.get());
 
     // No further disabledPeriodic calls while enabled
     SimHooks.stepTiming(PERIOD);
@@ -447,7 +447,7 @@ class OpModeRobotTest {
 
   @Test
   void teleopCreatedWhileEnabledAfterAutoWithFms() throws InterruptedException {
-    // Under FMS the teleop opmode is selected while the robot stays enabled after auto ends
+    // Under FMS the teleoperated opmode is selected while the robot stays enabled after auto ends
     MockOpMode[] opModes = new MockOpMode[2];
     final MockRobot robot = new MockRobot();
     robot.addOpMode(
