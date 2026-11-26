@@ -41,6 +41,7 @@ import org.wpilib.util.Alert;
  * <ul>
  *   <li>robotPeriodic()
  *   <li>disabledPeriodic()
+ *   <li>enabledPeriodic()
  *   <li>autonomousPeriodic()
  *   <li>teleopPeriodic()
  *   <li>utilityPeriodic()
@@ -52,6 +53,7 @@ import org.wpilib.util.Alert;
  *   <li>{@link #driverStationConnected()}, once, the first time the DS is connected
  *   <li>the end function of the previous mode and the start function of the new mode, only on a
  *       mode change
+ *   <li>{@link #enabledPeriodic()}, only while enabled
  *   <li>the periodic function for the current mode ({@link #disabledPeriodic()}, {@link
  *       #autonomousPeriodic()}, {@link #teleopPeriodic()}, or {@link #utilityPeriodic()})
  *   <li>{@link #robotPeriodic()}
@@ -156,9 +158,9 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Periodic code for all robot modes should go here.
    *
-   * <p>Runs after the current mode's periodic function ({@link #disabledPeriodic()}, {@link
-   * #autonomousPeriodic()}, {@link #teleopPeriodic()}, or {@link #utilityPeriodic()}) and before
-   * {@link #simulationPeriodic()}.
+   * <p>Runs after {@link #enabledPeriodic()} and the current mode's periodic function ({@link
+   * #disabledPeriodic()}, {@link #autonomousPeriodic()}, {@link #teleopPeriodic()}, or {@link
+   * #utilityPeriodic()}), and before {@link #simulationPeriodic()}.
    */
   public void robotPeriodic() {
     if (m_rpFirstRun) {
@@ -198,12 +200,22 @@ public abstract class IterativeRobotBase extends RobotBase {
     }
   }
 
+  /**
+   * Periodic code for all enabled modes should go here.
+   *
+   * <p>Called once per loop while the robot is enabled, after any mode transition callbacks and
+   * before the current mode's periodic function, {@link #robotPeriodic()}, and {@link
+   * #simulationPeriodic()}. Never runs while disabled.
+   */
+  public void enabledPeriodic() {}
+
   private boolean m_apFirstRun = true;
 
   /**
    * Periodic code for autonomous mode should go here.
    *
-   * <p>Runs before {@link #robotPeriodic()} and {@link #simulationPeriodic()}.
+   * <p>Runs after {@link #enabledPeriodic()} and before {@link #robotPeriodic()} and {@link
+   * #simulationPeriodic()}.
    */
   public void autonomousPeriodic() {
     if (m_apFirstRun) {
@@ -217,7 +229,8 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Periodic code for teleoperated mode should go here.
    *
-   * <p>Runs before {@link #robotPeriodic()} and {@link #simulationPeriodic()}.
+   * <p>Runs after {@link #enabledPeriodic()} and before {@link #robotPeriodic()} and {@link
+   * #simulationPeriodic()}.
    */
   public void teleopPeriodic() {
     if (m_tpFirstRun) {
@@ -231,7 +244,8 @@ public abstract class IterativeRobotBase extends RobotBase {
   /**
    * Periodic code for utility mode should go here.
    *
-   * <p>Runs before {@link #robotPeriodic()} and {@link #simulationPeriodic()}.
+   * <p>Runs after {@link #enabledPeriodic()} and before {@link #robotPeriodic()} and {@link
+   * #simulationPeriodic()}.
    */
   public void utilityPeriodic() {
     if (m_tmpFirstRun) {
@@ -338,6 +352,11 @@ public abstract class IterativeRobotBase extends RobotBase {
 
     // Call the appropriate function depending upon the current robot mode
     DriverStationJNI.observeUserProgram(m_word.getNative());
+    if (enabled) {
+      enabledPeriodic();
+      m_watchdog.addEpoch("enabledPeriodic()");
+    }
+
     switch (mode) {
       case UNKNOWN -> {
         disabledPeriodic();

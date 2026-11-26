@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
@@ -741,6 +743,72 @@ class TimedRobotTest {
       Thread.currentThread().interrupt();
     }
     robot.close();
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void enabledPeriodicTest() {
+    var calls = new ArrayList<String>();
+    try (var robot =
+        new MockRobot() {
+          @Override
+          public void disabledPeriodic() {
+            calls.add("disabled");
+          }
+
+          @Override
+          public void autonomousPeriodic() {
+            calls.add("autonomous");
+          }
+
+          @Override
+          public void teleopPeriodic() {
+            calls.add("teleop");
+          }
+
+          @Override
+          public void utilityPeriodic() {
+            calls.add("utility");
+          }
+
+          @Override
+          public void enabledPeriodic() {
+            calls.add("enabled");
+          }
+
+          @Override
+          public void robotPeriodic() {
+            calls.add("robot");
+          }
+
+          @Override
+          public void simulationPeriodic() {
+            calls.add("simulation");
+          }
+        }) {
+      DriverStationSim.notifyNewData();
+      robot.loopFunc();
+      assertEquals(List.of("disabled", "robot", "simulation"), calls);
+
+      RobotMode[] modes = {RobotMode.AUTONOMOUS, RobotMode.TELEOPERATED, RobotMode.UTILITY};
+      String[] modeNames = {"autonomous", "teleop", "utility"};
+      for (int i = 0; i < modes.length; i++) {
+        DriverStationSim.setRobotMode(modes[i]);
+        DriverStationSim.setEnabled(true);
+        DriverStationSim.notifyNewData();
+        for (int j = 0; j < 2; j++) {
+          calls.clear();
+          robot.loopFunc();
+          assertEquals(List.of("enabled", modeNames[i], "robot", "simulation"), calls);
+        }
+
+        DriverStationSim.setEnabled(false);
+        DriverStationSim.notifyNewData();
+        calls.clear();
+        robot.loopFunc();
+        assertEquals(List.of("disabled", "robot", "simulation"), calls);
+      }
+    }
   }
 
   @Test
