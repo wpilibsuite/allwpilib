@@ -57,11 +57,6 @@ if(WPILIB_WITH_IMGUI_TESTS)
     )
 endif()
 
-if(WPILIB_WITH_TESTS)
-    wpilib_add_test(glass src/test/native/cpp)
-    target_link_libraries(glass_test libglass)
-endif()
-
 #
 # libglassnt
 #
@@ -99,6 +94,11 @@ if(WPILIB_WITH_IMGUI_TESTS)
         libglassnt_for_tests
         PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/libnt/native/include>
     )
+endif()
+
+if(WPILIB_WITH_TESTS)
+    wpilib_add_test(glass src/test/native/cpp)
+    target_link_libraries(glass_test libglassnt)
 endif()
 
 #
