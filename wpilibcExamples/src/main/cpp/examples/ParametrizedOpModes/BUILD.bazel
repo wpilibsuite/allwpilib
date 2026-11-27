@@ -1,0 +1,36 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+
+filegroup(
+    name = "deploy",
+    srcs = glob(["deploy/**"]),
+)
+
+filegroup(
+    name = "sources",
+    srcs = glob([
+        "cpp/**/*.cpp",
+        "include/**/*.hpp",
+        "deploy/**",
+    ]),
+    visibility = [
+        "//wpilibcExamples/src/main/cpp/examples:__pkg__",
+    ],
+)
+
+cc_binary(
+    name = "ParametrizedOpModes",
+    srcs = glob([
+        "cpp/**/*.cpp",
+        "include/**/*.hpp",
+    ]),
+    data = [":deploy"],
+    includes = ["include"],
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        "//drivers",
+        "//wpilibc",
+        "//wpimath",
+    ],
+)

@@ -93,7 +93,7 @@ option(WPILIB_WITH_NTCORE "Build ntcore" ON)
 option(WPILIB_WITH_WPICAL "Build wpical" OFF)
 option(WPILIB_WITH_WPIMATH "Build wpimath" ON)
 option(WPILIB_WITH_WPILIB "Build hal, wpilibc/j, drivers, and developerRobot (needs OpenCV)" ON)
-option(WPILIB_WITH_EXAMPLES "Build examples" OFF)
+option(WPILIB_WITH_EXAMPLES "Build examples" ON)
 option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ${PROJECT_IS_TOP_LEVEL})
 option(WPILIB_WITH_GUI "Build GUI items (needs SDL3)" OFF)
 option(
