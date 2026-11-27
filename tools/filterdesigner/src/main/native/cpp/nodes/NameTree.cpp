@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <ranges>
 #include <span>
 #include <string>
 #include <string_view>
@@ -35,15 +36,18 @@ NameTreeNode BuildNameTree(std::span<const NameTreeItem> items) {
     // not itself a path — datalogtool's rule, verbatim. `NT` becomes its own
     // level; `/Shooter/ratio:1` is left alone.
     auto [prefix, mainpart] = wpi::util::split(item.name, ':');
-    if (mainpart.empty() || wpi::util::contains(prefix, '/')) {
+    if (mainpart.empty() || prefix.contains('/')) {
       mainpart = item.name;
     } else {
       parts.emplace_back(prefix);
     }
-    // -1: split at every '/', however many there are. false: drop the empty
-    // segments, so a leading '/' does not open an unnamed branch.
-    wpi::util::split(mainpart, '/', -1, false,
-                     [&](auto part) { parts.emplace_back(part); });
+    // Split at every '/', dropping empty segments so a leading '/' does
+    // not open an unnamed branch.
+    for (auto part : mainpart | std::views::split('/')) {
+      if (!part.empty()) {
+        parts.emplace_back(part);
+      }
+    }
 
     // A name that is all separators ("/", "") names nothing.
     if (parts.empty()) {

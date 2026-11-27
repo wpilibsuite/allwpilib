@@ -17,7 +17,6 @@
 #include "wpi/math/filter/LinearFilter.hpp"
 #include "wpi/math/filter/MedianFilter.hpp"
 #include "wpi/util/MathExtras.hpp"
-#include "wpi/util/StringExtras.hpp"
 
 using namespace sysid;
 
@@ -47,8 +46,7 @@ static void CheckSize(const std::vector<PreparedData>& data, size_t window,
  * @return True, if the key corresponds to a raw dataset.
  */
 static bool IsRaw(std::string_view key) {
-  return wpi::util::contains(key, "raw") &&
-         !wpi::util::contains(key, "original");
+  return key.contains("raw") && !key.contains("original");
 }
 
 /**
@@ -59,8 +57,7 @@ static bool IsRaw(std::string_view key) {
  * @return True, if the key corresponds to a filtered dataset.
  */
 static bool IsFiltered(std::string_view key) {
-  return !wpi::util::contains(key, "raw") &&
-         !wpi::util::contains(key, "original");
+  return !key.contains("raw") && !key.contains("original");
 }
 
 /**
@@ -327,7 +324,7 @@ static wpi::units::second_t GetMaxStepTime(
     auto& key = it.first;
     auto& dataset = it.second;
 
-    if (IsRaw(key) && wpi::util::contains(key, "dynamic")) {
+    if (IsRaw(key) && key.contains("dynamic")) {
       if (!dataset.empty()) {
         auto duration = dataset.back().timestamp - dataset.front().timestamp;
         if (duration > maxStepTime) {
@@ -356,7 +353,7 @@ void sysid::InitialTrimAndFilter(
     for (auto& it : preparedData) {
       auto& key = it.first;
       auto& dataset = it.second;
-      if (wpi::util::contains(key, "quasistatic")) {
+      if (key.contains("quasistatic")) {
         settings->velocityThreshold =
             std::min(settings->velocityThreshold,
                      GetNoiseFloor(dataset, NOISE_MEAN_WINDOW,
@@ -371,7 +368,7 @@ void sysid::InitialTrimAndFilter(
 
     // Trim quasistatic test data to remove all points where voltage is zero or
     // velocity < velocity threshold.
-    if (wpi::util::contains(key, "quasistatic")) {
+    if (key.contains("quasistatic")) {
       dataset.erase(std::remove_if(dataset.begin(), dataset.end(),
                                    [&](const auto& pt) {
                                      return std::abs(pt.voltage) <= 0 ||
@@ -395,7 +392,7 @@ void sysid::InitialTrimAndFilter(
     PrepareMechData(&dataset, unit);
 
     // Trims filtered Dynamic Test Data
-    if (IsFiltered(key) && wpi::util::contains(key, "dynamic")) {
+    if (IsFiltered(key) && key.contains("dynamic")) {
       // Get the filtered dataset name
       auto filteredKey = RemoveStr(key, "raw-");
 

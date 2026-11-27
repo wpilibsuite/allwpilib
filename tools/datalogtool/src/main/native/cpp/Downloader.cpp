@@ -104,7 +104,7 @@ void Downloader::DisplayRemoteDirSelector() {
   for (auto&& dir : m_dirList) {
     if (ImGui::Selectable(dir.c_str())) {
       if (dir == "..") {
-        if (wpi::util::ends_with(m_remoteDir, '/')) {
+        if (m_remoteDir.ends_with('/')) {
           m_remoteDir.resize(m_remoteDir.size() - 1);
         }
         m_remoteDir = wpi::util::rsplit(m_remoteDir, '/').first;
@@ -112,7 +112,7 @@ void Downloader::DisplayRemoteDirSelector() {
           m_remoteDir = "/";
         }
       } else {
-        if (!wpi::util::ends_with(m_remoteDir, '/')) {
+        if (!m_remoteDir.ends_with('/')) {
           m_remoteDir += '/';
         }
         m_remoteDir += dir;
@@ -336,7 +336,7 @@ void Downloader::ThreadMain() {
               }
             } else if (attr.type == SSH_FILEXFER_TYPE_REGULAR &&
                        (attr.flags & SSH_FILEXFER_ATTR_SIZE) != 0 &&
-                       wpi::util::ends_with(attr.name, ".wpilog")) {
+                       attr.name.ends_with(".wpilog")) {
               m_fileList.emplace_back(attr.name, attr.size);
             }
           }
@@ -358,9 +358,9 @@ void Downloader::ThreadMain() {
               continue;
             }
 
-            auto remoteFilename = std::format(
-                "{}{}{}", m_remoteDir,
-                wpi::util::ends_with(m_remoteDir, '/') ? "" : "/", file.name);
+            auto remoteFilename =
+                std::format("{}{}{}", m_remoteDir,
+                            m_remoteDir.ends_with('/') ? "" : "/", file.name);
             auto localFilename = fs::path{m_localDir} / file.name;
             uint64_t fileSize = file.size;
 
@@ -451,9 +451,9 @@ void Downloader::ThreadMain() {
               continue;
             }
 
-            auto remoteFilename = std::format(
-                "{}{}{}", m_remoteDir,
-                wpi::util::ends_with(m_remoteDir, '/') ? "" : "/", file.name);
+            auto remoteFilename =
+                std::format("{}{}{}", m_remoteDir,
+                            m_remoteDir.ends_with('/') ? "" : "/", file.name);
 
             lock.unlock();
             try {
