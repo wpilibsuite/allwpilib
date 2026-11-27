@@ -80,14 +80,17 @@ def wpilib_jni_java_library(
         visibility = visibility,
         testonly = testonly,
         tags = tags,
+        native_libs = native_libs,
         **java_library_args
     )
 
+    # Headers come from the compiled "-impl" library; `name` itself carries
+    # the native libraries built from them (see wpilib_java_library).
     jni = "@wpilib_toolchains//jni"
     _jni_headers(
         name = headers_name,
         jni = jni,
-        lib = ":" + name,
+        lib = ":" + name + ("-impl" if native_libs else ""),
         testonly = testonly,
         visibility = visibility,
     )
