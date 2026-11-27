@@ -6,12 +6,17 @@
 
 #include <stdint.h>
 
+#include <algorithm>
 #include <atomic>
+#include <cstdio>
+#include <format>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "wpi/util/UidVector.hpp"
 #include "wpi/util/mutex.hpp"
+#include "wpi/util/print.hpp"
 #include "wpi/util/string.hpp"
 #include "wpi/util/timestamp.hpp"
 
@@ -282,14 +287,51 @@ const WPI_AlertBackend defaultBackend{
     DefaultFreeAlerts,    DefaultResetAlertData};
 
 std::atomic<const WPI_AlertBackend*> backend{&defaultBackend};
+std::atomic<uint64_t> nextAlertId{0};
 
 }  // namespace
+
+Alert::Alert(std::string_view text, Level level) : Alert{text, level, true} {}
+
+Alert::Alert(std::string_view text, Level level, bool reportErrors)
+    : Alert{"Alerts",
+            std::format("auto-{}",
+                        nextAlertId.fetch_add(1, std::memory_order_relaxed)),
+            text, level, reportErrors} {
+  if (!*this) {
+    return;
+  }
+  int32_t capacity = WPI_GetNumAlerts();
+  if (capacity <= 1) {
+    return;
+  }
+  std::vector<WPI_AlertInfo> infos(capacity);
+  int32_t count = std::min(WPI_GetAlerts(infos.data(), capacity), capacity);
+  int matches = 0;
+  for (int32_t i = 0; i < count; ++i) {
+    if (to_string_view(&infos[i].text) == text) {
+      ++matches;
+    }
+  }
+  WPI_FreeAlerts(infos.data(), std::max(count, 0));
+  if (matches > 1) {
+    wpi::util::print(
+        stderr,
+        "Warning: An alert with text \"{}\" already exists. Alerts should be "
+        "created once and reused.\n",
+        text);
+  }
+}
 
 Alert::Alert(std::string_view id, std::string_view text, Level level)
     : Alert{"Alerts", id, text, level} {}
 
 Alert::Alert(std::string_view group, std::string_view id, std::string_view text,
-             Level level) {
+             Level level)
+    : Alert{group, id, text, level, true} {}
+
+Alert::Alert(std::string_view group, std::string_view id, std::string_view text,
+             Level level, bool reportErrors) {
   WPI_String wpiGroup = make_string(group);
   WPI_String wpiId = make_string(id);
   WPI_String wpiText = make_string(text);
@@ -298,6 +340,14 @@ Alert::Alert(std::string_view group, std::string_view id, std::string_view text,
                                    static_cast<int32_t>(level), &handle);
   if (status != 0) {
     handle = WPI_INVALID_HANDLE;
+  }
+  if (handle == WPI_INVALID_HANDLE && reportErrors) {
+    wpi::util::print(
+        stderr,
+        "Warning: Failed to create alert \"{}\" in group \"{}\" with ID "
+        "\"{}\". "
+        "Check for duplicate IDs. Alerts should be created once and reused.\n",
+        text, group, id);
   }
   m_handle = handle;
 }

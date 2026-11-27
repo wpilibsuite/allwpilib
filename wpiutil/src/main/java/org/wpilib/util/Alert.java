@@ -4,6 +4,9 @@
 
 package org.wpilib.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Persistent alert. Alerts are tagged with a type of {@code HIGH}, {@code MEDIUM}, or {@code LOW}
  * to denote urgency. See {@link org.wpilib.util.Alert.Level Level} for suggested usage of each
@@ -70,8 +73,36 @@ public class Alert implements AutoCloseable {
     }
   }
 
+  private static final AtomicLong s_nextId = new AtomicLong();
+
   private final Level m_level;
-  private int m_handle;
+  private final AtomicInteger m_handle;
+
+  /**
+   * Creates a new alert in the default group - "Alerts" with an automatically generated identifier.
+   *
+   * <p>The identifier uses the prefix {@code auto-} followed by a static incrementing value. If
+   * another allocated alert has the same text, a warning is printed to standard error.
+   *
+   * @param text Text to be displayed when the alert is active.
+   * @param level Alert urgency level.
+   */
+  public Alert(String text, Level level) {
+    this("auto-" + s_nextId.getAndIncrement(), text, level);
+    int matches = 0;
+    for (var info : AlertDataJNI.getAlerts()) {
+      if (text.equals(info.text)) {
+        matches++;
+        if (matches == 2) {
+          System.err.println(
+              "Warning: An alert with text \""
+                  + text
+                  + "\" already exists. Alerts should be created once and reused.");
+          break;
+        }
+      }
+    }
+  }
 
   /**
    * Creates a new alert in the default group - "Alerts".
@@ -94,7 +125,7 @@ public class Alert implements AutoCloseable {
    */
   public Alert(String group, String id, String text, Level level) {
     m_level = level;
-    m_handle = WPIUtilJNI.createAlert(group, id, text, level.m_value);
+    m_handle = new AtomicInteger(WPIUtilJNI.createAlert(group, id, text, level.m_value));
   }
 
   /**
@@ -104,7 +135,7 @@ public class Alert implements AutoCloseable {
    * @param active Whether to display the alert.
    */
   public void set(boolean active) {
-    WPIUtilJNI.setAlertActive(m_handle, active);
+    WPIUtilJNI.setAlertActive(m_handle.get(), active);
   }
 
   /**
@@ -113,7 +144,7 @@ public class Alert implements AutoCloseable {
    * @return whether the alert is active.
    */
   public boolean get() {
-    return WPIUtilJNI.isAlertActive(m_handle);
+    return WPIUtilJNI.isAlertActive(m_handle.get());
   }
 
   /**
@@ -123,7 +154,7 @@ public class Alert implements AutoCloseable {
    * @param text Text to be displayed when the alert is active.
    */
   public void setText(String text) {
-    WPIUtilJNI.setAlertText(m_handle, text);
+    WPIUtilJNI.setAlertText(m_handle.get(), text);
   }
 
   /**
@@ -132,7 +163,7 @@ public class Alert implements AutoCloseable {
    * @return the current text.
    */
   public String getText() {
-    return WPIUtilJNI.getAlertText(m_handle);
+    return WPIUtilJNI.getAlertText(m_handle.get());
   }
 
   /**
@@ -146,9 +177,9 @@ public class Alert implements AutoCloseable {
 
   @Override
   public void close() {
-    if (m_handle != 0) {
-      WPIUtilJNI.destroyAlert(m_handle);
-      m_handle = 0;
+    int handle = m_handle.getAndSet(0);
+    if (handle != 0) {
+      WPIUtilJNI.destroyAlert(handle);
     }
   }
 }

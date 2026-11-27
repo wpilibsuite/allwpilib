@@ -127,15 +127,88 @@ def test_close_releases_duplicate_id(group_name):
         assert is_alert_active("second", Alert.Level.HIGH)
 
 
-def test_duplicate_id_raises(group_name):
-    with Alert(group_name, "alert", "first", Alert.Level.HIGH) as first:
+def test_auto_generated_ids(group_name):
+    with (
+        Alert("text", Alert.Level.LOW) as first,
+        Alert("text", Alert.Level.LOW) as second,
+    ):
+        infos = AlertSim.get_all()
+        assert len(infos) == 2
+        for info in infos:
+            assert info.group == "Alerts"
+            assert info.id.startswith("auto-")
+            assert info.text == "text"
+            assert info.level == Alert.Level.LOW
+        first_id = int(infos[0].id.removeprefix("auto-"))
+        assert infos[1].id == f"auto-{first_id + 1}"
+
+        first.set(True)
+        assert first.get()
+        assert not second.get()
+
+    assert AlertSim.get_count() == 0
+    AlertSim.reset_data()
+
+    with Alert("text", Alert.Level.LOW) as third:
+        assert third
+        infos = AlertSim.get_all()
+        assert len(infos) == 1
+        assert infos[0].id == f"auto-{first_id + 2}"
+
+
+def test_duplicate_text_warns(group_name, capfd):
+    with Alert(group_name, "id", "initial", Alert.Level.HIGH) as first:
+        first.set_text("duplicate text")
+        assert capfd.readouterr().err == ""
+        with Alert("duplicate text", Alert.Level.LOW) as second:
+            second.set(True)
+            assert second.get()
+            assert not first.get()
+            assert AlertSim.get_count() == 2
+        assert (
+            'Warning: An alert with text "duplicate text" already exists.'
+            in capfd.readouterr().err
+        )
+
+
+def test_distinct_and_reused_text_do_not_warn(group_name, capfd):
+    with (
+        Alert("text", Alert.Level.LOW) as first,
+        Alert("other text", Alert.Level.LOW),
+        Alert("id", "text", Alert.Level.LOW),
+    ):
+        first.set_text("updated")
+    with Alert("text", Alert.Level.LOW):
+        AlertSim.reset_data()
+        with Alert("text", Alert.Level.LOW):
+            assert AlertSim.get_count() == 1
+    assert capfd.readouterr().err == ""
+
+
+def test_auto_id_collision_raises_without_warning(group_name, capfd):
+    with Alert("text", Alert.Level.LOW):
+        first_id = int(AlertSim.get_all()[0].id.removeprefix("auto-"))
+        with Alert(f"auto-{first_id + 1}", "text", Alert.Level.LOW):
+            with pytest.raises(RuntimeError, match="Alert already allocated"):
+                Alert("text", Alert.Level.LOW)
+            assert AlertSim.get_count() == 2
+    assert capfd.readouterr().err == ""
+
+
+@pytest.mark.parametrize("group", [None, "Alerts", "custom"])
+def test_duplicate_id_raises(group_name, capfd, group):
+    args = ("alert", "first", Alert.Level.HIGH)
+    if group is not None:
+        args = (group, *args)
+    with Alert(*args) as first:
         first.set(True)
 
         with pytest.raises(RuntimeError, match="Alert already allocated"):
-            Alert(group_name, "alert", "duplicate", Alert.Level.HIGH)
+            Alert(*args)
 
         assert AlertSim.get_count() == 1
         assert is_alert_active("first", Alert.Level.HIGH)
+        assert capfd.readouterr().err == ""
 
 
 def test_set_text_while_unset(group_name):
