@@ -1,0 +1,25 @@
+#
+# Use this configuration file to control what RobotPy packages are installed
+# on your RoboRIO
+#
+
+[tool.robotpy]
+
+# Version of robotpy this project depends on
+robotpy_version = "2027.0.0a6.post1"
+
+# Which optional robotpy components should be installed?
+# -> equivalent to `pip install robotpy[extra1, ...]
+components = [
+	#  "all",
+	#  "apriltag",
+	 "commands2",
+	#  "cscore",
+	#  "romi",
+	#  "sim",
+	#  "xrp",
+]
+
+# Other pip packages to install, such as vendor packages (each element
+# is equivalent to a line in requirements.txt)
+requires = [ ]
