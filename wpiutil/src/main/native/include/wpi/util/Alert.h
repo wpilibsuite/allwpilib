@@ -6,13 +6,13 @@
 
 #include <stdint.h>
 
+#include "wpi/util/AlertReader.h"
 #include "wpi/util/Handle.h"
 #include "wpi/util/string.h"
 
 typedef WPI_Handle WPI_AlertHandle;  // NOLINT(modernize-use-using)
-#define ALERT_ERROR -1
-#define ALERT_ALREADY_ALLOCATED -2
-#define ALERT_HANDLE_TYPE 23
+#define WPI_ALERT_ALREADY_ALLOCATED -2
+#define WPI_ALERT_HANDLE_TYPE 23
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,6 +67,15 @@ struct WPI_AlertBackend {
   int32_t (*getAlerts)(struct WPI_AlertInfo* arr, int32_t length);
   void (*freeAlerts)(struct WPI_AlertInfo* arr, int32_t length);
   void (*resetAlertData)(void);
+  /** Create an independent backend cursor. All three callbacks are required. */
+  int32_t (*createAlertReader)(size_t capacity, void** reader);
+  /** Destroy the backend cursor; caller excludes concurrent operations. */
+  void (*destroyAlertReader)(void* reader);
+  /**
+   * Read using WPI_ReadAlertEvents semantics. Allocate strings with WPI string
+   * allocation and the event array with malloc, for WPI_FreeAlertEvents.
+   */
+  int32_t (*readAlertEvents)(void* reader, struct WPI_AlertEvents* result);
 };
 
 /**
@@ -142,23 +151,29 @@ int32_t WPI_GetAlertText(WPI_AlertHandle alertHandle, struct WPI_String* text);
 int32_t WPI_GetAlertLevel(WPI_AlertHandle alertHandle, int32_t* level);
 
 /**
- * Gets the number of alerts. Note: this is not guaranteed to be consistent
- * with the number of alerts returned by WPI_GetAlerts, so the latter's
- * return value and the supplied capacity should be used to determine how many
- * alerts were actually filled in.
+ * Gets the number of observed system alerts, including inactive alerts.
+ * Observation does not confer ownership. Note: this is not guaranteed to be
+ * consistent with the number of alerts returned by WPI_GetAlerts, so the
+ * latter's return value and the supplied capacity should be used to determine
+ * how many alerts were actually filled in.
  *
- * @return the number of alerts
+ * @return Number of observed alerts, WPI_ALERT_NO_VALUE if unavailable or
+ * synchronizing, or WPI_ALERT_ERROR on failure. Zero means synchronized and
+ * empty.
  */
 int32_t WPI_GetNumAlerts(void);
 
 /**
- * Gets detailed information about all alerts.
+ * Gets a snapshot of observed system alerts, including externally owned alerts.
+ * Observation does not confer ownership. Missing text or active fields appear
+ * as empty or zero; use an alert reader to distinguish missing fields.
  *
  * @param arr array of information to be filled
  * @param length length of arr
  * @return Number of alerts; note: may be larger or smaller than passed-in
  * length. The number of elements filled in arr is the lesser of this return
- * value and length.
+ * value and length. WPI_ALERT_NO_VALUE means unavailable or synchronizing;
+ * WPI_ALERT_ERROR means failure. Negative results initialize no array elements.
  */
 int32_t WPI_GetAlerts(struct WPI_AlertInfo* arr, int32_t length);
 
@@ -173,12 +188,15 @@ int32_t WPI_GetAlerts(struct WPI_AlertInfo* arr, int32_t length);
 void WPI_FreeAlerts(struct WPI_AlertInfo* arr, int32_t length);
 
 /**
- * Resets all alerts in the alert backend.
+ * Destroys alerts owned by the alert backend. Independent observation readers
+ * remain valid and observe these removals; externally owned alerts are
+ * retained.
  */
 void WPI_ResetAlertData(void);
 
 /**
- * Sets the alert backend.
+ * Sets the alert backend. Existing readers remain bound to their original
+ * backend. Backends and their callbacks must outlive all operations using them.
  *
  * @param backend pointer to the alert backend
  */
