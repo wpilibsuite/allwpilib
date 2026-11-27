@@ -17,6 +17,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -28,10 +29,7 @@
 #include "wpi/datalog/DataLogReaderThread.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
-#include "wpi/util/DenseMap.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/SpanExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fmt/raw_ostream.hpp"
 #include "wpi/util/fs.hpp"
@@ -93,18 +91,21 @@ std::atomic_int gExportCount{0};
 // must be called with gEntriesMutex held
 static void RebuildEntryTree() {
   gEntryTree.clear();
-  wpi::util::SmallVector<std::string_view, 16> parts;
+  std::vector<std::string_view> parts;
   for (auto& kv : gEntries) {
     parts.clear();
     // split on first : if one is present
     auto [prefix, mainpart] = wpi::util::split(kv.first, ':');
-    if (mainpart.empty() || wpi::util::contains(prefix, '/')) {
+    if (mainpart.empty() || prefix.contains('/')) {
       mainpart = kv.first;
     } else {
       parts.emplace_back(prefix);
     }
-    wpi::util::split(mainpart, '/', -1, false,
-                     [&](auto part) { parts.emplace_back(part); });
+    for (auto part : mainpart | std::views::split('/')) {
+      if (!part.empty()) {
+        parts.emplace_back(part);
+      }
+    }
 
     // ignore a raw "/" key
     if (parts.empty()) {
@@ -113,8 +114,7 @@ static void RebuildEntryTree() {
 
     // get to leaf
     auto nodes = &gEntryTree;
-    for (auto part :
-         wpi::util::drop_back(std::span{parts.begin(), parts.end()})) {
+    for (auto part : parts | std::views::take(parts.size() - 1)) {
       auto it =
           std::find_if(nodes->begin(), nodes->end(),
                        [&](const auto& node) { return node.name == part; });
@@ -455,7 +455,7 @@ static void PrintEscapedCsvString(wpi::util::raw_ostream& os,
       os << '"' << '"';
     }
   }
-  if (wpi::util::ends_with(str, '"')) {
+  if (str.ends_with('"')) {
     os << '"' << '"';
   }
 }
@@ -563,7 +563,7 @@ static void ExportCsvFile(InputFile& f, wpi::util::raw_ostream& os, int style) {
     os << '\n';
   }
 
-  wpi::util::DenseMap<int, Entry*> nameMap;
+  std::unordered_map<int, Entry*> nameMap;
   for (auto&& record : f.datalog->GetReader()) {
     if (record.IsStart()) {
       wpi::log::StartRecordData data;

@@ -12,7 +12,6 @@
 #include "wpi/sysid/analysis/FeedforwardAnalysis.hpp"
 #include "wpi/sysid/analysis/FilteringUtils.hpp"
 #include "wpi/util/MathExtras.hpp"
-#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
 
 using namespace sysid;
@@ -91,7 +90,7 @@ static void CopyRawData(wpi::util::StringMap<MotorData>* dataset) {
     auto& key = it.first;
     auto& motorData = it.second;
 
-    if (!wpi::util::contains(key, "raw")) {
+    if (!key.contains("raw")) {
       data[std::format("raw-{}", key)] = motorData;
       data[std::format("original-raw-{}", key)] = motorData;
     }

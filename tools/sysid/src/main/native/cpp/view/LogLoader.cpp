@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <format>
 #include <memory>
-#include <span>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -18,8 +18,6 @@
 
 #include "wpi/datalog/DataLogReaderThread.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/SpanExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 
@@ -109,7 +107,7 @@ void LogLoader::Display() {
 
 void LogLoader::RebuildEntryTree() {
   m_entryTree.clear();
-  wpi::util::SmallVector<std::string_view, 16> parts;
+  std::vector<std::string_view> parts;
   m_reader->ForEachEntryName([&](const wpi::log::DataLogReaderEntry& entry) {
     // only show double/float/string entries (TODO: support struct/protobuf)
     if (entry.type != "double" && entry.type != "float" &&
@@ -125,13 +123,16 @@ void LogLoader::RebuildEntryTree() {
     parts.clear();
     // split on first : if one is present
     auto [prefix, mainpart] = wpi::util::split(entry.name, ':');
-    if (mainpart.empty() || wpi::util::contains(prefix, '/')) {
+    if (mainpart.empty() || prefix.contains('/')) {
       mainpart = entry.name;
     } else {
       parts.emplace_back(prefix);
     }
-    wpi::util::split(mainpart, '/', -1, false,
-                     [&](auto part) { parts.emplace_back(part); });
+    for (auto part : mainpart | std::views::split('/')) {
+      if (!part.empty()) {
+        parts.emplace_back(part);
+      }
+    }
 
     // ignore a raw "/" key
     if (parts.empty()) {
@@ -140,8 +141,7 @@ void LogLoader::RebuildEntryTree() {
 
     // get to leaf
     auto nodes = &m_entryTree;
-    for (auto part :
-         wpi::util::drop_back(std::span{parts.begin(), parts.end()})) {
+    for (auto part : parts | std::views::take(parts.size() - 1)) {
       auto it =
           std::find_if(nodes->begin(), nodes->end(),
                        [&](const auto& node) { return node.name == part; });
