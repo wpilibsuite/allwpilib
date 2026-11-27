@@ -214,8 +214,8 @@ from ._wpimath import (
     numerical_jacobian_x,
     object_to_robot_pose,
     rk4,
-    rkdp,
     slew_rate_limit,
+    tsit5,
 )
 
 __all__ = [
@@ -431,6 +431,6 @@ __all__ = [
     "numerical_jacobian_x",
     "object_to_robot_pose",
     "rk4",
-    "rkdp",
     "slew_rate_limit",
+    "tsit5",
 ]

@@ -65,7 +65,7 @@ TEST_CASE("DifferentialDrivetrainSimTest Convergence",
     sim.Update(20_ms);
 
     // Update ground truth.
-    groundTruthX = wpi::math::RKDP(
+    groundTruthX = wpi::math::Tsit5(
         [&sim](const auto& x, const auto& u) -> wpi::math::Vectord<7> {
           return sim.Dynamics(x, u);
         },
@@ -73,7 +73,7 @@ TEST_CASE("DifferentialDrivetrainSimTest Convergence",
   }
 
   // 2 inch tolerance is OK since our ground truth is an approximation of the
-  // ODE solution using wpi::math::RKDP anyway
+  // ODE solution using wpi::math::Tsit5 anyway
   CHECK_THAT(groundTruthX(0, 0),
              Catch::Matchers::WithinAbs(sim.GetState(State::X), 0.05));
   CHECK_THAT(groundTruthX(1, 0),

@@ -54,20 +54,20 @@ class NumericalIntegrationTest {
   }
 
   @Test
-  void testZeroRKDP() {
+  void testZeroTsit5() {
     var y1 =
-        NumericalIntegration.rkdp(
+        NumericalIntegration.tsit5(
             (x, u) -> VecBuilder.fill(0), VecBuilder.fill(0), VecBuilder.fill(0), 0.1);
 
     assertEquals(0.0, y1.get(0, 0), 1e-3);
   }
 
   @Test
-  void testExponentialRKDP() {
+  void testExponentialTsit5() {
     Matrix<N1, N1> y0 = VecBuilder.fill(0.0);
 
     var y1 =
-        NumericalIntegration.rkdp(
+        NumericalIntegration.tsit5(
             (x, u) -> {
               var y = new Matrix<>(Nat.N1(), Nat.N1());
               y.set(0, 0, Math.exp(x.get(0, 0)));
@@ -80,7 +80,7 @@ class NumericalIntegrationTest {
     assertEquals(Math.exp(0.1) - Math.exp(0.0), y1.get(0, 0), 1e-3);
   }
 
-  // Tests RKDP with a time varying solution. From
+  // Tests Tsit5 with a time varying solution. From
   // http://www2.hawaii.edu/~jmcfatri/math407/RungeKuttaTest.html:
   //
   //   dx/dt = x(2/(eᵗ + 1) - 1)
@@ -89,11 +89,11 @@ class NumericalIntegrationTest {
   //
   //   x(t) = 12eᵗ/(eᵗ + 1)²
   @Test
-  void testRKDPTimeVarying() {
+  void testTsit5TimeVarying() {
     final var y0 = VecBuilder.fill(12.0 * Math.exp(5.0) / Math.pow(Math.exp(5.0) + 1.0, 2.0));
 
     final var y1 =
-        NumericalIntegration.rkdp(
+        NumericalIntegration.tsit5(
             (Double t, Matrix<N1, N1> y) ->
                 MatBuilder.fill(
                     Nat.N1(), Nat.N1(), y.get(0, 0) * (2.0 / (Math.exp(t) + 1.0) - 1.0)),

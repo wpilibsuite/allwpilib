@@ -106,7 +106,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
 
     // integrate state derivatives [vₗ, vᵣ, ω, aₗ, aᵣ, α] to new states [x, y, θ, vₗ, vᵣ, ω]
     Matrix<N6, N1> endState =
-        NumericalIntegration.rkdp(this::dynamics, initialState, initialInput, interpDt);
+        NumericalIntegration.tsit5(this::dynamics, initialState, initialInput, interpDt);
 
     double x = endState.get(0, 0);
     double y = endState.get(1, 0);
