@@ -35,7 +35,7 @@ class PubSubOptionsImpl : public PubSubOptions {
     constexpr unsigned int RESOLUTION = 10;
     unsigned int rounded = periodicMs - periodicMs % RESOLUTION;
     if (periodicMs % RESOLUTION >= RESOLUTION / 2 &&
-        rounded <= std::numeric_limits<unsigned int>::max() - RESOLUTION) {
+        rounded <= (std::numeric_limits<unsigned int>::max)() - RESOLUTION) {
       rounded += RESOLUTION;
     }
     return rounded;

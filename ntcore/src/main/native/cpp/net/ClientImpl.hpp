@@ -17,8 +17,11 @@
 #include "NetworkOutgoingQueue.hpp"
 #include "NetworkPing.hpp"
 #include "PubSubOptions.hpp"
+#include "TimeSyncClient.h"
 #include "WireConnection.hpp"
 #include "WireDecoder.hpp"
+#include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/uv/Async.hpp"
 #include "wpi/util/DenseMap.hpp"
 
 namespace wpi::util {
@@ -38,11 +41,15 @@ class WireConnection;
 class ClientImpl final : private ServerMessageHandler {
  public:
   ClientImpl(
-      uint64_t curTimeMs, WireConnection& wire, bool local,
+      uint64_t curTimeMs, wpi::net::EventLoopRunner& loopRunner,
+      WireConnection& wire, ConnectionInfo connInfo, bool local,
       wpi::util::Logger& logger,
       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
           timeSyncUpdated,
       std::function<void(uint32_t repeatMs)> setPeriodic);
+
+  /** Stops time-sync callbacks before destroying client state. */
+  ~ClientImpl() override;
 
   void ProcessIncomingText(std::string_view data);
   void ProcessIncomingBinary(uint64_t curTimeMs, std::span<const uint8_t> data);
@@ -93,6 +100,12 @@ class ClientImpl final : private ServerMessageHandler {
 
   // ping
   NetworkPing m_ping;
+
+  // If the server is new enough, use TSP. Created on NT connection (so we know
+  // the endpoint to use)
+  std::unique_ptr<wpi::tsp::TimeSyncClient> m_tspClient;
+  std::shared_ptr<wpi::net::uv::Async<wpi::tsp::TimeSyncClient::Metadata>>
+      m_timeSyncAsync;
 
   // timestamp handling
   static constexpr uint32_t RTT_INTERVAL_MS = 3000;

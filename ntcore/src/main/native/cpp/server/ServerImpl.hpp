@@ -13,6 +13,7 @@
 #include <utility>
 #include <vector>
 
+#include "net/TimeSyncServer.h"
 #include "server/Functions.hpp"
 #include "server/ServerClient.hpp"
 #include "server/ServerStorage.hpp"
@@ -39,7 +40,7 @@ struct ServerTopic;
 
 class ServerImpl final {
  public:
-  explicit ServerImpl(wpi::util::Logger& logger);
+  ServerImpl(wpi::util::Logger& logger, unsigned int port);
 
   void SendAllOutgoing(uint64_t curTimeMs, bool flush);
   void SendOutgoing(int clientId, uint64_t curTimeMs);
