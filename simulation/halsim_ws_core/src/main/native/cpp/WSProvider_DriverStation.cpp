@@ -5,11 +5,14 @@
 #include "wpi/halsim/ws_core/WSProvider_DriverStation.hpp"
 
 #include <atomic>
+#include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include "wpi/hal/Extensions.h"
 #include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/string.hpp"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                         \
@@ -54,6 +57,31 @@ void HALSimWSProviderDriverStation::RegisterCallbacks() {
             wpi::util::json::object(">robotMode", mode, ">autonomous",
                                     mode == HAL_ROBOT_MODE_AUTONOMOUS, ">test",
                                     mode == HAL_ROBOT_MODE_UTILITY));
+      },
+      this, true);
+  m_opModeCbKey = HALSIM_RegisterDriverStationOpModeCallback(
+      [](const char* name, void* param, const struct HAL_Value* value) {
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            wpi::util::json::object(">opMode",
+                                    std::to_string(value->data.v_long)));
+      },
+      this, true);
+  m_opModeOptionsCbKey = HALSIM_RegisterOpModeOptionsCallback(
+      [](const char* name, void* param, const HAL_OpModeOption* opmodes,
+         int32_t count) {
+        auto options = wpi::util::json::array();
+        for (auto&& option : std::span{opmodes, static_cast<size_t>(count)}) {
+          options.emplace_back(wpi::util::json::object(
+              "id", std::to_string(option.id), "name",
+              std::string{wpi::util::to_string_view(&option.name)}, "group",
+              std::string{wpi::util::to_string_view(&option.group)},
+              "description",
+              std::string{wpi::util::to_string_view(&option.description)},
+              "robotMode",
+              static_cast<int>(HAL_OpMode_GetRobotMode(option.id))));
+        }
+        static_cast<HALSimWSProviderDriverStation*>(param)->ProcessHalCallback(
+            wpi::util::json::object("<opModes", std::move(options)));
       },
       this, true);
   m_estopCbKey = REGISTER(EStop, ">estop", bool, boolean);
@@ -109,6 +137,8 @@ void HALSimWSProviderDriverStation::CancelCallbacks() {
 void HALSimWSProviderDriverStation::DoCancelCallbacks() {
   HALSIM_CancelDriverStationEnabledCallback(m_enabledCbKey);
   HALSIM_CancelDriverStationRobotModeCallback(m_robotModeCbKey);
+  HALSIM_CancelDriverStationOpModeCallback(m_opModeCbKey);
+  HALSIM_CancelOpModeOptionsCallback(m_opModeOptionsCbKey);
   HALSIM_CancelDriverStationEStopCallback(m_estopCbKey);
   HALSIM_CancelDriverStationFmsAttachedCallback(m_fmsCbKey);
   HALSIM_CancelDriverStationDsAttachedCallback(m_dsCbKey);
@@ -118,6 +148,8 @@ void HALSimWSProviderDriverStation::DoCancelCallbacks() {
 
   m_enabledCbKey = 0;
   m_robotModeCbKey = 0;
+  m_opModeCbKey = 0;
+  m_opModeOptionsCbKey = 0;
   m_estopCbKey = 0;
   m_fmsCbKey = 0;
   m_dsCbKey = 0;
@@ -139,6 +171,14 @@ void HALSimWSProviderDriverStation::OnNetValueChanged(
   if (auto val = json.lookup(">robotMode"); val && val->is_int()) {
     HALSIM_SetDriverStationRobotMode(
         static_cast<HAL_RobotMode>(val->get_int()));
+  }
+  if (auto val = json.lookup(">opMode"); val && val->is_string()) {
+    auto& str = val->get_string();
+    if (str.empty()) {
+      HALSIM_SetDriverStationOpMode(0);
+    } else if (auto id = wpi::util::parse_integer<int64_t>(str, 10)) {
+      HALSIM_SetDriverStationOpMode(*id);
+    }
   }
   if (auto val = json.lookup(">estop"); val && val->is_bool()) {
     HALSIM_SetDriverStationEStop(val->get_bool());
