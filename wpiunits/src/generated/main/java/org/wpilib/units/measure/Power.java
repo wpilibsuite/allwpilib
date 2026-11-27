@@ -143,12 +143,12 @@ public record Power(double magnitude, double baseUnitMagnitude, PowerUnit unit) 
   }
 
   @Override
-  public Per<PowerUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
-    return (Per<PowerUnit, AngularVelocityUnit>) Measure.super.div(divisor);
+  public Torque div(AngularVelocity divisor) {
+    return NewtonMeters.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<PowerUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+  public Torque per(AngularVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -217,12 +217,12 @@ public record Power(double magnitude, double baseUnitMagnitude, PowerUnit unit) 
   }
 
   @Override
-  public Per<PowerUnit, ForceUnit> div(Force divisor) {
-    return (Per<PowerUnit, ForceUnit>) Measure.super.div(divisor);
+  public LinearVelocity div(Force divisor) {
+    return MetersPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<PowerUnit, ForceUnit> per(ForceUnit divisorUnit) {
+  public LinearVelocity per(ForceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -233,12 +233,12 @@ public record Power(double magnitude, double baseUnitMagnitude, PowerUnit unit) 
   }
 
   @Override
-  public Per<PowerUnit, FrequencyUnit> div(Frequency divisor) {
-    return (Per<PowerUnit, FrequencyUnit>) Measure.super.div(divisor);
+  public Energy div(Frequency divisor) {
+    return Joules.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<PowerUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+  public Energy per(FrequencyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -281,12 +281,12 @@ public record Power(double magnitude, double baseUnitMagnitude, PowerUnit unit) 
   }
 
   @Override
-  public Per<PowerUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
-    return (Per<PowerUnit, LinearVelocityUnit>) Measure.super.div(divisor);
+  public Force div(LinearVelocity divisor) {
+    return Newtons.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<PowerUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+  public Force per(LinearVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -425,12 +425,12 @@ public record Power(double magnitude, double baseUnitMagnitude, PowerUnit unit) 
   }
 
   @Override
-  public Per<PowerUnit, TorqueUnit> div(Torque divisor) {
-    return (Per<PowerUnit, TorqueUnit>) Measure.super.div(divisor);
+  public AngularVelocity div(Torque divisor) {
+    return RadiansPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<PowerUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+  public AngularVelocity per(TorqueUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

@@ -281,12 +281,12 @@ public record LinearAcceleration(double magnitude, double baseUnitMagnitude, Lin
   }
 
   @Override
-  public Per<LinearAccelerationUnit, LinearVelocityUnit> div(LinearVelocity divisor) {
-    return (Per<LinearAccelerationUnit, LinearVelocityUnit>) Measure.super.div(divisor);
+  public Frequency div(LinearVelocity divisor) {
+    return Hertz.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<LinearAccelerationUnit, LinearVelocityUnit> per(LinearVelocityUnit divisorUnit) {
+  public Frequency per(LinearVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
