@@ -189,6 +189,44 @@ class WatchdogTest {
 
   @Test
   @ResourceLock("timing")
+  void identicalDeadlineDisableTest() {
+    checkIdenticalDeadlines(Watchdog::disable);
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void identicalDeadlineResetTest() {
+    checkIdenticalDeadlines(Watchdog::reset);
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void identicalDeadlineSetTimeoutTest() {
+    checkIdenticalDeadlines(watchdog -> watchdog.setTimeout(0.6));
+  }
+
+  private static void checkIdenticalDeadlines(java.util.function.Consumer<Watchdog> update) {
+    AtomicInteger outerCount = new AtomicInteger();
+    AtomicInteger innerCount = new AtomicInteger();
+    try (Watchdog outer = new Watchdog(0.4, outerCount::incrementAndGet);
+        Watchdog inner = new Watchdog(0.4, innerCount::incrementAndGet)) {
+      outer.enable();
+      inner.enable();
+      assertEquals(outer, inner); // Public equality compares deadlines, not identity.
+      SimHooks.stepTiming(0.2);
+      update.accept(inner);
+      SimHooks.stepTiming(0.2);
+      assertEquals(1, outerCount.get());
+      assertEquals(0, innerCount.get());
+      inner.disable();
+      SimHooks.stepTiming(1.0);
+      assertEquals(1, outerCount.get());
+      assertEquals(0, innerCount.get());
+    }
+  }
+
+  @Test
+  @ResourceLock("timing")
   void multiWatchdogTest() {
     final AtomicInteger watchdogCounter1 = new AtomicInteger(0);
     final AtomicInteger watchdogCounter2 = new AtomicInteger(0);

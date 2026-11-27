@@ -70,9 +70,11 @@ concept ConstructibleOpMode =
  * 6. RobotPeriodic()
  * 7. SimulationPeriodic(), only in simulation
  *
- * The opmode's Start() runs before EnabledPeriodic() on its first enabled loop.
- * Additional callbacks from AddPeriodic() or the opmode run on their
- * own schedules.
+ * The opmode's Start() runs before EnabledPeriodic() and the opmode's
+ * Periodic() in that same first enabled loop. Additional callbacks from
+ * AddPeriodic() or the opmode run on their own schedules and do not necessarily
+ * run before the first opmode Periodic(). The robot watchdog covers the
+ * combined robot and opmode workload in the main loop.
  *
  * One exception to the list above: if an opmode is selected while the robot is
  * already enabled, its DisabledPeriodic() is called once, right after

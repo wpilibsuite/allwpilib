@@ -109,6 +109,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    *
    * @param timeout The watchdog's timeout in seconds with nanosecond resolution.
    */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals") // Equal deadlines do not imply identity.
   public void setTimeout(double timeout) {
     m_startTime = HALUtil.getMonotonicTime();
     m_tracer.clearEpochs();
@@ -118,7 +119,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
       m_timeout = timeout;
       m_isExpired = false;
 
-      m_watchdogs.remove(this);
+      m_watchdogs.removeIf(watchdog -> watchdog == this);
       m_expirationTime = m_startTime + Math.round(m_timeout * 1e9);
       m_watchdogs.add(this);
       updateAlarm();
@@ -184,6 +185,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
   /** Enables the watchdog timer. */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals") // Equal deadlines do not imply identity.
   public void enable() {
     m_startTime = HALUtil.getMonotonicTime();
     m_tracer.clearEpochs();
@@ -192,7 +194,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     try {
       m_isExpired = false;
 
-      m_watchdogs.remove(this);
+      m_watchdogs.removeIf(watchdog -> watchdog == this);
       m_expirationTime = m_startTime + Math.round(m_timeout * 1e9);
       m_watchdogs.add(this);
       updateAlarm();
@@ -202,10 +204,11 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   }
 
   /** Disables the watchdog timer. */
+  @SuppressWarnings("PMD.CompareObjectsWithEquals") // Equal deadlines do not imply identity.
   public void disable() {
     m_queueMutex.lock();
     try {
-      m_watchdogs.remove(this);
+      m_watchdogs.removeIf(watchdog -> watchdog == this);
       updateAlarm();
     } finally {
       m_queueMutex.unlock();

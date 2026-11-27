@@ -77,7 +77,9 @@ import org.wpilib.util.UsageReporting;
  *
  * <p>On an enabled transition, {@link PeriodicOpMode#start()} runs before {@link
  * #enabledPeriodic()} and the opmode's {@code periodic()} in that same loop. Additional callbacks
- * from {@link #addPeriodic} or the opmode run on their own schedules.
+ * from {@link #addPeriodic} or the opmode run on their own schedules and do not necessarily run
+ * before the first opmode {@code periodic()}. The robot watchdog covers the combined robot and
+ * opmode workload in the main loop.
  *
  * <p>One exception to the list above: if an opmode is selected while the robot is already enabled,
  * its {@code disabledPeriodic()} is called once, right after construction and before {@code
