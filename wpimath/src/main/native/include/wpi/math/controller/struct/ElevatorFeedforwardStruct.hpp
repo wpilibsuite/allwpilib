@@ -13,9 +13,9 @@ struct WPILIB_DLLEXPORT wpi::util::Struct<wpi::math::ElevatorFeedforward> {
   static constexpr std::string_view GetTypeName() {
     return "ElevatorFeedforward";
   }
-  static constexpr size_t GetSize() { return 32; }
+  static constexpr size_t GetSize() { return 40; }
   static constexpr std::string_view GetSchema() {
-    return "double ks;double kg;double kv;double ka";
+    return "double ks;double kg;double kv;double ka;double dt";
   }
 
   static wpi::math::ElevatorFeedforward Unpack(std::span<const uint8_t> data);

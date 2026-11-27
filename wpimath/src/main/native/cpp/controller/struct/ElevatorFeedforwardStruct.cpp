@@ -9,6 +9,7 @@ constexpr size_t KS_OFF = 0;
 constexpr size_t KG_OFF = KS_OFF + 8;
 constexpr size_t KV_OFF = KG_OFF + 8;
 constexpr size_t KA_OFF = KV_OFF + 8;
+constexpr size_t DT_OFF = KA_OFF + 8;
 }  // namespace
 
 using StructType = wpi::util::Struct<wpi::math::ElevatorFeedforward>;
@@ -22,6 +23,7 @@ wpi::math::ElevatorFeedforward StructType::Unpack(
           wpi::util::UnpackStruct<double, KV_OFF>(data)},
       wpi::units::unit_t<wpi::math::ElevatorFeedforward::ka_unit>{
           wpi::util::UnpackStruct<double, KA_OFF>(data)},
+      wpi::units::second_t{wpi::util::UnpackStruct<double, DT_OFF>(data)},
   };
 }
 
@@ -31,4 +33,5 @@ void StructType::Pack(std::span<uint8_t> data,
   wpi::util::PackStruct<KG_OFF>(data, value.GetKg().value());
   wpi::util::PackStruct<KV_OFF>(data, value.GetKv().value());
   wpi::util::PackStruct<KA_OFF>(data, value.GetKa().value());
+  wpi::util::PackStruct<DT_OFF>(data, value.GetDt().value());
 }
