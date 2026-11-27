@@ -64,8 +64,8 @@ concept ConstructibleOpMode =
  *
  * 1. DisabledPeriodic(), only while disabled
  * 2. DisabledPeriodic() of the selected opmode, only while disabled
- * 3. NonePeriodic(), only when no opmode is selected
- * 4. EnabledPeriodic(), only while enabled with an opmode selected
+ * 3. EnabledPeriodic(), only while enabled with an opmode selected
+ * 4. NonePeriodic(), only when no opmode is selected
  * 5. RobotPeriodic()
  * 6. SimulationPeriodic(), only in simulation
  *
@@ -132,7 +132,7 @@ class OpModeRobotBase : public RobotBase {
    * OpMode selection.
    *
    * Runs after DisabledPeriodic(), the opmode's DisabledPeriodic(),
-   * NonePeriodic(), and EnabledPeriodic(), and before SimulationPeriodic().
+   * EnabledPeriodic(), and NonePeriodic(), and before SimulationPeriodic().
    * When an opmode is enabled, this runs before its Periodic() in the same
    * period.
    */
@@ -181,7 +181,7 @@ class OpModeRobotBase : public RobotBase {
    * Function called periodically while the robot is enabled and there is a
    * current opmode.
    *
-   * Runs after NonePeriodic() and before RobotPeriodic(). When an opmode is
+   * Runs before RobotPeriodic(). When an opmode is
    * enabled, this runs before its Periodic() in the same period. Never runs
    * while disabled or when no opmode is selected.
    */

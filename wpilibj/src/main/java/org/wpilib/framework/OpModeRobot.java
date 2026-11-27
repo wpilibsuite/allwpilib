@@ -68,8 +68,8 @@ import org.wpilib.util.UsageReporting;
  * <ol>
  *   <li>{@link #disabledPeriodic()}, only while disabled
  *   <li>{@link PeriodicOpMode#disabledPeriodic()} of the selected opmode, only while disabled
- *   <li>{@link #nonePeriodic()}, only when no opmode is selected
  *   <li>{@link #enabledPeriodic()}, only while enabled with an opmode selected
+ *   <li>{@link #nonePeriodic()}, only when no opmode is selected
  *   <li>{@link #robotPeriodic()}
  *   <li>{@link #simulationPeriodic()}, only in simulation
  * </ol>
@@ -637,7 +637,7 @@ public abstract class OpModeRobot extends RobotBase {
    * Function called periodically every loop, regardless of enabled state or OpMode selection.
    *
    * <p>Runs after {@link #disabledPeriodic()}, the opmode's {@code disabledPeriodic()}, {@link
-   * #nonePeriodic()}, and {@link #enabledPeriodic()}, and before {@link #simulationPeriodic()}.
+   * #enabledPeriodic()}, and {@link #nonePeriodic()}, and before {@link #simulationPeriodic()}.
    * When an opmode is enabled, this runs before its {@code periodic()} in the same period.
    */
   public void robotPeriodic() {}
@@ -678,9 +678,8 @@ public abstract class OpModeRobot extends RobotBase {
   /**
    * Function called periodically while the robot is enabled and there is a current opmode.
    *
-   * <p>Runs after {@link #nonePeriodic()} and before {@link #robotPeriodic()}. When an opmode is
-   * enabled, this runs before its {@code periodic()} in the same period. Never runs while disabled
-   * or when no opmode is selected.
+   * <p>Runs before {@link #robotPeriodic()}. When an opmode is enabled, this runs before its {@code
+   * periodic()} in the same period. Never runs while disabled or when no opmode is selected.
    */
   public void enabledPeriodic() {}
 
