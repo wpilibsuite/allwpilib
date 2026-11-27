@@ -36,16 +36,7 @@ classes:
           "":
             ignore: true
           std::string_view, Level:
-            doc: |
-              Creates a new alert in the default group - "Alerts" with an
-              automatically generated identifier.
-
-              The identifier uses the prefix "auto-" followed by a static
-              incrementing value. If another allocated alert has the same text,
-              a warning is printed to standard error.
-
-              :param text: Text to be displayed when the alert is active.
-              :param level: Alert urgency level.
+            doc_append: |
               :raises RuntimeError: If the alert cannot be created.
             cpp_code: |
               [](std::string_view text, wpi::util::Alert::Level level) {
@@ -56,6 +47,8 @@ classes:
                 }
                 return alert;
               }
+          # Explicit-ID overloads replace the C++ failure-warning documentation:
+          # Python raises without printing a warning when creation fails.
           std::string_view, std::string_view, Level:
             doc: |
               Creates a new alert in the default group - "Alerts".
