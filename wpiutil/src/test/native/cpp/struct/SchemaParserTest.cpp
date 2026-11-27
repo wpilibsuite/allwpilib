@@ -59,6 +59,20 @@ TEST_CASE("StructParserTest SimpleTrailingSemi", "[wpiutil][struct]") {
   REQUIRE(schema.declarations.size() == 1u);
 }
 
+TEST_CASE("StructParserTest ArrayDeclarationIdentity", "[wpiutil][struct]") {
+  Parser p{"uint8 scalar; uint8 samples[1]; uint8 pair[2]; uint8 bits:1"};
+  ParsedSchema schema;
+  REQUIRE(p.Parse(&schema));
+  REQUIRE(schema.declarations.size() == 4u);
+  CHECK_FALSE(schema.declarations[0].isArray);
+  CHECK(schema.declarations[1].isArray);
+  CHECK(schema.declarations[2].isArray);
+  CHECK_FALSE(schema.declarations[3].isArray);
+  CHECK(schema.declarations[0].arraySize == 1u);
+  CHECK(schema.declarations[1].arraySize == 1u);
+  CHECK(schema.declarations[2].arraySize == 2u);
+}
+
 TEST_CASE("StructParserTest Array", "[wpiutil][struct]") {
   Parser p{"int32 a[2]"};
   ParsedSchema schema;

@@ -133,6 +133,8 @@ struct ParsedDeclaration {
   EnumValues enumValues;
   size_t arraySize = 1;
   unsigned int bitWidth = 0;
+  // Whether brackets were explicitly declared, including an extent of 1.
+  bool isArray = false;
 };
 
 /**
