@@ -69,9 +69,7 @@ public final class DARE {
       H_k = H_k1;
 
       // W = I + GₖHₖ
-      var W = SimpleMatrix.identity(H_k.getNumRows()).plus(G_k.mult(H_k));
-
-      W_solver.setA(W.getDDRM());
+      W_solver.setA(SimpleMatrix.identity(H_k.getNumRows()).plus(G_k.mult(H_k)).getDDRM());
 
       // Solve WV₁ = Aₖ for V₁
       W_solver.solve(A_k.getDDRM(), V_1.getDDRM());
