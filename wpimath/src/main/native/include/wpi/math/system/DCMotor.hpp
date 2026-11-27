@@ -144,93 +144,132 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
-   * Returns a gearbox of CIM motors.
+   * Return a gearbox of CIM motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of CIM motors.
    */
   static constexpr DCMotor CIM(int numMotors = 1) {
     return DCMotor(12_V, 2.42_Nm, 133_A, 2.7_A, 5310_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of MiniCIM motors.
+   * Return a gearbox of MiniCIM motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of MiniCIM motors.
    */
   static constexpr DCMotor MiniCIM(int numMotors = 1) {
     return DCMotor(12_V, 1.41_Nm, 89_A, 3_A, 5840_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of Bag motor motors.
+   * Return a gearbox of BAG motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of BAG motors.
    */
   static constexpr DCMotor Bag(int numMotors = 1) {
     return DCMotor(12_V, 0.43_Nm, 53_A, 1.8_A, 13180_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of Vex 775 Pro motors.
+   * Return a gearbox of Vex 775 Pro motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Vex 775 Pro motors.
    */
   static constexpr DCMotor Vex775Pro(int numMotors = 1) {
     return DCMotor(12_V, 0.71_Nm, 134_A, 0.7_A, 18730_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of Andymark RS 775-125 motors.
+   * Return a gearbox of Andymark RS 775-125 motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Andymark RS775-125 motors.
    */
-  static constexpr DCMotor RS775_125(int numMotors = 1) {
+  static constexpr DCMotor AndymarkRs775_125(int numMotors = 1) {
     return DCMotor(12_V, 0.28_Nm, 18_A, 1.6_A, 5800_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of Banebots RS 775 motors.
+   * Return a gearbox of Banebots RS775 motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Banebots RS775 motors.
    */
-  static constexpr DCMotor BanebotsRS775(int numMotors = 1) {
+  static constexpr DCMotor BanebotsRs775(int numMotors = 1) {
     return DCMotor(12_V, 0.72_Nm, 97_A, 2.7_A, 13050_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of Andymark 9015 motors.
+   * Return a gearbox of Andymark 9015 motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Andymark 9015 motors.
    */
   static constexpr DCMotor Andymark9015(int numMotors = 1) {
     return DCMotor(12_V, 0.36_Nm, 71_A, 3.7_A, 14270_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of Banebots RS 550 motors.
+   * Return a gearbox of Banebots RS550 motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Banebots RS550 motors.
    */
-  static constexpr DCMotor BanebotsRS550(int numMotors = 1) {
+  static constexpr DCMotor BanebotsRs550(int numMotors = 1) {
     return DCMotor(12_V, 0.38_Nm, 84_A, 0.4_A, 19000_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of Neo brushless motors.
+   * Return a gearbox of NEO brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of NEO motors.
    */
   static constexpr DCMotor Neo(int numMotors = 1) {
     return DCMotor(12_V, 2.6_Nm, 105_A, 1.8_A, 5676_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of Neo 550 brushless motors.
+   * Return a gearbox of NEO 550 brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of NEO 550 motors.
    */
   static constexpr DCMotor Neo550(int numMotors = 1) {
     return DCMotor(12_V, 0.97_Nm, 100_A, 1.4_A, 11000_rpm, numMotors);
   }
 
   /**
-   * Returns a gearbox of Falcon 500 brushless motors.
+   * Return a gearbox of Falcon 500 brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Falcon 500 motors.
    */
   static constexpr DCMotor Falcon500(int numMotors = 1) {
     return DCMotor(12_V, 4.69_Nm, 257_A, 1.5_A, 6380_rpm, numMotors);
   }
 
   /**
-   * Return a gearbox of Falcon 500 motors with FOC (Field-Oriented Control)
-   * enabled.
+   * Return a gearbox of Falcon 500 brushless motors with FOC (Field-Oriented
+   * Control) enabled.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Falcon 500 FOC enabled motors.
    */
-  static constexpr DCMotor Falcon500FOC(int numMotors = 1) {
+  static constexpr DCMotor Falcon500Foc(int numMotors = 1) {
     // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
     return DCMotor(12_V, 5.84_Nm, 304_A, 1.5_A, 6080_rpm, numMotors);
   }
 
   /**
    * Return a gearbox of Romi/TI_RSLK MAX motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Romi/TI_RSLK MAX motors.
    */
   static constexpr DCMotor RomiBuiltIn(int numMotors = 1) {
     // From https://www.pololu.com/product/1520/specs
@@ -239,6 +278,9 @@ class WPILIB_DLLEXPORT DCMotor {
 
   /**
    * Return a gearbox of Kraken X60 brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return a gearbox of Kraken X60 motors.
    */
   static constexpr DCMotor KrakenX60(int numMotors = 1) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
@@ -248,14 +290,20 @@ class WPILIB_DLLEXPORT DCMotor {
   /**
    * Return a gearbox of Kraken X60 brushless motors with FOC (Field-Oriented
    * Control) enabled.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Kraken X60 FOC enabled motors.
    */
-  static constexpr DCMotor KrakenX60FOC(int numMotors = 1) {
+  static constexpr DCMotor KrakenX60Foc(int numMotors = 1) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
     return DCMotor(12_V, 9.362_Nm, 476.1_A, 2_A, 5785_rpm, numMotors);
   }
 
   /**
    * Return a gearbox of Kraken X44 brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return a gearbox of Kraken X44 motors.
    */
   static constexpr DCMotor KrakenX44(int numMotors = 1) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
@@ -265,14 +313,20 @@ class WPILIB_DLLEXPORT DCMotor {
   /**
    * Return a gearbox of Kraken X44 brushless motors with FOC (Field-Oriented
    * Control) enabled.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Kraken X44 FOC enabled motors.
    */
-  static constexpr DCMotor KrakenX44FOC(int numMotors = 1) {
+  static constexpr DCMotor KrakenX44Foc(int numMotors = 1) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
     return DCMotor(12_V, 5.011_Nm, 329.2_A, 2_A, 7368_rpm, numMotors);
   }
 
   /**
    * Return a gearbox of Minion brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Minion motors.
    */
   static constexpr DCMotor Minion(int numMotors = 1) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
@@ -280,7 +334,10 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
-   * Return a gearbox of Neo Vortex brushless motors.
+   * Return a gearbox of NEO Vortex brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return a gearbox of NEO Vortex motors.
    */
   static constexpr DCMotor NeoVortex(int numMotors = 1) {
     // From https://www.revrobotics.com/next-generation-spark-neo/
@@ -288,7 +345,10 @@ class WPILIB_DLLEXPORT DCMotor {
   }
 
   /**
-   * Return a gearbox of Neo 2.0 brushless motors.
+   * Return a gearbox of NEO 2.0 brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of NEO 2.0 motors.
    */
   static constexpr DCMotor Neo2(int numMotors = 1) {
     // From https://docs.revrobotics.com/brushless/neo/2.0

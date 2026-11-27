@@ -151,26 +151,6 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Return a gearbox of 775Pro motors.
-   *
-   * @param numMotors Number of motors in the gearbox.
-   * @return A gearbox of 775Pro motors.
-   */
-  public static DCMotor getVex775Pro(int numMotors) {
-    return new DCMotor(12, 0.71, 134, 0.7, rotationsPerMinuteToRadiansPerSecond(18730), numMotors);
-  }
-
-  /**
-   * Return a gearbox of NEO motors.
-   *
-   * @param numMotors Number of motors in the gearbox.
-   * @return A gearbox of NEO motors.
-   */
-  public static DCMotor getNeo(int numMotors) {
-    return new DCMotor(12, 2.6, 105, 1.8, rotationsPerMinuteToRadiansPerSecond(5676), numMotors);
-  }
-
-  /**
    * Return a gearbox of MiniCIM motors.
    *
    * @param numMotors Number of motors in the gearbox.
@@ -181,13 +161,23 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Return a gearbox of Bag motors.
+   * Return a gearbox of BAG motors.
    *
    * @param numMotors Number of motors in the gearbox.
-   * @return A gearbox of Bag motors.
+   * @return A gearbox of BAG motors.
    */
   public static DCMotor getBag(int numMotors) {
     return new DCMotor(12, 0.43, 53, 1.8, rotationsPerMinuteToRadiansPerSecond(13180), numMotors);
+  }
+
+  /**
+   * Return a gearbox of Vex 775 Pro motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of Vex 775 Pro motors.
+   */
+  public static DCMotor getVex775Pro(int numMotors) {
+    return new DCMotor(12, 0.71, 134, 0.7, rotationsPerMinuteToRadiansPerSecond(18730), numMotors);
   }
 
   /**
@@ -221,17 +211,27 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Return a gearbox of Banebots RS 550 motors.
+   * Return a gearbox of Banebots RS550 motors.
    *
    * @param numMotors Number of motors in the gearbox.
-   * @return A gearbox of Banebots RS 550 motors.
+   * @return A gearbox of Banebots RS550 motors.
    */
   public static DCMotor getBanebotsRs550(int numMotors) {
     return new DCMotor(12, 0.38, 84, 0.4, rotationsPerMinuteToRadiansPerSecond(19000.0), numMotors);
   }
 
   /**
-   * Return a gearbox of NEO 550 motors.
+   * Return a gearbox of NEO brushless motors.
+   *
+   * @param numMotors Number of motors in the gearbox.
+   * @return A gearbox of NEO motors.
+   */
+  public static DCMotor getNeo(int numMotors) {
+    return new DCMotor(12, 2.6, 105, 1.8, rotationsPerMinuteToRadiansPerSecond(5676), numMotors);
+  }
+
+  /**
+   * Return a gearbox of NEO 550 brushless motors.
    *
    * @param numMotors Number of motors in the gearbox.
    * @return A gearbox of NEO 550 motors.
@@ -242,7 +242,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Return a gearbox of Falcon 500 motors.
+   * Return a gearbox of Falcon 500 brushless motors.
    *
    * @param numMotors Number of motors in the gearbox.
    * @return A gearbox of Falcon 500 motors.
@@ -252,7 +252,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Return a gearbox of Falcon 500 motors with FOC (Field-Oriented Control) enabled.
+   * Return a gearbox of Falcon 500 brushless motors with FOC (Field-Oriented Control) enabled.
    *
    * @param numMotors Number of motors in the gearbox.
    * @return A gearbox of Falcon 500 FOC enabled motors.
@@ -341,7 +341,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   }
 
   /**
-   * Return a gearbox of NEO 2.0 motors.
+   * Return a gearbox of NEO 2.0 brushless motors.
    *
    * @param numMotors Number of motors in the gearbox.
    * @return A gearbox of NEO 2.0 motors.

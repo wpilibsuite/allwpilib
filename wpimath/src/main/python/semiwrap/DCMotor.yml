@@ -26,21 +26,21 @@ classes:
       MiniCIM:
       Bag:
       Vex775Pro:
-      RS775_125:
-      BanebotsRS775:
+      AndymarkRs775_125:
+      BanebotsRs775:
       Andymark9015:
-      BanebotsRS550:
+      BanebotsRs550:
       Neo:
       Neo550:
       Falcon500:
-      Falcon500FOC:
+      Falcon500Foc:
       RomiBuiltIn:
       KrakenX60:
-      KrakenX60FOC:
+      KrakenX60Foc:
       NeoVortex:
       Neo2:
       KrakenX44:
-      KrakenX44FOC:
+      KrakenX44Foc:
       Minion:
 
 inline_code: |
