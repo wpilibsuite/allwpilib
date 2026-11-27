@@ -92,8 +92,8 @@ class Drivetrain:
 
         self.imu.reset_yaw()
 
-        self.left_leader.add_follower(self.left_follower)
-        self.right_leader.add_follower(self.right_follower)
+        self.left_follower.follow(self.left_leader)
+        self.right_follower.follow(self.right_leader)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's

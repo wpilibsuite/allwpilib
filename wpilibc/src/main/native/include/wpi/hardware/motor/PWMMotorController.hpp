@@ -4,11 +4,8 @@
 
 #pragma once
 
-#include <concepts>
 #include <memory>
 #include <string>
-#include <type_traits>
-#include <utility>
 #include <vector>
 
 #include "wpi/hal/SimDevice.hpp"
@@ -27,8 +24,9 @@ class PWMMotorController : public MotorController,
                            public MotorSafety,
                            public wpi::telemetry::TelemetryLoggable {
  public:
-  PWMMotorController(PWMMotorController&&) = default;
-  PWMMotorController& operator=(PWMMotorController&&) = default;
+  ~PWMMotorController();
+  PWMMotorController(PWMMotorController&& rhs);
+  PWMMotorController& operator=(PWMMotorController&& rhs);
 
   void SetThrottle(double throttle) override;
 
@@ -60,21 +58,19 @@ class PWMMotorController : public MotorController,
   void EnableDeadbandElimination(bool eliminateDeadband);
 
   /**
-   * Make the given PWM motor controller follow the output of this one.
+   * Make the this PWM motor controller follow the output of the given one.
    *
-   * @param follower The motor controller follower.
+   * @param leader The motor controller to follow.
    */
-  void AddFollower(PWMMotorController& follower);
+  void Follow(PWMMotorController& leader) & {
+    leader.m_followers.push_back(this);
+    m_leaderFollowers = &leader.m_followers;
+  }
 
-  /**
-   * Make the given PWM motor controller follow the output of this one.
-   *
-   * @param follower The motor controller follower.
-   */
-  template <std::derived_from<PWMMotorController> T>
-  void AddFollower(T&& follower) {
-    m_owningFollowers.emplace_back(
-        std::make_unique<std::decay_t<T>>(std::forward<T>(follower)));
+  void Unfollow() {
+    if (m_leaderFollowers) {
+      std::erase(*m_leaderFollowers, this);
+    }
   }
 
   void LogTo(wpi::telemetry::TelemetryTable& table) const override;
@@ -106,9 +102,9 @@ class PWMMotorController : public MotorController,
                  wpi::units::microsecond_t minPwm);
 
  private:
+  std::vector<PWMMotorController*>* m_leaderFollowers{nullptr};
   bool m_isInverted = false;
-  std::vector<PWMMotorController*> m_nonowningFollowers;
-  std::vector<std::unique_ptr<PWMMotorController>> m_owningFollowers;
+  std::vector<PWMMotorController*> m_followers;
 
   wpi::hal::SimDevice m_simDevice;
   wpi::hal::SimDouble m_simThrottle;

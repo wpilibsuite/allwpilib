@@ -7,10 +7,10 @@
 #include "wpi/commands2/Commands.hpp"
 
 Drive::Drive() {
-  leftMotor.AddFollower(wpi::PWMSparkMax{constants::drive::LEFT_MOTOR2_PORT});
-  rightMotor.AddFollower(wpi::PWMSparkMax{constants::drive::RIGHT_MOTOR2_PORT});
+  leftFollower.Follow(leftLeader);
+  rightFollower.Follow(rightLeader);
 
-  rightMotor.SetInverted(true);
+  rightLeader.SetInverted(true);
 
   leftEncoder.SetDistancePerPulse(
       constants::drive::ENCODER_DISTANCE_PER_PULSE.value());

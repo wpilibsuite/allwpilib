@@ -12,7 +12,7 @@ classes:
       GetDescription:
       GetChannel:
       EnableDeadbandElimination:
-      AddFollower:
+      Follow:
         overloads:
           PWMMotorController&:
             keepalive:

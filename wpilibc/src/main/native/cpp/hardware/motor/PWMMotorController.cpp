@@ -12,16 +12,60 @@
 
 using namespace wpi;
 
+PWMMotorController::~PWMMotorController() {
+  Unfollow();
+  for (auto follower : m_followers) {
+    follower->m_leaderFollowers = nullptr;
+  }
+}
+
+PWMMotorController::PWMMotorController(PWMMotorController&& rhs)
+    : MotorSafety{std::move(rhs)},
+      m_isInverted{rhs.m_isInverted},
+      m_eliminateDeadband{rhs.m_eliminateDeadband},
+      m_minPwm{rhs.m_minPwm},
+      m_deadbandMinPwm{rhs.m_deadbandMinPwm},
+      m_centerPwm{rhs.m_centerPwm},
+      m_deadbandMaxPwm{rhs.m_deadbandMaxPwm},
+      m_maxPwm{rhs.m_maxPwm},
+{
+  std::swap(m_followers, rhs.m_followers);
+  std::swap(m_simDevice, rhs.m_simDevice);
+  std::swap(m_simThrottle, rhs.m_simThrottle);
+  rhs.Unfollow();
+  std::swap(m_leaderFollowers, rhs.m_leaderFollowers);
+  if (m_leaderFollowers) {
+    m_leaderFollowers->push_back(this);
+  }
+}
+
+PWMMotorController& PWMMotorController::operator=(PWMMotorController&& rhs) {
+  MotorSafety::operator=(std::move(rhs));
+  rhs.Unfollow();
+  std::swap(m_leaderFollowers, rhs.m_leaderFollowers);
+  if (m_leaderFollowers) {
+    m_leaderFollowers->push_back(this);
+  }
+
+  m_isInverted = rhs.m_isInverted;
+  std::swap(m_followers, rhs.m_followers);
+  std::swap(m_simDevice, rhs.m_simDevice);
+  std::swap(m_simThrottle, rhs.m_simThrottle);
+
+  m_eliminateDeadband = rhs.m_eliminateDeadband;
+  m_minPwm = rhs.m_minPwm;
+  m_deadbandMinPwm = rhs.m_deadbandMinPwm;
+  m_centerPwm = rhs.m_centerPwm;
+  m_deadbandMaxPwm = rhs.m_deadbandMaxPwm;
+  m_maxPwm = rhs.m_maxPwm;
+}
+
 void PWMMotorController::SetThrottle(double throttle) {
   if (m_isInverted) {
     throttle = -throttle;
   }
   SetDutyCycleInternal(throttle);
-
-  for (auto& follower : m_nonowningFollowers) {
-    follower->SetThrottle(throttle);
-  }
-  for (auto& follower : m_owningFollowers) {
+  for (auto& follower : m_followers) {
     follower->SetThrottle(throttle);
   }
 
@@ -51,10 +95,7 @@ void PWMMotorController::StopMotor() {
     m_simThrottle.Set(0.0);
   }
 
-  for (auto& follower : m_nonowningFollowers) {
-    follower->StopMotor();
-  }
-  for (auto& follower : m_owningFollowers) {
+  for (auto& follower : m_followers) {
     follower->StopMotor();
   }
 }
@@ -69,10 +110,6 @@ int PWMMotorController::GetChannel() const {
 
 void PWMMotorController::EnableDeadbandElimination(bool eliminateDeadband) {
   m_eliminateDeadband = eliminateDeadband;
-}
-
-void PWMMotorController::AddFollower(PWMMotorController& follower) {
-  m_nonowningFollowers.emplace_back(&follower);
 }
 
 PWMMotorController::PWMMotorController(int channel) : m_pwm{channel} {

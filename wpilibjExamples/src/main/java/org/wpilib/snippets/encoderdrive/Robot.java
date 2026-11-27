@@ -33,8 +33,8 @@ public class Robot extends TimedRobot {
     // Invert the right side of the drivetrain. You might have to invert the other side
     rightLeader.setInverted(true);
     // Configure the followers to follow the leaders
-    leftLeader.addFollower(leftFollower);
-    rightLeader.addFollower(rightFollower);
+    leftFollower.follow(leftLeader);
+    rightFollower.follow(rightLeader);
   }
 
   /** Drives forward at half velocity until the robot has moved 5 feet, then stops. */
