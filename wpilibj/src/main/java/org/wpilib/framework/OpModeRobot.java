@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -34,6 +35,7 @@ import org.wpilib.internal.PeriodicPriorityQueue.Callback;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.OpMode;
+import org.wpilib.opmode.OpModeEventHandler;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 import org.wpilib.opmode.Utility;
@@ -110,6 +112,14 @@ public abstract class OpModeRobot extends RobotBase {
   private final Alert m_loopOverrunAlert;
   private final Watchdog m_opModeWatchdog;
   private final Alert m_opModePeriodicOverrunAlert;
+
+  // Keyed by listener ID. IDs only increase, so insertion order is registration order.
+  private int m_nextListenerId = 1;
+  private final LinkedHashMap<Integer, OpModeEventHandler> m_selectListeners =
+      new LinkedHashMap<>();
+  private final LinkedHashMap<Integer, OpModeEventHandler> m_startListeners = new LinkedHashMap<>();
+  private final LinkedHashMap<Integer, OpModeEventHandler> m_stopListeners = new LinkedHashMap<>();
+  private final LinkedHashMap<Integer, OpModeEventHandler> m_closeListeners = new LinkedHashMap<>();
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
     DriverStationErrors.reportError(
@@ -617,6 +627,78 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   /**
+   * Registers a handler that runs after an opmode has been selected on the Driver Station and
+   * constructed, before it is started. This runs once per selection, whether or not the robot is
+   * enabled.
+   *
+   * <p>Handlers run in registration order.
+   *
+   * @param handler The handler to register.
+   * @return An ID that can be passed to {@link #removeListener(int)}.
+   */
+  public int addOpModeSelectListener(OpModeEventHandler handler) {
+    return addListener(m_selectListeners, handler);
+  }
+
+  /**
+   * Registers a handler that runs after the opmode's {@link OpMode#start()} has run, when the robot
+   * is enabled with the opmode selected.
+   *
+   * <p>Handlers run in registration order.
+   *
+   * @param handler The handler to register.
+   * @return An ID that can be passed to {@link #removeListener(int)}.
+   */
+  public int addOpModeStartListener(OpModeEventHandler handler) {
+    return addListener(m_startListeners, handler);
+  }
+
+  /**
+   * Registers a handler that runs before the opmode's {@link OpMode#end()} runs. This is only
+   * called for opmodes that were started.
+   *
+   * <p>Handlers run in reverse registration order.
+   *
+   * @param handler The handler to register.
+   * @return An ID that can be passed to {@link #removeListener(int)}.
+   */
+  public int addOpModeStopListener(OpModeEventHandler handler) {
+    return addListener(m_stopListeners, handler);
+  }
+
+  /**
+   * Registers a handler that runs before the opmode's {@link OpMode#close()} runs. This is called
+   * for every opmode that was constructed, including ones that were selected but never started.
+   *
+   * <p>Handlers run in reverse registration order.
+   *
+   * @param handler The handler to register.
+   * @return An ID that can be passed to {@link #removeListener(int)}.
+   */
+  public int addOpModeCloseListener(OpModeEventHandler handler) {
+    return addListener(m_closeListeners, handler);
+  }
+
+  /**
+   * Removes a handler registered with one of the add*Listener methods. Does nothing if the ID is
+   * not registered.
+   *
+   * @param id The ID returned when the handler was registered.
+   */
+  public void removeListener(int id) {
+    m_selectListeners.remove(id);
+    m_startListeners.remove(id);
+    m_stopListeners.remove(id);
+    m_closeListeners.remove(id);
+  }
+
+  private int addListener(Map<Integer, OpModeEventHandler> listeners, OpModeEventHandler handler) {
+    int id = m_nextListenerId++;
+    listeners.put(id, handler);
+    return id;
+  }
+
+  /**
    * Get the period at which robot and opmode periodic callbacks are run.
    *
    * @return The period at which robot and opmode periodic callbacks are run.
@@ -737,6 +819,9 @@ public abstract class OpModeRobot extends RobotBase {
             m_currentOpMode.disabledPeriodic();
             m_watchdog.addEpoch("OpMode::DisabledPeriodic()");
           }
+          m_selectListeners
+              .values()
+              .forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
         }
       } else {
         DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
@@ -834,6 +919,10 @@ public abstract class OpModeRobot extends RobotBase {
 
     m_currentOpMode.start();
     m_watchdog.addEpoch("opMode.start()");
+
+    m_startListeners
+        .values()
+        .forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
   }
 
   private void runOpModePeriodic(OpMode opMode) {
@@ -850,6 +939,11 @@ public abstract class OpModeRobot extends RobotBase {
     if (m_currentOpModePeriodic != null) {
       System.out.println("********** Ending OpMode " + m_currentOpModeName + " **********");
 
+      m_stopListeners
+          .sequencedValues()
+          .reversed()
+          .forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
+
       m_currentOpMode.end();
       m_watchdog.addEpoch("opMode.end()");
 
@@ -862,6 +956,11 @@ public abstract class OpModeRobot extends RobotBase {
     // while disabled), so always remove them regardless of whether the opmode was started.
     m_callbacks.removeAll(m_activeOpModeCallbacks);
     m_activeOpModeCallbacks.clear();
+
+    m_closeListeners
+        .sequencedValues()
+        .reversed()
+        .forEach(handler -> handler.accept(m_currentOpModeName, m_currentOpMode));
 
     // regardless of whether opmode was started, close it and set to null
     System.out.println("********** Closing OpMode " + m_currentOpModeName + " **********");
