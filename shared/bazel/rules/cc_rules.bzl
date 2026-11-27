@@ -7,6 +7,7 @@ load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("//shared/bazel/rules/gen:defs.bzl", "gen_versionscript")
+load(":macos_debug_symbols.bzl", "macos_debug_symbols")
 
 # Copied from bazel since it isn't exposed publicly that I can find.
 # https://github.com/bazelbuild/bazel/blob/cc4e3b25a89cd8294406d9489ece706cfcc019bd/src/main/starlark/builtins_bzl/common/cc/cc_helper.bzl#L272
@@ -425,6 +426,17 @@ def wpilib_cc_shared_library(
     )
 
     universal_name = "universal/lib" + lib + ".lib"
+    macos_debug_symbols(
+        name = name + "-mac-debug",
+        shared_library = name,
+        deps = kwargs.get("deps", []),
+        target_compatible_with = ["@platforms//os:osx"],
+    )
+    universal_binary(
+        name = universal_name + ".debug",
+        binary = name + "-mac-debug",
+        target_compatible_with = ["@platforms//os:osx"],
+    )
     universal_binary(
         name = universal_name,
         binary = name,
@@ -450,7 +462,7 @@ def wpilib_cc_shared_library(
     pkg_files(
         name = folder + "/lib" + lib + "-shared-files",
         srcs = select({
-            "@wpilib_toolchains//conditions:osx": [universal_name],
+            "@wpilib_toolchains//conditions:osx": [universal_name, universal_name + ".debug"],
             "//conditions:default": [
                 ":" + name + "-symbolsplit",
             ],
