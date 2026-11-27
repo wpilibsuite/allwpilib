@@ -46,8 +46,8 @@ public class Drive extends SubsystemBase {
   // Create a new SysId routine for characterizing the drive.
   private final SysIdRoutine sysIdRoutine =
       new SysIdRoutine(
-          // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-          new SysIdRoutine.Config(),
+          // Use 4 volts for the dynamic test. Change this value to suit your mechanism.
+          new SysIdRoutine.Config(null, Volts.of(4), null),
           new SysIdRoutine.Mechanism(
               // Tell SysId how to plumb the driving voltage to the motors.
               voltage -> {
