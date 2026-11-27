@@ -21,7 +21,7 @@ class Robot : public wpi::TimedRobot {
   void DisabledPeriodic() override;
   void UtilityStart() override;
   void UtilityPeriodic() override;
-  void SimulationInit() override;
+  void SimulationStart() override;
   void SimulationPeriodic() override;
 
  private:

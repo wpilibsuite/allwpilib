@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
   public void utilityEnd() {}
 
   @Override
-  public void simulationInit() {}
+  public void simulationStart() {}
 
   @Override
   public void simulationPeriodic() {}

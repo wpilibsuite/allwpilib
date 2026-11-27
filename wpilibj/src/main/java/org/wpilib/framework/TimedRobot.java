@@ -81,7 +81,7 @@ public class TimedRobot extends IterativeRobotBase {
   @Override
   public void startCompetition() {
     if (isSimulation()) {
-      simulationInit();
+      simulationStart();
     }
 
     // Tell the DS that the robot is ready to be enabled

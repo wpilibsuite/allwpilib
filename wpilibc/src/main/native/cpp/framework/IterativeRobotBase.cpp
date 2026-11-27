@@ -27,7 +27,7 @@ IterativeRobotBase::IterativeRobotBase(wpi::units::second_t period)
 
 void IterativeRobotBase::DriverStationConnected() {}
 
-void IterativeRobotBase::SimulationInit() {}
+void IterativeRobotBase::SimulationStart() {}
 
 void IterativeRobotBase::DisabledStart() {}
 

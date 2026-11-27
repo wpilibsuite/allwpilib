@@ -74,7 +74,7 @@ class TestRobot(wpilib.OpModeRobot):
         if not {startup!r}:
             self.register_modes()
 
-    def simulation_init(self):
+    def simulation_start(self):
         if {startup!r}:
             import time
             time.sleep(0.02)
@@ -252,7 +252,7 @@ def test_opmode_fail_fast(pytester, isolated):
     assert not (pytester.path / "Utility.jsonl").exists()
 
 
-@pytest.mark.parametrize("stage", ["__init__", "simulation_init"])
+@pytest.mark.parametrize("stage", ["__init__", "simulation_start"])
 def test_discovery_reports_startup_exception(pytester, stage):
     pytester.makepyfile(robot_module=f"""
 import wpilib

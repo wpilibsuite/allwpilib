@@ -23,7 +23,7 @@ void Robot::UtilityStart() {}
 void Robot::UtilityPeriodic() {}
 void Robot::UtilityEnd() {}
 
-void Robot::SimulationInit() {}
+void Robot::SimulationStart() {}
 void Robot::SimulationPeriodic() {}
 
 #ifndef RUNNING_WPILIB_TESTS

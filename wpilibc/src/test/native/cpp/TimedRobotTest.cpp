@@ -58,7 +58,7 @@ class TimedRobotTest {
 
 class MockRobot : public TimedRobot {
  public:
-  std::atomic<uint32_t> m_simulationInitCount{0};
+  std::atomic<uint32_t> m_simulationStartCount{0};
   std::atomic<uint32_t> m_disabledStartCount{0};
   std::atomic<uint32_t> m_autonomousStartCount{0};
   std::atomic<uint32_t> m_teleopStartCount{0};
@@ -78,7 +78,7 @@ class MockRobot : public TimedRobot {
 
   MockRobot() : TimedRobot{PERIOD} {}
 
-  void SimulationInit() override { m_simulationInitCount++; }
+  void SimulationStart() override { m_simulationStartCount++; }
 
   void DisabledStart() override { m_disabledStartCount++; }
 
@@ -119,7 +119,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest DisabledMode", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(0u == robot.m_disabledStartCount);
   CHECK(0u == robot.m_autonomousStartCount);
   CHECK(0u == robot.m_teleopStartCount);
@@ -139,7 +139,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest DisabledMode", "[wpilibc]") {
 
   wpi::sim::StepTiming(PERIOD);
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(1u == robot.m_disabledStartCount);
   CHECK(0u == robot.m_autonomousStartCount);
   CHECK(0u == robot.m_teleopStartCount);
@@ -159,7 +159,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest DisabledMode", "[wpilibc]") {
 
   wpi::sim::StepTiming(PERIOD);
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(1u == robot.m_disabledStartCount);
   CHECK(0u == robot.m_autonomousStartCount);
   CHECK(0u == robot.m_teleopStartCount);
@@ -275,7 +275,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AutonomousMode", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::AUTONOMOUS);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(0u == robot.m_disabledStartCount);
   CHECK(0u == robot.m_autonomousStartCount);
   CHECK(0u == robot.m_teleopStartCount);
@@ -295,7 +295,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AutonomousMode", "[wpilibc]") {
 
   wpi::sim::StepTiming(PERIOD);
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(0u == robot.m_disabledStartCount);
   CHECK(1u == robot.m_autonomousStartCount);
   CHECK(0u == robot.m_teleopStartCount);
@@ -315,7 +315,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AutonomousMode", "[wpilibc]") {
 
   wpi::sim::StepTiming(PERIOD);
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(0u == robot.m_disabledStartCount);
   CHECK(1u == robot.m_autonomousStartCount);
   CHECK(0u == robot.m_teleopStartCount);
@@ -347,7 +347,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest TeleopMode", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(0u == robot.m_disabledStartCount);
   CHECK(0u == robot.m_autonomousStartCount);
   CHECK(0u == robot.m_teleopStartCount);
@@ -367,7 +367,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest TeleopMode", "[wpilibc]") {
 
   wpi::sim::StepTiming(PERIOD);
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(0u == robot.m_disabledStartCount);
   CHECK(0u == robot.m_autonomousStartCount);
   CHECK(1u == robot.m_teleopStartCount);
@@ -387,7 +387,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest TeleopMode", "[wpilibc]") {
 
   wpi::sim::StepTiming(PERIOD);
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(0u == robot.m_disabledStartCount);
   CHECK(0u == robot.m_autonomousStartCount);
   CHECK(1u == robot.m_teleopStartCount);
@@ -418,7 +418,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest UtilityMode", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::UTILITY);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(0u == robot.m_disabledStartCount);
   CHECK(0u == robot.m_autonomousStartCount);
   CHECK(0u == robot.m_teleopStartCount);
@@ -438,7 +438,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest UtilityMode", "[wpilibc]") {
 
   wpi::sim::StepTiming(PERIOD);
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(0u == robot.m_disabledStartCount);
   CHECK(0u == robot.m_autonomousStartCount);
   CHECK(0u == robot.m_teleopStartCount);
@@ -458,7 +458,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest UtilityMode", "[wpilibc]") {
 
   wpi::sim::StepTiming(PERIOD);
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(0u == robot.m_disabledStartCount);
   CHECK(0u == robot.m_autonomousStartCount);
   CHECK(0u == robot.m_teleopStartCount);
@@ -480,7 +480,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest UtilityMode", "[wpilibc]") {
   wpi::sim::DriverStationSim::NotifyNewData();
   wpi::sim::StepTiming(20_ms);  // Wait for Notifiers
 
-  CHECK(1u == robot.m_simulationInitCount);
+  CHECK(1u == robot.m_simulationStartCount);
   CHECK(1u == robot.m_disabledStartCount);
   CHECK(0u == robot.m_autonomousStartCount);
   CHECK(0u == robot.m_teleopStartCount);

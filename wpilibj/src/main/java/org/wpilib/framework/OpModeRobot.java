@@ -643,7 +643,7 @@ public abstract class OpModeRobot extends RobotBase {
   public void robotPeriodic() {}
 
   /** Function called once during robot initialization in simulation. */
-  public void simulationInit() {}
+  public void simulationStart() {}
 
   /**
    * Function called periodically in simulation.
@@ -874,7 +874,7 @@ public abstract class OpModeRobot extends RobotBase {
   @Override
   public final void startCompetition() {
     if (isSimulation()) {
-      simulationInit();
+      simulationStart();
     }
 
     // Tell the DS that the robot is ready to be enabled
