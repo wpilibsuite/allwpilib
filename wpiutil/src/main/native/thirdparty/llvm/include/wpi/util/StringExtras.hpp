@@ -462,7 +462,7 @@ constexpr std::string_view slice(std::string_view str,
  * @returns A string with the joined values.
  */
 template <typename T>
-constexpr std::string join(T container, std::string_view delimiter) {
+constexpr std::string join(const T& container, std::string_view delimiter) {
   std::string ret;
   bool isFirst = true;
   for (auto&& value : container) {
