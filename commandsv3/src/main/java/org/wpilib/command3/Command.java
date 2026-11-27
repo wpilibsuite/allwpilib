@@ -12,6 +12,10 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import org.wpilib.annotation.NoDiscard;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.TunableConfig;
+import org.wpilib.tunable.TunableOption;
+import org.wpilib.tunable.TunableTable;
 import org.wpilib.units.measure.Time;
 
 /**
@@ -97,7 +101,7 @@ import org.wpilib.units.measure.Time;
  * <p>This class is provided by the Commands v3 VendorDep
  */
 @NoDiscard("Commands must be used! Did you mean to fork it or bind it to a trigger?")
-public interface Command {
+public interface Command extends ComplexTunable {
   /** The default command priority. */
   int DEFAULT_PRIORITY = 0;
 
@@ -232,6 +236,58 @@ public interface Command {
 
     return race(this, waitFor(timeout).named("Timeout: " + timeout.toLongString()))
         .named(name() + " [" + timeout.toLongString() + " timeout]");
+  }
+
+  /**
+   * Creates a tunable for this command that is bound to a specified scheduler. When published, it
+   * shows the command's name and a toggle labelled 'running'. Setting this toggle true schedules
+   * the command on the specified scheduler, and toggling false cancels it.
+   *
+   * <p>A command can alternatively be published directly with {@code Tunables.publish(name,
+   * command)}, which implicitly calls this method using the scheduler of the command's first
+   * requirement, or falling back to {@link Scheduler#getDefault()} if the command takes no
+   * requirements. Use this method when the command is requirement-free and runs on a different
+   * scheduler, such as one created using {@link Scheduler#createIndependentScheduler()}.
+   *
+   * @param scheduler the specified scheduler
+   * @return the tunable
+   */
+  default ComplexTunable tunableUsing(Scheduler scheduler) {
+    Command cmd = this;
+    return new ComplexTunable() {
+      @Override
+      public void publishTunable(TunableTable table) {
+        // Borrows the publish logic of command V2
+        table.publishValue(
+            "name",
+            cmd::name,
+            null,
+            String.class,
+            TunableConfig.of(TunableOption.IMMUTABLE, TunableOption.GET_ON_CHANGE));
+
+        table.publishBoolean(
+            "running",
+            () -> scheduler.isScheduledOrRunning(cmd),
+            value -> {
+              boolean isScheduled = scheduler.isScheduledOrRunning(cmd);
+              if (value) {
+                if (!isScheduled) {
+                  scheduler.schedule(cmd);
+                }
+              } else {
+                if (isScheduled) {
+                  scheduler.cancel(cmd);
+                }
+              }
+            },
+            TunableConfig.of(TunableOption.ALWAYS_GET));
+      }
+
+      @Override
+      public String getTunableType() {
+        return cmd.getTunableType();
+      }
+    };
   }
 
   /**
@@ -426,5 +482,24 @@ public interface Command {
    */
   default ParallelGroupBuilder raceWith(Command... parallel) {
     return new ParallelGroupBuilder().optional(this).optional(parallel);
+  }
+
+  @Override
+  default void publishTunable(TunableTable table) {
+    // Finds the scheduler that owns the command requirements. If the command doesn't have any, gets
+    // the default scheduler.
+    Scheduler scheduler =
+        requirements().stream()
+            .findFirst()
+            .map(Mechanism::getRegisteredScheduler)
+            .orElseGet(Scheduler::getDefault);
+
+    // Publish the cmd using the inferred scheduler
+    tunableUsing(scheduler).publishTunable(table);
+  }
+
+  @Override
+  default String getTunableType() {
+    return "Command";
   }
 }
