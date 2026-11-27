@@ -274,6 +274,13 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    */
   constexpr wpi::units::unit_t<ka_unit> GetKa() const { return kA; }
 
+  /**
+   * Returns the period.
+   *
+   * @return The period.
+   */
+  constexpr wpi::units::second_t GetDt() const { return m_dt; }
+
  private:
   /// The static gain, in volts.
   wpi::units::volt_t kS;

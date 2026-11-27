@@ -15,7 +15,8 @@ static constexpr auto Ks = 1.91_V;
 static constexpr auto Kg = 2.29_V;
 static constexpr auto Kv = 35.04_V * 1_s / 1_rad;
 static constexpr auto Ka = 1.74_V * 1_s * 1_s / 1_rad;
-const ArmFeedforward EXPECTED_DATA{Ks, Kg, Kv, Ka};
+static constexpr auto Dt = 5_ms;
+const ArmFeedforward EXPECTED_DATA{Ks, Kg, Kv, Ka, Dt};
 }  // namespace
 
 TEST_CASE("ArmFeedforwardProtoTest Roundtrip", "[wpimath]") {
@@ -30,4 +31,5 @@ TEST_CASE("ArmFeedforwardProtoTest Roundtrip", "[wpimath]") {
   CHECK(EXPECTED_DATA.GetKg().value() == unpacked_data->GetKg().value());
   CHECK(EXPECTED_DATA.GetKv().value() == unpacked_data->GetKv().value());
   CHECK(EXPECTED_DATA.GetKa().value() == unpacked_data->GetKa().value());
+  CHECK(EXPECTED_DATA.GetDt().value() == unpacked_data->GetDt().value());
 }
