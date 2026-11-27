@@ -1,15 +1,36 @@
 from collections.abc import Callable
 from typing import TypeVar, overload
 
+import tunables
 from hal import RobotMode
 from wpiutil import Color
 
-__all__ = ["OpModeRobot", "autonomous", "teleop", "utility"]
+__all__ = ["OpModeRobot", "autonomous", "teleop", "utility", "TunableOpMode"]
 
 from ._impl import opmode as _opmode
 from ._wpilib import OpModeRobotBase, OpMode
 
 _OpModeT = TypeVar("_OpModeT", bound=OpMode)
+
+
+class TunableOpMode(OpMode):
+    """An OpMode whose tunables are removed when it closes.
+
+    Subclasses that override close() must call super().close().
+    """
+
+    def __init__(self):
+        super().__init__()
+        self._tunable_path = (
+            f"OpModes/{type(self).__module__}.{type(self).__qualname__}"
+        )
+        self.tunables = tunables.get_table(self._tunable_path)
+
+    def close(self):
+        try:
+            super().close()
+        finally:
+            tunables.remove(self._tunable_path)
 
 
 def _apply_opmode_decorator(

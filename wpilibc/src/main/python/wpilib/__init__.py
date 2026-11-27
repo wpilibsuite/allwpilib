@@ -234,9 +234,9 @@ __all__ += ["report_error", "report_warning"]
 
 del _init__wpilib
 
-from .opmodes import OpModeRobot, autonomous, teleop, utility
+from .opmodes import OpModeRobot, TunableOpMode, autonomous, teleop, utility
 
-__all__ += ["OpModeRobot", "autonomous", "teleop", "utility"]
+__all__ += ["OpModeRobot", "TunableOpMode", "autonomous", "teleop", "utility"]
 
 from .cameraserver import CameraServer
 from .deployinfo import get_deploy_data
