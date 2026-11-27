@@ -285,6 +285,22 @@ classes:
                                      queued.
         )"
       )
+      .def("__repr__", [](py::object self) {
+        return py::str("PubSubOptions(poll_storage={!r}, periodic={!r}, exclude_publisher={!r}, send_all={!r}, topics_only={!r}, keep_duplicates={!r}, prefix_match={!r}, disable_remote={!r}, disable_local={!r}, exclude_self={!r}, hidden={!r}, disable_signal={!r})").format(
+          self.attr("poll_storage"),
+          self.attr("periodic"),
+          self.attr("exclude_publisher"),
+          self.attr("send_all"),
+          self.attr("topics_only"),
+          self.attr("keep_duplicates"),
+          self.attr("prefix_match"),
+          self.attr("disable_remote"),
+          self.attr("disable_local"),
+          self.attr("exclude_self"),
+          self.attr("hidden"),
+          self.attr("disable_signal")
+        );
+      })
   wpi::nt::meta::SubscriberOptions:
     subpackage: meta
     attributes:
