@@ -12,7 +12,6 @@
 #include "wpi/commands2/Subsystem.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/tunables/ComplexTunable.hpp"
-#include "wpi/tunables/Tunable.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SmallSet.hpp"
 
