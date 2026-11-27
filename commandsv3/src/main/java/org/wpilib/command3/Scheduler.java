@@ -29,6 +29,7 @@ import org.wpilib.command3.Scheduler.ScheduleResult.RequiresUnsafeMechanisms;
 import org.wpilib.command3.Scheduler.ScheduleResult.Success;
 import org.wpilib.command3.button.CommandGenericHID;
 import org.wpilib.command3.proto.SchedulerProto;
+import org.wpilib.command3.Command.ExitStatus;
 import org.wpilib.event.EventLoop;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.system.RobotController;
@@ -734,7 +735,7 @@ public final class Scheduler implements ProtobufSerializable {
     // Cancel the root commands
     for (var conflictingState : conflictingRootStates) {
       emitInterruptedEvent(conflictingState.command(), incomingState.command());
-      cancel(conflictingState.command());
+      cancel(conflictingState.command(), ExitStatus.INTERRUPTED);
     }
   }
 
@@ -775,7 +776,7 @@ public final class Scheduler implements ProtobufSerializable {
    * @param command the command to cancel
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
-  public void cancel(Command command) {
+  public void cancel(Command command, ExitStatus exitStatus) {
     var currentState = currentState();
     if (currentState != null && command == currentState.command()) {
       currentState.coroutine().requestCancellation(); // yields internally
@@ -795,8 +796,7 @@ public final class Scheduler implements ProtobufSerializable {
       // even in the scheduler at the time, then there's nothing to do
       // Always run onExit first, in case cancellation has special behavior that overrides
       // standard exit logic.
-      command.onExit();
-      command.onCancel();
+      command.onExit(exitStatus);
     }
 
     if (running || queued) {
@@ -868,7 +868,7 @@ public final class Scheduler implements ProtobufSerializable {
       if (binding.scope().active()) {
         continue;
       }
-      cancel(binding.command());
+      cancel(binding.command(), ExitStatus.BINDING_SCOPE_INACTIVE);
       iterator.remove();
     }
   }
@@ -930,7 +930,7 @@ public final class Scheduler implements ProtobufSerializable {
     }
 
     for (var command : commandsToCancel) {
-      cancel(command);
+      cancel(command, ExitStatus.CANNOT_RUN_IN_DISABLED);
     }
   }
 
@@ -1062,10 +1062,11 @@ public final class Scheduler implements ProtobufSerializable {
     }
 
     if (coroutine.isCancellationRequested()) {
-      cancel(command);
+      cancel(command, ExitStatus.CANCELLATION_REQUESTED);
     } else if (coroutine.isDone()) {
       handleCommandCompletion(command);
     } else if (coroutine.getForkResult() != null) {
+      // Fork failed
       handleCoroutineIRQ(coroutine.getForkResult(), command);
     } else {
       // Yielded
@@ -1074,7 +1075,7 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   private void handleCommandCompletion(Command command) {
-    command.onExit();
+    command.onExit(ExitStatus.SUCCESS);
     emitCompletedEvent(command);
     m_runningCommands.remove(command);
     removeOrphanedChildren(command);
@@ -1084,7 +1085,7 @@ public final class Scheduler implements ProtobufSerializable {
     Command root = getRoot(command); // capture the root command before modifying scheduler state
     m_currentCommandAncestry.clear();
     emitForkFailureEvent(command, failure.getFailedCommands());
-    cancel(root);
+    cancel(root, ExitStatus.FORK_FAILED);
     Continuation.mountContinuation(null);
   }
 
@@ -1124,7 +1125,7 @@ public final class Scheduler implements ProtobufSerializable {
     // Note: Because we remove the command from the running set above, we still need to
     //       clean up all the failed command's children
     if (root != null && root != command) {
-      cancel(root);
+      cancel(root, ExitStatus.EXCEPTION_IN_CHILD_COMMAND);
     }
 
     // Then rethrow the exception
@@ -1171,7 +1172,7 @@ public final class Scheduler implements ProtobufSerializable {
     bindings.removeIf(
         b -> {
           if (!b.scope().active()) {
-            cancel(b.command());
+            cancel(b.command(), ExitStatus.BINDING_SCOPE_INACTIVE);
             return true;
           }
           return false;
@@ -1185,7 +1186,7 @@ public final class Scheduler implements ProtobufSerializable {
     // Cancel any default command except the narrowest-scoped one (the last binding in the list)
     for (int i = 0; i < bindings.size() - 1; i++) {
       Command widerScopeDefaultCommand = bindings.get(i).command();
-      cancel(widerScopeDefaultCommand);
+      cancel(widerScopeDefaultCommand, ExitStatus.MORE_NARROW_SCOPE_AVAILBLE);
     }
 
     if (!RobotStateFetcher.getFetcher().isEnabled() && !mechanism.controllableDuringDisabled()) {
@@ -1223,7 +1224,7 @@ public final class Scheduler implements ProtobufSerializable {
     m_runningCommands.entrySet().stream()
         .filter(e -> e.getValue().parent() == parent)
         .toList() // copy to an intermediate list to avoid concurrent modification
-        .forEach(e -> cancel(e.getKey()));
+        .forEach(e -> cancel(e.getKey(), ExitStatus.ORPHANED));
   }
 
   /**
@@ -1309,8 +1310,7 @@ public final class Scheduler implements ProtobufSerializable {
       Command canceledCommand = entry.getKey();
       // Always run onExit first, in case cancellation has special behavior that overrides
       // standard exit logic.
-      canceledCommand.onExit();
-      canceledCommand.onCancel();
+      canceledCommand.onExit(ExitStatus.CANCELLATION_REQUESTED);
       emitCanceledEvent(canceledCommand);
     }
   }
