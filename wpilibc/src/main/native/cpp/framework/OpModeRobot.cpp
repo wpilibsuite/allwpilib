@@ -130,7 +130,7 @@ void OpModeRobotBase::LoopFunc() {
       // Transitioning to disabled. Only tear down an opmode that was actually
       // running; a freshly selected opmode entering its disabled phase must
       // persist so it can be started on the next enable.
-      if (m_currentOpMode && m_opmodePeriodic) {
+      if (m_currentOpMode && m_opModeStarted) {
         EndCurrentOpMode();
         m_lastModeId = -1;  // force recreate next loop
       }
@@ -143,7 +143,7 @@ void OpModeRobotBase::LoopFunc() {
   // Start the opmode if enabled and not already started. This single check
   // covers both the disabled->enabled transition and an opmode constructed
   // while the robot is already enabled.
-  if (enabled && m_currentOpMode && !m_opmodePeriodic) {
+  if (enabled && m_currentOpMode && !m_opModeStarted) {
     StartCurrentOpMode();
   }
 
@@ -162,6 +162,12 @@ void OpModeRobotBase::LoopFunc() {
     // Call EnabledPeriodic when enabled with a current opmode
     EnabledPeriodic();
     m_watchdog.AddEpoch("EnabledPeriodic()");
+
+    m_opModeWatchdog.Reset();
+    m_currentOpMode->Periodic();
+    m_opModeWatchdog.Disable();
+    m_opModePeriodicOverrunAlert.Set(m_opModeWatchdog.IsExpired());
+    m_watchdog.AddEpoch("OpMode::Periodic()");
   }
 
   // Call NonePeriodic when no opmode is selected
@@ -265,28 +271,13 @@ void OpModeRobotBase::ClearOpModes() {
 }
 
 void OpModeRobotBase::StartCurrentOpMode() {
-  if (!m_currentOpMode || m_opmodePeriodic) {
+  if (!m_currentOpMode || m_opModeStarted) {
     return;
   }
 
   std::print("********** Starting OpMode {} **********\n", m_currentOpModeName);
 
-  // Register the main opmode periodic callback. Capture a weak_ptr so a queued
-  // callback can never resurrect or outlive a destroyed opmode.
-  m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
-      [this, op = std::weak_ptr<OpMode>{m_currentOpMode}] {
-        if (auto shared_op = op.lock()) {
-          m_opModeWatchdog.Reset();
-          shared_op->Periodic();
-          m_opModeWatchdog.Disable();
-
-          // Alert on opmode Periodic() overruns, and clear the alert once it's
-          // back on time
-          m_opModePeriodicOverrunAlert.Set(m_opModeWatchdog.IsExpired());
-        }
-      },
-      m_startTime, m_period};
-  m_callbacks.Add(*m_opmodePeriodic);
+  m_opModeStarted = true;
 
   m_currentOpMode->Start();
   m_watchdog.AddEpoch("OpMode::Start()");
@@ -297,15 +288,14 @@ void OpModeRobotBase::EndCurrentOpMode() {
     return;
   }
 
-  // If the opmode was started, end it and remove its main periodic callback.
-  if (m_opmodePeriodic) {
+  // If the opmode was started, end it.
+  if (m_opModeStarted) {
     std::print("********** Ending OpMode {} **********\n", m_currentOpModeName);
 
     m_currentOpMode->End();
     m_watchdog.AddEpoch("OpMode::End()");
 
-    m_callbacks.Remove(*m_opmodePeriodic);
-    m_opmodePeriodic.reset();
+    m_opModeStarted = false;
     m_opModePeriodicOverrunAlert.Set(false);
   }
 

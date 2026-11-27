@@ -133,10 +133,13 @@ TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest EnabledTransition",
   // 2. Transition to enabled
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(
-      40_ms);  // Step twice like Java test to get periodic callback
+  // Start and Periodic both run on the enabling tick.
+  wpi::sim::StepTiming(20_ms);
   CHECK(counts.start.load() == 1u);
   CHECK(counts.periodic.load() == 1u);
+  wpi::sim::StepTiming(20_ms);
+  CHECK(counts.start.load() == 1u);
+  CHECK(counts.periodic.load() == 2u);
 
   // 3. Transition to disabled
   wpi::sim::DriverStationSim::SetEnabled(false);
@@ -177,10 +180,14 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "OpMode1"));
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(40_ms);  // Need two iterations for periodic callback
+  wpi::sim::StepTiming(20_ms);
   CHECK(counts1.constructed.load() == 1u);
   CHECK(counts1.start.load() == 1u);
   CHECK(counts1.periodic.load() == 1u);
+  wpi::sim::StepTiming(20_ms);
+  CHECK(counts1.constructed.load() == 1u);
+  CHECK(counts1.start.load() == 1u);
+  CHECK(counts1.periodic.load() == 2u);
 
   // 2. Switch to OpMode2 while enabled. Selecting a different opmode while
   // enabled disables the robot first, so the DS sends disabled + new opmode.
@@ -200,10 +207,15 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
   // reconstructed.
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(40_ms);
+  wpi::sim::StepTiming(20_ms);
   CHECK(counts2.constructed.load() == 1u);
   CHECK(counts2.start.load() == 1u);
   CHECK(counts2.periodic.load() == 1u);
+  wpi::sim::StepTiming(20_ms);
+  CHECK(counts2.constructed.load() == 1u);
+  CHECK(counts2.start.load() == 1u);
+  CHECK(counts2.periodic.load() == 2u);
+  CHECK(counts1.periodic.load() == 2u);
 
   robot.EndCompetition();
   robotThread.join();
@@ -312,14 +324,19 @@ TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest InitialEnabledState",
       MakeOpModeId(wpi::RobotMode::TELEOPERATED, "TestOpMode"));
   wpi::sim::DriverStationSim::SetEnabled(true);
   wpi::sim::DriverStationSim::NotifyNewData();
-  wpi::sim::StepTiming(40_ms);  // Step twice to get periodic callback
+  wpi::sim::StepTiming(20_ms);
 
   // Should construct, call disabledPeriodic once (since it's a new opmode),
-  // then start and periodic
+  // then start and periodic, all on the first tick.
   CHECK(counts.constructed.load() == 1u);
   CHECK(counts.disabledPeriodic.load() == 1u);
   CHECK(counts.start.load() == 1u);
   CHECK(counts.periodic.load() == 1u);
+  wpi::sim::StepTiming(20_ms);
+  CHECK(counts.constructed.load() == 1u);
+  CHECK(counts.disabledPeriodic.load() == 1u);
+  CHECK(counts.start.load() == 1u);
+  CHECK(counts.periodic.load() == 2u);
 
   robot.EndCompetition();
   robotThread.join();

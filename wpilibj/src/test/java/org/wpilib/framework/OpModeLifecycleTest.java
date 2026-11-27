@@ -144,11 +144,13 @@ class OpModeLifecycleTest {
     // 2. Transition to enabled
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * PERIOD);
-    // Starts on first loop
+    // Start and periodic both run on the enabling tick.
+    SimHooks.stepTiming(PERIOD);
     assertEquals(1, startCount.get());
-    // Periodic is called on second loop
     assertEquals(1, periodicCount.get());
+    SimHooks.stepTiming(PERIOD);
+    assertEquals(1, startCount.get());
+    assertEquals(2, periodicCount.get());
 
     // 3. Transition to disabled
     DriverStationSim.setEnabled(false);
@@ -213,10 +215,14 @@ class OpModeLifecycleTest {
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode1"));
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * PERIOD);
+    SimHooks.stepTiming(PERIOD);
     assertEquals(1, constructedCount1.get());
     assertEquals(1, startCount1.get());
     assertEquals(1, periodicCount1.get());
+    SimHooks.stepTiming(PERIOD);
+    assertEquals(1, constructedCount1.get());
+    assertEquals(1, startCount1.get());
+    assertEquals(2, periodicCount1.get());
 
     // 2. Switch to OpMode2 while enabled. Selecting a different opmode while
     // enabled disables the robot first, so the DS sends disabled + new opmode.
@@ -234,10 +240,15 @@ class OpModeLifecycleTest {
     // 3. Re-enable. The same OpMode2 instance is started; it is not reconstructed.
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * PERIOD);
+    SimHooks.stepTiming(PERIOD);
     assertEquals(1, constructedCount2.get());
     assertEquals(1, startCount2.get());
     assertEquals(1, periodicCount2.get());
+    SimHooks.stepTiming(PERIOD);
+    assertEquals(1, constructedCount2.get());
+    assertEquals(1, startCount2.get());
+    assertEquals(2, periodicCount2.get());
+    assertEquals(2, periodicCount1.get());
 
     robot.endCompetition();
     robotThread.join();
@@ -380,14 +391,19 @@ class OpModeLifecycleTest {
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode"));
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * PERIOD);
+    SimHooks.stepTiming(PERIOD);
 
     // Should construct, call disabledPeriodic once (since it's a new opmode), then start and
-    // periodic
+    // periodic, all on the first tick.
     assertEquals(1, constructedCount.get());
     assertEquals(1, disabledPeriodicCount.get());
     assertEquals(1, startCount.get());
     assertEquals(1, periodicCount.get());
+    SimHooks.stepTiming(PERIOD);
+    assertEquals(1, constructedCount.get());
+    assertEquals(1, disabledPeriodicCount.get());
+    assertEquals(1, startCount.get());
+    assertEquals(2, periodicCount.get());
 
     robot.endCompetition();
     robotThread.join();
