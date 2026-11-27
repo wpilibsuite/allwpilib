@@ -1,0 +1,280 @@
+name: Vendordep compatibility
+
+on:
+  workflow_call:
+    inputs:
+      baseline:
+        description: Baseline commit SHA, or previous-tag for a branch comparison
+        required: true
+        type: string
+      baseline-branch:
+        description: Target branch used to find a recent published baseline version
+        required: true
+        type: string
+      candidate:
+        description: Candidate commit SHA (the proposed merge for a PR)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  revisions:
+    runs-on: ubuntu-24.04
+    outputs:
+      baseline: ${{ steps.baseline.outputs.ref }}
+      label: ${{ steps.baseline.outputs.label }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.candidate }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Select baseline
+        id: baseline
+        env:
+          BASELINE: ${{ inputs.baseline }}
+          CANDIDATE: ${{ inputs.candidate }}
+        run: |
+          if [ "$BASELINE" = previous-tag ]; then
+            if ! BASELINE=$(python3 .github/scripts/compatibility.py previous-tag --repo . --head "$CANDIDATE"); then
+              echo '**INCOMPLETE: no previous release tag was found.**' >> "$GITHUB_STEP_SUMMARY"
+              echo '::warning::Compatibility analysis has no baseline.'
+              exit 1
+            fi
+          fi
+          BASE_SHA=$(git rev-parse --verify "${BASELINE}^{commit}")
+          echo "ref=$BASE_SHA" >> "$GITHUB_OUTPUT"
+          echo "label=$BASELINE ($BASE_SHA)" >> "$GITHUB_OUTPUT"
+      - name: Locate published Artifactory baseline
+        id: plan
+        env:
+          BASE_SHA: ${{ steps.baseline.outputs.ref }}
+          CANDIDATE: ${{ inputs.candidate }}
+          BASE_BRANCH: ${{ inputs.baseline-branch }}
+        run: |
+          python3 .github/scripts/compatibility_artifacts.py plan --repo . \
+            --revision "$BASE_SHA" --candidate "$CANDIDATE" --branch "$BASE_BRANCH" \
+            --output "$GITHUB_OUTPUT"
+
+  libabigail:
+    name: Build libabigail 3.0
+    needs: revisions
+    if: ${{ needs.revisions.outputs.matrix != '' }}
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    container: wpilib/systemcore-cross-debian:trixie
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.candidate }}
+          path: candidate
+          persist-credentials: false
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential curl libdw-dev libelf-dev libxml2-dev libxxhash-dev patch pkg-config xz-utils
+      - name: Build libabigail
+        env:
+          LIBABIGAIL_VERSION: '3.0'
+          LIBABIGAIL_SHA512: 4803ada641d4becbff2f2578e1f874794af5295c7c780cfa4d4d96cddb59320625320c667e9ce2ccd4f9675d42ac4721305d4a3bd034862f34bb35dd4f9ff48c
+        run: |
+          mkdir -p source build tools/libabigail
+          curl --fail --location --retry 3 --max-time 600 \
+            -o "source/libabigail-$LIBABIGAIL_VERSION.tar.xz" \
+            "https://mirrors.kernel.org/sourceware/libabigail/libabigail-$LIBABIGAIL_VERSION.tar.xz"
+          echo "$LIBABIGAIL_SHA512  source/libabigail-$LIBABIGAIL_VERSION.tar.xz" | sha512sum --check
+          tar -xJf "source/libabigail-$LIBABIGAIL_VERSION.tar.xz" -C source
+          patch --batch --fuzz=0 --directory="source/libabigail-$LIBABIGAIL_VERSION" --strip=1 \
+            < candidate/.github/scripts/libabigail-3.0-subrange-comparison.patch
+          cd build
+          "../source/libabigail-$LIBABIGAIL_VERSION/configure" \
+            --prefix="$GITHUB_WORKSPACE/tools/libabigail" \
+            --disable-abidb \
+            --disable-apidoc \
+            --disable-fedabipkgdiff \
+            --disable-manual \
+            --disable-static
+          make -j4
+          make install
+          cd ..
+          tar -czf libabigail-3.0-install.tar.gz -C tools libabigail
+      - uses: actions/upload-artifact@v7
+        with:
+          name: libabigail-3.0
+          path: libabigail-3.0-install.tar.gz
+          compression-level: 0
+          if-no-files-found: error
+
+  compare:
+    needs: [revisions, libabigail]
+    # Allow incomplete reports after failures, but release the workflow on cancellation.
+    if: ${{ !cancelled() && needs.revisions.outputs.matrix != '' }}
+    name: Report ${{ matrix.platform }} (advisory)
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    container: wpilib/systemcore-cross-debian:trixie
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.revisions.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.candidate }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Download candidate build artifacts
+        id: candidate-artifacts
+        if: matrix.baseline_error == ''
+        uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: ${{ matrix.pattern }}
+          path: products/candidate
+      - name: Discard failed candidate download
+        # A digest failure can leave extracted files; they must not enter the report.
+        if: steps.candidate-artifacts.outcome == 'failure'
+        run: rm -rf products/candidate
+      - name: Download published baseline from Artifactory
+        if: matrix.baseline_error == ''
+        env:
+          BASE_SHA: ${{ matrix.baseline_revision }}
+          VERSION: ${{ matrix.baseline_version }}
+          REPOSITORY: ${{ matrix.baseline_repository }}
+          REQUESTED_BASE: ${{ needs.revisions.outputs.baseline }}
+          BASELINE_WARNING: ${{ matrix.baseline_warning }}
+          HEAD_SHA: ${{ inputs.candidate }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          python3 candidate/.github/scripts/compatibility_artifacts.py fetch-baseline \
+            --repo candidate --repository "$REPOSITORY" --version "$VERSION" \
+            --candidate-products products/candidate --baseline-products products/baseline \
+            --base-revision "$BASE_SHA" --base-label "$VERSION ($BASE_SHA)" --head-revision "$HEAD_SHA" \
+            --platform "$PLATFORM" --output report \
+            --requested-base "$REQUESTED_BASE" --baseline-warning "$BASELINE_WARNING"
+      - name: Require complete build artifacts
+        env:
+          BASE_SHA: ${{ matrix.baseline_revision }}
+          REQUESTED_BASE: ${{ needs.revisions.outputs.baseline }}
+          BASELINE_WARNING: ${{ matrix.baseline_warning }}
+          BASE_LABEL: ${{ format('{0} ({1})', matrix.baseline_version, matrix.baseline_revision) }}
+          HEAD_SHA: ${{ inputs.candidate }}
+          BASELINE_ERROR: ${{ matrix.baseline_error }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          if [ -n "$BASELINE_WARNING" ]; then echo "::warning::$BASELINE_WARNING"; fi
+          python3 candidate/.github/scripts/compatibility_artifacts.py validate \
+            --candidate-products products/candidate --baseline-products products/baseline \
+            --base-revision "$BASE_SHA" --base-label "$BASE_LABEL" --head-revision "$HEAD_SHA" \
+            --platform "$PLATFORM" --output report --baseline-error "$BASELINE_ERROR" \
+            --requested-base "$REQUESTED_BASE" --baseline-warning "$BASELINE_WARNING"
+      - uses: actions/download-artifact@v8
+        with:
+          name: libabigail-3.0
+          path: tools
+      - name: Install comparison tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y maven libdw-dev libelf-dev libxml2-dev libxxhash-dev llvm-19 clang-19 lld-19 lldb-19 python3-lldb-19 liblldb-19-dev
+          echo "PYTHONPATH=$(lldb-19 -P)" >> "$GITHUB_ENV"
+          tar -xzf tools/libabigail-3.0-install.tar.gz -C tools
+          export PATH="$GITHUB_WORKSPACE/tools/libabigail/bin:$PATH"
+          export LD_LIBRARY_PATH="$GITHUB_WORKSPACE/tools/libabigail/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          echo "$GITHUB_WORKSPACE/tools/libabigail/bin" >> "$GITHUB_PATH"
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
+          mkdir -p report
+          curl --fail --location --retry 3 --max-time 120 \
+            -o tools/japicmp.jar \
+            https://repo.maven.apache.org/maven2/com/github/siom79/japicmp/japicmp/0.24.2/japicmp-0.24.2-jar-with-dependencies.jar
+          echo '799a3a85b3025d84b2ed9e0c105064e12adc2c414afe8c25a95454f8d3772f7f  tools/japicmp.jar' | sha256sum --check
+          {
+            abidiff --version
+            llvm-readobj-19 --version
+            lldb-19 --version
+            java -version
+            echo 'japicmp 0.24.2'
+          } > report/tools.txt 2>&1
+      - name: Resolve published baseline Java dependencies
+        run: |
+          cp products/baseline/compatibility/manifest.json report/baseline-provenance.json
+          cp products/baseline/compatibility/dependencies.pom report/baseline-dependencies.xml
+          python3 candidate/.github/scripts/compatibility_artifacts.py resolve-classpath \
+            --products products/baseline --log report/baseline-classpath.txt
+      - name: Test comparison engine
+        env:
+          JAPICMP_JAR: ${{ github.workspace }}/tools/japicmp.jar
+        run: python3 -m unittest discover -s candidate/.github/scripts/compatibility_tests -v
+      - uses: actions/checkout@v7
+        continue-on-error: true
+        with:
+          repository: wpilibsuite/vendor-json-repo
+          path: vendor-json-repo
+          persist-credentials: false
+      - name: Compare all configurations and architectures
+        continue-on-error: true
+        env:
+          BASE_SHA: ${{ matrix.baseline_revision }}
+          REQUESTED_BASE: ${{ needs.revisions.outputs.baseline }}
+          BASELINE_WARNING: ${{ matrix.baseline_warning }}
+          BASE_LABEL: ${{ format('{0} ({1})', matrix.baseline_version, matrix.baseline_revision) }}
+          HEAD_SHA: ${{ inputs.candidate }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          python3 candidate/.github/scripts/compatibility_artifacts.py report \
+            --candidate-products products/candidate --baseline-products products/baseline \
+            --base-revision "$BASE_SHA" --base-label "$BASE_LABEL" --head-revision "$HEAD_SHA" \
+            --platform "$PLATFORM" --repo candidate --inventory vendor-json-repo \
+            --japicmp tools/japicmp.jar --output report \
+            --requested-base "$REQUESTED_BASE" --baseline-warning "$BASELINE_WARNING"
+      - name: Publish summary
+        if: always()
+        run: |
+          mkdir -p report
+          if [ ! -f report/summary.md ]; then
+            echo '# Compatibility report (advisory)' > report/summary.md
+            echo '**INCOMPLETE: setup or analysis failed. See the job logs.**' >> report/summary.md
+          fi
+          cat report/summary.md >> "$GITHUB_STEP_SUMMARY"
+          if grep -q INCOMPLETE report/summary.md; then
+            echo '::warning::Compatibility analysis is incomplete; see the summary and job logs.'
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compatibility-${{ matrix.platform }}-${{ inputs.candidate }}
+          path: |
+            report/**/*.md
+            report/**/*.json
+            report/**/*.txt
+            report/**/*.xml
+            report/**/*.html
+          if-no-files-found: warn
+
+  summary:
+    needs: [revisions, compare]
+    if: ${{ always() && !cancelled() }}
+    name: Vendordep compatibility summary
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.candidate }}
+          path: candidate
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: compatibility-*-${{ inputs.candidate }}
+          path: reports
+      - name: Publish vendordep compatibility summary
+        run: |
+          python3 candidate/.github/scripts/compatibility_artifacts.py aggregate-summary \
+            --reports reports --output compatibility-summary.md
+          cat compatibility-summary.md >> "$GITHUB_STEP_SUMMARY"
