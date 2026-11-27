@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.14'",
@@ -46,7 +46,7 @@ dev = [
     { name = "jinja2", specifier = "==3.1.6" },
     { name = "protobuf", specifier = "==5.28.3" },
     { name = "pytest-order" },
-    { name = "semiwrap", specifier = "==0.8.1" },
+    { name = "semiwrap", specifier = "==0.9.0" },
 ]
 
 [[package]]
@@ -635,7 +635,7 @@ wheels = [
 
 [[package]]
 name = "semiwrap"
-version = "0.8.1"
+version = "0.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cxxheaderparser", extra = ["pcpp"] },
@@ -653,9 +653,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "validobj" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6e/8e/a5a4ec393f15934b4b8582ea0f9c63aba7bf290ce557324d37a832055250/semiwrap-0.8.1.tar.gz", hash = "sha256:e5a8d12e4ceb21b705702731aab368b86cea38463ca498d9243fc76345692d4c", size = 84280, upload-time = "2026-10-29T06:00:28.624Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b0/b2/51d1a42e4e3fa35beabf5d5b30721759fec1e9378c7f674a787eae45750c/semiwrap-0.9.0.tar.gz", hash = "sha256:72d6d4a23ad661cf1844669cc714774bd982a636992c4e6ef8be35d65d158eb9", size = 85456, upload-time = "2026-11-20T06:17:06.823Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f6/29/5a0753a5782d90f5379e5a469a87485d3b7080bb5e4b05dbe87c397128ac/semiwrap-0.8.1-py3-none-any.whl", hash = "sha256:c2f93f2d50e6aeb8552f4d5f27142a8c3e035e18a1e8d5dce400f030bd86afac", size = 105746, upload-time = "2026-10-29T06:00:26.867Z" },
+    { url = "https://files.pythonhosted.org/packages/73/60/cd2845627a3b6a637af141faa3c16fc5ee714c857e34e4c1e1e106250e00/semiwrap-0.9.0-py3-none-any.whl", hash = "sha256:a57db1e70f2681aab0e21d8c9c64106413e06bf5bd27b5311369e23e212f85a9", size = 106925, upload-time = "2026-11-20T06:17:05.482Z" },
 ]
 
 [[package]]

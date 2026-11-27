@@ -17,7 +17,7 @@ namespace wpi::fields {
 inline constexpr const char* BASE_RESOURCE_DIR = "/org/wpilib/fields/";
 
 /** Built-in FIRST field identifier. */
-enum class FieldId {
+enum class FieldId : uint32_t {
   /** 2018 FRC Power Up. */
   FRC_2018_POWER_UP,
   /** 2019 FRC Destination: Deep Space. */
@@ -87,3 +87,6 @@ WPILIB_DLLEXPORT
 Field GetField(FieldId field);
 
 }  // namespace wpi::fields
+
+#include "wpi/fields/proto/FieldIdProto.hpp"
+#include "wpi/fields/struct/FieldIdStruct.hpp"

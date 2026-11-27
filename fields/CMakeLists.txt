@@ -27,13 +27,16 @@ if(WPILIB_WITH_GUI)
     )
 endif()
 
+file(GLOB_RECURSE fields_native_src src/main/native/cpp/*.cpp)
+
+file(GLOB fields_protobuf_native_src src/generated/main/native/cpp/wpi/fields/protobuf/*.cpp)
+
 add_library(
     fields
     ${field_resources_src}
     src/generated/main/native/cpp/fields/fields.cpp
-    src/main/native/cpp/FieldTag.cpp
-    src/main/native/cpp/FieldImage.cpp
-    src/main/native/cpp/Field.cpp
+    ${fields_native_src}
+    ${fields_protobuf_native_src}
 )
 set_target_properties(fields PROPERTIES DEBUG_POSTFIX "d")
 
@@ -72,6 +75,12 @@ if(WPILIB_WITH_GUI)
     wpilib_target_warnings(fieldimages)
 endif()
 
+install(
+    DIRECTORY src/generated/main/native/cpp/
+    DESTINATION "${include_dest}/fields"
+    FILES_MATCHING
+    PATTERN "*.h"
+)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/fields")
 install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/fields")
 target_include_directories(
@@ -79,6 +88,7 @@ target_include_directories(
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/cpp>
         $<INSTALL_INTERFACE:${include_dest}/fields>
 )
 

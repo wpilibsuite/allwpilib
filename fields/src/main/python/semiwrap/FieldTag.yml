@@ -1,3 +1,6 @@
+extra_includes:
+- wpystruct.h
+
 classes:
   wpi::fields::FieldTag:
     force_no_trampoline: true
@@ -18,3 +21,6 @@ functions:
     ignore: true
   from_json:
     ignore: true
+
+inline_code: |
+  SetupWPyStruct<wpi::fields::FieldTag>(cls_FieldTag);

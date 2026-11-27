@@ -128,6 +128,33 @@ def test_nested_unpack():
 
 
 #
+# Enum struct
+#
+
+
+def test_enum_get_type_string():
+    assert wpistruct.get_type_name(module.ThingB) == "ThingB"
+
+
+def test_enum_get_schema():
+    assert wpistruct.get_schema(module.ThingB) == "uint8 value"
+
+
+def test_enum_get_size():
+    assert wpistruct.get_size(module.ThingB) == 1
+
+
+def test_enum_pack():
+    assert wpistruct.pack(module.ThingB.FIRST) == b"\x00"
+    assert wpistruct.pack(module.ThingB.SECOND) == b"\x01"
+
+
+def test_enum_unpack():
+    assert wpistruct.unpack(module.ThingB, b"\x00") == module.ThingB.FIRST
+    assert wpistruct.unpack(module.ThingB, b"\x01") == module.ThingB.SECOND
+
+
+#
 # User defined serialization
 #
 
