@@ -185,6 +185,24 @@ from ._ntcore import _now, _set_now
 
 __all__ += ["_now", "_set_now"]
 
+from .protobuf import (
+    ProtobufPublisher,
+    ProtobufSubscriber,
+    ProtobufTopic,
+    TimestampedProtobuf,
+    add_protobuf_schema,
+    get_protobuf_topic,
+)
+
+__all__ += [
+    "ProtobufPublisher",
+    "ProtobufSubscriber",
+    "ProtobufTopic",
+    "TimestampedProtobuf",
+    "add_protobuf_schema",
+    "get_protobuf_topic",
+]
+
 try:
     from .version import version as __version__
 except ImportError:

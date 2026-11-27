@@ -434,3 +434,8 @@ __all__ = [
     "rkdp",
     "slew_rate_limit",
 ]
+
+# Importing the subpackage registers each type's protobuf serializer (its WPIProto attribute),
+# which must happen after the types above are defined. The serializers themselves live in
+# wpimath.protobuf rather than in this namespace.
+from . import protobuf as protobuf  # noqa: E402

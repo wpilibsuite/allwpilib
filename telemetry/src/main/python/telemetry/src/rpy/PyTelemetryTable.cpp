@@ -32,6 +32,16 @@ bool IsWpiStructType(py::handle value) {
   return PyType_Check(value.ptr()) && py::hasattr(value, "WPIStruct");
 }
 
+// Returns the wpiutil.protobuf serializer for a value, if it has one.
+std::optional<py::object> GetProtobufSerializer(py::handle value) {
+  py::object serializer = py::module_::import("wpiutil.protobuf")
+                              .attr("get_serializer")(py::type::of(value));
+  if (serializer.is_none()) {
+    return std::nullopt;
+  }
+  return serializer;
+}
+
 std::optional<py::object> GetOptionalAttr(py::handle value, const char* name) {
 #if PY_VERSION_HEX >= 0x030D0000
   PyObject* attr = nullptr;
@@ -160,6 +170,9 @@ void PyTelemetryTable::Log(std::string_view name, py::object value,
   } else if (IsWpiStruct(value)) {
     ValidateNoExplicitTelemetryType(elementType, typeString);
     LogStruct(name, value);
+  } else if (auto serializer = GetProtobufSerializer(value)) {
+    ValidateNoExplicitTelemetryType(elementType, typeString);
+    LogProtobuf(name, value, *serializer);
   } else if (PySequence_Check(value.ptr())) {
     ValidateNoTypeString(typeString);
     if (elementType.is_none()) {
@@ -194,6 +207,50 @@ void PyTelemetryTable::AddStructSchemas(
       },
       info);
   entry.MarkSchemaPublished(typeString);
+}
+
+void PyTelemetryTable::AddProtobufSchemas(
+    const wpi::telemetry::TelemetryTable::EntryHandle& entry,
+    std::string_view typeString, py::handle messageType) {
+  if (entry.HasPublishedSchema(typeString)) {
+    return;
+  }
+  auto& backend = entry.GetBackend();
+  auto exists = py::cpp_function([&backend](std::string_view schemaName) {
+    return wpi::telemetry::TelemetryRegistry::HasSchema(backend, schemaName);
+  });
+  auto add = py::cpp_function(
+      [&backend](std::string_view schemaName, const py::bytes& schema) {
+        std::string_view data{schema};
+        wpi::telemetry::TelemetryRegistry::AddSchema(
+            backend, schemaName, "proto:FileDescriptorProto",
+            std::span<const uint8_t>{
+                reinterpret_cast<const uint8_t*>(data.data()), data.size()});
+      });
+  py::module_::import("wpiutil.protobuf")
+      .attr("for_each_descriptor")(messageType, exists, add);
+  entry.MarkSchemaPublished(typeString);
+}
+
+void PyTelemetryTable::LogProtobuf(std::string_view name, py::handle value,
+                                   py::handle serializer) const {
+  auto entry = GetEntry(name);
+  if (entry->IsDiscard()) {
+    return;
+  }
+
+  py::object messageType = serializer.attr("message_type");
+  auto typeString = py::module_::import("wpiutil.protobuf")
+                        .attr("get_type_string")(messageType)
+                        .cast<std::string>();
+  py::bytes serialized = serializer.attr("serialize")(value);
+  AddProtobufSchemas(entry, typeString, messageType);
+
+  std::string_view data{serialized};
+  entry->LogRaw(
+      std::span<const uint8_t>{reinterpret_cast<const uint8_t*>(data.data()),
+                               data.size()},
+      typeString, 0);
 }
 
 wpi::telemetry::TelemetryTable::EntryHandle PyTelemetryTable::GetEntry(

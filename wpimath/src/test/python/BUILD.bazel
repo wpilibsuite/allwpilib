@@ -52,6 +52,7 @@ robotpy_py_test(
         "//tunables/src/main/python",
         "//wpimath/src/main/python",
         requirement("numpy"),
+        requirement("protobuf"),
         requirement("pytest"),
     ],
 )

@@ -127,6 +127,7 @@ write_source_files(
         "//drivers:write_drivers",
         "//fields:write_fields",
         "//wpimath:write_wpimath",
+        "//wpimath/src/main/python:write_wpimath_protobuf",
         "//wpiunits:write_wpiunits",
         "//wpiutil:write_wpiutil",
     ],

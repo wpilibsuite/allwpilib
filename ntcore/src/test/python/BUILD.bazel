@@ -6,6 +6,7 @@ robotpy_py_test(
     srcs = glob(["**/*.py"]),
     deps = [
         "//ntcore/src/main/python",
+        requirement("protobuf"),
         requirement("pytest"),
     ],
 )

@@ -43,4 +43,8 @@ classes:
       a WPIStruct class for struct arrays. type_string is only used as custom type
       metadata for scalar str and bytes-like values (bytes, bytearray, and
       memoryview). Wrap other buffer exporters in memoryview to explicitly log their
-      raw bytes in C order.)doc"))
+      raw bytes in C order.
+
+      A value with no struct serialization is logged as protobuf if it is a generated
+      message or its type has a serializer registered in wpiutil.protobuf; the schemas
+      for the message and its imports are published first.)doc"))

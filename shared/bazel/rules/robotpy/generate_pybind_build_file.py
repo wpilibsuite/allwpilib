@@ -478,6 +478,7 @@ def generate_pybind_build_file(
         "robotpy-cli",
         "pytest-reraise",
         "pytest",
+        "protobuf",
     ]
 
     python_deps = []

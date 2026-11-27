@@ -1,3 +1,4 @@
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_pybind_build_info")
 load(":robotpy_pybind_build_info.bzl", "define_pybind_library", "publish_library_casters", "wpimath_extension")
 
@@ -20,6 +21,17 @@ generate_robotpy_pybind_build_info(
 )
 
 publish_library_casters()
+
+write_source_files(
+    name = "write_wpimath_protobuf",
+    diff_args = ["-u"],
+    files = {
+        "wpimath/protobuf/_generated": "//wpimath:generate_wpimath_python",
+    },
+    suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
+    visibility = ["//:__pkg__"],
+)
 
 wpimath_extension(
     srcs = ["wpimath/src/wpimath.cpp"],
