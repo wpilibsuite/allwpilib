@@ -2,6 +2,7 @@
 
 import sphinxify
 from cxxheaderparser.simple import parse_string
+from semiwrap.name_transform import snake_case_transform
 
 if __name__ == "__main__":
     with open("ntcore/src/main/native/include/wpi/nt/ntcore_cpp.hpp") as fp:
@@ -13,14 +14,17 @@ if __name__ == "__main__":
             docs = []
 
             for f in c.fields:
-                if f.static or f.name == "structSize":
+                if f.static or f.name == "structSize" or f.value is None:
                     continue
+
+                py_name = snake_case_transform(f.name, "attribute") if f.name else None
 
                 if f.type.format() == "NT_Publisher":
                     params.append(
                         (
                             "std::optional<std::shared_ptr<wpi::nt::Publisher>>",
                             f.name,
+                            py_name,
                             f"{f.name}.has_value() ? {f.name}.value()->GetHandle() : {f.value.format()}",
                             "std::nullopt",
                         )
@@ -29,14 +33,25 @@ if __name__ == "__main__":
                     v = f.value.format()
                     if v == "DEFAULT_PERIODIC":
                         v = f"wpi::nt::PubSubOptions::{v}"
-                    params.append((f.type, f.name, f.name, v))
+                    params.append((f.type, f.name, py_name, f.name, v))
 
                 if f.doxygen:
-                    docs.append(f"@param {f.name} {f.doxygen}")
+                    docs.append(f"@param {py_name} {f.doxygen}")
 
-            paramstr = ",\n        ".join(f"{t.format()} {n}" for t, n, _, _ in params)
-            args = ",\n        ".join(f'py::arg("{n}") = {v}' for _, n, _, v in params)
-            options = ",\n          ".join(f".{fn} = {n}" for _, fn, n, _ in params)
+            paramstr = ",\n        ".join(
+                f"{t.format()} {n}" for t, n, _, _, _ in params
+            )
+            args = ",\n        ".join(
+                f'py::arg("{snake_case_transform(n, "attribute")}") = {v}'
+                for _, _, n, _, v in params
+            )
+            options = ",\n          ".join(f".{fn} = {n}" for _, fn, _, n, _ in params)
+
+            repr_fields = ", ".join(f"{n}={{!r}}" for _, _, n, _, _ in params)
+            repr_accessors = ",\n          ".join(
+                f'self.attr("{snake_case_transform(n, "attribute")}")'
+                for _, _, n, _, _ in params
+            )
 
             doc = "\n            ".join(
                 sphinxify.process_raw("\n".join(docs)).lstrip().splitlines()
@@ -57,4 +72,9 @@ if __name__ == "__main__":
             {doc}
         )"
       )
+      .def("__repr__", [](py::object self) {{
+        return py::str("PubSubOptions({repr_fields})").format(
+          {repr_accessors}
+        );
+      }})
             """.removeprefix("\n").rstrip())
