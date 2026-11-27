@@ -207,6 +207,416 @@ class SchedulerCancellationTests extends CommandTestBase {
   }
 
   @Test
+  void cancelRootDuringImmediateChildExecutionHaltsRoot() {
+    var ranAfterCancel = new AtomicBoolean(false);
+    var ranAfterFork = new AtomicBoolean(false);
+    var childRan = new AtomicBoolean(false);
+
+    AtomicReference<Command> rootHolder = new AtomicReference<>();
+
+    var child =
+        Command.noRequirements(
+                co -> {
+                  childRan.set(true);
+                  m_scheduler.cancel(rootHolder.get());
+                  ranAfterCancel.set(true); // should never be reached
+                  co.park();
+                })
+            .named("Child");
+
+    var root =
+        Command.noRequirements(
+                co -> {
+                  co.fork(child);
+                  ranAfterFork.set(true);
+                  co.park();
+                })
+            .named("Root");
+
+    rootHolder.set(root);
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+
+    assertTrue(childRan.get(), "Child should have run");
+    assertEquals(List.of(), m_scheduler.getRunningCommands(), "All commands should have stopped");
+    assertFalse(
+        ranAfterCancel.get(), "Child should not have continued running after canceling its parent");
+    assertFalse(
+        ranAfterFork.get(),
+        "Root should not have continued running after child immediately canceled it");
+  }
+
+  @Test
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  void cancelRootDuringDeferredChildExecutionHaltsRoot() {
+    var childRan = new AtomicBoolean(false);
+
+    AtomicReference<Command> rootHolder = new AtomicReference<>();
+
+    var child =
+        Command.noRequirements(
+                co -> {
+                  childRan.set(true);
+                  co.yield();
+                  m_scheduler.cancel(rootHolder.get());
+                  co.park();
+                })
+            .named("Child");
+
+    var root =
+        Command.noRequirements(
+                co -> {
+                  co.fork(child);
+                  co.park();
+                })
+            .named("Root");
+
+    rootHolder.set(root);
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+    assertTrue(childRan.get(), "Child should have run");
+    assertEquals(List.of(root, child), m_scheduler.getRunningCommands());
+
+    m_scheduler.run();
+    assertEquals(List.of(), m_scheduler.getRunningCommands(), "Root and child should have stopped");
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class, e -> e.command() == root, "Root should have been canceled");
+  }
+
+  @Test
+  void cancelRootDuringDeferredChildExecutionCancelsLaterSibling() {
+    List<String> canceled = new ArrayList<>();
+    AtomicReference<Command> rootHolder = new AtomicReference<>();
+
+    var child =
+        Command.noRequirements(
+                co -> {
+                  co.yield();
+                  m_scheduler.cancel(rootHolder.get());
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("Child"))
+            .named("Child");
+
+    var laterSibling =
+        Command.noRequirements(Coroutine::park)
+            .whenCanceled(() -> canceled.add("Later sibling"))
+            .named("Later sibling");
+
+    var root =
+        Command.noRequirements(
+                co -> {
+                  co.fork(child, laterSibling);
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("Root"))
+            .named("Root");
+
+    rootHolder.set(root);
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+    assertEquals(List.of(root, child, laterSibling), m_scheduler.getRunningCommands());
+
+    m_scheduler.run();
+
+    assertEquals(List.of(), m_scheduler.getRunningCommands());
+    assertTrue(canceled.contains("Root"), "Root cancellation hook should have run");
+    assertTrue(canceled.contains("Child"), "Current child cancellation hook should have run");
+    assertTrue(
+        canceled.contains("Later sibling"),
+        "Later sibling should have been canceled during root cleanup");
+  }
+
+  @Test
+  void cancelRootDuringNestedDeferredDescendantExecutionCancelsLaterRootSibling() {
+    List<String> canceled = new ArrayList<>();
+    AtomicReference<Command> rootHolder = new AtomicReference<>();
+
+    var nestedCurrent =
+        Command.noRequirements(
+                co -> {
+                  co.yield();
+                  m_scheduler.cancel(rootHolder.get());
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("Nested current"))
+            .named("Nested current");
+
+    var branch =
+        Command.noRequirements(
+                co -> {
+                  co.fork(nestedCurrent);
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("Branch"))
+            .named("Branch");
+
+    var laterRootSibling =
+        Command.noRequirements(Coroutine::park)
+            .whenCanceled(() -> canceled.add("Later root sibling"))
+            .named("Later root sibling");
+
+    var root =
+        Command.noRequirements(
+                co -> {
+                  co.fork(branch, laterRootSibling);
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("Root"))
+            .named("Root");
+
+    rootHolder.set(root);
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+    assertEquals(
+        List.of(root, branch, nestedCurrent, laterRootSibling), m_scheduler.getRunningCommands());
+
+    m_scheduler.run();
+
+    assertEquals(List.of(), m_scheduler.getRunningCommands());
+    assertTrue(canceled.contains("Root"), "Root cancellation hook should have run");
+    assertTrue(canceled.contains("Branch"), "Intermediate branch should have been canceled");
+    assertTrue(
+        canceled.contains("Nested current"), "Current nested descendant should have been canceled");
+    assertTrue(
+        canceled.contains("Later root sibling"),
+        "Later sibling of the current descendant's ancestor should have been canceled");
+  }
+
+  @Test
+  void cancelRootDuringDeferredChildWithChildrenCancelsAllDescendants() {
+    List<String> canceled = new ArrayList<>();
+    AtomicReference<Command> rootHolder = new AtomicReference<>();
+
+    var grandchild =
+        Command.noRequirements(Coroutine::park)
+            .whenCanceled(() -> canceled.add("Grandchild"))
+            .named("Grandchild");
+
+    var activeChild =
+        Command.noRequirements(
+                co -> {
+                  co.fork(grandchild);
+                  co.yield();
+                  m_scheduler.cancel(rootHolder.get());
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("ActiveChild"))
+            .named("ActiveChild");
+
+    var sibling =
+        Command.noRequirements(Coroutine::park)
+            .whenCanceled(() -> canceled.add("Sibling"))
+            .named("Sibling");
+
+    var root =
+        Command.noRequirements(
+                co -> {
+                  co.fork(activeChild, sibling);
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("Root"))
+            .named("Root");
+
+    rootHolder.set(root);
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+    assertEquals(List.of(root, activeChild, grandchild, sibling), m_scheduler.getRunningCommands());
+
+    m_scheduler.run();
+
+    assertEquals(List.of(), m_scheduler.getRunningCommands());
+    assertTrue(canceled.contains("Root"), "Root should have been canceled");
+    assertTrue(canceled.contains("ActiveChild"), "Active child should have been canceled");
+    assertTrue(canceled.contains("Grandchild"), "Grandchild should have been canceled");
+    assertTrue(canceled.contains("Sibling"), "Sibling should have been canceled");
+  }
+
+  @Test
+  void cancelRootDuringDeferredChildExecutionCancelsSiblingSubtree() {
+    List<String> canceled = new ArrayList<>();
+    AtomicReference<Command> rootHolder = new AtomicReference<>();
+
+    var siblingGrandchild =
+        Command.noRequirements(Coroutine::park)
+            .whenCanceled(() -> canceled.add("SiblingGrandchild"))
+            .named("SiblingGrandchild");
+
+    var siblingChild =
+        Command.noRequirements(
+                co -> {
+                  co.fork(siblingGrandchild);
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("SiblingChild"))
+            .named("SiblingChild");
+
+    var activeChild =
+        Command.noRequirements(
+                co -> {
+                  co.yield();
+                  m_scheduler.cancel(rootHolder.get());
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("ActiveChild"))
+            .named("ActiveChild");
+
+    var root =
+        Command.noRequirements(
+                co -> {
+                  co.fork(activeChild, siblingChild);
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("Root"))
+            .named("Root");
+
+    rootHolder.set(root);
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+    assertEquals(
+        List.of(root, activeChild, siblingChild, siblingGrandchild),
+        m_scheduler.getRunningCommands());
+
+    m_scheduler.run();
+
+    assertEquals(List.of(), m_scheduler.getRunningCommands());
+    assertTrue(canceled.contains("Root"), "Root should have been canceled");
+    assertTrue(canceled.contains("ActiveChild"), "Active child should have been canceled");
+    assertTrue(canceled.contains("SiblingChild"), "Sibling child should have been canceled");
+    assertTrue(
+        canceled.contains("SiblingGrandchild"), "Sibling grandchild should have been canceled");
+  }
+
+  @Test
+  void requestCancellationCancelsAllChildrenBeforeYieldingSelf() {
+    List<String> canceled = new ArrayList<>();
+
+    var firstChild =
+        Command.noRequirements(Coroutine::park)
+            .whenCanceled(() -> canceled.add("First child"))
+            .named("First child");
+
+    var laterChild =
+        Command.noRequirements(Coroutine::park)
+            .whenCanceled(() -> canceled.add("Later child"))
+            .named("Later child");
+
+    var root =
+        Command.noRequirements(
+                co -> {
+                  co.fork(firstChild, laterChild);
+                  co.requestCancellation();
+                })
+            .whenCanceled(() -> canceled.add("Root"))
+            .named("Root");
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+
+    assertEquals(List.of(), m_scheduler.getRunningCommands());
+    assertTrue(canceled.contains("Root"), "Root cancellation hook should have run");
+    assertTrue(canceled.contains("First child"), "First child should have been canceled");
+    assertTrue(canceled.contains("Later child"), "Later child should have been canceled");
+  }
+
+  @Test
+  void cancelAllFromCurrentCommandCancelsLaterIndependentCommand() {
+    List<String> canceled = new ArrayList<>();
+
+    var current =
+        Command.noRequirements(
+                co -> {
+                  co.yield();
+                  m_scheduler.cancelAll();
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("Current"))
+            .named("Current");
+
+    var laterIndependent =
+        Command.noRequirements(Coroutine::park)
+            .whenCanceled(() -> canceled.add("Later independent"))
+            .named("Later independent");
+
+    m_scheduler.schedule(current);
+    m_scheduler.schedule(laterIndependent);
+
+    m_scheduler.run();
+    assertEquals(List.of(current, laterIndependent), m_scheduler.getRunningCommands());
+
+    m_scheduler.run();
+
+    assertEquals(List.of(), m_scheduler.getRunningCommands());
+    assertTrue(canceled.contains("Current"), "Current command should have been canceled");
+    assertTrue(
+        canceled.contains("Later independent"),
+        "Later independent command should have been canceled by cancelAll()");
+  }
+
+  @Test
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  void forkFailureInDeferredChildCancelsLaterSiblingInSameComposition() {
+    m_enabled = false;
+
+    List<String> canceled = new ArrayList<>();
+
+    var unsafeMechanism = new DummyMechanism("Unsafe mechanism", m_scheduler);
+    var unsafeCommand = unsafeMechanism.run(Coroutine::park).named("Unsafe command");
+
+    var deferredUnsafeWrapper =
+        Command.noRequirements(
+                co -> {
+                  co.yield();
+                  co.await(unsafeCommand);
+                })
+            .whenCanceled(() -> canceled.add("Deferred unsafe wrapper"))
+            .named("Deferred unsafe wrapper");
+
+    var laterSibling =
+        Command.noRequirements(Coroutine::park)
+            .whenCanceled(() -> canceled.add("Later sibling"))
+            .named("Later sibling");
+
+    var root =
+        Command.noRequirements(
+                co -> {
+                  co.fork(deferredUnsafeWrapper, laterSibling);
+                  co.park();
+                })
+            .whenCanceled(() -> canceled.add("Root"))
+            .named("Root");
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+    assertEquals(
+        List.of(root, deferredUnsafeWrapper, laterSibling), m_scheduler.getRunningCommands());
+
+    m_scheduler.run();
+
+    assertEquals(List.of(), m_scheduler.getRunningCommands());
+    assertTrue(canceled.contains("Root"), "Root should have been canceled after fork failure");
+    assertTrue(
+        canceled.contains("Deferred unsafe wrapper"),
+        "Deferred wrapper should have been canceled after fork failure");
+    assertTrue(
+        canceled.contains("Later sibling"),
+        "Later sibling should have been canceled after deferred fork failure");
+    assertSchedulerEvent(
+        SchedulerEvent.ForkFailure.class,
+        e ->
+            e.command() == deferredUnsafeWrapper
+                && e.failures().size() == 1
+                && e.failures().getFirst().command() == unsafeCommand,
+        "Deferred wrapper should have failed to fork the unsafe command");
+  }
+
+  @Test
   void requestCancellationDoesNotBubbleUp() {
     var selfCanceller =
         Command.noRequirements(Coroutine::requestCancellation).named("Self-Canceling Command");

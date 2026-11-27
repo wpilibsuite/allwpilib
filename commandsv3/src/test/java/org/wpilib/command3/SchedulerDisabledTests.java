@@ -5,11 +5,13 @@
 package org.wpilib.command3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 import org.wpilib.command3.Scheduler.ScheduleResult.RequiresUnsafeMechanisms;
 import org.wpilib.command3.Scheduler.ScheduleResult.Success;
@@ -167,5 +169,99 @@ class SchedulerDisabledTests extends CommandTestBase {
         Canceled.class,
         e -> e.command().equals(command),
         "The command should have received a cancellation event");
+  }
+
+  @Test
+  void nestedForkFailureInDisabledCancelsRootCommand() {
+    m_enabled = false;
+
+    var mech = new DummyMechanism("mech", m_scheduler);
+    var unsafeCommand = mech.run(Coroutine::park).named("Unsafe Command");
+
+    var ranAfterFork = new AtomicBoolean(false);
+
+    var child =
+        Command.noRequirements(
+                coroutine -> {
+                  coroutine.await(unsafeCommand);
+                })
+            .named("Child Wrapper");
+
+    var root =
+        Command.noRequirements(
+                coroutine -> {
+                  coroutine.fork(child);
+                  ranAfterFork.set(true);
+                  coroutine.yield();
+                })
+            .named("Root Command");
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+
+    assertFalse(
+        ranAfterFork.get(), "Root command should not continue running after child fork failure");
+    assertFalse(m_scheduler.isScheduledOrRunning(root), "Root command should have been canceled");
+    assertFalse(m_scheduler.isScheduledOrRunning(child), "Child command should have been canceled");
+
+    assertSchedulerEvent(
+        ForkFailure.class, e -> e.command() == child, "Child should receive a ForkFailure event");
+    assertSchedulerEvent(
+        Canceled.class, e -> e.command() == root, "Root should receive a cancellation event");
+    assertSchedulerEvent(
+        Canceled.class, e -> e.command() == child, "Child should receive a cancellation event");
+  }
+
+  @Test
+  void delayedForkFailureInDisabledCancelsRootCommand() {
+    m_enabled = false;
+
+    var mech = new DummyMechanism("mech", m_scheduler);
+    var unsafeCommand = mech.run(Coroutine::park).named("Unsafe Command");
+
+    var ranAfterFork = new AtomicBoolean(false);
+    var childRanOnSecondCycle = new AtomicBoolean(false);
+
+    var child =
+        Command.noRequirements(
+                coroutine -> {
+                  coroutine.yield();
+                  childRanOnSecondCycle.set(true);
+                  coroutine.await(unsafeCommand);
+                })
+            .named("Child Wrapper");
+
+    var root =
+        Command.noRequirements(
+                coroutine -> {
+                  coroutine.fork(child);
+                  coroutine.yield();
+                  ranAfterFork.set(true);
+                  coroutine.yield();
+                })
+            .named("Root Command");
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+
+    assertTrue(m_scheduler.isRunning(root), "Root should be running after cycle 1");
+    assertTrue(m_scheduler.isRunning(child), "Child should be running after cycle 1");
+    assertFalse(ranAfterFork.get(), "Root should not have run cycle 2 yet");
+
+    m_scheduler.run();
+
+    assertTrue(childRanOnSecondCycle.get(), "Child should have run on cycle 2");
+    assertFalse(
+        ranAfterFork.get(),
+        "Root command should not continue running after delayed child fork failure");
+    assertFalse(m_scheduler.isScheduledOrRunning(root), "Root command should have been canceled");
+    assertFalse(m_scheduler.isScheduledOrRunning(child), "Child command should have been canceled");
+
+    assertSchedulerEvent(
+        ForkFailure.class, e -> e.command() == child, "Child should receive a ForkFailure event");
+    assertSchedulerEvent(
+        Canceled.class, e -> e.command() == root, "Root should receive a cancellation event");
+    assertSchedulerEvent(
+        Canceled.class, e -> e.command() == child, "Child should receive a cancellation event");
   }
 }
