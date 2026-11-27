@@ -17,7 +17,6 @@
 #include <vector>
 
 #include "dns_sd.h"
-#include "wpi/util/SmallVector.hpp"
 
 using namespace wpi::net;
 

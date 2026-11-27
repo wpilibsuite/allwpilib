@@ -15,7 +15,6 @@
 #include "WebSocketTest.hpp"
 #include "wpi/net/HttpParser.hpp"
 #include "wpi/util/Base64.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/sha1.hpp"
 
 namespace wpi::net {

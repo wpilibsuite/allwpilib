@@ -9,7 +9,6 @@
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
-#include "wpi/util/SmallVector.hpp"
 
 using namespace wpi::glass;
 
@@ -21,8 +20,7 @@ struct IndicatorData {
 }  // namespace
 
 void wpi::glass::DisplayLEDDisplay(LEDDisplayModel* model, int index) {
-  wpi::util::SmallVector<LEDDisplayModel::Data, 64> dataBuf;
-  auto data = model->GetData(dataBuf);
+  auto data = model->GetData();
   int length = data.size();
   auto& storage = GetStorage();
 

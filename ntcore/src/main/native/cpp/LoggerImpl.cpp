@@ -8,7 +8,6 @@
 
 #include "IListenerStorage.hpp"
 #include "wpi/util/Logger.hpp"
-#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/print.hpp"
 

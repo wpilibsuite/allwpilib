@@ -20,9 +20,8 @@
 #include "wpi/util/sha1.hpp"
 
 #include <string>
+#include <vector>
 
-#include "wpi/util/SmallVector.hpp"
-#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/raw_istream.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
@@ -288,6 +287,7 @@ static void finalize(uint32_t digest[], unsigned char* buffer, size_t& buf_size,
 
 std::string SHA1::Final() {
   std::string out;
+  out.reserve(40);
   raw_string_ostream os(out);
 
   finalize(digest, buffer, buf_size, transforms, os, true);
@@ -295,20 +295,14 @@ std::string SHA1::Final() {
   return os.str();
 }
 
-std::string_view SHA1::Final(SmallVectorImpl<char>& buf) {
-  raw_svector_ostream os(buf);
-
-  finalize(digest, buffer, buf_size, transforms, os, true);
-
-  return os.str();
-}
-
-std::string_view SHA1::RawFinal(SmallVectorImpl<char>& buf) {
-  raw_svector_ostream os(buf);
+std::vector<uint8_t> SHA1::RawFinal() {
+  std::vector<uint8_t> out;
+  out.reserve(20);
+  raw_uvector_ostream os(out);
 
   finalize(digest, buffer, buf_size, transforms, os, false);
 
-  return os.str();
+  return out;
 }
 
 std::string SHA1::FromFile(std::string_view filename) {

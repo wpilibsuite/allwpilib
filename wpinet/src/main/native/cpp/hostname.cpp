@@ -6,10 +6,8 @@
 
 #include <cstdlib>
 #include <string>
-#include <string_view>
 
 #include "uv.h"
-#include "wpi/util/SmallVector.hpp"
 
 namespace wpi::net {
 
@@ -31,27 +29,6 @@ std::string GetHostname() {
   }
 
   return rv;
-}
-
-std::string_view GetHostname(wpi::util::SmallVectorImpl<char>& name) {
-  // Use a tmp array to not require the wpi::util::SmallVector to be too large.
-  char tmpName[256];
-  size_t size = sizeof(tmpName);
-
-  name.clear();
-
-  int err = uv_os_gethostname(tmpName, &size);
-  if (err == 0) {
-    name.append(tmpName, tmpName + size);
-  } else if (err == UV_ENOBUFS) {
-    name.resize(size);
-    err = uv_os_gethostname(name.data(), &size);
-    if (err != 0) {
-      size = 0;
-    }
-  }
-
-  return {name.data(), size};
 }
 
 }  // namespace wpi::net

@@ -6,21 +6,20 @@
 
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include "MulticastHandleManager.hpp"
-#include "wpi/util/SmallVector.hpp"
 
 extern "C" {
 
 WPI_MulticastServiceAnnouncerHandle WPI_CreateMulticastServiceAnnouncer(
     const char* serviceName, const char* serviceType, int32_t port,
-    int32_t txtCount, const char** keys, const char** values)
-
-{
+    int32_t txtCount, const char** keys, const char** values) {
   auto& manager = wpi::net::GetMulticastManager();
   std::scoped_lock lock{manager.mutex};
 
-  wpi::util::SmallVector<std::pair<std::string_view, std::string_view>, 8> txts;
+  std::vector<std::pair<std::string_view, std::string_view>> txts;
+  txts.reserve(txtCount);
 
   for (int32_t i = 0; i < txtCount; i++) {
     txts.emplace_back(

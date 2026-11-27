@@ -8,13 +8,12 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstring>
 #include <span>
 #include <string>
 #include <string_view>
 #include <system_error>
 #include <vector>
-
-#include "wpi/util/SmallVector.hpp"
 
 namespace wpi::util {
 
@@ -52,22 +51,6 @@ class raw_istream {
     return m_read_count;
   }
 
-  raw_istream& readinto(SmallVectorImpl<char>& buf, size_t len) {
-    size_t old_size = buf.size();
-    buf.append(len, 0);
-    read_impl(&buf[old_size], len);
-    buf.resize(old_size + m_read_count);
-    return *this;
-  }
-
-  raw_istream& readinto(SmallVectorImpl<uint8_t>& buf, size_t len) {
-    size_t old_size = buf.size();
-    buf.append(len, 0);
-    read_impl(&buf[old_size], len);
-    buf.resize(old_size + m_read_count);
-    return *this;
-  }
-
   raw_istream& readinto(std::vector<char>& buf, size_t len) {
     size_t old_size = buf.size();
     buf.insert(buf.end(), len, 0);
@@ -93,12 +76,11 @@ class raw_istream {
   }
 
   // Read a line from an input stream (up to a maximum length).
-  // The returned buffer will contain the trailing \n (unless the maximum length
-  // was reached).  \r's are stripped from the buffer.
-  // @param buf Buffer for output
+  // The returned string will contain the trailing \n (unless the maximum length
+  // was reached).  \r's are stripped from the string.
   // @param maxLen Maximum length
   // @return Line
-  std::string_view getline(SmallVectorImpl<char>& buf, int maxLen);
+  std::string getline(int maxLen);
 
   virtual void close() = 0;
 

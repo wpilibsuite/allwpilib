@@ -1468,8 +1468,7 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
 }
 
 void UsbCameraImpl::SetQuirks() {
-  wpi::util::SmallString<128> descbuf;
-  std::string_view desc = GetDescription(descbuf);
+  std::string desc = GetDescription();
   m_lifecam_exposure = wpi::util::ends_with(desc, "LifeCam HD-3000") ||
                        wpi::util::ends_with(desc, "LifeCam Cinema (TM)");
   m_ov9281_exposure = wpi::util::contains(desc, "OV9281");
@@ -1733,9 +1732,9 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
       UsbCameraInfo info;
       info.dev = dev;
 
-      wpi::util::SmallString<32> path{"/dev/"};
+      std::string path{"/dev/"};
       path += fname;
-      info.path = path.str();
+      info.path = path;
 
       if (!IsVideoCaptureDevice(path.c_str())) {
         continue;
