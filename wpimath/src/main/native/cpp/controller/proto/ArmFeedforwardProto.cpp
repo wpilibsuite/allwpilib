@@ -20,6 +20,8 @@ wpi::util::Protobuf<wpi::math::ArmFeedforward>::Unpack(InputStream& stream) {
       wpi::units::volt_t{msg.kg},
       wpi::units::unit_t<wpi::math::ArmFeedforward::kv_unit>{msg.kv},
       wpi::units::unit_t<wpi::math::ArmFeedforward::ka_unit>{msg.ka},
+      // default dt for back-compat with old versions
+      wpi::units::second_t{msg.dt > 0 ? msg.dt : 0.020},
   };
 }
 
@@ -30,7 +32,7 @@ bool wpi::util::Protobuf<wpi::math::ArmFeedforward>::Pack(
       .kg = value.GetKg().value(),
       .kv = value.GetKv().value(),
       .ka = value.GetKa().value(),
-      .dt = 0,
+      .dt = value.GetDt().value(),
   };
   return stream.Encode(msg);
 }
