@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +16,16 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class SelectableTest {
   MockTunableBackend m_mock;
+
+  class DataHolder {
+    String currentKey;
+    int currentVal;
+
+    public void set(String key, int val) {
+      currentKey = key;
+      currentVal = val;
+    }
+  }
 
   @BeforeEach
   void setUp() {
@@ -43,6 +52,7 @@ class SelectableTest {
     TunableRegistry.update();
     m_mock.setValue("/returnsSelectedChooser" + toSelect + "/selected", String.valueOf(toSelect));
     TunableRegistry.update();
+    assertEquals(String.valueOf(toSelect), chooser.getSelectedName());
     assertEquals(toSelect, chooser.getSelected());
   }
 
@@ -68,6 +78,7 @@ class SelectableTest {
     assertEquals("two", m_mock.getValue("/metadataChooser/default", String.class));
     assertArrayEquals(
         new String[] {"one", "two"}, m_mock.getValue("/metadataChooser/options", String[].class));
+    assertEquals("two", chooser.getSelectedName());
     assertEquals(2, chooser.getSelected());
   }
 
@@ -79,6 +90,7 @@ class SelectableTest {
     }
     chooser.addDefault(String.valueOf(0), 0);
 
+    assertEquals("0", chooser.getSelectedName());
     assertEquals(0, chooser.getSelected());
   }
 
@@ -92,6 +104,7 @@ class SelectableTest {
     m_mock.setValue("/unknownDefaultChooser/selected", "missing");
     TunableRegistry.update();
 
+    assertEquals("one", chooser.getSelectedName());
     assertEquals(1, chooser.getSelected());
   }
 
@@ -102,6 +115,7 @@ class SelectableTest {
       chooser.add(String.valueOf(i), i);
     }
 
+    assertNull(chooser.getSelectedName());
     assertNull(chooser.getSelected());
   }
 
@@ -111,14 +125,15 @@ class SelectableTest {
     for (int i = 1; i <= 3; i++) {
       chooser.add(String.valueOf(i), i);
     }
-    AtomicInteger currentVal = new AtomicInteger();
-    chooser.onChange(currentVal::set);
+    var data = new DataHolder();
+    chooser.onChange(data::set);
 
     Tunables.publish("changeListenerChooser", chooser);
     TunableRegistry.update();
     m_mock.setValue("/changeListenerChooser/selected", "3");
     TunableRegistry.update();
-    assertEquals(3, currentVal.get());
+    assertEquals("3", data.currentKey);
+    assertEquals(3, data.currentVal);
   }
 
   @Test
@@ -126,28 +141,31 @@ class SelectableTest {
     var chooser = new Selectable<Integer>();
     chooser.addDefault("one", 1);
     chooser.add("two", 2);
-    AtomicInteger currentVal = new AtomicInteger();
-    chooser.onChange(currentVal::set);
+    var data = new DataHolder();
+    chooser.onChange(data::set);
 
     Tunables.publish("changeListenerUnknownDefaultChooser", chooser);
     m_mock.setValue("/changeListenerUnknownDefaultChooser/selected", "missing");
     TunableRegistry.update();
 
-    assertEquals(1, currentVal.get());
+    assertEquals("one", data.currentKey);
+    assertEquals(1, data.currentVal);
   }
 
   @Test
   void listenerIsNotCalledForUnknownSelection() {
     var chooser = new Selectable<Integer>();
     chooser.add("one", 1);
-    AtomicInteger currentVal = new AtomicInteger();
-    chooser.onChange(currentVal::set);
+    var data = new DataHolder();
+    chooser.onChange(data::set);
 
     Tunables.publish("unknownSelectionChooser", chooser);
     m_mock.setValue("/unknownSelectionChooser/selected", "missing");
     TunableRegistry.update();
 
-    assertEquals(0, currentVal.get());
+    assertNull(data.currentKey);
+    assertEquals(0, data.currentVal);
+    assertNull(chooser.getSelectedName());
     assertNull(chooser.getSelected());
   }
 
@@ -155,8 +173,8 @@ class SelectableTest {
   void listenerReplacementUsesLatestListener() {
     var chooser = new Selectable<Integer>();
     chooser.add("one", 1);
-    AtomicInteger first = new AtomicInteger();
-    AtomicInteger second = new AtomicInteger();
+    var first = new DataHolder();
+    var second = new DataHolder();
     chooser.onChange(first::set);
     chooser.onChange(second::set);
 
@@ -164,8 +182,10 @@ class SelectableTest {
     m_mock.setValue("/listenerReplacementChooser/selected", "one");
     TunableRegistry.update();
 
-    assertEquals(0, first.get());
-    assertEquals(1, second.get());
+    assertNull(first.currentKey);
+    assertEquals(0, first.currentVal);
+    assertEquals("one", second.currentKey);
+    assertEquals(1, second.currentVal);
   }
 
   @Test
@@ -178,6 +198,7 @@ class SelectableTest {
     m_mock.setValue("/duplicateChooser/selected", "mode");
     TunableRegistry.update();
 
+    assertEquals("mode", chooser.getSelectedName());
     assertEquals(2, chooser.getSelected());
     assertArrayEquals(
         new String[] {"mode"}, m_mock.getValue("/duplicateChooser/options", String[].class));
@@ -194,22 +215,26 @@ class SelectableTest {
     TunableRegistry.update();
 
     chooser.remove("one");
+    assertEquals("two", chooser.getSelectedName());
     assertEquals(2, chooser.getSelected());
     assertEquals("", m_mock.getValue("/removeChooser/default", String.class));
     assertArrayEquals(
         new String[] {"two", "three"}, m_mock.getValue("/removeChooser/options", String[].class));
 
     chooser.remove("two");
+    assertNull(chooser.getSelectedName());
     assertNull(chooser.getSelected());
     assertArrayEquals(
         new String[] {"three"}, m_mock.getValue("/removeChooser/options", String[].class));
 
     chooser.add("two", 22);
+    assertEquals("two", chooser.getSelectedName());
     assertEquals(22, chooser.getSelected());
     assertArrayEquals(
         new String[] {"three", "two"}, m_mock.getValue("/removeChooser/options", String[].class));
 
     chooser.remove("missing");
+    assertEquals("two", chooser.getSelectedName());
     assertEquals(22, chooser.getSelected());
     assertArrayEquals(
         new String[] {"three", "two"}, m_mock.getValue("/removeChooser/options", String[].class));
@@ -225,11 +250,13 @@ class SelectableTest {
     TunableRegistry.update();
 
     chooser.clear();
+    assertNull(chooser.getSelectedName());
     assertNull(chooser.getSelected());
     assertEquals("", m_mock.getValue("/clearChooser/default", String.class));
     assertArrayEquals(new String[0], m_mock.getValue("/clearChooser/options", String[].class));
 
     chooser.add("two", 22);
+    assertEquals("two", chooser.getSelectedName());
     assertEquals(22, chooser.getSelected());
     assertArrayEquals(
         new String[] {"two"}, m_mock.getValue("/clearChooser/options", String[].class));
