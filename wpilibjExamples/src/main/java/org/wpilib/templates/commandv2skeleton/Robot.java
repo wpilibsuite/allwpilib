@@ -6,16 +6,17 @@ package org.wpilib.templates.commandv2skeleton;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.Commands;
 import org.wpilib.framework.TimedRobot;
 
 public class Robot extends TimedRobot {
   private Command autonomousCommand;
 
-  private final RobotContainer robotContainer;
-
   public Robot() {
-    robotContainer = new RobotContainer();
+    configureBindings();
   }
+
+  private void configureBindings() {}
 
   @Override
   public void robotPeriodic() {
@@ -33,11 +34,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousStart() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
+    autonomousCommand = Commands.print("No autonomous command configured");
 
-    if (autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(autonomousCommand);
-    }
+    CommandScheduler.getInstance().schedule(autonomousCommand);
   }
 
   @Override

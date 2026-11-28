@@ -7,6 +7,8 @@ package org.wpilib.templates.xrpcommandv2;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.framework.TimedRobot;
+import org.wpilib.templates.xrpcommandv2.commands.ExampleCommand;
+import org.wpilib.templates.xrpcommandv2.subsystems.XRPDrivetrain;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -16,17 +18,24 @@ import org.wpilib.framework.TimedRobot;
 public class Robot extends TimedRobot {
   private Command autonomousCommand;
 
-  private final RobotContainer robotContainer;
+  private final XRPDrivetrain xrpDrivetrain = new XRPDrivetrain();
 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    robotContainer = new RobotContainer();
+    // Configure the button bindings
+    configureButtonBindings();
   }
+
+  /**
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link org.wpilib.driverstation.GenericHID} or one of its subclasses ({@link
+   * org.wpilib.driverstation.Joystick} or {@link Gamepad}), and then passing it to a {@link
+   * org.wpilib.command2.button.JoystickButton}.
+   */
+  private void configureButtonBindings() {}
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
@@ -51,15 +60,13 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {}
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  /** This autonomous runs your autonomous command. */
   @Override
   public void autonomousStart() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
-
+    // An ExampleCommand will run in autonomous
+    autonomousCommand = new ExampleCommand(xrpDrivetrain);
     // schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(autonomousCommand);
-    }
+    CommandScheduler.getInstance().schedule(autonomousCommand);
   }
 
   /** This function is called periodically during autonomous. */

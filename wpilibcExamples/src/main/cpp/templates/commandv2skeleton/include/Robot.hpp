@@ -6,7 +6,6 @@
 
 #include <optional>
 
-#include "RobotContainer.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 
@@ -28,7 +27,6 @@ class Robot : public wpi::TimedRobot {
   void UtilityEnd() override;
 
  private:
+  void ConfigureBindings();
   std::optional<wpi::cmd::CommandPtr> autonomousCommand;
-
-  RobotContainer container;
 };

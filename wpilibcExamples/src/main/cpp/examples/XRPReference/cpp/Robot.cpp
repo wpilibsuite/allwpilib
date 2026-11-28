@@ -4,10 +4,41 @@
 
 #include "Robot.hpp"
 
+#include "commands/TeleopArcadeDrive.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/Commands.hpp"
+#include "wpi/commands2/button/JoystickButton.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
+#include "wpi/tunables/Tunables.hpp"
 
-Robot::Robot() {}
+Robot::Robot() {
+  // Configure the button bindings
+  ConfigureButtonBindings();
+}
 
+void Robot::ConfigureButtonBindings() {
+  // Also set default commands here
+  drive.SetDefaultCommand(TeleopArcadeDrive(
+      &drive, [this] { return -controller.GetRawAxis(1); },
+      [this] { return -controller.GetRawAxis(2); }));
+
+  // Example of how to use the onboard IO
+  userButton.OnTrue(wpi::cmd::Print("USER Button Pressed"))
+      .OnFalse(wpi::cmd::Print("USER Button Released"));
+
+  wpi::cmd::JoystickButton(&controller, 1)
+      .OnTrue(wpi::cmd::RunOnce([this] { arm.SetAngle(45_deg); }, {}))
+      .OnFalse(wpi::cmd::RunOnce([this] { arm.SetAngle(0_deg); }, {}));
+
+  wpi::cmd::JoystickButton(&controller, 2)
+      .OnTrue(wpi::cmd::RunOnce([this] { arm.SetAngle(90_deg); }, {}))
+      .OnFalse(wpi::cmd::RunOnce([this] { arm.SetAngle(0_deg); }, {}));
+
+  // Setup chooser options.
+  chooser.AddDefault("Auto Routine Distance", &autoDistance);
+  chooser.Add("Auto Routine Time", &autoTime);
+  wpi::tunables::Publish("Auto Selector", chooser);
+}
 /**
  * This function is called every 20 ms, no matter the mode. Use
  * this for items like diagnostics that you want to run during disabled,
@@ -30,15 +61,12 @@ void Robot::DisabledStart() {}
 void Robot::DisabledPeriodic() {}
 
 /**
- * This autonomous runs the autonomous command selected by your {@link
- * RobotContainer} class.
+ * This autonomous runs the autonomous command selected by the chooser.
  */
 void Robot::AutonomousStart() {
-  autonomousCommand = container.GetAutonomousCommand();
-
-  if (autonomousCommand != nullptr) {
-    wpi::cmd::CommandScheduler::GetInstance().Schedule(autonomousCommand);
-  }
+  // An example command will be run in autonomous
+  autonomousCommand = chooser.GetSelected();
+  wpi::cmd::CommandScheduler::GetInstance().Schedule(autonomousCommand);
 }
 
 void Robot::AutonomousPeriodic() {}
@@ -50,7 +78,6 @@ void Robot::AutonomousEnd() {
   // this line or comment it out.
   if (autonomousCommand != nullptr) {
     autonomousCommand->Cancel();
-    autonomousCommand = nullptr;
   }
 }
 

@@ -5,6 +5,7 @@
 #include "Robot.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/Commands.hpp"
 
 Robot::Robot() {}
 
@@ -19,12 +20,8 @@ void Robot::DisabledPeriodic() {}
 void Robot::DisabledEnd() {}
 
 void Robot::AutonomousStart() {
-  autonomousCommand = container.GetAutonomousCommand();
-
-  if (autonomousCommand) {
-    wpi::cmd::CommandScheduler::GetInstance().Schedule(
-        autonomousCommand.value());
-  }
+  autonomousCommand = wpi::cmd::Print("No autonomous command configured");
+  wpi::cmd::CommandScheduler::GetInstance().Schedule(autonomousCommand.value());
 }
 
 void Robot::AutonomousPeriodic() {}

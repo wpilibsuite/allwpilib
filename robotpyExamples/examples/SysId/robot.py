@@ -7,9 +7,13 @@
 
 from typing import override
 
-from commands2 import CommandScheduler, TimedCommandRobot
+from commands2 import Command, CommandScheduler, TimedCommandRobot
+from commands2.button import CommandXboxController
+from commands2.sysid import SysIdRoutine
 
-from sysidroutinebot import SysIdRoutineBot
+from constants import OIConstants
+from subsystems.drive import Drive
+from subsystems.shooter import Shooter
 
 
 class MyRobot(TimedCommandRobot):
@@ -23,12 +27,69 @@ class MyRobot(TimedCommandRobot):
         initialization code.
         """
         super().__init__()
-        self.robot = SysIdRoutineBot()
+        # The robot's subsystems
+        self.drive = Drive()
+        self.shooter = Shooter()
+
+        # The driver's controller
+        self.controller = CommandXboxController(OIConstants.DRIVER_CONTROLLER_PORT)
 
         # Configure default commands and condition bindings on robot startup
-        self.robot.configure_bindings()
+        self.configure_bindings()
 
         self.autonomous_command = None
+
+    def configure_bindings(self) -> None:
+        """Use this method to define bindings between conditions and commands. These are useful for
+        automating robot behaviors based on button and sensor input.
+
+        Should be called in the robot class constructor.
+
+        Event binding methods are available on the :class:`.Trigger` class.
+        """
+
+        # Control the drive with split-stick arcade controls
+        self.drive.set_default_command(
+            self.drive.arcade_drive_command(
+                lambda: -self.controller.get_left_y(),
+                lambda: -self.controller.get_right_x(),
+            )
+        )
+
+        # Bind full set of SysId routine tests to buttons; a complete routine should run each of these
+        # once.
+        # Using bumpers as a modifier and combining it with the buttons so that we can have both sets
+        # of bindings at once
+        self.controller.a().and_(self.controller.right_bumper()).while_true(
+            self.drive.sys_id_quasistatic(SysIdRoutine.Direction.FORWARD)
+        )
+        self.controller.b().and_(self.controller.right_bumper()).while_true(
+            self.drive.sys_id_quasistatic(SysIdRoutine.Direction.REVERSE)
+        )
+        self.controller.x().and_(self.controller.right_bumper()).while_true(
+            self.drive.sys_id_dynamic(SysIdRoutine.Direction.FORWARD)
+        )
+        self.controller.y().and_(self.controller.right_bumper()).while_true(
+            self.drive.sys_id_dynamic(SysIdRoutine.Direction.REVERSE)
+        )
+
+        # Control the shooter wheel with the left trigger
+        self.shooter.set_default_command(
+            self.shooter.run_shooter(self.controller.get_left_trigger)
+        )
+
+        self.controller.a().and_(self.controller.left_bumper()).while_true(
+            self.shooter.sys_id_quasistatic(SysIdRoutine.Direction.FORWARD)
+        )
+        self.controller.b().and_(self.controller.left_bumper()).while_true(
+            self.shooter.sys_id_quasistatic(SysIdRoutine.Direction.REVERSE)
+        )
+        self.controller.x().and_(self.controller.left_bumper()).while_true(
+            self.shooter.sys_id_dynamic(SysIdRoutine.Direction.FORWARD)
+        )
+        self.controller.y().and_(self.controller.left_bumper()).while_true(
+            self.shooter.sys_id_dynamic(SysIdRoutine.Direction.REVERSE)
+        )
 
     @override
     def disabled_start(self) -> None:
@@ -41,10 +102,9 @@ class MyRobot(TimedCommandRobot):
 
     @override
     def autonomous_start(self) -> None:
-        self.autonomous_command = self.robot.get_autonomous_command()
-
-        if self.autonomous_command is not None:
-            CommandScheduler.get_instance().schedule(self.autonomous_command)
+        # Do nothing
+        self.autonomous_command = self.drive.run(lambda: None)
+        CommandScheduler.get_instance().schedule(self.autonomous_command)
 
     @override
     def autonomous_periodic(self) -> None:

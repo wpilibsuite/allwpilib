@@ -737,12 +737,12 @@ This publishes to normalized paths `/arm/pivot/maxSpeed` and `/arm/pivot/maxAcce
 Use `Selectable<Command>` for the same autonomous-chooser workflow teams previously used with `SendableChooser`.
 
 ```java
-public final class RobotContainer {
+public final class Robot extends TimedRobot {
   private final DriveSubsystem m_drive = new DriveSubsystem();
   private final Selectable<Command> m_autoChooser = new Selectable<>();
   private String m_selectedAutoName = "Leave Community";
 
-  public RobotContainer() {
+  public Robot() {
     m_autoChooser.addDefault("Leave Community", new DriveDistance(m_drive, 3.0));
     m_autoChooser.add("Score And Leave", new ScoreAndLeave(m_drive));
     m_autoChooser.add("Do Nothing", Commands.none());
@@ -931,7 +931,7 @@ public void robotPeriodic() {
 private final SendableChooser<Command> m_autoChooser =
     new SendableChooser<>();
 
-public RobotContainer() {
+public Robot() {
   m_autoChooser.setDefaultOption(
       "Leave Community", new DriveDistance(m_drive, 3.0));
   m_autoChooser.addOption("Score And Leave", new ScoreAndLeave(m_drive));
@@ -949,7 +949,7 @@ public Command getAutonomousCommand() {
 private final Selectable<Command> m_autoChooser =
     new Selectable<>();
 
-public RobotContainer() {
+public Robot() {
   m_autoChooser.addDefault(
       "Leave Community", new DriveDistance(m_drive, 3.0));
   m_autoChooser.add("Score And Leave", new ScoreAndLeave(m_drive));
@@ -969,7 +969,7 @@ The same pattern works for non-command options:
 private final SendableChooser<String> m_driveModeChooser =
     new SendableChooser<>();
 
-public RobotContainer() {
+public Robot() {
   m_driveModeChooser.setDefaultOption("Field Relative", "field");
   m_driveModeChooser.addOption("Robot Relative", "robot");
   SmartDashboard.putData("Drive Mode", m_driveModeChooser);
@@ -986,7 +986,7 @@ public void teleopPeriodic() {
 private final Selectable<DriveMode> m_driveMode =
     new Selectable<>();
 
-public RobotContainer() {
+public Robot() {
   m_driveMode.addDefault("Field Relative", DriveMode.FIELD_RELATIVE);
   m_driveMode.add("Robot Relative", DriveMode.ROBOT_RELATIVE);
   Tunables.publish("Drive/mode", m_driveMode);

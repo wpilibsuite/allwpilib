@@ -8,9 +8,22 @@
 from typing import override
 
 import commands2
+import commands2.button
+import telemetry
+import tunables
 import wpilib
 
-from robotcontainer import RobotContainer
+import constants
+
+from commands.complexauto import ComplexAuto
+from commands.drivedistance import DriveDistance
+from commands.defaultdrive import DefaultDrive
+from commands.grabhatch import GrabHatch
+from commands.halvedrivevelocity import HalveDriveVelocity
+from commands.releasehatch import ReleaseHatch
+
+from subsystems.drivesubsystem import DriveSubsystem
+from subsystems.hatchsubsystem import HatchSubsystem
 
 
 class MyRobot(commands2.TimedCommandRobot):
@@ -28,9 +41,46 @@ class MyRobot(commands2.TimedCommandRobot):
         """
         super().__init__()
 
-        # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-        # autonomous chooser on the dashboard.
-        self.container = RobotContainer()
+        # The driver's controller
+        # self.driver_controller = wpilib.XboxController(constants.DRIVER_CONTROLLER_PORT)
+        self.driver_controller = wpilib.Joystick(constants.DRIVER_CONTROLLER_PORT)
+
+        # The robot's subsystems
+        self.drive = DriveSubsystem()
+        self.hatch = HatchSubsystem()
+
+        # Autonomous routines
+
+        # A simple auto routine that drives forward a specified distance, and then stops.
+        self.simple_auto = DriveDistance(
+            constants.AUTO_DRIVE_DISTANCE_INCHES,
+            constants.AUTO_DRIVE_VELOCITY,
+            self.drive,
+        )
+
+        # A complex auto routine that drives forward, drops a hatch, and then drives backward.
+        self.complex_auto = ComplexAuto(self.drive, self.hatch)
+
+        # Chooser
+        self.chooser = tunables.Selectable()
+
+        # Add commands to the autonomous command chooser
+        self.chooser.add_default("Simple Auto", self.simple_auto)
+        self.chooser.add("Complex Auto", self.complex_auto)
+
+        # Put the chooser on the dashboard
+        tunables.publish("Autonomous", self.chooser)
+
+        self.configure_button_bindings()
+
+        # set up default drive command
+        self.drive.set_default_command(
+            DefaultDrive(
+                self.drive,
+                lambda: -self.driver_controller.get_y(),
+                lambda: self.driver_controller.get_x(),
+            )
+        )
 
         # Start recording to data log
         wpilib.DataLogManager.start()
@@ -39,10 +89,30 @@ class MyRobot(commands2.TimedCommandRobot):
         # Change to `false` to not record joystick data.
         wpilib.DriverStation.start_data_log(wpilib.DataLogManager.get_log(), True)
 
+    def configure_button_bindings(self):
+        """
+        Use this method to define your button->command mappings. Buttons can be created by
+        instantiating a wpilib.GenericHID or one of its subclasses (Joystick or XboxController),
+        and then passing it to a JoystickButton.
+        """
+
+        commands2.button.JoystickButton(self.driver_controller, 1).on_true(
+            GrabHatch(self.hatch)
+        )
+
+        commands2.button.JoystickButton(self.driver_controller, 2).on_true(
+            ReleaseHatch(self.hatch)
+        )
+
+        commands2.button.JoystickButton(self.driver_controller, 3).while_true(
+            HalveDriveVelocity(self.drive)
+        )
+
     @override
     def robot_periodic(self) -> None:
         super().robot_periodic()
-        self.container.update_telemetry()
+        telemetry.log("Drivetrain", self.drive)
+        telemetry.log("HatchSubsystem", self.hatch)
 
     @override
     def disabled_start(self) -> None:
@@ -54,11 +124,9 @@ class MyRobot(commands2.TimedCommandRobot):
 
     @override
     def autonomous_start(self) -> None:
-        """This autonomous runs the autonomous command selected by your RobotContainer class."""
-        self.autonomous_command = self.container.get_autonomous_command()
-
-        if self.autonomous_command:
-            self.autonomous_command.schedule()
+        """This autonomous runs the autonomous command selected by your chooser."""
+        self.autonomous_command = self.chooser.get_selected()
+        self.autonomous_command.schedule()
 
     @override
     def autonomous_periodic(self) -> None:

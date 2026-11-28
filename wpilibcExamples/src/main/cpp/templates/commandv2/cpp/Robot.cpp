@@ -4,9 +4,30 @@
 
 #include "Robot.hpp"
 
+#include "commands/Autos.hpp"
+#include "commands/ExampleCommand.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
 
-Robot::Robot() {}
+Robot::Robot() {
+  // Initialize all of your commands and subsystems here
+
+  // Configure the button bindings
+  ConfigureBindings();
+}
+
+void Robot::ConfigureBindings() {
+  // Configure your trigger bindings here
+
+  // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+  wpi::cmd::Trigger([this] {
+    return subsystem.ExampleCondition();
+  }).OnTrue(ExampleCommand(&subsystem).ToPtr());
+
+  // Schedule `ExampleMethodCommand` when the Gamepad's Face Right button is
+  // pressed, cancelling on release.
+  driverController.FaceRight().WhileTrue(subsystem.ExampleMethodCommand());
+}
 
 /**
  * This function is called every 20 ms, no matter the mode. Use
@@ -30,16 +51,12 @@ void Robot::DisabledStart() {}
 void Robot::DisabledPeriodic() {}
 
 /**
- * This autonomous runs the autonomous command selected by your {@link
- * RobotContainer} class.
+ * This autonomous runs your autonomous command.
  */
 void Robot::AutonomousStart() {
-  autonomousCommand = container.GetAutonomousCommand();
-
-  if (autonomousCommand) {
-    wpi::cmd::CommandScheduler::GetInstance().Schedule(
-        autonomousCommand.value());
-  }
+  // An example command will be run in autonomous
+  autonomousCommand = autos::ExampleAuto(&subsystem);
+  wpi::cmd::CommandScheduler::GetInstance().Schedule(autonomousCommand.value());
 }
 
 void Robot::AutonomousPeriodic() {}

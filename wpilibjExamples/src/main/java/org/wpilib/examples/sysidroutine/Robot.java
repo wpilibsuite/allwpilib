@@ -6,6 +6,12 @@ package org.wpilib.examples.sysidroutine;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.button.CommandGamepad;
+import org.wpilib.command2.button.Trigger;
+import org.wpilib.command2.sysid.SysIdRoutine;
+import org.wpilib.examples.sysidroutine.Constants.OIConstants;
+import org.wpilib.examples.sysidroutine.subsystems.Drive;
+import org.wpilib.examples.sysidroutine.subsystems.Shooter;
 import org.wpilib.framework.TimedRobot;
 
 /**
@@ -16,7 +22,12 @@ import org.wpilib.framework.TimedRobot;
 public class Robot extends TimedRobot {
   private Command autonomousCommand;
 
-  private final SysIdRoutineBot robot = new SysIdRoutineBot();
+  // The robot's subsystems
+  private final Drive drive = new Drive();
+  private final Shooter shooter = new Shooter();
+
+  // The driver's controller
+  CommandGamepad driverController = new CommandGamepad(OIConstants.DRIVER_CONTROLLER_PORT);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -24,7 +35,63 @@ public class Robot extends TimedRobot {
    */
   public Robot() {
     // Configure default commands and condition bindings on robot startup
-    robot.configureBindings();
+    configureBindings();
+  }
+
+  /**
+   * Use this method to define bindings between conditions and commands. These are useful for
+   * automating robot behaviors based on button and sensor input.
+   *
+   * <p>Should be called in the robot class constructor.
+   *
+   * <p>Event binding methods are available on the {@link Trigger} class.
+   */
+  public void configureBindings() {
+    // Control the drive with split-stick arcade controls
+    drive.setDefaultCommand(
+        drive.arcadeDriveCommand(
+            () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
+
+    // Bind full set of SysId routine tests to buttons; a complete routine should run each of these
+    // once.
+    // Using bumpers as a modifier and combining it with the buttons so that we can have both sets
+    // of bindings at once
+    driverController
+        .faceDown()
+        .and(driverController.rightBumper())
+        .whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.FORWARD));
+    driverController
+        .faceRight()
+        .and(driverController.rightBumper())
+        .whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.REVERSE));
+    driverController
+        .faceLeft()
+        .and(driverController.rightBumper())
+        .whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.FORWARD));
+    driverController
+        .faceUp()
+        .and(driverController.rightBumper())
+        .whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.REVERSE));
+
+    // Control the shooter wheel with the left trigger
+    shooter.setDefaultCommand(shooter.runShooter(driverController::getLeftTrigger));
+
+    driverController
+        .faceDown()
+        .and(driverController.leftBumper())
+        .whileTrue(shooter.sysIdQuasistatic(SysIdRoutine.Direction.FORWARD));
+    driverController
+        .faceRight()
+        .and(driverController.leftBumper())
+        .whileTrue(shooter.sysIdQuasistatic(SysIdRoutine.Direction.REVERSE));
+    driverController
+        .faceLeft()
+        .and(driverController.leftBumper())
+        .whileTrue(shooter.sysIdDynamic(SysIdRoutine.Direction.FORWARD));
+    driverController
+        .faceUp()
+        .and(driverController.leftBumper())
+        .whileTrue(shooter.sysIdDynamic(SysIdRoutine.Direction.REVERSE));
   }
 
   /**
@@ -52,11 +119,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousStart() {
-    autonomousCommand = robot.getAutonomousCommand();
-
-    if (autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(autonomousCommand);
-    }
+    // Do nothing
+    autonomousCommand = drive.run(() -> {});
+    CommandScheduler.getInstance().schedule(autonomousCommand);
   }
 
   /** This function is called periodically during autonomous. */
