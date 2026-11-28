@@ -6,7 +6,13 @@ package org.wpilib.templates.commandv2;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.button.CommandGamepad;
+import org.wpilib.command2.button.Trigger;
 import org.wpilib.framework.TimedRobot;
+import org.wpilib.templates.commandv2.Constants.OperatorConstants;
+import org.wpilib.templates.commandv2.commands.Autos;
+import org.wpilib.templates.commandv2.commands.ExampleCommand;
+import org.wpilib.templates.commandv2.subsystems.ExampleSubsystem;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -16,16 +22,34 @@ import org.wpilib.framework.TimedRobot;
 public class Robot extends TimedRobot {
   private Command autonomousCommand;
 
-  private final RobotContainer robotContainer;
+  private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
+
+  private final CommandGamepad driverController =
+      new CommandGamepad(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    robotContainer = new RobotContainer();
+    // Configure the trigger bindings
+    configureBindings();
+  }
+
+  /**
+   * Use this method to define your trigger->command mappings. Triggers can be created via the
+   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+   * predicate, or via the named factories in {@link org.wpilib.command2.button.CommandGenericHID}'s
+   * subclasses for {@link CommandGamepad Gamepad} gamepads or {@link
+   * org.wpilib.command2.button.CommandJoystick Flight joysticks}.
+   */
+  private void configureBindings() {
+    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    new Trigger(exampleSubsystem::exampleCondition).onTrue(new ExampleCommand(exampleSubsystem));
+
+    // Schedule `exampleMethodCommand` when the Gamepad's right face button is pressed,
+    // cancelling on release.
+    driverController.faceRight().whileTrue(exampleSubsystem.exampleMethodCommand());
   }
 
   /**
@@ -51,15 +75,13 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {}
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  /** This autonomous runs your autonomous command. */
   @Override
   public void autonomousStart() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
-
+    // An example command will be run in autonomous
+    autonomousCommand = Autos.exampleAuto(exampleSubsystem);
     // schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(autonomousCommand);
-    }
+    CommandScheduler.getInstance().schedule(autonomousCommand);
   }
 
   /** This function is called periodically during autonomous. */
