@@ -4,9 +4,31 @@
 
 #include "Robot.hpp"
 
+#include "commands/TeleopArcadeDrive.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/Commands.hpp"
+#include "wpi/tunables/Tunables.hpp"
 
-Robot::Robot() {}
+Robot::Robot() {
+  // Configure the button bindings
+  ConfigureButtonBindings();
+}
+
+void Robot::ConfigureButtonBindings() {
+  // Also set default commands here
+  drive.SetDefaultCommand(TeleopArcadeDrive(
+      &drive, [this] { return -controller.GetRawAxis(1); },
+      [this] { return -controller.GetRawAxis(2); }));
+
+  // Example of how to use the onboard IO
+  onboardButtonA.OnTrue(wpi::cmd::Print("Button A Pressed"))
+      .OnFalse(wpi::cmd::Print("Button A Released"));
+
+  // Setup chooser options.
+  chooser.AddDefault("Auto Routine Distance", &autoDistance);
+  chooser.Add("Auto Routine Time", &autoTime);
+  wpi::tunables::Publish("Auto Selector", chooser);
+}
 
 /**
  * This function is called every 20 ms, no matter the mode. Use
@@ -30,15 +52,11 @@ void Robot::DisabledStart() {}
 void Robot::DisabledPeriodic() {}
 
 /**
- * This autonomous runs the autonomous command selected by your {@link
- * RobotContainer} class.
+ * This autonomous runs the autonomous command selected by the chooser.
  */
 void Robot::AutonomousStart() {
-  autonomousCommand = container.GetAutonomousCommand();
-
-  if (autonomousCommand != nullptr) {
-    wpi::cmd::CommandScheduler::GetInstance().Schedule(autonomousCommand);
-  }
+  autonomousCommand = chooser.GetSelected();
+  wpi::cmd::CommandScheduler::GetInstance().Schedule(autonomousCommand);
 }
 
 void Robot::AutonomousPeriodic() {}
@@ -50,7 +68,6 @@ void Robot::AutonomousEnd() {
   // this line or comment it out.
   if (autonomousCommand != nullptr) {
     autonomousCommand->Cancel();
-    autonomousCommand = nullptr;
   }
 }
 

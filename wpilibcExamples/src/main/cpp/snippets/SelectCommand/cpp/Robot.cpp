@@ -5,9 +5,22 @@
 #include "Robot.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/tunables/Tunables.hpp"
 
-Robot::Robot() {}
+Robot::Robot() {
+  chooser.AddDefault("ONE", CommandSelector::ONE);
+  chooser.Add("TWO", CommandSelector::TWO);
+  chooser.Add("THREE", CommandSelector::THREE);
 
+  wpi::tunables::Publish("Auto Chooser", chooser);
+
+  // Configure the button bindings
+  ConfigureButtonBindings();
+}
+
+void Robot::ConfigureButtonBindings() {
+  // Configure your button bindings here
+}
 /**
  * This function is called every 20 ms, no matter the mode. Use
  * this for items like diagnostics that you want to run during disabled,
@@ -30,15 +43,10 @@ void Robot::DisabledStart() {}
 void Robot::DisabledPeriodic() {}
 
 /**
- * This autonomous runs the autonomous command selected by your {@link
- * RobotContainer} class.
+ * This autonomous runs your selected autonomous command.
  */
 void Robot::AutonomousStart() {
-  autonomousCommand = container.GetAutonomousCommand();
-
-  if (autonomousCommand != nullptr) {
-    wpi::cmd::CommandScheduler::GetInstance().Schedule(autonomousCommand);
-  }
+  wpi::cmd::CommandScheduler::GetInstance().Schedule(autonomousCommand);
 }
 
 void Robot::AutonomousPeriodic() {}
@@ -48,10 +56,7 @@ void Robot::AutonomousEnd() {
   // autonomous mode ends. If you want the autonomous to
   // continue until interrupted by another command, remove
   // this line or comment it out.
-  if (autonomousCommand != nullptr) {
-    autonomousCommand->Cancel();
-    autonomousCommand = nullptr;
-  }
+  autonomousCommand.Cancel();
 }
 
 void Robot::TeleopStart() {}

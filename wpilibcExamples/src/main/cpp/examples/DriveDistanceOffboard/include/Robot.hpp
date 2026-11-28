@@ -6,8 +6,12 @@
 
 #include <optional>
 
-#include "RobotContainer.hpp"
+#include "Constants.hpp"
+#include "subsystems/DriveSubsystem.hpp"
 #include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/Commands.hpp"
+#include "wpi/commands2/button/CommandGamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 
 class Robot : public wpi::TimedRobot {
@@ -24,9 +28,21 @@ class Robot : public wpi::TimedRobot {
   void UtilityPeriodic() override;
 
  private:
+  void ConfigureButtonBindings();
   // Have it null by default so that if testing teleop it
   // doesn't have undefined behavior and potentially crash.
   std::optional<wpi::cmd::CommandPtr> autonomousCommand;
 
-  RobotContainer container;
+  // The driver's controller
+  wpi::cmd::CommandGamepad driverController{
+      OIConstants::DRIVER_CONTROLLER_PORT};
+
+  // The robot's subsystems
+  DriveSubsystem drive;
+
+  // Robot-owned commands
+  wpi::cmd::CommandPtr driveHalfVelocity =
+      wpi::cmd::RunOnce([this] { drive.SetMaxOutput(0.5); }, {});
+  wpi::cmd::CommandPtr driveFullVelocity =
+      wpi::cmd::RunOnce([this] { drive.SetMaxOutput(1); }, {});
 };

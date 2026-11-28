@@ -4,17 +4,57 @@
 
 #include "Robot.hpp"
 
+#include "commands/DefaultDrive.hpp"
+#include "commands/GrabHatch.hpp"
+#include "commands/HalveDriveVelocity.hpp"
+#include "commands/ReleaseHatch.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/button/GamepadButton.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/system/DataLogManager.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
+#include "wpi/tunables/Tunables.hpp"
 
 Robot::Robot() {
+  // Initialize all of your commands and subsystems here
+
+  // Add commands to the autonomous command chooser
+  chooser.AddDefault("Simple Auto", &simpleAuto);
+  chooser.Add("Complex Auto", &complexAuto);
+
+  // Put the chooser on the dashboard
+  wpi::tunables::Publish("Autonomous", chooser);
+
+  // Configure the button bindings
+  ConfigureButtonBindings();
+
+  // Set up default drive command
+  drive.SetDefaultCommand(DefaultDrive(
+      &drive, [this] { return -driverController.GetLeftY(); },
+      [this] { return -driverController.GetRightX(); }));
   // Start recording to data log
   wpi::DataLogManager::Start();
 
   // Record DS control and joystick data.
   // Change to `false` to not record joystick data.
   wpi::DriverStation::StartDataLog(wpi::DataLogManager::GetLog(), true);
+}
+
+void Robot::ConfigureButtonBindings() {
+  // Configure your button bindings here
+
+  // NOTE: since we're binding a CommandPtr, command ownership here is moved to
+  // the scheduler thus, no memory leaks!
+
+  // Grab the hatch when the 'Face Down' button is pressed.
+  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::FACE_DOWN)
+      .OnTrue(GrabHatch(&hatch).ToPtr());
+  // Release the hatch when the 'Face Right' button is pressed.
+  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::FACE_RIGHT)
+      .OnTrue(ReleaseHatch(&hatch).ToPtr());
+  // While holding the bumper button, drive at half velocity
+  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::RIGHT_BUMPER)
+      .WhileTrue(HalveDriveVelocity(&drive).ToPtr());
 }
 
 /**
@@ -27,7 +67,9 @@ Robot::Robot() {
  */
 void Robot::RobotPeriodic() {
   wpi::cmd::CommandScheduler::GetInstance().Run();
-  container.UpdateTelemetry();
+  // Put subsystems to dashboard.
+  wpi::telemetry::Log("Drivetrain", drive);
+  wpi::telemetry::Log("HatchSubsystem", hatch);
 }
 
 /**
@@ -40,15 +82,12 @@ void Robot::DisabledStart() {}
 void Robot::DisabledPeriodic() {}
 
 /**
- * This autonomous runs the autonomous command selected by your {@link
- * RobotContainer} class.
+ * This autonomous runs the autonomous command selected by your chooser.
  */
 void Robot::AutonomousStart() {
-  autonomousCommand = container.GetAutonomousCommand();
-
-  if (autonomousCommand != nullptr) {
-    wpi::cmd::CommandScheduler::GetInstance().Schedule(autonomousCommand);
-  }
+  // Runs the chosen command in autonomous
+  autonomousCommand = chooser.GetSelected();
+  wpi::cmd::CommandScheduler::GetInstance().Schedule(autonomousCommand);
 }
 
 void Robot::AutonomousPeriodic() {}
@@ -60,7 +99,6 @@ void Robot::AutonomousEnd() {
   // this line or comment it out.
   if (autonomousCommand != nullptr) {
     autonomousCommand->Cancel();
-    autonomousCommand = nullptr;
   }
 }
 

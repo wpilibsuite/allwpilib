@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include "RobotContainer.hpp"
 #include "wpi/commands2/Command.hpp"
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/Commands.hpp"
 #include "wpi/framework/TimedRobot.hpp"
+#include "wpi/tunables/Selectable.hpp"
 
 class Robot : public wpi::TimedRobot {
  public:
@@ -22,9 +24,22 @@ class Robot : public wpi::TimedRobot {
   void UtilityPeriodic() override;
 
  private:
-  // Have it null by default so that if testing teleop it
-  // doesn't have undefined behavior and potentially crash.
-  wpi::cmd::Command* autonomousCommand = nullptr;
+  void ConfigureButtonBindings();
+  // An example selectcommand.  Will select from the three commands based on the
+  // value returned by the selector method at runtime.  Note that selectcommand
+  // takes a generic type, so the selector does not have to be an enum; it could
+  // be any desired type (string, integer, boolean, double...)
+  wpi::cmd::CommandPtr autonomousCommand = wpi::cmd::Select<CommandSelector>(
+      [this] { return chooser.GetSelected(); },
+      // Maps selector values to commands
+      std::pair{ONE, wpi::cmd::Print("Command one was selected!")},
+      std::pair{TWO, wpi::cmd::Print("Command two was selected!")},
+      std::pair{THREE, wpi::cmd::Print("Command three was selected!")});
 
-  RobotContainer container;
+  // The enum used as keys for selecting the command to run.
+  enum CommandSelector { ONE, TWO, THREE };
+
+  // An example of how command selector may be used with
+  // wpi::tunables::Selectable
+  wpi::tunables::Selectable<CommandSelector> chooser;
 };

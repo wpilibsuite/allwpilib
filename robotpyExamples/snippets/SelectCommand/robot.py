@@ -7,9 +7,8 @@
 
 from typing import override
 
+import enum
 import commands2
-
-from robotcontainer import RobotContainer
 
 
 class MyRobot(commands2.TimedCommandRobot):
@@ -18,7 +17,13 @@ class MyRobot(commands2.TimedCommandRobot):
     has an implementation of robot_periodic which runs the scheduler for you
     """
 
-    autonomous_command: commands2.Command | None = None
+    # The enum used as keys for selecting the command to run.
+    class CommandSelector(enum.Enum):
+        ONE = enum.auto()
+        TWO = enum.auto()
+        THREE = enum.auto()
+
+    autonomous_command: commands2.Command
 
     def __init__(self) -> None:
         """
@@ -27,9 +32,42 @@ class MyRobot(commands2.TimedCommandRobot):
         """
 
         super().__init__()
-        # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-        # autonomous chooser on the dashboard.
-        self.container = RobotContainer()
+        # An example selectcommand. Will select from the three commands based on the value returned
+        # by the selector method at runtime. Note that selectcommand takes a generic type, so the
+        # selector does not have to be an enum; it could be any desired type (string, integer,
+        # boolean, double...)
+        self.autonomous_command = commands2.SelectCommand(
+            # Maps selector values to commands
+            {
+                self.CommandSelector.ONE: commands2.PrintCommand(
+                    "Command one was selected!"
+                ),
+                self.CommandSelector.TWO: commands2.PrintCommand(
+                    "Command two was selected!"
+                ),
+                self.CommandSelector.THREE: commands2.PrintCommand(
+                    "Command three was selected!"
+                ),
+            },
+            self.select,
+        )
+
+        # Configure the button bindings
+        self.configure_button_bindings()
+
+    def configure_button_bindings(self) -> None:
+        """Use this method to define your button->command mappings. Buttons can be created by
+        instantiating a {GenericHID} or one of its subclasses
+        ({org.wpilib.driverstation.Joystick} or {XboxController}), and then calling passing it to a
+        {org.wpilib.command2.button.JoystickButton}.
+        """
+
+    # An example selector method for the selectcommand.
+    def select(self) -> CommandSelector:
+        """Returns the selector that will select which command to run.
+        Can base this choice on logical conditions evaluated at runtime.
+        """
+        return self.CommandSelector.ONE
 
     @override
     def disabled_start(self) -> None:
@@ -43,11 +81,8 @@ class MyRobot(commands2.TimedCommandRobot):
 
     @override
     def autonomous_start(self) -> None:
-        """This autonomous runs the autonomous command selected by your RobotContainer class."""
-        self.autonomous_command = self.container.get_autonomous_command()
-
-        if self.autonomous_command:
-            self.autonomous_command.schedule()
+        """This autonomous runs your selected autonomous command."""
+        self.autonomous_command.schedule()
 
     @override
     def autonomous_periodic(self) -> None:
@@ -60,8 +95,7 @@ class MyRobot(commands2.TimedCommandRobot):
         # teleop starts running. If you want the autonomous to
         # continue until interrupted by another command, remove
         # this line or comment it out.
-        if self.autonomous_command:
-            self.autonomous_command.cancel()
+        self.autonomous_command.cancel()
 
     @override
     def teleop_periodic(self) -> None:

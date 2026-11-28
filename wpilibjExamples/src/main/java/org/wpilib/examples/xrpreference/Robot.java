@@ -6,7 +6,22 @@ package org.wpilib.examples.xrpreference;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.InstantCommand;
+import org.wpilib.command2.PrintCommand;
+import org.wpilib.command2.button.JoystickButton;
+import org.wpilib.command2.button.Trigger;
+import org.wpilib.driverstation.Gamepad;
+import org.wpilib.driverstation.GenericHID;
+import org.wpilib.driverstation.Joystick;
+import org.wpilib.examples.xrpreference.commands.ArcadeDrive;
+import org.wpilib.examples.xrpreference.commands.AutonomousDistance;
+import org.wpilib.examples.xrpreference.commands.AutonomousTime;
+import org.wpilib.examples.xrpreference.subsystems.Arm;
+import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 import org.wpilib.framework.TimedRobot;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
+import org.wpilib.xrp.XRPOnBoardIO;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -16,16 +31,58 @@ import org.wpilib.framework.TimedRobot;
 public class Robot extends TimedRobot {
   private Command autonomousCommand;
 
-  private final RobotContainer robotContainer;
+  private final Drivetrain drivetrain = new Drivetrain();
+  private final XRPOnBoardIO onboardIO = new XRPOnBoardIO();
+  private final Arm arm = new Arm();
+
+  // Assumes a gamepad plugged into channel 0
+  private final Joystick controller = new Joystick(0);
+
+  // Create chooser for autonomous routines
+  private final Selectable<Command> chooser = new Selectable<>();
 
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    robotContainer = new RobotContainer();
+    // Configure the button bindings
+    configureButtonBindings();
+  }
+
+  /**
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * org.wpilib.driverstation.Joystick} or {@link Gamepad}), and then passing it to a {@link
+   * org.wpilib.command2.button.JoystickButton}.
+   */
+  private void configureButtonBindings() {
+    // Default command is arcade drive. This will run unless another command
+    // is scheduled over it.
+    drivetrain.setDefaultCommand(
+        new ArcadeDrive(
+            drivetrain, () -> -controller.getRawAxis(1), () -> -controller.getRawAxis(2)));
+
+    // Example of how to use the onboard IO
+    Trigger userButton = new Trigger(onboardIO::getUserButtonPressed);
+    userButton
+        .onTrue(new PrintCommand("USER Button Pressed"))
+        .onFalse(new PrintCommand("USER Button Released"));
+
+    JoystickButton joystickAButton = new JoystickButton(controller, 1);
+    joystickAButton
+        .onTrue(new InstantCommand(() -> arm.setAngle(45.0), arm))
+        .onFalse(new InstantCommand(() -> arm.setAngle(0.0), arm));
+
+    JoystickButton joystickBButton = new JoystickButton(controller, 2);
+    joystickBButton
+        .onTrue(new InstantCommand(() -> arm.setAngle(90.0), arm))
+        .onFalse(new InstantCommand(() -> arm.setAngle(0.0), arm));
+
+    // Setup SmartDashboard options
+    chooser.addDefault("Auto Routine Distance", new AutonomousDistance(drivetrain));
+    chooser.add("Auto Routine Time", new AutonomousTime(drivetrain));
+    Tunables.publish("Auto Chooser", chooser);
   }
 
   /**
@@ -51,15 +108,12 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {}
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  /** This autonomous runs the autonomous command selected by the {@link #chooser}. */
   @Override
   public void autonomousStart() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
-
+    autonomousCommand = chooser.getSelected();
     // schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(autonomousCommand);
-    }
+    CommandScheduler.getInstance().schedule(autonomousCommand);
   }
 
   /** This function is called periodically during autonomous. */

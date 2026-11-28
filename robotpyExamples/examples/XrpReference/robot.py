@@ -41,8 +41,17 @@
 from typing import override
 
 import commands2
+import commands2.button
+import tunables
+import wpilib
+import xrp
 
-from robotcontainer import RobotContainer
+from commands.arcadedrive import ArcadeDrive
+from commands.autonomousdistance import AutonomousDistance
+from commands.autonomoustime import AutonomousTime
+
+from subsystems.arm import Arm
+from subsystems.drivetrain import Drivetrain
 
 
 class MyRobot(commands2.TimedCommandRobot):
@@ -60,9 +69,64 @@ class MyRobot(commands2.TimedCommandRobot):
         """
         super().__init__()
 
-        # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-        # autonomous chooser on the dashboard.
-        self.container = RobotContainer()
+        self.drivetrain = Drivetrain()
+        self.onboard_io = xrp.XRPOnBoardIO()
+        self.arm = Arm()
+
+        # Assumes a gamepad plugged into channnel 0
+        self.controller = wpilib.Joystick(0)
+
+        # Create a tunable selector for autonomous routines.
+        self.chooser = tunables.Selectable()
+
+        self._configure_button_bindings()
+
+    def _configure_button_bindings(self):
+        """Use this method to define your button->command mappings. Buttons can be created by
+        instantiating a :class:`.GenericHID` or one of its subclasses (:class`.Joystick or
+        :class:`.XboxController`), and then passing it to a :class:`.JoystickButton`.
+        """
+
+        # Default command is arcade drive. This will run unless another command
+        # is scheduled over it
+        self.drivetrain.set_default_command(
+            ArcadeDrive(
+                self.drivetrain,
+                lambda: -self.controller.get_raw_axis(1),
+                lambda: -self.controller.get_raw_axis(2),
+            )
+        )
+
+        # Example of how to use the onboard IO
+        onboard_button_a = commands2.button.Trigger(
+            self.onboard_io.get_user_button_pressed
+        )
+        onboard_button_a.on_true(
+            commands2.PrintCommand("USER Button Pressed")
+        ).on_false(commands2.PrintCommand("USER Button Released"))
+
+        joystick_a_button = commands2.button.JoystickButton(self.controller, 1)
+        joystick_a_button.on_true(
+            commands2.InstantCommand(lambda: self.arm.set_angle(45.0), self.arm)
+        )
+        joystick_a_button.on_false(
+            commands2.InstantCommand(lambda: self.arm.set_angle(0.0), self.arm)
+        )
+
+        joystick_b_button = commands2.button.JoystickButton(self.controller, 2)
+        joystick_b_button.on_true(
+            commands2.InstantCommand(lambda: self.arm.set_angle(90.0), self.arm)
+        )
+        joystick_b_button.on_false(
+            commands2.InstantCommand(lambda: self.arm.set_angle(0.0), self.arm)
+        )
+
+        # Set up autonomous options.
+        self.chooser.add_default(
+            "Auto Routine Distance", AutonomousDistance(self.drivetrain)
+        )
+        self.chooser.add("Auto Routine Time", AutonomousTime(self.drivetrain))
+        tunables.publish("Autonomous", self.chooser)
 
     @override
     def disabled_start(self) -> None:
@@ -74,11 +138,9 @@ class MyRobot(commands2.TimedCommandRobot):
 
     @override
     def autonomous_start(self) -> None:
-        """This autonomous runs the autonomous command selected by your RobotContainer class."""
-        self.autonomous_command = self.container.get_autonomous_command()
-
-        if self.autonomous_command:
-            self.autonomous_command.schedule()
+        """This autonomous runs the autonomous command selected by the chooser."""
+        self.autonomous_command = self.chooser.get_selected()
+        self.autonomous_command.schedule()
 
     @override
     def autonomous_periodic(self) -> None:
